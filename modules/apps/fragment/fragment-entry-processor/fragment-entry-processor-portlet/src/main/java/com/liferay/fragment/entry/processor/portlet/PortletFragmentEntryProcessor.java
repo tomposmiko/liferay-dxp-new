@@ -20,6 +20,7 @@ import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessor;
 import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -45,7 +46,6 @@ import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.configuration.kernel.util.PortletConfigurationApplicationType;
@@ -359,8 +359,6 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 		Group group = _groupLocalService.getGroup(groupId);
 
-		long defaultPlid = _portal.getControlPanelPlid(group.getCompanyId());
-
 		String portletId = PortletIdCodec.encode(
 			PortletIdCodec.decodePortletName(portletName),
 			PortletIdCodec.decodeUserId(portletName), instanceId);
@@ -378,8 +376,9 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 			jxPortletPreferences =
 				PortletPreferencesFactoryUtil.getLayoutPortletSetup(
 					group.getCompanyId(), PortletKeys.PREFS_OWNER_ID_DEFAULT,
-					PortletKeys.PREFS_OWNER_TYPE_LAYOUT, defaultPlid, portletId,
-					defaultPreferences);
+					PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
+					_portal.getControlPanelPlid(group.getCompanyId()),
+					portletId, defaultPreferences);
 
 			_updateLayoutPortletSetup(
 				portletPreferencesList, jxPortletPreferences);
@@ -395,7 +394,8 @@ public class PortletFragmentEntryProcessor implements FragmentEntryProcessor {
 
 	private void _updateLayoutPortletSetup(
 		List<com.liferay.portal.kernel.model.PortletPreferences>
-			portletPreferencesList, PortletPreferences jxPortletPreferences) {
+			portletPreferencesList,
+		PortletPreferences jxPortletPreferences) {
 
 		String portletPreferencesXml = PortletPreferencesFactoryUtil.toXML(
 			jxPortletPreferences);

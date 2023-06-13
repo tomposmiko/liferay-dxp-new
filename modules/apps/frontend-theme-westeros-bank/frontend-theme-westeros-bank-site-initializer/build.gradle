@@ -1,14 +1,12 @@
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
-
 dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.dynamic.data.mapping.api", version: "4.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.fragment.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.journal.api", version: "3.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.layout.admin.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.layout.page.template.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.site.api", version: "3.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.site.navigation.api", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.site.navigation.api", version: "2.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "3.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.util.java", version: "3.0.0"

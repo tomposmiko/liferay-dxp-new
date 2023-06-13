@@ -56,7 +56,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.system=true",
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=Asset Categories Selector",
-		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + AssetCategoriesSelectorPortletKeys.ASSET_CATEGORIES_SELECTOR,
 		"javax.portlet.resource-bundle=content.Language",
@@ -117,14 +117,15 @@ public class AssetCategoriesSelectorPortlet extends MVCPortlet {
 
 		long categoryId = ParamUtil.getLong(portletRequest, "categoryId");
 		long vocabularyId = ParamUtil.getLong(portletRequest, "vocabularyId");
-		int start = ParamUtil.getInteger(
-			portletRequest, "start", QueryUtil.ALL_POS);
-		int end = ParamUtil.getInteger(
-			portletRequest, "end", QueryUtil.ALL_POS);
 
 		if ((categoryId <= 0) && (vocabularyId <= 0)) {
 			return Collections.emptyList();
 		}
+
+		int start = ParamUtil.getInteger(
+			portletRequest, "start", QueryUtil.ALL_POS);
+		int end = ParamUtil.getInteger(
+			portletRequest, "end", QueryUtil.ALL_POS);
 
 		if (categoryId > 0) {
 			return _assetCategoryService.getChildCategories(

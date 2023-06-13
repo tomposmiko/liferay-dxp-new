@@ -113,18 +113,16 @@ public class UpgradePortletId extends UpgradeProcess {
 
 	protected String[][] getRenamePortletIdsArray() {
 		return new String[][] {
-			new String[] {
-				"109", "1_WAR_webformportlet"
-			},
-			new String[] {
+			{"109", "1_WAR_webformportlet"},
+			{
 				"google_adsense_portlet_WAR_googleadsenseportlet",
 				"1_WAR_googleadsenseportlet"
 			},
-			new String[] {
+			{
 				"google_gadget_portlet_WAR_googlegadgetportlet",
 				"1_WAR_googlegadgetportlet"
 			},
-			new String[] {
+			{
 				"google_maps_portlet_WAR_googlemapsportlet",
 				"1_WAR_googlemapsportlet"
 			}
@@ -188,6 +186,7 @@ public class UpgradePortletId extends UpgradeProcess {
 
 			while (rs.next()) {
 				long portletPreferencesId = rs.getLong("portletPreferencesId");
+
 				String portletId = rs.getString("portletId");
 
 				String newPortletId = StringUtil.replace(
@@ -279,6 +278,7 @@ public class UpgradePortletId extends UpgradeProcess {
 
 			while (rs.next()) {
 				long layoutRevisionId = rs.getLong("layoutRevisionId");
+
 				String typeSettings = rs.getString("typeSettings");
 
 				String newTypeSettings = getNewTypeSettings(
@@ -304,6 +304,7 @@ public class UpgradePortletId extends UpgradeProcess {
 
 			while (rs.next()) {
 				long plid = rs.getLong("plid");
+
 				String typeSettings = rs.getString("typeSettings");
 
 				String newTypeSettings = getNewTypeSettings(

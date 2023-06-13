@@ -18,6 +18,7 @@ import com.liferay.message.boards.exception.BannedUserException;
 import com.liferay.message.boards.model.MBBan;
 import com.liferay.message.boards.service.base.MBBanLocalServiceBaseImpl;
 import com.liferay.message.boards.util.MBUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -28,7 +29,6 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.spring.extender.service.ServiceReference;
 import com.liferay.portal.util.PropsValues;
 
@@ -45,23 +45,26 @@ public class MBBanLocalServiceImpl extends MBBanLocalServiceBaseImpl {
 			long userId, long banUserId, ServiceContext serviceContext)
 		throws PortalException {
 
-		User user = _userLocalService.getUser(userId);
 		long groupId = serviceContext.getScopeGroupId();
-
-		long banId = counterLocalService.increment();
 
 		MBBan ban = mbBanPersistence.fetchByG_B(groupId, banUserId);
 
 		if (ban == null) {
 			Date now = new Date();
 
+			long banId = counterLocalService.increment();
+
 			ban = mbBanPersistence.create(banId);
 
 			ban.setUuid(serviceContext.getUuid());
 			ban.setGroupId(groupId);
+
+			User user = _userLocalService.getUser(userId);
+
 			ban.setCompanyId(user.getCompanyId());
 			ban.setUserId(user.getUserId());
 			ban.setUserName(user.getFullName());
+
 			ban.setCreateDate(serviceContext.getCreateDate(now));
 			ban.setModifiedDate(serviceContext.getModifiedDate(now));
 			ban.setBanUserId(banUserId);
@@ -142,9 +145,8 @@ public class MBBanLocalServiceImpl extends MBBanLocalServiceBaseImpl {
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						StringBundler.concat(
-							"Auto expiring ban ",
-							String.valueOf(ban.getBanId()), " on user ",
-							String.valueOf(ban.getBanUserId())));
+							"Auto expiring ban ", ban.getBanId(), " on user ",
+							ban.getBanUserId()));
 				}
 
 				mbBanPersistence.remove(ban);
@@ -167,9 +169,8 @@ public class MBBanLocalServiceImpl extends MBBanLocalServiceBaseImpl {
 		if (mbBanPersistence.fetchByG_B(groupId, banUserId) == null) {
 			return false;
 		}
-		else {
-			return true;
-		}
+
+		return true;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

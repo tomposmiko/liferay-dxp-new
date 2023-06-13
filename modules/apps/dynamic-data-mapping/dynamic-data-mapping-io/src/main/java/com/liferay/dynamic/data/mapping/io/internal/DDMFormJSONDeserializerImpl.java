@@ -49,7 +49,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcellus Tavares
  */
-@Component(immediate = true)
+@Component(immediate = true, service = DDMFormJSONDeserializer.class)
 public class DDMFormJSONDeserializerImpl implements DDMFormJSONDeserializer {
 
 	@Override
@@ -132,9 +132,8 @@ public class DDMFormJSONDeserializerImpl implements DDMFormJSONDeserializer {
 			return deserializeDDMFormFieldValidation(
 				serializedDDMFormFieldProperty);
 		}
-		else {
-			return serializedDDMFormFieldProperty;
-		}
+
+		return serializedDDMFormFieldProperty;
 	}
 
 	protected DDMFormFieldValidation deserializeDDMFormFieldValidation(

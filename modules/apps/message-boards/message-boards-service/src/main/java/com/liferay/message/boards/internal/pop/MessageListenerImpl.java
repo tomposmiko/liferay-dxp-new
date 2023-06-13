@@ -24,6 +24,7 @@ import com.liferay.message.boards.service.MBCategoryLocalService;
 import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.message.boards.service.MBMessageService;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
@@ -42,7 +43,6 @@ import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.security.permission.PermissionCheckerUtil;
 import com.liferay.portal.util.PropsValues;
@@ -86,6 +86,7 @@ public class MessageListenerImpl implements MessageListener {
 			}
 
 			Company company = getCompany(messageIdString);
+
 			long categoryId = MBMailUtil.getCategoryId(messageIdString);
 
 			MBCategory category = _mbCategoryLocalService.getCategory(
@@ -164,6 +165,7 @@ public class MessageListenerImpl implements MessageListener {
 			}
 
 			long groupId = 0;
+
 			long categoryId = MBMailUtil.getCategoryId(messageIdString);
 
 			MBCategory category = _mbCategoryLocalService.fetchMBCategory(
@@ -297,9 +299,8 @@ public class MessageListenerImpl implements MessageListener {
 		if (PropsValues.POP_SERVER_SUBDOMAIN.length() > 0) {
 			return recipient;
 		}
-		else {
-			return MBMailUtil.getParentMessageIdString(message);
-		}
+
+		return MBMailUtil.getParentMessageIdString(message);
 	}
 
 	protected boolean isAutoReply(Message message) throws MessagingException {

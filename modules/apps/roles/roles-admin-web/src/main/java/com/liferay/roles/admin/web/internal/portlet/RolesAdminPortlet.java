@@ -101,7 +101,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=Roles Admin",
 		"javax.portlet.expiration-cache=0",
-		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + RolesAdminPortletKeys.ROLES_ADMIN,
 		"javax.portlet.resource-bundle=content.Language",
@@ -187,8 +187,6 @@ public class RolesAdminPortlet extends MVCPortlet {
 			actionRequest, "title");
 		Map<Locale, String> descriptionMap =
 			LocalizationUtil.getLocalizationMap(actionRequest, "description");
-		int type = ParamUtil.getInteger(
-			actionRequest, "type", RoleConstants.TYPE_REGULAR);
 		String subtype = ParamUtil.getString(actionRequest, "subtype");
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			Role.class.getName(), actionRequest);
@@ -196,6 +194,9 @@ public class RolesAdminPortlet extends MVCPortlet {
 		if (roleId <= 0) {
 
 			// Add role
+
+			int type = ParamUtil.getInteger(
+				actionRequest, "type", RoleConstants.TYPE_REGULAR);
 
 			Role role = _roleService.addRole(
 				null, 0, name, titleMap, descriptionMap, type, subtype,
@@ -220,10 +221,11 @@ public class RolesAdminPortlet extends MVCPortlet {
 			// Update role
 
 			if (name.equals(RoleConstants.SITE_ADMINISTRATOR)) {
-				Role role = _roleLocalService.getRole(roleId);
 				ThemeDisplay themeDisplay =
 					(ThemeDisplay)actionRequest.getAttribute(
 						WebKeys.THEME_DISPLAY);
+
+				Role role = _roleLocalService.getRole(roleId);
 				boolean manageSubgroups = ParamUtil.getBoolean(
 					actionRequest, "manageSubgroups");
 
@@ -357,6 +359,7 @@ public class RolesAdminPortlet extends MVCPortlet {
 				resourceActionsMap.entrySet()) {
 
 			String selResource = entry.getKey();
+
 			List<String> actions = entry.getValue();
 
 			actions = ListUtil.sort(

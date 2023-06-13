@@ -56,6 +56,11 @@ public class RandomTestUtil {
 		return _random.nextBoolean();
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 * TestDataConstants#TEST_BYTE_ARRAY}
+	 */
+	@Deprecated
 	@SafeVarargs
 	public static byte[] randomBytes(
 		int size, RandomizerBumper<byte[]>... randomizerBumpers) {
@@ -85,6 +90,11 @@ public class RandomTestUtil {
 				" tries"));
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 * TestDataConstants#TEST_BYTE_ARRAY}
+	 */
+	@Deprecated
 	@SafeVarargs
 	public static byte[] randomBytes(
 		RandomizerBumper<byte[]>... randomizerBumpers) {
@@ -101,11 +111,14 @@ public class RandomTestUtil {
 		else if (value == 0) {
 			return randomDouble();
 		}
-		else {
-			return -value;
-		}
+
+		return -value;
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	@SafeVarargs
 	public static InputStream randomInputStream(
 		RandomizerBumper<byte[]>... randomizerBumpers) {
@@ -155,9 +168,8 @@ public class RandomTestUtil {
 		else if (value == 0) {
 			return randomLong();
 		}
-		else {
-			return -value;
-		}
+
+		return -value;
 	}
 
 	@SafeVarargs

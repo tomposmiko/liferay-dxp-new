@@ -17,7 +17,7 @@ package com.liferay.apio.architect.test.util.representor;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
-import com.liferay.apio.architect.impl.internal.representor.RepresentorImpl;
+import com.liferay.apio.architect.internal.representor.RepresentorImpl;
 import com.liferay.apio.architect.representor.Representor;
 import com.liferay.apio.architect.test.util.identifier.FirstEmbeddedId;
 import com.liferay.apio.architect.test.util.identifier.RootModelId;
@@ -27,6 +27,7 @@ import com.liferay.apio.architect.test.util.model.FirstEmbeddedModel;
 import com.liferay.apio.architect.test.util.model.RootModel;
 import com.liferay.apio.architect.test.util.model.SecondEmbeddedModel;
 import com.liferay.apio.architect.test.util.model.ThirdEmbeddedModel;
+import com.liferay.apio.architect.test.util.writer.MockWriterUtil;
 
 import java.util.Date;
 
@@ -52,7 +53,8 @@ public class MockRepresentorCreator {
 		createFirstEmbeddedModelRepresentor() {
 
 		Representor.Builder<FirstEmbeddedModel, String> builder =
-			new RepresentorImpl.BuilderImpl<>(FirstEmbeddedId.class);
+			new RepresentorImpl.BuilderImpl<>(
+				FirstEmbeddedId.class, MockWriterUtil::getIdentifierName);
 
 		return builder.types(
 			"Type"
@@ -73,6 +75,18 @@ public class MockRepresentorCreator {
 		).addLocalizedStringByLanguage(
 			"localizedString",
 			(firstEmbeddedModel, acceptLanguage) -> "Translated"
+		).addNestedList(
+			"nestedList",
+			__ -> asList((SecondEmbeddedModel)() -> "id 1", () -> "id 2"),
+			nestedListBuilder -> nestedListBuilder.types(
+				"Type 7"
+			).addNumber(
+				"number1", __ -> 2018
+			).addString(
+				"string1", SecondEmbeddedModel::getId
+			).addString(
+				"string2", __ -> "string3"
+			).build()
 		).addNumber(
 			"number", __ -> 42
 		).addNumberList(
@@ -96,12 +110,15 @@ public class MockRepresentorCreator {
 		boolean activateNulls) {
 
 		Representor.Builder<RootModel, String> builder =
-			new RepresentorImpl.BuilderImpl<>(RootModelId.class);
+			new RepresentorImpl.BuilderImpl<>(
+				RootModelId.class, MockWriterUtil::getIdentifierName);
 
 		Representor.FirstStep<RootModel> firstStepBuilder = builder.types(
 			"Type 1", "Type 2"
 		).identifier(
 			RootModel::getId
+		).addApplicationRelativeURL(
+			"applicationRelativeURL1", __ -> "/first"
 		).addBinary(
 			"binary1", __ -> null
 		).addBinary(
@@ -134,6 +151,34 @@ public class MockRepresentorCreator {
 			"localizedString1", (model, acceptLanguage) -> "Translated 1"
 		).addLocalizedStringByLanguage(
 			"localizedString2", (model, acceptLanguage) -> "Translated 2"
+		).addNestedList(
+			"nestedList",
+			__ -> asList((FirstEmbeddedModel)() -> "id 1", () -> "id 2"),
+			nestedListBuilder -> nestedListBuilder.types(
+				"Type 6"
+			).addNested(
+				"nested4", __ -> (ThirdEmbeddedModel)() -> "id 4",
+				thirdNestedBuilder -> thirdNestedBuilder.types(
+					"Type 7"
+				).addString(
+					"string1", ThirdEmbeddedModel::getId
+				).addNestedList(
+					"nestedList",
+					__ -> asList(
+						(FirstEmbeddedModel)() -> "id 1", () -> "id 2"),
+					nestedListBuilder1 -> nestedListBuilder1.types(
+						"Type 8"
+					).addNumber(
+						"number1", __ -> 2017
+					).build()
+				).build()
+			).addNumber(
+				"number1", __ -> 2017
+			).addString(
+				"string1", FirstEmbeddedModel::getId
+			).addString(
+				"string2", __ -> "string2"
+			).build()
 		).addNumber(
 			"number1", __ -> 2017
 		).addNumber(
@@ -227,7 +272,8 @@ public class MockRepresentorCreator {
 		createSecondEmbeddedModelRepresentor() {
 
 		Representor.Builder<SecondEmbeddedModel, String> builder =
-			new RepresentorImpl.BuilderImpl<>(SecondEmbeddedId.class);
+			new RepresentorImpl.BuilderImpl<>(
+				SecondEmbeddedId.class, MockWriterUtil::getIdentifierName);
 
 		return builder.types(
 			"Type"
@@ -267,7 +313,8 @@ public class MockRepresentorCreator {
 		createThirdEmbeddedModelRepresentor() {
 
 		Representor.Builder<ThirdEmbeddedModel, String> builder =
-			new RepresentorImpl.BuilderImpl<>(ThirdEmbeddedId.class);
+			new RepresentorImpl.BuilderImpl<>(
+				ThirdEmbeddedId.class, MockWriterUtil::getIdentifierName);
 
 		return builder.types(
 			"Type"

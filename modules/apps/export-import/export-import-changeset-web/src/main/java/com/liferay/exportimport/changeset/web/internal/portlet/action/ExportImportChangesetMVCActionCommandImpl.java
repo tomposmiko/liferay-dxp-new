@@ -29,9 +29,8 @@ import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
 import com.liferay.exportimport.kernel.service.ExportImportLocalService;
 import com.liferay.exportimport.kernel.staging.Staging;
+import com.liferay.exportimport.kernel.staging.StagingURLHelper;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.model.Portlet;
@@ -48,11 +47,11 @@ import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.theme.PortletDisplay;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -192,11 +191,11 @@ public class ExportImportChangesetMVCActionCommandImpl
 			portletId = portletDisplay.getId();
 		}
 
-		Portlet portlet = _portletLocalService.getPortletById(portletId);
-
 		long backgroundTaskId = 0;
 
 		if (cmd.equals(Constants.EXPORT)) {
+			Portlet portlet = _portletLocalService.getPortletById(portletId);
+
 			Map<String, Serializable> settingsMap =
 				_exportImportConfigurationSettingsMapFactory.
 					buildExportPortletSettingsMap(
@@ -279,7 +278,7 @@ public class ExportImportChangesetMVCActionCommandImpl
 					stagingGroup.getTypeSettingsProperties();
 
 				HttpPrincipal httpPrincipal = new HttpPrincipal(
-					_staging.buildRemoteURL(typeSettingsProperties),
+					_stagingURLHelper.buildRemoteURL(typeSettingsProperties),
 					user.getLogin(), user.getPassword(),
 					user.isPasswordEncrypted());
 
@@ -290,7 +289,7 @@ public class ExportImportChangesetMVCActionCommandImpl
 
 				try {
 					currentThread.setContextClassLoader(
-						ClassLoaderUtil.getPortalClassLoader());
+						PortalClassLoaderUtil.getClassLoader());
 
 					Group liveGroup = GroupServiceHttp.getGroup(
 						httpPrincipal, liveGroupId);
@@ -325,9 +324,6 @@ public class ExportImportChangesetMVCActionCommandImpl
 
 		sendRedirect(actionRequest, actionResponse, backgroundTaskId);
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		ExportImportChangesetMVCActionCommandImpl.class);
 
 	@Reference
 	private ChangesetManager _changesetManager;
@@ -364,5 +360,8 @@ public class ExportImportChangesetMVCActionCommandImpl
 
 	@Reference
 	private Staging _staging;
+
+	@Reference
+	private StagingURLHelper _stagingURLHelper;
 
 }

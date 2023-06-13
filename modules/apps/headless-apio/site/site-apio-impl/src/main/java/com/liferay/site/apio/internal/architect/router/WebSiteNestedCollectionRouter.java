@@ -33,16 +33,15 @@ import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides the information necessary to expose the <a
- * href="http://schema.org/WebSite">WebSite</a> resources contained inside a <a
+ * href="http://schema.org/WebSite">WebSite</a> resources of a <a
  * href="http://schema.org/WebSite">WebSite</a> through a web API. The resources
  * are mapped from the internal model {@link GroupWrapper}.
  *
  * @author Eduardo Perez
- * @review
  */
-@Component(immediate = true)
-public class WebSiteNestedCollectionRouter implements
-	NestedCollectionRouter
+@Component(immediate = true, service = NestedCollectionRouter.class)
+public class WebSiteNestedCollectionRouter
+	implements NestedCollectionRouter
 		<GroupWrapper, Long, WebSiteIdentifier, Long, WebSiteIdentifier> {
 
 	@Override

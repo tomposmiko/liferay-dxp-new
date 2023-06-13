@@ -1,0 +1,53 @@
+#
+# Liferay App Version 1.0.0
+#
+
+app.artifacts-1.0.0=\
+	com.liferay.portal.remote.axis.extender-2.0.0.jar,\
+	com.liferay.portal.remote.cxf.common-4.0.1.jar,\
+	com.liferay.portal.remote.http.tunnel.extender-3.0.0.jar,\
+	com.liferay.portal.remote.jaxrs.whiteboard-1.0.6.jar,\
+	com.liferay.portal.remote.jaxrs.whiteboard.debug-1.0.1.jar,\
+	com.liferay.portal.remote.jaxrs.whiteboard.jaxb.json-1.0.2.jar,\
+	com.liferay.portal.remote.json.web.service.extender-3.0.0.jar,\
+	com.liferay.portal.remote.rest.extender-3.0.1.jar,\
+	com.liferay.portal.remote.soap.extender.api-2.0.0.jar,\
+	com.liferay.portal.remote.soap.extender.impl-2.0.0.jar,\
+	javax.json-api-1.0.jar,\
+	org.apache.aries.javax.jax.rs.api-0.0.1-20180514.145128-46-LIFERAY-CACHED.jar,\
+	org.apache.aries.jax.rs.jaxb.json-0.0.1-20180608.092312-9-LIFERAY-CACHED.jar,\
+	org.apache.aries.jax.rs.whiteboard-0.0.1-20180626.192612-91-LIFERAY-CACHED.jar,\
+	org.apache.servicemix.specs.annotation.api-1.3_1.jar,\
+	org.osgi.service.jaxrs-1.0.0.jar,\
+	org.osgi.util.function-1.1.0.jar,\
+	org.osgi.util.promise-1.1.0.jar
+
+app.change.log-1.0.0=LPS-77699 LPS-80332 LPS-80517 LPS-80681 LPS-81952 LPS-82343 LPS-82420 LPS-82850
+
+app.git.id-1.0.0=bf9943b93ff9473888db9fac9695168575fa3ab2
+
+#
+# Liferay App Version 1.0.1
+#
+
+app.artifacts-1.0.1=\
+	com.liferay.portal.remote.axis.extender-2.0.2.jar,\
+	com.liferay.portal.remote.cxf.common-4.0.5.jar,\
+	com.liferay.portal.remote.http.tunnel.extender-3.0.2.jar,\
+	com.liferay.portal.remote.http.whiteboard.debug-3.0.0.jar,\
+	com.liferay.portal.remote.jaxrs.whiteboard-2.0.2.jar,\
+	com.liferay.portal.remote.jaxrs.whiteboard.debug-1.0.7.jar,\
+	com.liferay.portal.remote.jaxrs.whiteboard.jaxb.json-1.0.3.jar,\
+	com.liferay.portal.remote.json.web.service.extender-3.0.1.jar,\
+	com.liferay.portal.remote.rest.extender-3.0.6.jar,\
+	com.liferay.portal.remote.soap.extender.api-2.0.0.jar,\
+	com.liferay.portal.remote.soap.extender.impl-2.0.4.jar,\
+	geronimo-jaxrs_2.1_spec-1.1.jar,\
+	javax.json-api-1.0.jar,\
+	org.apache.aries.jax.rs.jaxb.json-1.0.0.jar,\
+	org.apache.aries.jax.rs.whiteboard-1.0.2-20181022.083746-4.jar,\
+	org.osgi.service.jaxrs-1.0.0.jar
+
+app.change.log-1.0.1=LPS-72545 LPS-74544 LPS-80681 LPS-82460 LPS-82828 LPS-82850 LPS-83308 LPS-84048 LPS-84093 LPS-84119 LPS-84626 LPS-85260 LPS-85296 LPS-86079 LPS-86332 LPS-86408 LPS-86714 OAUTH2-44 
+
+app.git.id-1.0.1=b51ec93fe503b1865350287a94c813d7ede16a23

@@ -54,9 +54,19 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class PollsPortletDataHandler extends BasePortletDataHandler {
 
+	public static final String[] CLASS_NAMES = {
+		PollsChoice.class.getName(), PollsQuestion.class.getName(),
+		PollsVote.class.getName()
+	};
+
 	public static final String NAMESPACE = "polls";
 
 	public static final String SCHEMA_VERSION = "1.0.0";
+
+	@Override
+	public String[] getClassNames() {
+		return CLASS_NAMES;
+	}
 
 	@Override
 	public String getSchemaVersion() {
@@ -149,11 +159,12 @@ public class PollsPortletDataHandler extends BasePortletDataHandler {
 		portletDataContext.importPortletPermissions(
 			PollsConstants.RESOURCE_NAME);
 
-		Element questionsElement = portletDataContext.getImportDataGroupElement(
-			PollsQuestion.class);
-
 		if (portletDataContext.getBooleanParameter(
 				PollsPortletDataHandler.NAMESPACE, "questions")) {
+
+			Element questionsElement =
+				portletDataContext.getImportDataGroupElement(
+					PollsQuestion.class);
 
 			List<Element> questionElements = questionsElement.elements();
 

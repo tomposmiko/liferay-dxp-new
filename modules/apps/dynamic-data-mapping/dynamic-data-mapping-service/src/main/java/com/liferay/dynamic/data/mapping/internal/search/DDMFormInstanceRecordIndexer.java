@@ -24,8 +24,8 @@ import com.liferay.dynamic.data.mapping.service.DDMFormInstanceRecordVersionLoca
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.StorageEngine;
 import com.liferay.dynamic.data.mapping.util.DDMIndexer;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
@@ -50,8 +50,8 @@ import com.liferay.portal.kernel.search.filter.QueryFilter;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
+import com.liferay.portal.kernel.util.ResourceBundleLoaderUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -312,20 +312,23 @@ public class DDMFormInstanceRecordIndexer
 			ddmFormInstance.getStructure(), ddmFormValues, locale);
 	}
 
+	protected ResourceBundle getResourceBundle(Locale defaultLocale) {
+		ResourceBundleLoader portalResourceBundleLoader =
+			ResourceBundleLoaderUtil.getPortalResourceBundleLoader();
+
+		return portalResourceBundleLoader.loadResourceBundle(defaultLocale);
+	}
+
 	protected String getTitle(long ddmFormInstanceId, Locale locale) {
 		try {
-			ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
-				"content.Language", locale,
-				DDMFormInstanceRecordIndexer.class.getClassLoader());
-
 			DDMFormInstance ddmFormInstance =
 				ddmFormInstanceLocalService.getFormInstance(ddmFormInstanceId);
 
 			String ddmFormInstanceName = ddmFormInstance.getName(locale);
 
 			return LanguageUtil.format(
-				resourceBundle, "new-entry-for-form-x", ddmFormInstanceName,
-				false);
+				getResourceBundle(locale), "new-entry-for-form-x",
+				ddmFormInstanceName, false);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -340,67 +343,50 @@ public class DDMFormInstanceRecordIndexer
 				getIndexableActionableDynamicQuery();
 
 		indexableActionableDynamicQuery.setAddCriteriaMethod(
-			new ActionableDynamicQuery.AddCriteriaMethod() {
+			dynamicQuery -> {
+				Property ddmFormInstanceRecordIdProperty =
+					PropertyFactoryUtil.forName("formInstanceRecordId");
 
-				@Override
-				public void addCriteria(DynamicQuery dynamicQuery) {
-					Property ddmFormInstanceRecordIdProperty =
-						PropertyFactoryUtil.forName("formInstanceRecordId");
+				DynamicQuery ddmFormInstanceRecordVersionDynamicQuery =
+					ddmFormInstanceRecordVersionLocalService.dynamicQuery();
 
-					DynamicQuery ddmFormInstanceRecordVersionDynamicQuery =
-						ddmFormInstanceRecordVersionLocalService.dynamicQuery();
+				ddmFormInstanceRecordVersionDynamicQuery.setProjection(
+					ProjectionFactoryUtil.property("formInstanceRecordId"));
 
-					ddmFormInstanceRecordVersionDynamicQuery.setProjection(
-						ProjectionFactoryUtil.property("formInstanceRecordId"));
+				dynamicQuery.add(
+					ddmFormInstanceRecordIdProperty.in(
+						ddmFormInstanceRecordVersionDynamicQuery));
 
-					dynamicQuery.add(
-						ddmFormInstanceRecordIdProperty.in(
-							ddmFormInstanceRecordVersionDynamicQuery));
+				Property ddmFormInstanceProperty = PropertyFactoryUtil.forName(
+					"formInstanceId");
 
-					Property ddmFormInstanceProperty =
-						PropertyFactoryUtil.forName("formInstanceId");
+				DynamicQuery ddmFormInstanceDynamicQuery =
+					ddmFormInstanceLocalService.dynamicQuery();
 
-					DynamicQuery ddmFormInstanceDynamicQuery =
-						ddmFormInstanceLocalService.dynamicQuery();
+				ddmFormInstanceDynamicQuery.setProjection(
+					ProjectionFactoryUtil.property("formInstanceId"));
 
-					ddmFormInstanceDynamicQuery.setProjection(
-						ProjectionFactoryUtil.property("formInstanceId"));
-
-					dynamicQuery.add(
-						ddmFormInstanceProperty.in(
-							ddmFormInstanceDynamicQuery));
-				}
-
+				dynamicQuery.add(
+					ddmFormInstanceProperty.in(ddmFormInstanceDynamicQuery));
 			});
 		indexableActionableDynamicQuery.setCompanyId(companyId);
 		indexableActionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.
-				PerformActionMethod<DDMFormInstanceRecord>() {
+			(DDMFormInstanceRecord ddmFormInstanceRecord) -> {
+				try {
+					Document document = getDocument(ddmFormInstanceRecord);
 
-				@Override
-				public void performAction(
-						DDMFormInstanceRecord ddmFormInstanceRecord)
-					throws PortalException {
-
-					try {
-						Document document = getDocument(ddmFormInstanceRecord);
-
-						if (document != null) {
-							indexableActionableDynamicQuery.addDocuments(
-								document);
-						}
-					}
-					catch (PortalException pe) {
-						if (_log.isWarnEnabled()) {
-							_log.warn(
-								"Unable to index form instance record " +
-									ddmFormInstanceRecord.
-										getFormInstanceRecordId(),
-								pe);
-						}
+					if (document != null) {
+						indexableActionableDynamicQuery.addDocuments(document);
 					}
 				}
-
+				catch (PortalException pe) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							"Unable to index form instance record " +
+								ddmFormInstanceRecord.getFormInstanceRecordId(),
+							pe);
+					}
+				}
 			});
 		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 

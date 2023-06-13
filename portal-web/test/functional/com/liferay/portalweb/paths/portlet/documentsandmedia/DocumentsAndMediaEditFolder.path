@@ -8,36 +8,6 @@
 <tr><td rowspan="1" colspan="3">DocumentsAndMediaEditFolder</td></tr>
 </thead>
 <tbody>
-<tr>
-	<td>NAME_FIELD</td>
-	<td>//input[contains(@id,'name')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DESCRIPTION_FIELD</td>
-	<td>//textarea[contains(@id,'description')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DOCUMENT_TYPE_USE_PARENT</td>
-	<td>//input[contains(@id,'useFileEntryTypes')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DOCUMENT_TYPE_OVERRIDE_PARENT</td>
-	<td>//input[contains(@id,'overrideFileEntryTypes')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>SELECT_DOCUMENT_TYPE</td>
-	<td>//div[contains(@id,'overrideParentSettings')]/span/a/span</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
 <!--WORKFLOW -->
 <tr>
 	<td>WORKFLOW_DOCUMENT_TYPE_RESTRICTIONS_TOGGLE</td>

@@ -1,11 +1,8 @@
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
-
 copyLibs {
 	enabled = true
 }
 
 dependencies {
-	testIntegrationCompile group: "com.liferay", name: "com.liferay.arquillian.extension.junit.bridge", version: "1.0.8"
+	testIntegrationCompile group: "com.liferay", name: "com.liferay.arquillian.extension.junit.bridge", version: "1.0.10"
 	testIntegrationCompile project(":apps:asset:asset-display-page-api")
 }

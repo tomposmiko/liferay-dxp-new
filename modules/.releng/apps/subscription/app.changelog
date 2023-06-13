@@ -1,0 +1,25 @@
+#
+# Liferay App Version 1.0.0
+#
+
+app.artifacts-1.0.0=\
+	com.liferay.subscription.api-1.0.1.jar,\
+	com.liferay.subscription.service-1.0.1.jar,\
+	com.liferay.subscription.web-1.0.2.jar
+
+app.change.log-1.0.0=LPS-79653 LPS-79679 LPS-79799 LPS-80332 LPS-80517 LPS-81028 LPS-81069 LPS-82261
+
+app.git.id-1.0.0=bf9943b93ff9473888db9fac9695168575fa3ab2
+
+#
+# Liferay App Version 1.0.1
+#
+
+app.artifacts-1.0.1=\
+	com.liferay.subscription.api-1.0.3.jar,\
+	com.liferay.subscription.service-1.0.5.jar,\
+	com.liferay.subscription.web-1.0.6.jar
+
+app.change.log-1.0.1=LPS-77699 LPS-78938 LPS-83705 LPS-84093 LPS-84119 LPS-85296 LPS-85849 LPS-86408
+
+app.git.id-1.0.1=c072145ea9cd2a940bef26e72370ac7ac9a61f44

@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.io.unsync.UnsyncFilterInputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -112,7 +111,6 @@ import org.apache.http.util.EntityUtils;
  * @author Hugo Huijser
  * @author Shuyang Zhou
  */
-@DoPrivileged
 @ProviderType
 public class HttpImpl implements Http {
 
@@ -1281,8 +1279,6 @@ public class HttpImpl implements Http {
 	 */
 	@Override
 	public String URLtoString(URL url) throws IOException {
-		String xml = null;
-
 		if (url == null) {
 			return null;
 		}
@@ -1303,6 +1299,8 @@ public class HttpImpl implements Http {
 			return null;
 		}
 
+		String xml = null;
+
 		try (InputStream inputStream = urlConnection.getInputStream();
 			UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 				new UnsyncByteArrayOutputStream()) {
@@ -1310,7 +1308,7 @@ public class HttpImpl implements Http {
 			byte[] bytes = new byte[512];
 
 			for (int i = inputStream.read(bytes, 0, 512); i != -1;
-					i = inputStream.read(bytes, 0, 512)) {
+				 i = inputStream.read(bytes, 0, 512)) {
 
 				unsyncByteArrayOutputStream.write(bytes, 0, i);
 			}
@@ -1870,13 +1868,11 @@ public class HttpImpl implements Http {
 				}
 			}
 
-			long contentLengthLong = 0;
-
 			Header contentLengthHeader = closeableHttpResponse.getFirstHeader(
 				HttpHeaders.CONTENT_LENGTH);
 
 			if (contentLengthHeader != null) {
-				contentLengthLong = GetterUtil.getLong(
+				long contentLengthLong = GetterUtil.getLong(
 					contentLengthHeader.getValue());
 
 				response.setContentLengthLong(contentLengthLong);

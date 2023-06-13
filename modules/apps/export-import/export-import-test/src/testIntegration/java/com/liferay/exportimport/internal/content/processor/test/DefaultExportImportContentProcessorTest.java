@@ -36,6 +36,7 @@ import com.liferay.exportimport.test.util.TestUserIdStrategy;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.model.Company;
@@ -59,6 +60,7 @@ import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestDataConstants;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
@@ -66,14 +68,12 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.test.randomizerbumpers.FriendlyURLRandomizerBumper;
-import com.liferay.portal.test.randomizerbumpers.TikaSafeRandomizerBumper;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.PortalImpl;
 import com.liferay.portal.util.PropsValues;
@@ -144,7 +144,7 @@ public class DefaultExportImportContentProcessorTest {
 	@Before
 	public void setUp() throws Exception {
 		_defaultLocale = LocaleUtil.getDefault();
-		_nonDefaultLocale = getNonDefaultLocale();
+		_nondefaultLocale = getNondefaultLocale();
 
 		_externalGroup = GroupTestUtil.addGroup();
 		_liveGroup = GroupTestUtil.addGroup();
@@ -161,8 +161,7 @@ public class DefaultExportImportContentProcessorTest {
 			TestPropsValues.getUserId(), _stagingGroup.getGroupId(),
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 			RandomTestUtil.randomString() + ".txt", ContentTypes.TEXT_PLAIN,
-			RandomTestUtil.randomBytes(TikaSafeRandomizerBumper.INSTANCE),
-			serviceContext);
+			TestDataConstants.TEST_BYTE_ARRAY, serviceContext);
 
 		ThumbnailCapability thumbnailCapability =
 			_fileEntry.getRepositoryCapability(ThumbnailCapability.class);
@@ -526,6 +525,21 @@ public class DefaultExportImportContentProcessorTest {
 	}
 
 	@Test
+	public void testExportLinksToURLsWithStopCharacters() throws Exception {
+		String path = RandomTestUtil.randomString();
+
+		String content = getContent("url_links.txt");
+
+		content = content.replaceAll("PATH", path);
+
+		content = _exportImportContentProcessor.replaceExportContentReferences(
+			_portletDataContextExport, _referrerStagedModel, content, true,
+			true);
+
+		_assertContainsPathWithStopCharacters(content, path);
+	}
+
+	@Test
 	public void testExportLinksToUserLayouts() throws Exception {
 		User user = TestPropsValues.getUser();
 
@@ -786,7 +800,7 @@ public class DefaultExportImportContentProcessorTest {
 		Map<Locale, String> nameMap = new HashMap<>();
 		Map<Locale, String> firendlyURLMap = new HashMap<>();
 
-		for (Locale locale : new Locale[] {_defaultLocale, _nonDefaultLocale}) {
+		for (Locale locale : new Locale[] {_defaultLocale, _nondefaultLocale}) {
 			String name = RandomTestUtil.randomString(
 				FriendlyURLRandomizerBumper.INSTANCE,
 				NumericStringRandomizerBumper.INSTANCE,
@@ -967,7 +981,7 @@ public class DefaultExportImportContentProcessorTest {
 		return scanner.next();
 	}
 
-	protected Locale getNonDefaultLocale() throws Exception {
+	protected Locale getNondefaultLocale() throws Exception {
 		for (Locale locale : _locales) {
 			if (!locale.equals(_defaultLocale)) {
 				return locale;
@@ -1072,9 +1086,9 @@ public class DefaultExportImportContentProcessorTest {
 				_liveGroup.getFriendlyURL(),
 				String.valueOf(_liveGroup.getGroupId()),
 				_livePublicLayout.getFriendlyURL(),
-				livePublicLayoutFriendlyURLMap.get(_nonDefaultLocale),
-				stagingPrivateLayoutFriendlyURLMap.get(_nonDefaultLocale),
-				stagingPublicLayoutFriendlyURLMap.get(_nonDefaultLocale),
+				livePublicLayoutFriendlyURLMap.get(_nondefaultLocale),
+				stagingPrivateLayoutFriendlyURLMap.get(_nondefaultLocale),
+				stagingPublicLayoutFriendlyURLMap.get(_nondefaultLocale),
 				PortalUtil.getPathContext(),
 				PropsValues.LAYOUT_FRIENDLY_URL_PRIVATE_GROUP_SERVLET_MAPPING,
 				PropsValues.LAYOUT_FRIENDLY_URL_PRIVATE_USER_SERVLET_MAPPING,
@@ -1159,6 +1173,24 @@ public class DefaultExportImportContentProcessorTest {
 			entriesStream.anyMatch(pattern.asPredicate()));
 	}
 
+	private void _assertContainsPathWithStopCharacters(
+		String content, String path) {
+
+		for (char stopChar : _LAYOUT_REFERENCE_STOP_CHARS) {
+			StringBundler sb = new StringBundler(4);
+
+			sb.append(path);
+			sb.append(StringPool.SLASH);
+			sb.append(stopChar);
+			sb.append(StringPool.SLASH);
+
+			Assert.assertTrue(
+				String.format(
+					"%s does not contain the path %s", content, sb.toString()),
+				content.contains(sb.toString()));
+		}
+	}
+
 	private void _assertContainsReference(
 		List<String> entries, String className, long classPK) {
 
@@ -1184,6 +1216,13 @@ public class DefaultExportImportContentProcessorTest {
 		"[$PUBLIC_LAYOUT_FRIENDLY_URL$]"
 	};
 
+	private static final char[] _LAYOUT_REFERENCE_STOP_CHARS = {
+		CharPool.APOSTROPHE, CharPool.CLOSE_BRACKET, CharPool.CLOSE_CURLY_BRACE,
+		CharPool.CLOSE_PARENTHESIS, CharPool.GREATER_THAN, CharPool.LESS_THAN,
+		CharPool.PIPE, CharPool.POUND, CharPool.QUESTION, CharPool.QUOTE,
+		CharPool.SPACE
+	};
+
 	private static final String[] _MULTI_LOCALE_LAYOUT_VARIABLES = {
 		"[$LIVE_PUBLIC_LAYOUT_FRIENDLY_URL$]",
 		"[$PRIVATE_LAYOUT_FRIENDLY_URL$]", "[$PUBLIC_LAYOUT_FRIENDLY_URL$]"
@@ -1198,9 +1237,10 @@ public class DefaultExportImportContentProcessorTest {
 	private static final Locale[] _locales =
 		{LocaleUtil.US, LocaleUtil.GERMANY, LocaleUtil.SPAIN};
 	private static String _oldLayoutFriendlyURLPrivateUserServletMapping;
+	private static final Pattern _pattern = Pattern.compile("href=|\\{|\\[");
 	private static ServiceTracker
-		<ExportImportContentProcessor,
-			ExportImportContentProcessor> _serviceTracker;
+		<ExportImportContentProcessor, ExportImportContentProcessor>
+			_serviceTracker;
 
 	private Locale _defaultLocale;
 	private ExportImportContentProcessor<String> _exportImportContentProcessor;
@@ -1219,8 +1259,7 @@ public class DefaultExportImportContentProcessorTest {
 
 	private Layout _livePrivateLayout;
 	private Layout _livePublicLayout;
-	private Locale _nonDefaultLocale;
-	private final Pattern _pattern = Pattern.compile("href=|\\{|\\[");
+	private Locale _nondefaultLocale;
 	private PortletDataContext _portletDataContextExport;
 	private PortletDataContext _portletDataContextImport;
 	private StagedModel _referrerStagedModel;

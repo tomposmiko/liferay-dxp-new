@@ -8,14 +8,12 @@
 
 		<execute macro="User#firstLoginPG" />
 
-		<execute macro="ProductMenu#gotoPortlet">
-			<var name="category" value="Sites" />
-			<var name="panel" value="Control Panel" />
-			<var name="portlet" value="Sites" />
+		<execute macro="JSONGroup#addGroup">
+			<var name="groupName" value="Site Name" />
 		</execute>
 
-		<execute macro="Site#addBlankCP">
-			<var name="siteName" value="Site Name" />
+		<execute macro="ProductMenu#gotoSite">
+			<var name="site" value="Site Name" />
 		</execute>
 
 		<execute macro="ProductMenu#gotoPortlet">
@@ -50,7 +48,7 @@
 	</set-up>
 
 	<tear-down>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+		<var method="PropsUtil#get('test.portal.instance')" name="testPortalInstance" />
 
 		<if>
 			<equals arg1="${testPortalInstance}" arg2="true" />
@@ -58,7 +56,9 @@
 				<execute macro="PortalInstances#tearDownCP" />
 			</then>
 			<else>
-				<execute macro="Site#tearDownCP" />
+				<execute macro="JSONGroup#deleteGroupByName">
+					<var name="groupName" value="Site Name" />
+				</execute>
 			</else>
 		</if>
 	</tear-down>
@@ -71,7 +71,7 @@
 	</command>
 
 	<command name="AddPageVariation" priority="5">
-		<property name="portal.acceptance" value="false" />
+		<property name="portal.acceptance" value="true" />
 		<property name="test.assert.warning.exceptions" value="true" />
 		<property name="testray.component.names" value="Training" />
 
@@ -103,7 +103,7 @@
 			<var name="rowEntry" value="Default" />
 		</execute>
 
-		<execute macro="SiteNavigationMenu#deleteItem">
+		<execute macro="NavigationMenusAdmin#deleteItem">
 			<var name="itemName" value="Staging Test Page" />
 		</execute>
 
@@ -123,11 +123,15 @@
 		</execute>
 
 		<execute macro="Page#addFriendlyURLLocalizedPG">
-			<var name="friendlyUrlLocalized" value="de_DE" />
+			<var name="friendlyUrlLocalized" value="de-DE" />
 			<var name="localizedFriendlyURL" value="/german" />
 		</execute>
 
-		<execute macro="Button#clickSave" />
+		<execute macro="PortletEntry#inputName">
+			<var name="name" value="German Staging Test Page" />
+		</execute>
+
+		<execute function="Click" locator1="Button#SAVE" />
 
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />

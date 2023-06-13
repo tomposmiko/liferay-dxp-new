@@ -1,6 +1,10 @@
 Liferay = window.Liferay || {};
 
 (function($, _, Liferay) {
+	var isFunction = function(val) {
+		return typeof val === 'function';
+	};
+
 	var isNode = function(node) {
 		return node && (node._node || node.jquery || node.nodeType);
 	};
@@ -133,7 +137,7 @@ Liferay = window.Liferay || {};
 				delete payload.io;
 
 				if (!ioConfig.success) {
-					var callbacks = _.filter(args, _.isFunction);
+					var callbacks = _.filter(args, isFunction);
 
 					var callbackException = callbacks[1];
 					var callbackSuccess = callbacks[0];
@@ -192,7 +196,7 @@ Liferay = window.Liferay || {};
 
 				var config = args[1];
 
-				if (!_.isFunction(config) && !isNode(config)) {
+				if (!isFunction(config) && !isNode(config)) {
 					params = config;
 				}
 
@@ -222,7 +226,7 @@ Liferay = window.Liferay || {};
 		);
 
 		if (ioConfig.form) {
-			if (ioConfig.form.enctype == STR_MULTIPART && _.isFunction(window.FormData)) {
+			if (ioConfig.form.enctype == STR_MULTIPART && isFunction(window.FormData)) {
 				ioConfig.data = new FormData(ioConfig.form);
 
 				ioConfig.data.append('cmd', cmd);
@@ -304,7 +308,7 @@ Liferay = window.Liferay || {};
 		if (arguments.length === 1) {
 			var component = components[id];
 
-			if (component && _.isFunction(component)) {
+			if (component && isFunction(component)) {
 				componentsFn[id] = component;
 
 				component = component();
@@ -443,6 +447,16 @@ Liferay = window.Liferay || {};
 		}
 
 		componentIds.forEach(Liferay.destroyComponent);
+	};
+
+	/**
+	 * Clears the component promises map to make sure pending promises won't get
+	 * accidentally resolved at a later stage if a component with the same id appears
+	 * causing stale code to run.
+	 */
+
+	Liferay.destroyUnfulfilledPromises = function() {
+		componentPromiseWrappers = {};
 	};
 
 	Liferay._components = components;

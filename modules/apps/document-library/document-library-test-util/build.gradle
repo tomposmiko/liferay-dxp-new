@@ -1,0 +1,10 @@
+dependencies {
+	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "2.1.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.33.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.test", version: "5.2.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.test.integration", version: "5.1.0"
+}
+
+liferay {
+	deployDir = file("${liferayHome}/osgi/test")
+}

@@ -23,6 +23,7 @@ import com.liferay.message.boards.service.MBCategoryLocalService;
 import com.liferay.message.boards.service.MBCategoryService;
 import com.liferay.message.boards.service.MBDiscussionLocalService;
 import com.liferay.message.boards.service.MBMessageLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.comment.Comment;
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -61,7 +62,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
@@ -415,8 +415,7 @@ public class MBMessageIndexer
 		catch (Exception e) {
 			_log.error(
 				StringBundler.concat(
-					"Unable to parse message ",
-					String.valueOf(message.getMessageId()), ": ",
+					"Unable to parse message ", message.getMessageId(), ": ",
 					e.getMessage()),
 				e);
 		}
@@ -447,17 +446,9 @@ public class MBMessageIndexer
 
 		actionableDynamicQuery.setCompanyId(companyId);
 		actionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.PerformActionMethod<MBCategory>() {
-
-				@Override
-				public void performAction(MBCategory category)
-					throws PortalException {
-
-					reindexMessages(
-						companyId, category.getGroupId(),
-						category.getCategoryId());
-				}
-
+			(MBCategory category) -> {
+				reindexMessages(
+					companyId, category.getGroupId(), category.getCategoryId());
 			});
 
 		actionableDynamicQuery.performActions();
@@ -503,61 +494,49 @@ public class MBMessageIndexer
 			_log.debug(
 				StringBundler.concat(
 					"Reindexing message boards messages for message board ",
-					"category ID ", String.valueOf(categoryId),
-					" and group ID ", String.valueOf(groupId)));
+					"category ID ", categoryId, " and group ID ", groupId));
 		}
 
 		final IndexableActionableDynamicQuery indexableActionableDynamicQuery =
 			mbMessageLocalService.getIndexableActionableDynamicQuery();
 
 		indexableActionableDynamicQuery.setAddCriteriaMethod(
-			new ActionableDynamicQuery.AddCriteriaMethod() {
+			dynamicQuery -> {
+				Property categoryIdProperty = PropertyFactoryUtil.forName(
+					"categoryId");
 
-				@Override
-				public void addCriteria(DynamicQuery dynamicQuery) {
-					Property categoryIdProperty = PropertyFactoryUtil.forName(
-						"categoryId");
+				dynamicQuery.add(categoryIdProperty.eq(categoryId));
 
-					dynamicQuery.add(categoryIdProperty.eq(categoryId));
+				Property statusProperty = PropertyFactoryUtil.forName("status");
 
-					Property statusProperty = PropertyFactoryUtil.forName(
-						"status");
+				Integer[] statuses = {
+					WorkflowConstants.STATUS_APPROVED,
+					WorkflowConstants.STATUS_IN_TRASH
+				};
 
-					Integer[] statuses = {
-						WorkflowConstants.STATUS_APPROVED,
-						WorkflowConstants.STATUS_IN_TRASH
-					};
-
-					dynamicQuery.add(statusProperty.in(statuses));
-				}
-
+				dynamicQuery.add(statusProperty.in(statuses));
 			});
 		indexableActionableDynamicQuery.setCompanyId(companyId);
 		indexableActionableDynamicQuery.setGroupId(groupId);
 		indexableActionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.PerformActionMethod<MBMessage>() {
-
-				@Override
-				public void performAction(MBMessage message) {
-					if (message.isDiscussion() && message.isRoot()) {
-						return;
-					}
-
-					try {
-						Document document = getDocument(message);
-
-						indexableActionableDynamicQuery.addDocuments(document);
-					}
-					catch (PortalException pe) {
-						if (_log.isWarnEnabled()) {
-							_log.warn(
-								"Unable to index message boards message " +
-									message.getMessageId(),
-								pe);
-						}
-					}
+			(MBMessage message) -> {
+				if (message.isDiscussion() && message.isRoot()) {
+					return;
 				}
 
+				try {
+					Document document = getDocument(message);
+
+					indexableActionableDynamicQuery.addDocuments(document);
+				}
+				catch (PortalException pe) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							"Unable to index message boards message " +
+								message.getMessageId(),
+							pe);
+					}
+				}
 			});
 		indexableActionableDynamicQuery.setSearchEngineId(getSearchEngineId());
 

@@ -1,9 +1,9 @@
 (function() {
 	var Lang = AUI().Lang;
 
-	var STR_ADAPTIVE_MEDIA_URL_RETURN_TYPE = 'com.liferay.adaptive.media.image.item.selector.AMImageURLItemSelectorReturnType';
-
 	var STR_ADAPTIVE_MEDIA_FILE_ENTRY_RETURN_TYPE = 'com.liferay.adaptive.media.image.item.selector.AMImageFileEntryItemSelectorReturnType';
+
+	var STR_ADAPTIVE_MEDIA_URL_RETURN_TYPE = 'com.liferay.adaptive.media.image.item.selector.AMImageURLItemSelectorReturnType';
 
 	var TPL_PICTURE_TAG = '<picture {fileEntryAttributeName}="{fileEntryId}">{sources}<img src="{defaultSrc}"></picture>';
 
@@ -29,11 +29,7 @@
 
 							event.cancel();
 
-							var onSelectedImageChangeFn = AUI._.bind(
-								instance._onSelectedImageChange,
-								instance,
-								editor
-							);
+							var onSelectedImageChangeFn = instance._onSelectedImageChange.bind(instance, editor);
 
 							editor.execCommand('imageselector', onSelectedImageChangeFn);
 
@@ -41,6 +37,22 @@
 						}
 					}
 				);
+			},
+
+			_getImgElement: function(imageSrc, selectedItem, fileEntryAttributeName) {
+				var imgEl = CKEDITOR.dom.element.createFromHtml('<img>');
+
+				if (selectedItem.returnType === STR_ADAPTIVE_MEDIA_FILE_ENTRY_RETURN_TYPE) {
+					var itemValue = JSON.parse(selectedItem.value);
+
+					imgEl.setAttribute('src', itemValue.url);
+					imgEl.setAttribute(fileEntryAttributeName, itemValue.fileEntryId);
+				}
+				else {
+					imgEl.setAttribute('src', imageSrc);
+				}
+
+				return imgEl;
 			},
 
 			_getPictureElement: function(selectedItem, fileEntryAttributeName) {
@@ -92,25 +104,19 @@
 				return pictureEl;
 			},
 
-			_getImgElement: function(imageSrc, selectedItem, fileEntryAttributeName) {
-				var imgEl = CKEDITOR.dom.element.createFromHtml('<img>');
+			_isEmptySelection: function(editor) {
+				var selection = editor.getSelection();
 
-				if (selectedItem.returnType === STR_ADAPTIVE_MEDIA_FILE_ENTRY_RETURN_TYPE) {
-					var itemValue = JSON.parse(selectedItem.value);
+				var ranges = selection.getRanges();
 
-					imgEl.setAttribute('src', itemValue.url);
-					imgEl.setAttribute(fileEntryAttributeName, itemValue.fileEntryId);
-				}
-				else {
-					imgEl.setAttribute('src', imageSrc);
-				}
-
-				return imgEl;
+				return selection.getType() === CKEDITOR.SELECTION_NONE || (ranges.length === 1 && ranges[0].collapsed);
 			},
 
 			_onSelectedImageChange: function(editor, imageSrc, selectedItem) {
-				var el;
 				var instance = this;
+
+				var el;
+
 				var fileEntryAttributeName = editor.config.adaptiveMediaFileEntryAttributeName;
 
 				if (selectedItem.returnType === STR_ADAPTIVE_MEDIA_URL_RETURN_TYPE) {
@@ -120,9 +126,16 @@
 					el = instance._getImgElement(imageSrc, selectedItem, fileEntryAttributeName);
 				}
 
-				editor.insertElement(el);
+				editor.insertHtml(el.getOuterHtml());
 
-				editor.setData(editor.getData());
+				if (instance._isEmptySelection(editor)) {
+					if (AUI.Env.UA.ie >= 9) {
+						editor.insertHtml(el.getOuterHtml() + ' <br /> ');
+					}
+					else {
+						editor.execCommand('enter');
+					}
+				}
 			}
 		}
 	);

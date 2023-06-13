@@ -14,6 +14,7 @@
 
 package com.liferay.wiki.web.internal.search;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.EmptyOnClickRowChecker;
 import com.liferay.portal.kernel.dao.search.RowChecker;
@@ -26,7 +27,6 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.wiki.model.WikiPage;
 import com.liferay.wiki.service.WikiPageLocalServiceUtil;
@@ -87,7 +87,6 @@ public class PagesChecker extends EmptyOnClickRowChecker {
 			return StringPool.BLANK;
 		}
 
-		String name = WikiPage.class.getSimpleName();
 		boolean showInput = false;
 
 		try {
@@ -112,7 +111,11 @@ public class PagesChecker extends EmptyOnClickRowChecker {
 		sb.append("['");
 		sb.append(_liferayPortletResponse.getNamespace());
 		sb.append(RowChecker.ROW_IDS);
-		sb.append(WikiPage.class.getSimpleName());
+
+		String name = WikiPage.class.getSimpleName();
+
+		sb.append(name);
+
 		sb.append("']");
 
 		String checkBoxRowIds = sb.toString();

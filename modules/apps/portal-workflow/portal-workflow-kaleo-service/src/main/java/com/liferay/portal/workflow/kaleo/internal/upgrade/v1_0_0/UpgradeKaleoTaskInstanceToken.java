@@ -14,10 +14,10 @@
 
 package com.liferay.portal.workflow.kaleo.internal.upgrade.v1_0_0;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.workflow.kaleo.definition.NodeType;
 
 import java.sql.PreparedStatement;
@@ -75,7 +75,7 @@ public class UpgradeKaleoTaskInstanceToken extends UpgradeProcess {
 		sb.append("KaleoInstanceToken.currentKaleoNodeId) where ");
 		sb.append("KaleoInstanceToken.kaleoInstanceTokenId = (select ");
 		sb.append("parentKaleoInstanceTokenId from KaleoInstanceToken where ");
-		sb.append("KaleoInstanceTokenId = ?)");
+		sb.append("kaleoInstanceTokenId = ?)");
 
 		String sql = sb.toString();
 
@@ -97,9 +97,8 @@ public class UpgradeKaleoTaskInstanceToken extends UpgradeProcess {
 
 					return getKaleoInstanceTokenId(parentKaleoInstanceTokenId);
 				}
-				else {
-					return kaleoInstanceTokenId;
-				}
+
+				return kaleoInstanceTokenId;
 			}
 		}
 	}
@@ -112,8 +111,6 @@ public class UpgradeKaleoTaskInstanceToken extends UpgradeProcess {
 			ResultSet rs = ps.executeQuery()) {
 
 			while (rs.next()) {
-				long kaleoTaskInstanceTokenId = rs.getLong(
-					"kaleoTaskInstanceTokenId");
 				long oldKaleoInstanceTokenId = rs.getLong(
 					"kaleoInstanceTokenId");
 
@@ -130,6 +127,10 @@ public class UpgradeKaleoTaskInstanceToken extends UpgradeProcess {
 				sb.append("kaleoInstanceTokenId = ");
 				sb.append(newKaleoInstanceTokenId);
 				sb.append(" where kaleoTaskInstanceTokenId = ");
+
+				long kaleoTaskInstanceTokenId = rs.getLong(
+					"kaleoTaskInstanceTokenId");
+
 				sb.append(kaleoTaskInstanceTokenId);
 
 				String sql = sb.toString();

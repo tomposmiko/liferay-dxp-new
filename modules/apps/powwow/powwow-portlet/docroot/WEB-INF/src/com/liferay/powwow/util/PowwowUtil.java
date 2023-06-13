@@ -17,6 +17,7 @@ package com.liferay.powwow.util;
 import com.liferay.calendar.model.CalendarBooking;
 import com.liferay.calendar.service.CalendarBookingLocalServiceUtil;
 import com.liferay.petra.content.ContentUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -51,7 +52,6 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PrefsPropsUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.powwow.model.PowwowMeeting;
@@ -213,15 +213,16 @@ public class PowwowUtil {
 				participantsJSONArray.getJSONObject(i);
 
 			String name = participantJSONObject.getString("name");
-			long participantUserId = participantJSONObject.getLong(
-				"participantUserId");
 			String emailAddress = participantJSONObject.getString(
 				"emailAddress");
-			int type = participantJSONObject.getInt("type");
 
 			if (Validator.isNull(name) && Validator.isNull(emailAddress)) {
 				continue;
 			}
+
+			long participantUserId = participantJSONObject.getLong(
+				"participantUserId");
+			int type = participantJSONObject.getInt("type");
 
 			PowwowParticipant powwowParticipant = _getPowwowParticipant(
 				powwowMeetingId, name, participantUserId, emailAddress, type);

@@ -20,7 +20,6 @@ import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderContextCont
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderInvoker;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderRequest;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderResponse;
-import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderResponse.Status;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderTracker;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesJSONDeserializer;
 import com.liferay.dynamic.data.mapping.model.DDMDataProviderInstance;
@@ -35,7 +34,6 @@ import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.util.Validator;
 
 import com.netflix.hystrix.exception.HystrixRuntimeException;
-import com.netflix.hystrix.exception.HystrixRuntimeException.FailureType;
 
 import java.util.List;
 import java.util.Map;
@@ -47,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcellus Tavares
  */
-@Component(immediate = true)
+@Component(immediate = true, service = DDMDataProviderInvoker.class)
 public class DDMDataProviderInvokerImpl implements DDMDataProviderInvoker {
 
 	public DDMDataProviderResponse invoke(
@@ -121,20 +119,27 @@ public class DDMDataProviderInvokerImpl implements DDMDataProviderInvoker {
 		Exception e) {
 
 		if (e instanceof HystrixRuntimeException) {
-			FailureType failureType = getHystrixFailureType(e);
+			HystrixRuntimeException.FailureType failureType =
+				getHystrixFailureType(e);
 
-			if (failureType == FailureType.TIMEOUT) {
-				return DDMDataProviderResponse.error(Status.TIMEOUT);
+			if (failureType == HystrixRuntimeException.FailureType.TIMEOUT) {
+				return DDMDataProviderResponse.error(
+					DDMDataProviderResponse.Status.TIMEOUT);
 			}
-			else if (failureType == FailureType.SHORTCIRCUIT) {
-				return DDMDataProviderResponse.error(Status.SHORTCIRCUIT);
+			else if (failureType ==
+						HystrixRuntimeException.FailureType.SHORTCIRCUIT) {
+
+				return DDMDataProviderResponse.error(
+					DDMDataProviderResponse.Status.SHORTCIRCUIT);
 			}
 		}
 		else if (e instanceof PrincipalException) {
-			return DDMDataProviderResponse.error(Status.UNAUTHORIZED);
+			return DDMDataProviderResponse.error(
+				DDMDataProviderResponse.Status.UNAUTHORIZED);
 		}
 
-		return DDMDataProviderResponse.error(Status.UNKNOWN_ERROR);
+		return DDMDataProviderResponse.error(
+			DDMDataProviderResponse.Status.UNKNOWN_ERROR);
 	}
 
 	protected DDMDataProviderResponse doInvoke(
@@ -209,7 +214,9 @@ public class DDMDataProviderInvokerImpl implements DDMDataProviderInvoker {
 				ddmDataProviderInstanceId));
 	}
 
-	protected FailureType getHystrixFailureType(Exception e) {
+	protected HystrixRuntimeException.FailureType getHystrixFailureType(
+		Exception e) {
+
 		HystrixRuntimeException hystrixRuntimeException =
 			(HystrixRuntimeException)e;
 

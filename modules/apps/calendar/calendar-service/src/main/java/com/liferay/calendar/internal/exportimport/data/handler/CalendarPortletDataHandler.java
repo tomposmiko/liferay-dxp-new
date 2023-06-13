@@ -34,7 +34,6 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
-import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
@@ -63,9 +62,20 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class CalendarPortletDataHandler extends BasePortletDataHandler {
 
+	public static final String[] CLASS_NAMES = {
+		Calendar.class.getName(), CalendarBooking.class.getName(),
+		CalendarNotificationTemplate.class.getName(),
+		CalendarResource.class.getName()
+	};
+
 	public static final String NAMESPACE = "calendar";
 
 	public static final String SCHEMA_VERSION = "1.0.0";
+
+	@Override
+	public String[] getClassNames() {
+		return CLASS_NAMES;
+	}
 
 	@Override
 	public String getSchemaVersion() {
@@ -114,18 +124,12 @@ public class CalendarPortletDataHandler extends BasePortletDataHandler {
 		}
 
 		actionableDynamicQuery.setAddCriteriaMethod(
-			new ActionableDynamicQuery.AddCriteriaMethod() {
+			dynamicQuery -> {
+				Property property = PropertyFactoryUtil.forName(
+					"calendarResourceId");
 
-				@Override
-				public void addCriteria(DynamicQuery dynamicQuery) {
-					Property property = PropertyFactoryUtil.forName(
-						"calendarResourceId");
-
-					dynamicQuery.add(
-						property.ne(
-							guestCalendarResource.getCalendarResourceId()));
-				}
-
+				dynamicQuery.add(
+					property.ne(guestCalendarResource.getCalendarResourceId()));
 			});
 	}
 

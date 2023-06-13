@@ -45,12 +45,6 @@
 	<td></td>
 	<td></td>
 </tr>
-<!--DELIVERY_EMAIL-->
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
 <!--NOTIFICATIONS_EMAIL-->
 <tr>
 	<td>NOTIFICATIONS_EMAIL_SUBJECT_FIELD</td>

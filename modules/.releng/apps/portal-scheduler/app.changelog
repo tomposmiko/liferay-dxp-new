@@ -1,0 +1,25 @@
+#
+# Liferay App Version 1.0.0
+#
+
+app.artifacts-1.0.0=\
+	com.liferay.portal.scheduler-5.0.2.jar,\
+	com.liferay.portal.scheduler.quartz-4.0.0.jar,\
+	com.liferay.portal.scheduler.single-3.0.0.jar
+
+app.change.log-1.0.0=LPS-79679 LPS-80332 LPS-80517 LPS-82828
+
+app.git.id-1.0.0=bf9943b93ff9473888db9fac9695168575fa3ab2
+
+#
+# Liferay App Version 1.0.1
+#
+
+app.artifacts-1.0.1=\
+	com.liferay.portal.scheduler-5.0.7.jar,\
+	com.liferay.portal.scheduler.quartz-4.0.7.jar,\
+	com.liferay.portal.scheduler.single-3.0.0.jar
+
+app.change.log-1.0.1=LPS-77699 LPS-79679 LPS-82828 LPS-84093 LPS-84119 LPS-84487 LPS-84521 LPS-85296 LPS-86408 
+
+app.git.id-1.0.1=6ec0b3de97a5699ac2385af3cca160dce18b2dbd

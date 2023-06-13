@@ -44,7 +44,19 @@ AUI.add(
 						var instance = this;
 
 						instance._eventHandles = [
-							instance._searchContainer.on('rowToggled', instance._onRowToggled, instance)
+							instance._searchContainer.on(
+								'rowToggled',
+								A.debounce(instance._getSidebarContent, 50, instance),
+								instance
+							),
+							Liferay.after(
+								'refreshInfoPanel',
+								function() {
+									setTimeout(function() {
+										instance._getSidebarContent()
+									}, 0);
+								}
+							)
 						];
 					},
 
@@ -60,7 +72,7 @@ AUI.add(
 						}
 					},
 
-					_onRowToggled: function(event) {
+					_getSidebarContent: function(event) {
 						var instance = this;
 
 						A.io.request(
@@ -101,6 +113,6 @@ AUI.add(
 	},
 	'',
 	{
-		requires: ['aui-base', 'aui-io-request', 'aui-parse-content', 'liferay-portlet-base']
+		requires: ['aui-base', 'aui-debounce', 'aui-io-request', 'aui-parse-content', 'liferay-portlet-base']
 	}
 );

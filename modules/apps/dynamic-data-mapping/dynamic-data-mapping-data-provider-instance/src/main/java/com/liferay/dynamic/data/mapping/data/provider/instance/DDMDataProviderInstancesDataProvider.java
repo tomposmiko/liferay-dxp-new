@@ -45,7 +45,8 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	immediate = true,
-	property = "ddm.data.provider.instance.id=getDataProviderInstances"
+	property = "ddm.data.provider.instance.id=getDataProviderInstances",
+	service = DDMDataProvider.class
 )
 public class DDMDataProviderInstancesDataProvider implements DDMDataProvider {
 

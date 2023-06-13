@@ -23,7 +23,6 @@ import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderException;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderOutputParametersSettings;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderRequest;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderResponse;
-import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderResponse.Status;
 import com.liferay.dynamic.data.mapping.data.provider.DDMDataProviderResponseOutput;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
@@ -45,7 +44,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,7 +58,10 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcellus Tavares
  */
-@Component(immediate = true, property = "ddm.data.provider.type=rest")
+@Component(
+	immediate = true, property = "ddm.data.provider.type=rest",
+	service = DDMDataProvider.class
+)
 public class DDMRESTDataProvider implements DDMDataProvider {
 
 	@Override
@@ -101,7 +102,7 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 
 			if (cause instanceof ConnectException) {
 				return DDMDataProviderResponse.error(
-					Status.SERVICE_UNAVAILABLE);
+					DDMDataProviderResponse.Status.SERVICE_UNAVAILABLE);
 			}
 			else {
 				throw new DDMDataProviderException(he);
@@ -126,7 +127,9 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 
 		String url = ddmRESTDataProviderSettings.url();
 
-		for (Entry<String, String> pathParameter : pathParameters.entrySet()) {
+		for (Map.Entry<String, String> pathParameter :
+				pathParameters.entrySet()) {
+
 			url = StringUtil.replaceFirst(
 				url, String.format("{%s}", pathParameter.getKey()),
 				pathParameter.getValue());
@@ -344,10 +347,10 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 
 		return MapUtil.filter(
 			ddmDataProviderRequest.getParameters(),
-			new PredicateFilter<Entry<String, String>>() {
+			new PredicateFilter<Map.Entry<String, String>>() {
 
 				@Override
-				public boolean filter(Entry<String, String> parameter) {
+				public boolean filter(Map.Entry<String, String> parameter) {
 					return !pathParameters.containsKey(parameter.getKey());
 				}
 
@@ -396,7 +399,9 @@ public class DDMRESTDataProvider implements DDMDataProvider {
 				ddmDataProviderRequest, ddmRESTDataProviderSettings));
 	}
 
-	private final Pattern _pathParameterPattern = Pattern.compile("\\{(.*)\\}");
+	private static final Pattern _pathParameterPattern = Pattern.compile(
+		"\\{(.*)\\}");
+
 	private PortalCache<String, DDMRESTDataProviderResult> _portalCache;
 
 	private static class DDMRESTDataProviderResult implements Serializable {

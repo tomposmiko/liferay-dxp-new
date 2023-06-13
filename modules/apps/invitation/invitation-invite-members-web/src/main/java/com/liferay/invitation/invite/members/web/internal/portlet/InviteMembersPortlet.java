@@ -74,7 +74,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=Invite Members",
 		"javax.portlet.expiration-cache=0",
-		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.init-param.view-template=/invite_members/view.jsp",
 		"javax.portlet.name=" + InviteMembersPortletKeys.INVITE_MEMBERS,
 		"javax.portlet.resource-bundle=content.Language",
@@ -200,11 +200,6 @@ public class InviteMembersPortlet extends MVCPortlet {
 
 	protected void doSendInvite(ActionRequest actionRequest) throws Exception {
 		long groupId = ParamUtil.getLong(actionRequest, "groupId");
-		long[] receiverUserIds = getLongArray(actionRequest, "receiverUserIds");
-		String[] receiverEmailAddresses = getStringArray(
-			actionRequest, "receiverEmailAddresses");
-		long invitedRoleId = ParamUtil.getLong(actionRequest, "invitedRoleId");
-		long invitedTeamId = ParamUtil.getLong(actionRequest, "invitedTeamId");
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -214,6 +209,12 @@ public class InviteMembersPortlet extends MVCPortlet {
 
 			return;
 		}
+
+		long invitedTeamId = ParamUtil.getLong(actionRequest, "invitedTeamId");
+		long[] receiverUserIds = getLongArray(actionRequest, "receiverUserIds");
+		long invitedRoleId = ParamUtil.getLong(actionRequest, "invitedRoleId");
+		String[] receiverEmailAddresses = getStringArray(
+			actionRequest, "receiverEmailAddresses");
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);

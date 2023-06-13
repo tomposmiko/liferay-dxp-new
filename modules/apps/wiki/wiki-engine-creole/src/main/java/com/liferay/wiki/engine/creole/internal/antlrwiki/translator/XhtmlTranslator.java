@@ -15,12 +15,12 @@
 package com.liferay.wiki.engine.creole.internal.antlrwiki.translator;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.util.HtmlUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TreeNode;
 import com.liferay.wiki.engine.creole.internal.antlrwiki.translator.internal.UnformattedHeadingTextVisitor;
@@ -32,7 +32,6 @@ import com.liferay.wiki.engine.creole.internal.parser.ast.WikiPageNode;
 import com.liferay.wiki.engine.creole.internal.parser.ast.extension.TableOfContentsNode;
 import com.liferay.wiki.engine.creole.internal.parser.ast.link.LinkNode;
 import com.liferay.wiki.engine.creole.internal.parser.visitor.XhtmlTranslationVisitor;
-import com.liferay.wiki.exception.NoSuchPageException;
 import com.liferay.wiki.model.WikiPage;
 import com.liferay.wiki.service.WikiPageLocalServiceUtil;
 
@@ -228,11 +227,11 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 	protected void appendWikiHref(LinkNode linkNode) {
 		WikiPage page = null;
 
+		String title = StringUtil.replace(
+			linkNode.getLink(), CharPool.NO_BREAK_SPACE, StringPool.SPACE);
+
 		try {
-			page = WikiPageLocalServiceUtil.getPage(
-				_page.getNodeId(), linkNode.getLink());
-		}
-		catch (NoSuchPageException nspe) {
+			page = WikiPageLocalServiceUtil.fetchPage(_page.getNodeId(), title);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -249,17 +248,15 @@ public class XhtmlTranslator extends XhtmlTranslationVisitor {
 			return;
 		}
 
-		String pageTitle = linkNode.getLink();
-
 		if ((page != null) && (_viewPageURL != null)) {
-			_viewPageURL.setParameter("title", pageTitle);
+			_viewPageURL.setParameter("title", title);
 
 			append(_viewPageURL.toString());
 
 			_viewPageURL.setParameter("title", _page.getTitle());
 		}
 		else if (_editPageURL != null) {
-			_editPageURL.setParameter("title", pageTitle);
+			_editPageURL.setParameter("title", title);
 
 			append(_editPageURL.toString());
 

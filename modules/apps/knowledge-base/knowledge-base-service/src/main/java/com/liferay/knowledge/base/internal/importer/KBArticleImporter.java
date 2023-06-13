@@ -21,13 +21,13 @@ import com.liferay.knowledge.base.exception.KBArticleImportException;
 import com.liferay.knowledge.base.internal.importer.util.KBArticleMarkdownConverter;
 import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.service.KBArticleLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -213,10 +213,11 @@ public class KBArticleImporter {
 			Map<String, String> metadata = new HashMap<>(properties.size());
 
 			for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-				Object key = entry.getKey();
 				Object value = entry.getValue();
 
 				if (value != null) {
+					Object key = entry.getKey();
+
 					metadata.put(key.toString(), value.toString());
 				}
 			}

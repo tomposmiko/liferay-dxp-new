@@ -17,10 +17,8 @@ package com.liferay.apio.architect.representor;
 import aQute.bnd.annotation.ProviderType;
 
 import com.liferay.apio.architect.identifier.Identifier;
-import com.liferay.apio.architect.related.RelatedCollection;
 
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 /**
  * Holds information about the metadata supported for a resource.
@@ -44,14 +42,6 @@ public interface Representor<T> extends BaseRepresentor<T> {
 	 * @return the model's identifier
 	 */
 	public Object getIdentifier(T model);
-
-	/**
-	 * Returns the related collections.
-	 *
-	 * @return the related collections
-	 */
-	public Stream<RelatedCollection<? extends Identifier>>
-		getRelatedCollections();
 
 	/**
 	 * Creates generic representations of your domain models that Apio
@@ -87,14 +77,14 @@ public interface Representor<T> extends BaseRepresentor<T> {
 		 * @param  key the relation's name in the resource
 		 * @param  relatedKey the relation's name in the related resource
 		 * @param  identifierClass the related resource identifier's class
-		 * @param  identifierFunction the function used to get the related
-		 *         resource's identifier
+		 * @param  modelToIdentifierFunction the function used to get the
+		 *         related resource's identifier
 		 * @return the builder's step
 		 */
 		public <S> FirstStep<T> addBidirectionalModel(
 			String key, String relatedKey,
 			Class<? extends Identifier<S>> identifierClass,
-			Function<T, S> identifierFunction);
+			Function<T, S> modelToIdentifierFunction);
 
 		/**
 		 * Adds information about a related collection.
@@ -116,11 +106,12 @@ public interface Representor<T> extends BaseRepresentor<T> {
 		 * Provides a lambda function that can be used to obtain a model's
 		 * identifier.
 		 *
-		 * @param  identifierFunction lambda function used to obtain a model's
-		 *         identifier
+		 * @param  modelToIdentifierFunction lambda function used to obtain a
+		 *         model's identifier
 		 * @return the builder's next step
 		 */
-		public FirstStep<T> identifier(Function<T, U> identifierFunction);
+		public FirstStep<T> identifier(
+			Function<T, U> modelToIdentifierFunction);
 
 	}
 

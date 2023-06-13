@@ -16,6 +16,7 @@ package com.liferay.portal.search.internal.permission;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.search.SearchPaginationUtil;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -42,7 +43,6 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.configuration.DefaultSearchResultPermissionFilterConfiguration;
@@ -168,6 +168,7 @@ public class DefaultSearchResultPermissionFilter
 			(searchContext.getEnd() != QueryUtil.ALL_POS)) {
 
 			int end = searchContext.getEnd();
+
 			int start = searchContext.getStart();
 
 			if (start == QueryUtil.ALL_POS) {
@@ -179,10 +180,9 @@ public class DefaultSearchResultPermissionFilter
 			if (searchResultWindow > _searchQueryResultWindowLimit) {
 				throw new SystemException(
 					StringBundler.concat(
-						"Search result window size of ",
-						String.valueOf(searchResultWindow),
+						"Search result window size of ", searchResultWindow,
 						" exceeds the configured limit of ",
-						String.valueOf(_searchQueryResultWindowLimit)));
+						_searchQueryResultWindowLimit));
 			}
 		}
 
@@ -371,6 +371,7 @@ public class DefaultSearchResultPermissionFilter
 			Hits hits, int accumulatedCount, int start, int end) {
 
 			int delta = end - start;
+
 			Document[] docs = hits.getDocs();
 
 			int remaining = docs.length;

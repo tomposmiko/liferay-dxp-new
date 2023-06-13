@@ -15,9 +15,11 @@
 package com.liferay.blog.apio.internal.architect.form;
 
 import com.liferay.apio.architect.form.Form;
-import com.liferay.apio.architect.form.Form.Builder;
 import com.liferay.apio.architect.function.throwable.ThrowableFunction;
 import com.liferay.apio.architect.functional.Try;
+import com.liferay.category.apio.architect.identifier.CategoryIdentifier;
+import com.liferay.media.object.apio.architect.identifier.MediaObjectIdentifier;
+import com.liferay.person.apio.architect.identifier.PersonIdentifier;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.servlet.taglib.ui.ImageSelector;
@@ -32,24 +34,21 @@ import java.util.Optional;
 import javax.ws.rs.BadRequestException;
 
 /**
- * Instances of this class represent the values extracted from a blog posting
- * form.
+ * Represents the values extracted from a blog posting form.
  *
  * @author Alejandro Hernández
- * @review
  */
 public class BlogPostingForm {
 
 	/**
-	 * Builds a {@code Form} that generates {@code BlogPostingForm} depending on
-	 * the HTTP body.
+	 * Builds a {@code Form} that generates a {@code BlogPostingForm} that
+	 * depends on the HTTP body.
 	 *
 	 * @param  formBuilder the {@code Form} builder
-	 * @return a blog posting form
-	 * @review
+	 * @return the blog posting form
 	 */
 	public static Form<BlogPostingForm> buildForm(
-		Builder<BlogPostingForm> formBuilder) {
+		Form.Builder<BlogPostingForm> formBuilder) {
 
 		return formBuilder.title(
 			__ -> "The blog posting form"
@@ -58,39 +57,39 @@ public class BlogPostingForm {
 		).constructor(
 			BlogPostingForm::new
 		).addOptionalDate(
-			"dateDisplayed", BlogPostingForm::_setDisplayDate
+			"dateDisplayed", BlogPostingForm::setDisplayDate
 		).addOptionalDate(
-			"dateCreated", BlogPostingForm::_setCreateDate
+			"dateCreated", BlogPostingForm::setCreateDate
 		).addOptionalDate(
-			"dateModified", BlogPostingForm::_setModifiedDate
-		).addOptionalLong(
-			"author", BlogPostingForm::_setAuthorId
-		).addOptionalLong(
-			"image", BlogPostingForm::_setImageId
+			"dateModified", BlogPostingForm::setModifiedDate
+		).addOptionalLinkedModel(
+			"creator", PersonIdentifier.class, BlogPostingForm::setCreatorId
+		).addOptionalLinkedModel(
+			"image", MediaObjectIdentifier.class, BlogPostingForm::setImageId
+		).addOptionalLinkedModelList(
+			"category", CategoryIdentifier.class, BlogPostingForm::setCategories
 		).addOptionalString(
-			"alternativeHeadline", BlogPostingForm::_setAlternativeHeadline
+			"alternativeHeadline", BlogPostingForm::setAlternativeHeadline
 		).addOptionalString(
-			"caption", BlogPostingForm::_setImageCaption
+			"caption", BlogPostingForm::setImageCaption
 		).addOptionalString(
-			"description", BlogPostingForm::_setDescription
+			"description", BlogPostingForm::setDescription
 		).addOptionalString(
-			"semanticUrl", BlogPostingForm::_setSemanticUrl
+			"friendlyUrlPath", BlogPostingForm::setFriendlyURLPath
 		).addOptionalStringList(
-			"keywords", BlogPostingForm::_setKeywords
+			"keywords", BlogPostingForm::setKeywords
 		).addRequiredString(
-			"articleBody", BlogPostingForm::_setArticleBody
+			"articleBody", BlogPostingForm::setArticleBody
 		).addRequiredString(
-			"headline", BlogPostingForm::_setHeadline
+			"headline", BlogPostingForm::setHeadline
 		).build();
 	}
 
 	/**
-	 * Returns the blog posting's alternative headline if present. Returns an
-	 * empty {@code String} otherwise.
+	 * Returns the blog posting's alternative headline, if present; otherwise,
+	 * returns an empty string.
 	 *
-	 * @return the blog posting's alternative headline if present; an empty
-	 *         {@code String} otherwise
-	 * @review
+	 * @return the alternative headline, if present; an empty string otherwise
 	 */
 	public String getAlternativeHeadline() {
 		return Optional.ofNullable(
@@ -101,39 +100,34 @@ public class BlogPostingForm {
 	}
 
 	/**
-	 * Returns the blog posting's body
+	 * Returns the blog post's body.
 	 *
-	 * @return the blog posting's body
-	 * @review
+	 * @return the blog post's body
 	 */
 	public String getArticleBody() {
 		return _articleBody;
 	}
 
 	/**
-	 * Returns the blog posting's author ID if present. Returns the provided
-	 * default ID otherwise.
+	 * Returns the blog post's creator ID, if present; otherwise, returns the
+	 * provided default ID.
 	 *
-	 * @param  defaultAuthorId the default author ID
-	 * @return the blog posting's author ID, if present; the provided default ID
-	 *         otherwise.
-	 * @review
+	 * @param  defaultCreatorId the default creator ID
+	 * @return the creator ID, if present; the default ID otherwise
 	 */
-	public long getAuthorId(long defaultAuthorId) {
+	public long getCreatorId(long defaultCreatorId) {
 		return Optional.ofNullable(
-			_authorId
+			_creatorId
 		).orElse(
-			defaultAuthorId
+			defaultCreatorId
 		);
 	}
 
 	/**
-	 * Returns the blog posting's description if present. Returns an empty
-	 * {@code String} otherwise.
+	 * Returns the blog post's description, if present; otherwise, returns an
+	 * empty string.
 	 *
-	 * @return the blog posting's description if present; an empty {@code
-	 *         String} otherwise
-	 * @review
+	 * @return the description, if present; an empty string otherwise
 	 */
 	public String getDescription() {
 		return Optional.ofNullable(
@@ -144,12 +138,10 @@ public class BlogPostingForm {
 	}
 
 	/**
-	 * Returns the blog posting's display date if present. Returns today's date
-	 * otherwise.
+	 * Returns the blog post's display date, if present; otherwise, returns
+	 * today's date.
 	 *
-	 * @return the blog posting's display date if present; today's date
-	 *         otherwise.
-	 * @review
+	 * @return the display date, if present; today's date otherwise
 	 */
 	public Date getDisplayDate() {
 		return Optional.ofNullable(
@@ -160,22 +152,33 @@ public class BlogPostingForm {
 	}
 
 	/**
-	 * Returns the blog posting's headline
+	 * Returns the blog post's friendly URL, if present; otherwise, returns an
+	 * empty string.
 	 *
-	 * @return the blog posting's headline
-	 * @review
+	 * @return the friendly URL if present; an empty string otherwise
+	 */
+	public String getFriendlyURLPath() {
+		return Optional.ofNullable(
+			_friendlyURLPath
+		).orElse(
+			""
+		);
+	}
+
+	/**
+	 * Returns the blog post's headline.
+	 *
+	 * @return the headline
 	 */
 	public String getHeadline() {
 		return _headline;
 	}
 
 	/**
-	 * Returns the blog posting's image caption if present. Returns empty {@code
-	 * String} otherwise.
+	 * Returns the blog post's image caption, if present; otherwise, returns an
+	 * empty string.
 	 *
-	 * @return the blog posting's image caption if present; empty {@code String}
-	 *         otherwise
-	 * @review
+	 * @return the image caption, if present; an empty string otherwise
 	 */
 	public String getImageCaption() {
 		return Optional.ofNullable(
@@ -186,14 +189,13 @@ public class BlogPostingForm {
 	}
 
 	/**
-	 * Returns the {@link ImageSelector} for the blog posting's image, if an
-	 * image ID is present. Returns {@code null} otherwise.
+	 * Returns the {@code ImageSelector} for the blog post's image, if an image
+	 * ID is present; otherwise, returns {@code null}.
 	 *
-	 * @param  function a function that transforms a file entry ID into a {@link
+	 * @param  function a function that transforms a file entry ID into a {@code
 	 *         FileEntry}
-	 * @return the {@link ImageSelector} for the blog posting's image, if an
-	 *         image ID is present; {@code null} otherwise
-	 * @review
+	 * @return the {@code ImageSelector}, if an image ID is present; {@code
+	 *         null} otherwise
 	 */
 	public ImageSelector getImageSelector(
 		ThrowableFunction<Long, FileEntry> function) {
@@ -216,27 +218,10 @@ public class BlogPostingForm {
 	}
 
 	/**
-	 * Returns the blog posting's semantic URL if present. Returns an empty
-	 * {@code String} otherwise.
-	 *
-	 * @return the blog posting's semantic URL if present; an empty {@code
-	 *         String} otherwise
-	 * @review
-	 */
-	public String getSemanticUrl() {
-		return Optional.ofNullable(
-			_semanticUrl
-		).orElse(
-			""
-		);
-	}
-
-	/**
-	 * Returns the service context related with this form
+	 * Returns the service context related to this form.
 	 *
 	 * @param  groupId the group ID
 	 * @return the service context
-	 * @review
 	 */
 	public ServiceContext getServiceContext(long groupId) {
 		ServiceContext serviceContext = new ServiceContext();
@@ -257,68 +242,78 @@ public class BlogPostingForm {
 			serviceContext.setAssetTagNames(ArrayUtil.toStringArray(_keywords));
 		}
 
+		if (ListUtil.isNotEmpty(_categories)) {
+			serviceContext.setAssetCategoryIds(
+				ArrayUtil.toLongArray(_categories));
+		}
+
 		return serviceContext;
 	}
 
-	private void _setAlternativeHeadline(String alternativeHeadline) {
+	public void setAlternativeHeadline(String alternativeHeadline) {
 		_alternativeHeadline = alternativeHeadline;
 	}
 
-	private void _setArticleBody(String articleBody) {
+	public void setArticleBody(String articleBody) {
 		_articleBody = articleBody;
 	}
 
-	private void _setAuthorId(long authorId) {
-		_authorId = authorId;
+	public void setCategories(List<Long> categories) {
+		_categories = categories;
 	}
 
-	private void _setCreateDate(Date createDate) {
+	public void setCreateDate(Date createDate) {
 		_createDate = createDate;
 	}
 
-	private void _setDescription(String description) {
+	public void setCreatorId(long creatorId) {
+		_creatorId = creatorId;
+	}
+
+	public void setDescription(String description) {
 		_description = description;
 	}
 
-	private void _setDisplayDate(Date displayDate) {
+	public void setDisplayDate(Date displayDate) {
 		_displayDate = displayDate;
 	}
 
-	private void _setHeadline(String headline) {
+	public void setFriendlyURLPath(String friendlyURLPath) {
+		_friendlyURLPath = friendlyURLPath;
+	}
+
+	public void setHeadline(String headline) {
 		_headline = headline;
 	}
 
-	private void _setImageCaption(String imageCaption) {
+	public void setImageCaption(String imageCaption) {
 		_imageCaption = imageCaption;
 	}
 
-	private void _setImageId(long imageId) {
+	public void setImageId(long imageId) {
 		_imageId = imageId;
 	}
 
-	private void _setKeywords(List<String> keywords) {
+	public void setKeywords(List<String> keywords) {
 		_keywords = keywords;
 	}
 
-	private void _setModifiedDate(Date modifiedDate) {
+	public void setModifiedDate(Date modifiedDate) {
 		_modifiedDate = modifiedDate;
-	}
-
-	private void _setSemanticUrl(String semanticUrl) {
-		_semanticUrl = semanticUrl;
 	}
 
 	private String _alternativeHeadline;
 	private String _articleBody;
-	private Long _authorId;
+	private List<Long> _categories;
 	private Date _createDate;
+	private Long _creatorId;
 	private String _description;
 	private Date _displayDate;
+	private String _friendlyURLPath;
 	private String _headline;
 	private String _imageCaption;
 	private Long _imageId;
 	private List<String> _keywords;
 	private Date _modifiedDate;
-	private String _semanticUrl;
 
 }

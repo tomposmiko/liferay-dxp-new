@@ -14,6 +14,10 @@
 
 package com.liferay.portal.fabric.netty.worker;
 
+import com.liferay.petra.concurrent.DefaultNoticeableFuture;
+import com.liferay.petra.concurrent.NoticeableFuture;
+import com.liferay.petra.process.ProcessCallable;
+import com.liferay.petra.process.ProcessException;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.fabric.local.worker.EmbeddedProcessChannel;
 import com.liferay.portal.fabric.local.worker.LocalFabricWorker;
@@ -21,11 +25,7 @@ import com.liferay.portal.fabric.netty.NettyTestUtil;
 import com.liferay.portal.fabric.netty.handlers.NettyChannelAttributes;
 import com.liferay.portal.fabric.netty.rpc.handlers.NettyRPCChannelHandler;
 import com.liferay.portal.fabric.netty.util.NettyUtilAdvice;
-import com.liferay.portal.fabric.status.JMXProxyUtil.ProcessCallableExecutor;
-import com.liferay.portal.kernel.concurrent.DefaultNoticeableFuture;
-import com.liferay.portal.kernel.concurrent.NoticeableFuture;
-import com.liferay.portal.kernel.process.ProcessCallable;
-import com.liferay.portal.kernel.process.ProcessException;
+import com.liferay.portal.fabric.status.JMXProxyUtil;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.CodeCoverageAssertor;
 import com.liferay.portal.kernel.test.rule.NewEnv;
@@ -73,7 +73,7 @@ public class NettyFabricWorkerProcessCallableExecutorTest {
 				new EmbeddedProcessChannel<Serializable>(
 					new DefaultNoticeableFuture<Serializable>())));
 
-		ProcessCallableExecutor processCallableExecutor =
+		JMXProxyUtil.ProcessCallableExecutor processCallableExecutor =
 			new NettyFabricWorkerProcessCallableExecutor(
 				embeddedChannel, 0, Long.MAX_VALUE);
 

@@ -17,6 +17,7 @@ package com.liferay.alloy.mvc;
 import com.liferay.alloy.mvc.internal.json.web.service.AlloyControllerInvokerManager;
 import com.liferay.alloy.mvc.internal.json.web.service.AlloyMockUtil;
 import com.liferay.counter.kernel.service.CounterLocalServiceUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.bean.ConstantsBeanFactoryUtil;
@@ -71,6 +72,8 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
+import com.liferay.portal.kernel.transaction.TransactionConfig;
+import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
@@ -79,8 +82,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.ServiceBeanMethodInvocationFactoryUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
@@ -320,6 +321,10 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 		}
 	}
 
+	/**
+	 * @deprecated As of Judson (7.1.x), as of 7.1.x, with no direct replacement
+	 */
+	@Deprecated
 	@SuppressWarnings("unused")
 	@Transactional(
 		isolation = Isolation.PORTAL, propagation = Propagation.REQUIRES_NEW,
@@ -545,15 +550,20 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 	protected void executeResource(Method method) throws Exception {
 		try {
 			if (method != null) {
-				Method invokeMethod = clazz.getMethod(
-					"invoke", new Class<?>[] {Method.class});
-
-				ServiceBeanMethodInvocationFactoryUtil.proceed(
-					this, clazz, invokeMethod, new Object[] {method},
-					new String[] {"transactionAdvice"});
+				TransactionInvokerUtil.invoke(
+					_transactionConfig, () -> method.invoke(this));
 			}
 		}
-		catch (Exception e) {
+		catch (Throwable t) {
+			Exception e = null;
+
+			if (t instanceof Exception) {
+				e = (Exception)t;
+			}
+			else {
+				e = new Exception(t);
+			}
+
 			Object[] arguments = null;
 			String message = "an-unexpected-system-error-occurred";
 
@@ -793,7 +803,7 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 			return;
 		}
 
-		indexerClassName = indexer.getClassNames()[0];
+		indexerClassName = indexer.getSearchClassNames()[0];
 
 		Indexer existingIndexer = IndexerRegistryUtil.getIndexer(
 			indexerClassName);
@@ -1285,7 +1295,7 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 
 		searchContext.setEnd(end);
 
-		String modelClassName = indexer.getClassNames()[0];
+		String modelClassName = indexer.getSearchClassNames()[0];
 
 		int pos = modelClassName.indexOf(".model.");
 
@@ -1648,5 +1658,17 @@ public abstract class BaseAlloyControllerImpl implements AlloyController {
 	protected ThemeDisplay themeDisplay;
 	protected User user;
 	protected String viewPath;
+
+	private static final TransactionConfig _transactionConfig;
+
+	static {
+		TransactionConfig.Builder builder = new TransactionConfig.Builder();
+
+		builder.setIsolation(Isolation.PORTAL);
+		builder.setPropagation(Propagation.REQUIRES_NEW);
+		builder.setRollbackForClasses(Exception.class);
+
+		_transactionConfig = builder.build();
+	}
 
 }

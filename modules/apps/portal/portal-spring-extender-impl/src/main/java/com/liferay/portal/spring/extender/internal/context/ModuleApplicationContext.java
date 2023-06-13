@@ -14,6 +14,8 @@
 
 package com.liferay.portal.spring.extender.internal.context;
 
+import com.liferay.portal.spring.bean.LiferayBeanFactory;
+
 import java.net.URL;
 
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.List;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -37,18 +40,18 @@ public class ModuleApplicationContext extends ClassPathXmlApplicationContext {
 
 		super(configLocations, false, null);
 
-		_bundle = bundle;
+		this.bundle = bundle;
 
 		setClassLoader(classLoader);
 	}
 
 	public BundleContext getBundleContext() {
-		return _bundle.getBundleContext();
+		return bundle.getBundleContext();
 	}
 
 	@Override
 	public Resource[] getResources(String locationPattern) {
-		Enumeration<URL> enumeration = _bundle.findEntries(
+		Enumeration<URL> enumeration = bundle.findEntries(
 			locationPattern, "*.xml", false);
 
 		List<Resource> resources = new ArrayList<>();
@@ -60,6 +63,11 @@ public class ModuleApplicationContext extends ClassPathXmlApplicationContext {
 		return resources.toArray(new Resource[resources.size()]);
 	}
 
-	private final Bundle _bundle;
+	@Override
+	protected DefaultListableBeanFactory createBeanFactory() {
+		return new LiferayBeanFactory(getInternalParentBeanFactory());
+	}
+
+	protected final Bundle bundle;
 
 }

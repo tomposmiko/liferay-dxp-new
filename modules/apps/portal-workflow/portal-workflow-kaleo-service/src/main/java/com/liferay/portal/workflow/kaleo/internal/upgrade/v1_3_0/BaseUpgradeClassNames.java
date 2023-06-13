@@ -14,9 +14,9 @@
 
 package com.liferay.portal.workflow.kaleo.internal.upgrade.v1_3_0;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.workflow.kaleo.runtime.util.WorkflowContextUtil;
 
@@ -86,7 +86,6 @@ public abstract class BaseUpgradeClassNames extends UpgradeProcess {
 			ResultSet rs = ps.executeQuery()) {
 
 			while (rs.next()) {
-				long primaryKeyValue = rs.getLong(primaryKeyName);
 				String workflowContextJSON = rs.getString("workflowContext");
 
 				if (Validator.isNull(workflowContextJSON)) {
@@ -97,6 +96,8 @@ public abstract class BaseUpgradeClassNames extends UpgradeProcess {
 					updateWorkflowContext(workflowContextJSON);
 
 				if (workflowContext != null) {
+					long primaryKeyValue = rs.getLong(primaryKeyName);
+
 					updateWorkflowContext(
 						tableName, primaryKeyName, primaryKeyValue,
 						WorkflowContextUtil.convert(workflowContext));

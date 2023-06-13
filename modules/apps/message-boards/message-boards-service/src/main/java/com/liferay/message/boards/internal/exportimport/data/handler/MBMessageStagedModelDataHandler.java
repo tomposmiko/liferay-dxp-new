@@ -122,12 +122,12 @@ public class MBMessageStagedModelDataHandler
 			ServiceContext serviceContext)
 		throws PortalException {
 
-		MBDiscussion discussion = _mbDiscussionLocalService.getThreadDiscussion(
-			threadId);
-
 		MBMessage importedMessage = null;
 
 		if (!message.isRoot()) {
+			MBDiscussion discussion =
+				_mbDiscussionLocalService.getThreadDiscussion(threadId);
+
 			importedMessage = _mbMessageLocalService.addDiscussionMessage(
 				userId, message.getUserName(),
 				portletDataContext.getScopeGroupId(), discussion.getClassName(),
@@ -449,14 +449,14 @@ public class MBMessageStagedModelDataHandler
 			PortletDataContext portletDataContext, MBMessage message)
 		throws Exception {
 
-		long userId = portletDataContext.getUserId(message.getUserUuid());
-
 		MBMessage existingMessage = fetchStagedModelByUuidAndGroupId(
 			message.getUuid(), portletDataContext.getScopeGroupId());
 
 		if (existingMessage == null) {
 			return;
 		}
+
+		long userId = portletDataContext.getUserId(message.getUserUuid());
 
 		if (existingMessage.isInTrash()) {
 			TrashHandler trashHandler =

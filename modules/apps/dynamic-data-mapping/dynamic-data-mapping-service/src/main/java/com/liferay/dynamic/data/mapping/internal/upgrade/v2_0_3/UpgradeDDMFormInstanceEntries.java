@@ -14,13 +14,13 @@
 
 package com.liferay.dynamic.data.mapping.internal.upgrade.v2_0_3;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.util.StringBundler;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -51,10 +51,11 @@ public class UpgradeDDMFormInstanceEntries extends UpgradeProcess {
 			ResultSet rs = ps1.executeQuery()) {
 
 			while (rs.next()) {
-				long contentId = rs.getLong("contentId");
 				String data = rs.getString("data_");
 
 				ps2.setString(1, updateFieldValuesToLocalizable(data));
+
+				long contentId = rs.getLong("contentId");
 
 				ps2.setLong(2, contentId);
 

@@ -58,11 +58,12 @@ public class WikiAttachmentsHelper {
 
 		try {
 			if (numOfFiles == 0) {
-				String fileName = uploadPortletRequest.getFileName("file");
 				InputStream inputStream = uploadPortletRequest.getFileAsStream(
 					"file");
 
 				if (inputStream != null) {
+					String fileName = uploadPortletRequest.getFileName("file");
+
 					ObjectValuePair<String, InputStream> inputStreamOVP =
 						new ObjectValuePair<>(fileName, inputStream);
 
@@ -73,6 +74,7 @@ public class WikiAttachmentsHelper {
 				for (int i = 1; i <= numOfFiles; i++) {
 					String fileName = uploadPortletRequest.getFileName(
 						"file" + i);
+
 					InputStream inputStream =
 						uploadPortletRequest.getFileAsStream("file" + i);
 

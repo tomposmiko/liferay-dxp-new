@@ -18,9 +18,9 @@ import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormJSONSerializer;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.sql.PreparedStatement;
@@ -60,7 +60,6 @@ public class UpgradeAutocompleteDDMTextFieldSetting extends UpgradeProcess {
 
 			try (ResultSet rs = ps1.executeQuery()) {
 				while (rs.next()) {
-					long structureId = rs.getLong(1);
 					String definition = rs.getString(2);
 
 					String newDefinition = upgradeDDMFormInstanceStructure(
@@ -71,6 +70,8 @@ public class UpgradeAutocompleteDDMTextFieldSetting extends UpgradeProcess {
 					}
 
 					ps2.setString(1, newDefinition);
+
+					long structureId = rs.getLong(1);
 
 					ps2.setLong(2, structureId);
 

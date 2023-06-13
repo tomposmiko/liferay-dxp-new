@@ -18,6 +18,7 @@ import com.liferay.document.library.kernel.exception.DuplicateFileException;
 import com.liferay.document.library.kernel.exception.NoSuchFileException;
 import com.liferay.document.library.kernel.store.BaseStore;
 import com.liferay.document.library.kernel.store.Store;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -25,7 +26,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.store.jcr.configuration.JCRStoreConfiguration;
@@ -412,14 +412,12 @@ public class JCRStore extends BaseStore {
 
 			Version version = versionHistory.getVersionByLabel(versionLabel);
 
-			Version linearPredecessorVersion = version.getLinearPredecessor();
-
 			if (version.getLinearSuccessor() == null) {
-				Version restoreVersion = linearPredecessorVersion;
+				Version restoreVersion = version.getLinearPredecessor();
 
 				if (Objects.equals(
 						JCRConstants.JCR_ROOT_VERSION,
-						linearPredecessorVersion.getName())) {
+						restoreVersion.getName())) {
 
 					versionManager.checkout(contentNode.getPath());
 
@@ -954,10 +952,6 @@ public class JCRStore extends BaseStore {
 		Node contentNode = null;
 
 		try {
-			Workspace workspace = session.getWorkspace();
-
-			VersionManager versionManager = workspace.getVersionManager();
-
 			Node rootNode = getRootNode(session, companyId);
 
 			Node repositoryNode = getFolderNode(rootNode, repositoryId);
@@ -967,6 +961,10 @@ public class JCRStore extends BaseStore {
 			contentNode = fileNode.getNode(JCRConstants.JCR_CONTENT);
 
 			if (Validator.isNotNull(versionLabel)) {
+				Workspace workspace = session.getWorkspace();
+
+				VersionManager versionManager = workspace.getVersionManager();
+
 				VersionHistory versionHistory =
 					versionManager.getVersionHistory(contentNode.getPath());
 

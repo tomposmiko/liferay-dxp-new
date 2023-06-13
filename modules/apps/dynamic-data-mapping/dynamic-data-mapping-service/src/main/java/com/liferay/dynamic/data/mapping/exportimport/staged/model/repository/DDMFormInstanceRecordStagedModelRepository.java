@@ -35,8 +35,6 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.util.List;
@@ -152,32 +150,27 @@ public class DDMFormInstanceRecordStagedModelRepository
 			exportActionableDynamicQuery.getAddCriteriaMethod();
 
 		exportActionableDynamicQuery.setAddCriteriaMethod(
-			new ActionableDynamicQuery.AddCriteriaMethod() {
+			dynamicQuery -> {
+				addCriteriaMethod.addCriteria(dynamicQuery);
 
-				@Override
-				public void addCriteria(DynamicQuery dynamicQuery) {
-					addCriteriaMethod.addCriteria(dynamicQuery);
+				Property formInstanceRecordIdProperty =
+					PropertyFactoryUtil.forName("formInstanceRecordId");
 
-					Property formInstanceRecordIdProperty =
-						PropertyFactoryUtil.forName("formInstanceRecordId");
+				DynamicQuery formInstanceRecordVersionDynamicQuery =
+					getRecordVersionDynamicQuery();
 
-					DynamicQuery formInstanceRecordVersionDynamicQuery =
-						getRecordVersionDynamicQuery();
+				dynamicQuery.add(
+					formInstanceRecordIdProperty.in(
+						formInstanceRecordVersionDynamicQuery));
 
-					dynamicQuery.add(
-						formInstanceRecordIdProperty.in(
-							formInstanceRecordVersionDynamicQuery));
+				Property formInstanceIdProperty = PropertyFactoryUtil.forName(
+					"formInstanceId");
 
-					Property formInstanceIdProperty =
-						PropertyFactoryUtil.forName("formInstanceId");
+				DynamicQuery formInstanceDynamicQuery =
+					getFormInstanceDynamicQuery();
 
-					DynamicQuery formInstanceDynamicQuery =
-						getFormInstanceDynamicQuery();
-
-					dynamicQuery.add(
-						formInstanceIdProperty.in(formInstanceDynamicQuery));
-				}
-
+				dynamicQuery.add(
+					formInstanceIdProperty.in(formInstanceDynamicQuery));
 			});
 
 		return exportActionableDynamicQuery;
@@ -305,9 +298,6 @@ public class DDMFormInstanceRecordStagedModelRepository
 		_ddmFormInstanceRecordLocalService.updateDDMFormInstanceRecord(
 			importedFormInstanceRecord);
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDMFormInstanceRecordStagedModelRepository.class);
 
 	@Reference
 	private DDMFormInstanceRecordLocalService

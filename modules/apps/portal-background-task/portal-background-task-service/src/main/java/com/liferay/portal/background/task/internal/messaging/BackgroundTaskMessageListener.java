@@ -14,6 +14,8 @@
 
 package com.liferay.portal.background.task.internal.messaging;
 
+import com.liferay.petra.lang.ClassLoaderPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.background.task.internal.SerialBackgroundTaskExecutor;
 import com.liferay.portal.background.task.internal.ThreadLocalAwareBackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
@@ -37,10 +39,10 @@ import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.util.ClassLoaderUtil;
+import com.liferay.portal.kernel.util.AggregateClassLoader;
 import com.liferay.portal.kernel.util.InstanceFactory;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StackTraceUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -171,9 +173,8 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					StringBundler.concat(
-						"Completing background task ",
-						String.valueOf(backgroundTaskId), " with status: ",
-						String.valueOf(status)));
+						"Completing background task ", backgroundTaskId,
+						" with status: ", status));
 			}
 
 			_backgroundTaskManager.amendBackgroundTask(
@@ -225,11 +226,11 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 			backgroundTaskExecutor = backgroundTaskExecutor.clone();
 		}
 		else {
-			ClassLoader classLoader = ClassLoaderUtil.getPortalClassLoader();
+			ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
 
 			if (Validator.isNotNull(servletContextNames)) {
-				classLoader = ClassLoaderUtil.getAggregatePluginsClassLoader(
-					StringUtil.split(servletContextNames), false);
+				classLoader = _getAggregatePluginsClassLoader(
+					servletContextNames);
 			}
 
 			try {
@@ -255,13 +256,12 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 			return null;
 		}
 
-		ClassLoader classLoader = ClassLoaderUtil.getPortalClassLoader();
+		ClassLoader classLoader = PortalClassLoaderUtil.getClassLoader();
 
 		String servletContextNames = backgroundTask.getServletContextNames();
 
 		if (Validator.isNotNull(servletContextNames)) {
-			classLoader = ClassLoaderUtil.getAggregatePluginsClassLoader(
-				StringUtil.split(servletContextNames), false);
+			classLoader = _getAggregatePluginsClassLoader(servletContextNames);
 		}
 
 		return classLoader;
@@ -287,6 +287,23 @@ public class BackgroundTaskMessageListener extends BaseMessageListener {
 			backgroundTaskExecutor, _backgroundTaskThreadLocalManager);
 
 		return backgroundTaskExecutor;
+	}
+
+	private ClassLoader _getAggregatePluginsClassLoader(
+		String servletContextNamesString) {
+
+		String[] servletContextNames = StringUtil.split(
+			servletContextNamesString);
+
+		ClassLoader[] classLoaders =
+			new ClassLoader[servletContextNames.length];
+
+		for (int i = 0; i < servletContextNames.length; i++) {
+			classLoaders[i] = ClassLoaderPool.getClassLoader(
+				servletContextNames[i]);
+		}
+
+		return AggregateClassLoader.getAggregateClassLoader(classLoaders);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

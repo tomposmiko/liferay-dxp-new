@@ -140,6 +140,12 @@ public class LayoutExportController implements ExportController {
 		catch (Throwable t) {
 			ExportImportThreadLocal.setLayoutExportInProcess(false);
 
+			if (portletDataContext != null) {
+				ZipWriter zipWriter = portletDataContext.getZipWriter();
+
+				zipWriter.umount();
+			}
+
 			_exportImportLifecycleManager.fireExportImportLifecycleEvent(
 				ExportImportLifecycleConstants.EVENT_LAYOUT_EXPORT_FAILED,
 				getProcessFlag(),
@@ -161,6 +167,7 @@ public class LayoutExportController implements ExportController {
 
 		boolean ignoreLastPublishDate = MapUtil.getBoolean(
 			parameterMap, PortletDataHandlerKeys.IGNORE_LAST_PUBLISH_DATE);
+
 		boolean permissions = MapUtil.getBoolean(
 			parameterMap, PortletDataHandlerKeys.PERMISSIONS);
 
@@ -330,7 +337,6 @@ public class LayoutExportController implements ExportController {
 		// Export other models
 
 		_portletExportController.exportAssetLinks(portletDataContext);
-		_portletExportController.exportExpandoTables(portletDataContext);
 		_portletExportController.exportLocks(portletDataContext);
 
 		portletDataContext.addDeletionSystemEventStagedModelTypes(

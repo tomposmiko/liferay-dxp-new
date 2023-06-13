@@ -1127,15 +1127,14 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			return repository.getFileEntry(folderId, title);
 		}
 		catch (NoSuchFileEntryException nsfee) {
-			if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-				Repository repository = repositoryProvider.getFolderRepository(
-					folderId);
-
-				return repository.getFileEntry(folderId, title);
-			}
-			else {
+			if (folderId == DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 				throw nsfee;
 			}
+
+			Repository repository = repositoryProvider.getFolderRepository(
+				folderId);
+
+			return repository.getFileEntry(folderId, title);
 		}
 	}
 
@@ -2109,6 +2108,7 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 
 		Repository fromRepository = repositoryProvider.getFileEntryRepository(
 			fileEntryId);
+
 		Repository toRepository = getFolderRepository(
 			newFolderId, serviceContext.getScopeGroupId());
 
@@ -2151,6 +2151,7 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 
 		Repository fromRepository = repositoryProvider.getFolderRepository(
 			folderId);
+
 		Repository toRepository = getFolderRepository(
 			parentFolderId, serviceContext.getScopeGroupId());
 

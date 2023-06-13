@@ -18,6 +18,7 @@ import aQute.bnd.header.Attrs;
 import aQute.bnd.header.Parameters;
 import aQute.bnd.osgi.Constants;
 import aQute.bnd.osgi.Jar;
+import aQute.bnd.osgi.repository.SimpleIndexer;
 import aQute.bnd.osgi.resource.CapabilityBuilder;
 
 import com.liferay.portal.target.platform.indexer.Indexer;
@@ -29,24 +30,24 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
+import java.net.URLEncoder;
+
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-import java.security.MessageDigest;
-
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -59,8 +60,6 @@ import org.osgi.framework.namespace.NativeNamespace;
 import org.osgi.framework.namespace.PackageNamespace;
 import org.osgi.framework.wiring.BundleRevision;
 import org.osgi.resource.Capability;
-import org.osgi.service.indexer.ResourceIndexer;
-import org.osgi.service.indexer.impl.RepoIndex;
 import org.osgi.service.repository.ContentNamespace;
 
 /**
@@ -75,13 +74,6 @@ public class TargetPlatformIndexer implements Indexer {
 		_systemBundle = systemBundle;
 		_additionalJarFiles = additionalJarFiles;
 		_dirNames = dirNames;
-
-		_config.put("compressed", "false");
-		_config.put(
-			"license.url", "https://www.liferay.com/downloads/ce-license");
-		_config.put("pretty", "true");
-		_config.put("repository.name", "Liferay Target Platform");
-		_config.put("stylesheet", "http://www.osgi.org/www/obr2html.xsl");
 	}
 
 	@Override
@@ -90,14 +82,12 @@ public class TargetPlatformIndexer implements Indexer {
 
 		File tempDir = tempPath.toFile();
 
-		_config.put("root.url", tempDir.getPath());
-
 		Set<File> jarFiles = new LinkedHashSet<>();
 
 		try {
 			Object[] objects = _processSystemBundle(tempDir, jarFiles);
 
-			String sha256sum = (String)objects[0];
+			String crc32 = (String)objects[0];
 			int size = (int)objects[1];
 
 			for (String dirName : _dirNames) {
@@ -130,31 +120,26 @@ public class TargetPlatformIndexer implements Indexer {
 				jarFiles.add(tempJarPath.toFile());
 			}
 
-			ResourceIndexer resourceIndexer = new RepoIndex();
-
 			ByteArrayOutputStream byteArrayOutputStream =
 				new ByteArrayOutputStream();
 
-			resourceIndexer.index(jarFiles, byteArrayOutputStream, _config);
+			SimpleIndexer simpleIndexer = new SimpleIndexer();
+
+			simpleIndexer.base(tempPath.toUri());
+			simpleIndexer.compress(false);
+			simpleIndexer.files(jarFiles);
+			simpleIndexer.increment(1);
+			simpleIndexer.name("Liferay Target Platform");
+
+			simpleIndexer.index(byteArrayOutputStream);
 
 			outputStream.write(
 				_fixSystemBundleOSGiContent(
-					byteArrayOutputStream.toString("UTF-8"), sha256sum, size));
+					byteArrayOutputStream.toString("UTF-8"), crc32, size));
 		}
 		finally {
 			PathUtil.deltree(tempPath);
 		}
-	}
-
-	private static String _bytesToHexString(byte[] bytes) {
-		char[] chars = new char[bytes.length * 2];
-
-		for (int i = 0; i < bytes.length; i++) {
-			chars[i * 2] = _HEX_DIGITS[(bytes[i] & 0xFF) >> 4];
-			chars[i * 2 + 1] = _HEX_DIGITS[bytes[i] & 0x0F];
-		}
-
-		return new String(chars);
 	}
 
 	private static String _filterJavaSEVesions(String versions) {
@@ -181,7 +166,8 @@ public class TargetPlatformIndexer implements Indexer {
 			return;
 		}
 
-		Path tempJarPath = tempPath.resolve(jarPath.getFileName());
+		Path tempJarPath = tempPath.resolve(
+			URLEncoder.encode(String.valueOf(jarPath.getFileName()), "UTF-8"));
 
 		Files.copy(
 			jarPath, tempJarPath, StandardCopyOption.COPY_ATTRIBUTES,
@@ -191,7 +177,7 @@ public class TargetPlatformIndexer implements Indexer {
 	}
 
 	private byte[] _fixSystemBundleOSGiContent(
-			String content, String sha256sum, long size)
+			String content, String crc32, long size)
 		throws UnsupportedEncodingException {
 
 		String url =
@@ -206,7 +192,7 @@ public class TargetPlatformIndexer implements Indexer {
 					"\nMissing system bundle URL: " + url);
 		}
 
-		int start = content.lastIndexOf(_ATTRIBUTE_PREFIX_OSGI_CONTENT, index);
+		int start = content.indexOf(_ATTRIBUTE_PREFIX_OSGI_CONTENT, index);
 
 		if (start == -1) {
 			throw new IllegalStateException(
@@ -217,19 +203,17 @@ public class TargetPlatformIndexer implements Indexer {
 
 		start += _ATTRIBUTE_PREFIX_OSGI_CONTENT.length();
 
-		int end = content.lastIndexOf("\"/>", index);
+		int end = content.indexOf("\"/>", start);
 
 		String prefix = content.substring(0, start);
 
 		String postfix = content.substring(end);
 
-		String newContent = prefix.concat(sha256sum).concat(postfix);
+		String newContent = prefix.concat(crc32).concat(postfix);
 
 		index = newContent.indexOf(url);
 
-		index += url.length() + 3;
-
-		start = newContent.indexOf(_ATTRIBUTE_PREFIX_SIZE, index);
+		start = newContent.lastIndexOf(_ATTRIBUTE_PREFIX_SIZE, index);
 
 		if (start == -1) {
 			throw new IllegalStateException(
@@ -239,7 +223,7 @@ public class TargetPlatformIndexer implements Indexer {
 
 		start += _ATTRIBUTE_PREFIX_SIZE.length();
 
-		end = newContent.indexOf("\"/>", index);
+		end = newContent.indexOf("\" t", start);
 
 		prefix = newContent.substring(0, start);
 		postfix = newContent.substring(end);
@@ -380,13 +364,12 @@ public class TargetPlatformIndexer implements Indexer {
 					}
 				}
 
-				MessageDigest messageDigest = MessageDigest.getInstance(
-					"SHA-256");
+				CRC32 crc32 = new CRC32();
 
-				messageDigest.update(byteArrayOutputStream.toByteArray());
+				crc32.update(byteArrayOutputStream.toByteArray());
 
 				return new Object[] {
-					_bytesToHexString(messageDigest.digest()),
+					Long.toHexString(crc32.getValue()),
 					byteArrayOutputStream.size()
 				};
 			}
@@ -397,12 +380,7 @@ public class TargetPlatformIndexer implements Indexer {
 		"<attribute name=\"osgi.content\" value=\"";
 
 	private static final String _ATTRIBUTE_PREFIX_SIZE =
-		"<attribute name=\"size\" type=\"Long\" value=\"";
-
-	private static final char[] _HEX_DIGITS = {
-		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
-		'e', 'f'
-	};
+		"<attribute name=\"size\" value=\"";
 
 	private static final String _MAX_SUPPORTED_JAVA_SE_VERSION = "1.8.0";
 
@@ -410,19 +388,15 @@ public class TargetPlatformIndexer implements Indexer {
 		"eclipse.platform;osgi.os=linux;osgi.arch=x86_64;osgi.ws=gtk;osgi.nl=" +
 			"en_US";
 
-	private static final Set<String> _ignoredNamespaces = new HashSet<>();
-
-	static {
-		_ignoredNamespaces.add(BundleNamespace.BUNDLE_NAMESPACE);
-		_ignoredNamespaces.add(ContentNamespace.CONTENT_NAMESPACE);
-		_ignoredNamespaces.add(HostNamespace.HOST_NAMESPACE);
-		_ignoredNamespaces.add(IdentityNamespace.IDENTITY_NAMESPACE);
-		_ignoredNamespaces.add(NativeNamespace.NATIVE_NAMESPACE);
-		_ignoredNamespaces.add(PackageNamespace.PACKAGE_NAMESPACE);
-	}
+	private static final Set<String> _ignoredNamespaces = new HashSet<>(
+		Arrays.asList(
+			BundleNamespace.BUNDLE_NAMESPACE,
+			ContentNamespace.CONTENT_NAMESPACE, HostNamespace.HOST_NAMESPACE,
+			IdentityNamespace.IDENTITY_NAMESPACE,
+			NativeNamespace.NATIVE_NAMESPACE,
+			PackageNamespace.PACKAGE_NAMESPACE));
 
 	private final List<File> _additionalJarFiles;
-	private final Map<String, String> _config = new HashMap<>();
 	private final String[] _dirNames;
 	private final Parameters _packagesParamters = new Parameters();
 	private final List<Parameters> _parametersList = new ArrayList<>();

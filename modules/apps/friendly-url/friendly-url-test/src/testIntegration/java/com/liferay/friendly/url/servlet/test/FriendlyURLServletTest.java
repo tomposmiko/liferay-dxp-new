@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.servlet.I18nServlet;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.test.LayoutTestUtil;
@@ -234,10 +233,8 @@ public class FriendlyURLServletTest {
 
 		Locale locale = LocaleUtil.fromLanguageId(i18nLanguageId, true, false);
 
-		String i18nLanguageCode = i18nLanguageId;
-
 		if ((locale == null) || Validator.isNull(locale.getCountry())) {
-			locale = LanguageUtil.getLocale(i18nLanguageCode);
+			locale = LanguageUtil.getLocale(i18nLanguageId);
 		}
 
 		if (locale != null) {
@@ -322,7 +319,6 @@ public class FriendlyURLServletTest {
 	@DeleteAfterTestRun
 	private Group _group;
 
-	private final I18nServlet _i18nServlet = new I18nServlet();
 	private Layout _layout;
 	private Constructor<?> _redirectConstructor1;
 	private Constructor<?> _redirectConstructor2;

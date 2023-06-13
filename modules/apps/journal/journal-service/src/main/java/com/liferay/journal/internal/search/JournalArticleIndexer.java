@@ -319,75 +319,61 @@ public class JournalArticleIndexer
 				_journalArticleResourceLocalService.getActionableDynamicQuery();
 
 			actionableDynamicQuery.setAddCriteriaMethod(
-				new ActionableDynamicQuery.AddCriteriaMethod() {
+				dynamicQuery -> {
+					Class<?> clazz = getClass();
 
-					@Override
-					public void addCriteria(DynamicQuery dynamicQuery) {
-						Class<?> clazz = getClass();
+					DynamicQuery journalArticleDynamicQuery =
+						DynamicQueryFactoryUtil.forClass(
+							JournalArticle.class, "journalArticle",
+							clazz.getClassLoader());
 
-						DynamicQuery journalArticleDynamicQuery =
-							DynamicQueryFactoryUtil.forClass(
-								JournalArticle.class, "journalArticle",
-								clazz.getClassLoader());
+					journalArticleDynamicQuery.setProjection(
+						ProjectionFactoryUtil.property("resourcePrimKey"));
 
-						journalArticleDynamicQuery.setProjection(
-							ProjectionFactoryUtil.property("resourcePrimKey"));
+					journalArticleDynamicQuery.add(
+						RestrictionsFactoryUtil.eqProperty(
+							"journalArticle.resourcePrimKey",
+							"this.resourcePrimKey"));
+
+					journalArticleDynamicQuery.add(
+						RestrictionsFactoryUtil.eqProperty(
+							"journalArticle.groupId", "this.groupId"));
+
+					Property ddmStructureKey = PropertyFactoryUtil.forName(
+						"DDMStructureKey");
+
+					journalArticleDynamicQuery.add(
+						ddmStructureKey.in(ddmStructureKeys));
+
+					if (!isIndexAllArticleVersions()) {
+						Property statusProperty = PropertyFactoryUtil.forName(
+							"status");
+
+						Integer[] statuses = {
+							WorkflowConstants.STATUS_APPROVED,
+							WorkflowConstants.STATUS_IN_TRASH
+						};
 
 						journalArticleDynamicQuery.add(
-							RestrictionsFactoryUtil.eqProperty(
-								"journalArticle.resourcePrimKey",
-								"this.resourcePrimKey"));
-
-						journalArticleDynamicQuery.add(
-							RestrictionsFactoryUtil.eqProperty(
-								"journalArticle.groupId", "this.groupId"));
-
-						Property ddmStructureKey = PropertyFactoryUtil.forName(
-							"DDMStructureKey");
-
-						journalArticleDynamicQuery.add(
-							ddmStructureKey.in(ddmStructureKeys));
-
-						if (!isIndexAllArticleVersions()) {
-							Property statusProperty =
-								PropertyFactoryUtil.forName("status");
-
-							Integer[] statuses = {
-								WorkflowConstants.STATUS_APPROVED,
-								WorkflowConstants.STATUS_IN_TRASH
-							};
-
-							journalArticleDynamicQuery.add(
-								statusProperty.in(statuses));
-						}
-
-						Property resourcePrimKeyProperty =
-							PropertyFactoryUtil.forName("resourcePrimKey");
-
-						dynamicQuery.add(
-							resourcePrimKeyProperty.in(
-								journalArticleDynamicQuery));
+							statusProperty.in(statuses));
 					}
 
+					Property resourcePrimKeyProperty =
+						PropertyFactoryUtil.forName("resourcePrimKey");
+
+					dynamicQuery.add(
+						resourcePrimKeyProperty.in(journalArticleDynamicQuery));
 				});
 			actionableDynamicQuery.setPerformActionMethod(
-				new ActionableDynamicQuery.
-					PerformActionMethod<JournalArticleResource>() {
-
-					@Override
-					public void performAction(JournalArticleResource article)
-						throws PortalException {
-
-						try {
-							indexer.reindex(
-								indexer.getClassName(),
-								article.getResourcePrimKey());
-						}
-						catch (Exception e) {
-							throw new PortalException(e);
-						}
+				(JournalArticleResource article) -> {
+					try {
+						indexer.reindex(
+							indexer.getClassName(),
+							article.getResourcePrimKey());
 					}
-
+					catch (Exception e) {
+						throw new PortalException(e);
+					}
 				});
 
 			actionableDynamicQuery.performActions();
@@ -402,7 +388,8 @@ public class JournalArticleIndexer
 		throws Exception {
 
 		DDMStructure ddmStructure = _ddmStructureLocalService.fetchStructure(
-			article.getGroupId(), _portal.getClassNameId(JournalArticle.class),
+			_portal.getSiteGroupId(article.getGroupId()),
+			_portal.getClassNameId(JournalArticle.class),
 			article.getDDMStructureKey(), true);
 
 		if (ddmStructure == null) {
@@ -578,6 +565,7 @@ public class JournalArticleIndexer
 
 		document.addKeywordSortable(Field.ARTICLE_ID, articleId);
 
+		document.addDate(Field.DISPLAY_DATE, journalArticle.getDisplayDate());
 		document.addKeyword(Field.LAYOUT_UUID, journalArticle.getLayoutUuid());
 		document.addKeyword(
 			Field.TREE_PATH,
@@ -588,7 +576,6 @@ public class JournalArticleIndexer
 			"ddmStructureKey", journalArticle.getDDMStructureKey());
 		document.addKeyword(
 			"ddmTemplateKey", journalArticle.getDDMTemplateKey());
-		document.addDate("displayDate", journalArticle.getDisplayDate());
 		document.addKeyword("head", JournalUtil.isHead(journalArticle));
 
 		boolean headListable = JournalUtil.isHeadListable(journalArticle);
@@ -617,7 +604,7 @@ public class JournalArticleIndexer
 	@Override
 	protected String doGetSortField(String orderByCol) {
 		if (orderByCol.equals("display-date")) {
-			return "displayDate";
+			return Field.DISPLAY_DATE;
 		}
 		else if (orderByCol.equals("id")) {
 			return Field.ENTRY_CLASS_PK;
@@ -628,9 +615,8 @@ public class JournalArticleIndexer
 		else if (orderByCol.equals("title")) {
 			return Field.TITLE;
 		}
-		else {
-			return orderByCol;
-		}
+
+		return orderByCol;
 	}
 
 	@Override
@@ -723,7 +709,8 @@ public class JournalArticleIndexer
 		throws Exception {
 
 		DDMStructure ddmStructure = _ddmStructureLocalService.fetchStructure(
-			article.getGroupId(), _portal.getClassNameId(JournalArticle.class),
+			_portal.getSiteGroupId(article.getGroupId()),
+			_portal.getClassNameId(JournalArticle.class),
 			article.getDDMStructureKey(), true);
 
 		if (ddmStructure == null) {
@@ -897,27 +884,20 @@ public class JournalArticleIndexer
 				_batchIndexingHelper.getBulkSize(
 					JournalArticle.class.getName()));
 			indexableActionableDynamicQuery.setPerformActionMethod(
-				new ActionableDynamicQuery.
-					PerformActionMethod<JournalArticle>() {
+				(JournalArticle article) -> {
+					try {
+						Document document = getDocument(article);
 
-					@Override
-					public void performAction(JournalArticle article) {
-						try {
-							Document document = getDocument(article);
-
-							indexableActionableDynamicQuery.addDocuments(
-								document);
-						}
-						catch (PortalException pe) {
-							if (_log.isWarnEnabled()) {
-								_log.warn(
-									"Unable to index journal article " +
-										article.getId(),
-									pe);
-							}
+						indexableActionableDynamicQuery.addDocuments(document);
+					}
+					catch (PortalException pe) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"Unable to index journal article " +
+									article.getId(),
+								pe);
 						}
 					}
-
 				});
 		}
 		else {
@@ -930,38 +910,28 @@ public class JournalArticleIndexer
 					JournalArticleResource.class.getName()));
 
 			indexableActionableDynamicQuery.setPerformActionMethod(
-				new ActionableDynamicQuery.
-					PerformActionMethod<JournalArticleResource>() {
+				(JournalArticleResource articleResource) -> {
+					JournalArticle latestIndexableArticle =
+						fetchLatestIndexableArticleVersion(
+							articleResource.getResourcePrimKey());
 
-					@Override
-					public void performAction(
-						JournalArticleResource articleResource) {
-
-						JournalArticle latestIndexableArticle =
-							fetchLatestIndexableArticleVersion(
-								articleResource.getResourcePrimKey());
-
-						if (latestIndexableArticle == null) {
-							return;
-						}
-
-						try {
-							Document document = getDocument(
-								latestIndexableArticle);
-
-							indexableActionableDynamicQuery.addDocuments(
-								document);
-						}
-						catch (PortalException pe) {
-							if (_log.isWarnEnabled()) {
-								_log.warn(
-									"Unable to index journal article " +
-										latestIndexableArticle.getId(),
-									pe);
-							}
-						}
+					if (latestIndexableArticle == null) {
+						return;
 					}
 
+					try {
+						Document document = getDocument(latestIndexableArticle);
+
+						indexableActionableDynamicQuery.addDocuments(document);
+					}
+					catch (PortalException pe) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"Unable to index journal article " +
+									latestIndexableArticle.getId(),
+								pe);
+						}
+					}
 				});
 		}
 

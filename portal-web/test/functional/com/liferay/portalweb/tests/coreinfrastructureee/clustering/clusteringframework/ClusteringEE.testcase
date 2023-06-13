@@ -14,7 +14,7 @@
 	</set-up>
 
 	<tear-down>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+		<var method="PropsUtil#get('test.portal.instance')" name="testPortalInstance" />
 
 		<if>
 			<equals arg1="${testPortalInstance}" arg2="true" />
@@ -149,10 +149,8 @@
 		</execute>
 
 		<execute macro="BlogsEntry#moveToRecycleBinPG">
-			<var name="assetType" value="Blogs Entry" />
-			<var name="entryContent" value="Blogs Entry1 Content" />
-			<var name="entryTitle" value="Blogs Entry1 Title" />
-			<var name="nodePort" value="9080" />
+			<var name="entryContent" value="Blogs Entry2 Content" />
+			<var name="entryTitle" value="Blogs Entry2 Title" />
 		</execute>
 
 		<execute macro="Navigator#openSpecificURL">
@@ -183,26 +181,25 @@
 		</execute>
 
 		<execute macro="BlogsEntry#viewNoPG">
-			<var name="entryTitle" value="Blogs Entry1 Title" />
+			<var name="entryTitle" value="Blogs Entry2 Title" />
 		</execute>
 
 		<execute macro="BlogsNavigator#gotoEntryPG">
-			<var name="entryContent" value="Blogs Entry2 Content" />
-			<var name="entryTitle" value="Blogs Entry2 Title" />
+			<var name="entryContent" value="Blogs Entry1 Content" />
+			<var name="entryTitle" value="Blogs Entry1 Title" />
 		</execute>
 
 		<execute macro="BlogsEntry#viewEntry">
-			<var name="entryContent" value="Blogs Entry2 Content" />
-			<var name="entryTitle" value="Blogs Entry2 Title" />
+			<var name="entryContent" value="Blogs Entry1 Content" />
+			<var name="entryTitle" value="Blogs Entry1 Title" />
 		</execute>
 
-		<execute macro="SearchPortlet#searchPG">
-			<var name="searchTerm" value="Entry1" />
+		<execute macro="SearchPortlets#searchEmbedded">
+			<var name="searchTerm" value="Entry2" />
 		</execute>
 
-		<execute macro="SearchPortlet#viewSearchNoPG">
-			<var name="searchNoResults" value="true" />
-			<var name="searchTerm" value="Entry1" />
+		<execute macro="SearchResultPortlet#viewNoSearchResults">
+			<var name="searchTerm" value="Entry2" />
 		</execute>
 	</command>
 
@@ -371,10 +368,12 @@
 		</execute>
 	</command>
 
-	<!-- LRQA-29556 -->
-
-	<!--<command name="ValidateSchedulerOnSeparateNodes" priority="4">
+	<command name="ValidateSchedulerOnSeparateNodes" priority="4">
 		<property name="test.name.skip.portal.instance" value="ClusteringEE#ValidateSchedulerOnSeparateNodes" />
+
+		<execute macro="TestCase#getSiteName">
+			<return name="siteName" />
+		</execute>
 
 		<execute macro="Clustering#viewClusterStatusInConsoleEE" />
 
@@ -393,7 +392,7 @@
 		</execute>
 
 		<execute macro="Staging#activateStagingCP">
-			<var name="siteName" value="Liferay DXP" />
+			<var name="siteName" value="${siteName}" />
 		</execute>
 
 		<execute macro="Navigator#openURL" />
@@ -410,7 +409,11 @@
 			<var name="pageName" value="New Page Name" />
 		</execute>
 
-		<execute macro="Navigator#gotoPage">
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="Navigator#gotoStagedView" />
+
+		<execute macro="Navigator#_gotoPage">
 			<var name="pageName" value="New Page Name" />
 		</execute>
 
@@ -463,7 +466,7 @@
 		</execute>
 
 		<execute macro="Staging#deactivateStagingCP">
-			<var name="siteName" value="Liferay DXP" />
+			<var name="siteName" value="${siteName}" />
 		</execute>
 
 		<execute macro="User#logoutPG">
@@ -476,5 +479,5 @@
 			<var name="password" value="test" />
 			<var name="userEmailAddress" value="test@liferay.com" />
 		</execute>
-	</command>-->
+	</command>
 </definition>

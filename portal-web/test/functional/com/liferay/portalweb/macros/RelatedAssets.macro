@@ -8,8 +8,8 @@
 
 		<var method="StringUtil#upperCase('${assetTypeLocator}')" name="assetTypeLocator" />
 
-		<execute function="AssertClick" locator1="MenuItem#ANY_MENU_ITEM" value1="${assetType}">
-			<var name="key_menuItem" value="${assetType}" />
+		<execute macro="MenuItem#click">
+			<var name="menuItem" value="${assetType}" />
 		</execute>
 	</command>
 
@@ -18,8 +18,8 @@
 			<var name="portletName" value="Bookmarks" />
 		</execute>
 
-		<execute function="AssertClick" locator1="MenuItem#ANY_MENU_ITEM" value1="Bookmark">
-			<var name="key_menuItem" value="Bookmark" />
+		<execute macro="MenuItem#click">
+			<var name="menuItem" value="Bookmark" />
 		</execute>
 
 		<execute macro="Panel#expandPanel">
@@ -33,18 +33,6 @@
 		<execute function="AssertClick" locator1="AssetRelatedAssets#RELATED_ASSETS_SELECT_MENULIST_ASSET" value1="${assetType}" />
 	</command>
 
-	<command name="gotoWebContentSelectionCP">
-		<execute macro="WebContentNavigator#gotoAddCP" />
-
-		<execute macro="Panel#expandPanel">
-			<var name="panel" value="Related Assets" />
-		</execute>
-
-		<execute macro="RelatedAssets#_selectAssetType">
-			<var name="assetType" value="${assetType}" />
-		</execute>
-	</command>
-
 	<command name="selectAsset">
 		<execute macro="RelatedAssets#_selectAssetType">
 			<var name="assetType" value="${assetType}" />
@@ -56,7 +44,11 @@
 
 		<var name="key_assetTitle" value="${assetTitle}" />
 
-		<execute function="AssertClick" locator1="AssetRelatedAssets#ASSET_TABLE_CHOOSE" value1="${assetTitle}" />
+		<execute function="Click" locator1="AssetRelatedAssets#ASSET_TABLE_CHECKBOX">
+			<var name="key_assetTitle" value="${assetTitle}" />
+		</execute>
+
+		<execute function="AssertClick" locator1="Button#ADD" value1="Add" />
 
 		<execute function="SelectFrame" value1="relative=top" />
 	</command>

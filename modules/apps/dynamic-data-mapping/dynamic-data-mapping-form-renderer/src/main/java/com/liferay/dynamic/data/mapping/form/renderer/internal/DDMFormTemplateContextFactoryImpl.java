@@ -29,6 +29,7 @@ import com.liferay.dynamic.data.mapping.model.DDMFormLayout;
 import com.liferay.dynamic.data.mapping.model.DDMFormRule;
 import com.liferay.dynamic.data.mapping.service.DDMDataProviderInstanceService;
 import com.liferay.dynamic.data.mapping.util.DDM;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -39,7 +40,6 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.template.soy.utils.SoyHTMLSanitizer;
@@ -67,7 +67,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcellus Tavares
  */
-@Component(immediate = true)
+@Component(immediate = true, service = DDMFormTemplateContextFactory.class)
 public class DDMFormTemplateContextFactoryImpl
 	implements DDMFormTemplateContextFactory {
 
@@ -192,12 +192,13 @@ public class DDMFormTemplateContextFactoryImpl
 
 		String submitLabel = GetterUtil.getString(
 			ddmFormRenderingContext.getSubmitLabel(),
-			LanguageUtil.get(locale, "submit"));
+			LanguageUtil.get(resourceBundle, "submit-form"));
 
 		templateContext.put("submitLabel", submitLabel);
 
 		templateContext.put(
 			"templateNamespace", getTemplateNamespace(ddmFormLayout));
+		templateContext.put("viewMode", ddmFormRenderingContext.isViewMode());
 
 		return templateContext;
 	}

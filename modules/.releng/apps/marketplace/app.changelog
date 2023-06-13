@@ -1,0 +1,13 @@
+#
+# Liferay App Version 10
+#
+
+app.artifacts-10=\
+	com.liferay.marketplace.api-5.0.3.jar,\
+	com.liferay.marketplace.app.manager.web-2.0.16.jar,\
+	com.liferay.marketplace.service-4.0.8.jar,\
+	com.liferay.marketplace.store.web-4.0.5.jar
+
+app.change.log-10=LPS-84119 LPS-85849 LPS-86444 LPS-86782
+
+app.git.id-10=07543a5b569a67dbc62c4116575b9861cf8f704a

@@ -8,11 +8,6 @@
 <tr><td rowspan="1" colspan="3">DocumentsAndMediaConfiguration</td></tr>
 </thead>
 <tbody>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
 <!--DISPLAY_SETTINGS-->
 <tr>
 	<td>DISPLAY_SETTINGS_DROPDOWN</td>
@@ -32,11 +27,6 @@
 <tr>
 	<td>DISPLAY_SETTINGS_ROOT_FOLDER_SELECT_BUTTON</td>
 	<td>//button[contains(.,'Select')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DISPLAY_SETTINGS_ROOT_FOLDER_REMOVE_BUTTON</td>
-	<td>//button[contains(.,'Remove')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -67,11 +57,6 @@
 <tr>
 	<td>DISPLAY_SETTINGS_DISPLAY_STYLE_VIEW_CURRENT_PRESENT</td>
 	<td>//select[contains(@id,'currentDisplayViews')]/option</td>
-	<td></td>
-</tr>
-<tr>
-	<td>DISPLAY_SETTINGS_DISPLAY_STYLE_VIEW_AVAILABLE_PRESENT</td>
-	<td>//select[contains(@id,'availableDisplayViews')]/option</td>
 	<td></td>
 </tr>
 <tr>

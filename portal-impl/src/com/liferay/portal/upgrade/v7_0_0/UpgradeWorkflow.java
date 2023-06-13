@@ -30,7 +30,6 @@ public class UpgradeWorkflow extends UpgradeProcess {
 			for (String[] orphanedAttachedModel : getOrphanedAttachedModels()) {
 				String tableName = orphanedAttachedModel[0];
 				String columnName = orphanedAttachedModel[1];
-				String columnValue = orphanedAttachedModel[2];
 
 				if (!hasTable(tableName) || !hasColumn(tableName, columnName)) {
 					continue;
@@ -44,6 +43,8 @@ public class UpgradeWorkflow extends UpgradeProcess {
 
 					continue;
 				}
+
+				String columnValue = orphanedAttachedModel[2];
 
 				deleteOrphaned(
 					tableName, columnName, columnValue, orphanedTableName,
@@ -88,21 +89,21 @@ public class UpgradeWorkflow extends UpgradeProcess {
 			"com.liferay.portal.workflow.kaleo.forms.model.KaleoProcess"));
 
 	private static final String[][] _ORPHANED_ATTACHED_MODELS = {
-		new String[] {
+		{
 			"KaleoInstance", "className",
 			"'com.liferay.portal.workflow.kaleo.forms.model.KaleoProcess'",
 			"DDLRecord", "recordId"
 		},
-		new String[] {
+		{
 			"KaleoInstanceToken", "className",
 			"'com.liferay.portal.workflow.kaleo.forms.model.KaleoProcess'",
 			"DDLRecord", "recordId"
 		},
-		new String[] {
+		{
 			"WorkflowDefinitionLink", "classNameId", _CLASS_NAME_ID,
 			"KaleoProcess", "kaleoProcessId"
 		},
-		new String[] {
+		{
 			"WorkflowInstanceLink", "classNameId", _CLASS_NAME_ID, "DDLRecord",
 			"recordId"
 		}

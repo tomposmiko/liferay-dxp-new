@@ -15,6 +15,7 @@
 package com.liferay.portal.search.internal;
 
 import com.liferay.osgi.util.StringPlus;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -25,7 +26,6 @@ import com.liferay.portal.kernel.search.dummy.DummyIndexer;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.search.buffer.IndexerRequestBuffer;
 import com.liferay.portal.search.buffer.IndexerRequestBufferOverflowHandler;
 import com.liferay.portal.search.configuration.IndexerRegistryConfiguration;
@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -116,17 +117,21 @@ public class IndexerRegistryImpl implements IndexerRegistry {
 
 		synchronized (_queuedIndexerPostProcessors) {
 			List<IndexerPostProcessor> indexerPostProcessors =
-				_queuedIndexerPostProcessors.get(indexer.getClassName());
+				_queuedIndexerPostProcessors.getOrDefault(
+					clazz.getName(), new ArrayList<>());
 
-			if (indexerPostProcessors != null) {
-				for (IndexerPostProcessor indexerPostProcessor :
-						indexerPostProcessors) {
+			Optional.ofNullable(
+				_queuedIndexerPostProcessors.get(indexer.getClassName())
+			).ifPresent(
+				indexerPostProcessors::addAll
+			);
 
-					indexer.registerIndexerPostProcessor(indexerPostProcessor);
-				}
+			indexerPostProcessors.forEach(
+				indexer::registerIndexerPostProcessor);
 
-				_queuedIndexerPostProcessors.remove(indexer.getClassName());
-			}
+			_queuedIndexerPostProcessors.remove(clazz.getName());
+
+			_queuedIndexerPostProcessors.remove(indexer.getClassName());
 		}
 	}
 
@@ -152,7 +157,7 @@ public class IndexerRegistryImpl implements IndexerRegistry {
 
 		modified(properties);
 
-		_indexerServiceTracker = new ServiceTracker<Indexer<?>, Indexer<?>>(
+		_indexerServiceTracker = new ServiceTracker<>(
 			bundleContext, Indexer.class.getName(),
 			new ServiceTrackerCustomizer<Indexer<?>, Indexer<?>>() {
 

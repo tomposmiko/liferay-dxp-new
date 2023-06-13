@@ -1,0 +1,39 @@
+#
+# Liferay App Version 1.0.0
+#
+
+app.artifacts-1.0.0=\
+	com.liferay.frontend.image.editor.api-2.0.0.jar,\
+	com.liferay.frontend.image.editor.capability.brightness-2.0.3.jar,\
+	com.liferay.frontend.image.editor.capability.contrast-2.0.3.jar,\
+	com.liferay.frontend.image.editor.capability.crop-2.0.1.jar,\
+	com.liferay.frontend.image.editor.capability.effects-2.0.2.jar,\
+	com.liferay.frontend.image.editor.capability.resize-2.0.1.jar,\
+	com.liferay.frontend.image.editor.capability.rotate-2.0.1.jar,\
+	com.liferay.frontend.image.editor.capability.saturation-2.0.3.jar,\
+	com.liferay.frontend.image.editor.integration.document.library-2.0.1.jar,\
+	com.liferay.frontend.image.editor.web-2.0.1.jar
+
+app.change.log-1.0.0=LPS-77699 LPS-80332 LPS-81713 LPS-82756
+
+app.git.id-1.0.0=bf9943b93ff9473888db9fac9695168575fa3ab2
+
+#
+# Liferay App Version 1.0.1
+#
+
+app.artifacts-1.0.1=\
+	com.liferay.frontend.image.editor.api-2.0.0.jar,\
+	com.liferay.frontend.image.editor.capability.brightness-2.0.4.jar,\
+	com.liferay.frontend.image.editor.capability.contrast-2.0.4.jar,\
+	com.liferay.frontend.image.editor.capability.crop-2.0.1.jar,\
+	com.liferay.frontend.image.editor.capability.effects-2.0.3.jar,\
+	com.liferay.frontend.image.editor.capability.resize-2.0.1.jar,\
+	com.liferay.frontend.image.editor.capability.rotate-2.0.1.jar,\
+	com.liferay.frontend.image.editor.capability.saturation-2.0.4.jar,\
+	com.liferay.frontend.image.editor.integration.document.library-2.0.7.jar,\
+	com.liferay.frontend.image.editor.web-2.0.7.jar
+
+app.change.log-1.0.1=LPS-74544 LPS-77699 LPS-81713 LPS-83037 LPS-83494 LPS-83705 LPS-84090 LPS-84119 LPS-85296 
+
+app.git.id-1.0.1=f862f7ca8a5c030f569f36beaf2e8501a0f21cd3

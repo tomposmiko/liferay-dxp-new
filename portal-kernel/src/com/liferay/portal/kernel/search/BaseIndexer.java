@@ -79,7 +79,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
@@ -903,7 +902,7 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 		Document document, String field, Locale siteDefaultLocale,
 		Map<Locale, String> map) {
 
-		for (Entry<Locale, String> entry : map.entrySet()) {
+		for (Map.Entry<Locale, String> entry : map.entrySet()) {
 			Locale locale = entry.getKey();
 
 			if (locale.equals(siteDefaultLocale)) {
@@ -976,6 +975,7 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 				assetCategoryTitles.entrySet()) {
 
 			Locale locale = entry.getKey();
+
 			List<String> titles = entry.getValue();
 
 			String[] titlesArray = titles.toArray(new String[titles.size()]);
@@ -1072,20 +1072,8 @@ public abstract class BaseIndexer<T> implements Indexer<T> {
 			BooleanQuery searchQuery, SearchContext searchContext)
 		throws Exception {
 
-		String keywords = searchContext.getKeywords();
-
-		if (Validator.isNull(keywords)) {
-			return Collections.emptyMap();
-		}
-
-		addSearchExpando(searchQuery, searchContext, keywords);
-
-		addSearchLocalizedTerm(
-			searchQuery, searchContext, Field.ASSET_CATEGORY_TITLES,
-			searchContext.isLike());
-
-		return searchQuery.addTerms(
-			Field.KEYWORDS, keywords, searchContext.isLike());
+		return addSearchExpando(
+			searchQuery, searchContext, searchContext.getKeywords());
 	}
 
 	protected void addSearchLayout(

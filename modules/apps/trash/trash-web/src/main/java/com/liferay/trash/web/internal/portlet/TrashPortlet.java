@@ -80,7 +80,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.scopeable=true",
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=Trash",
-		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + TrashPortletKeys.TRASH,
 		"javax.portlet.resource-bundle=content.Language",
@@ -257,14 +257,14 @@ public class TrashPortlet extends MVCPortlet {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		long trashEntryId = ParamUtil.getLong(actionRequest, "trashEntryId");
 
 		String newName = ParamUtil.getString(actionRequest, "newName");
 
 		if (Validator.isNull(newName)) {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
 			String oldName = ParamUtil.getString(actionRequest, "oldName");
 
 			newName = _trashHelper.getNewName(themeDisplay, null, 0, oldName);

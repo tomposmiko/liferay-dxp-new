@@ -1,5 +1,4 @@
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
+apply plugin: "com.liferay.lang.merger"
 
 dependencies {
 	compileInclude group: "com.jayway.jsonpath", name: "json-path", version: "2.2.0"

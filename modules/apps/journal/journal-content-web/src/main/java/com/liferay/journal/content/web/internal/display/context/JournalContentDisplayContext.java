@@ -71,6 +71,8 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.staging.StagingGroupHelper;
+import com.liferay.staging.StagingGroupHelperUtil;
 import com.liferay.trash.kernel.model.TrashEntry;
 
 import java.util.ArrayList;
@@ -78,7 +80,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import javax.portlet.PortletMode;
@@ -175,6 +176,10 @@ public class JournalContentDisplayContext {
 	}
 
 	public JournalArticleDisplay getArticleDisplay() {
+		if (_articleDisplay != null) {
+			return _articleDisplay;
+		}
+
 		_articleDisplay = (JournalArticleDisplay)_portletRequest.getAttribute(
 			WebKeys.JOURNAL_ARTICLE_DISPLAY);
 
@@ -191,6 +196,12 @@ public class JournalContentDisplayContext {
 		ThemeDisplay themeDisplay = (ThemeDisplay)_portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		String viewMode = ParamUtil.getString(
+			_portletRequest, "viewMode", null);
+		String languageId = ParamUtil.getString(
+			_portletRequest, "languageId", themeDisplay.getLanguageId());
+		int page = ParamUtil.getInteger(_portletRequest, "page", 1);
+
 		if (article.isApproved()) {
 			JournalContent journalContent =
 				(JournalContent)_portletRequest.getAttribute(
@@ -202,15 +213,17 @@ public class JournalContentDisplayContext {
 
 			_articleDisplay = journalContent.getDisplay(
 				article.getGroupId(), article.getArticleId(),
-				article.getVersion(), null, null, themeDisplay.getLanguageId(),
-				1, new PortletRequestModel(_portletRequest, _portletResponse),
+				article.getVersion(), getDDMTemplateKey(), viewMode, languageId,
+				page,
+				new PortletRequestModel(_portletRequest, _portletResponse),
 				themeDisplay);
 		}
 		else {
 			try {
 				_articleDisplay =
 					JournalArticleLocalServiceUtil.getArticleDisplay(
-						article, null, null, themeDisplay.getLanguageId(), 1,
+						article, getDDMTemplateKey(), viewMode, languageId,
+						page,
 						new PortletRequestModel(
 							_portletRequest, _portletResponse),
 						themeDisplay);
@@ -646,6 +659,12 @@ public class JournalContentDisplayContext {
 
 	public String getURLEditTemplate() {
 		try {
+			DDMTemplate ddmTemplate = getDDMTemplate();
+
+			if (ddmTemplate == null) {
+				return StringPool.BLANK;
+			}
+
 			ThemeDisplay themeDisplay =
 				(ThemeDisplay)_portletRequest.getAttribute(
 					WebKeys.THEME_DISPLAY);
@@ -655,12 +674,6 @@ public class JournalContentDisplayContext {
 				PortletProviderUtil.getPortletId(
 					DDMTemplate.class.getName(), PortletProvider.Action.EDIT),
 				PortletRequest.RENDER_PHASE);
-
-			DDMTemplate ddmTemplate = getDDMTemplate();
-
-			if (ddmTemplate == null) {
-				return StringPool.BLANK;
-			}
 
 			portletURL.setParameter(
 				"hideDefaultSuccessMessage", Boolean.TRUE.toString());
@@ -764,21 +777,21 @@ public class JournalContentDisplayContext {
 	}
 
 	public boolean isDefaultTemplate() {
-		JournalArticleDisplay articleDisplay = getArticleDisplay();
+		String ddmTemplateKey = ParamUtil.getString(
+			_portletRequest, "ddmTemplateKey");
 
-		if ((articleDisplay == null) ||
-			Validator.isNull(articleDisplay.getDDMTemplateKey())) {
-
-			return true;
+		if (Validator.isNotNull(ddmTemplateKey)) {
+			return false;
 		}
 
-		if (Objects.equals(
-				articleDisplay.getDDMTemplateKey(), getDDMTemplateKey())) {
+		ddmTemplateKey =
+			_journalContentPortletInstanceConfiguration.ddmTemplateKey();
 
-			return true;
+		if (Validator.isNotNull(ddmTemplateKey)) {
+			return false;
 		}
 
-		return false;
+		return true;
 	}
 
 	public boolean isEnableViewCountIncrement() {
@@ -935,13 +948,18 @@ public class JournalContentDisplayContext {
 
 		Group scopeGroup = themeDisplay.getScopeGroup();
 
-		if (!scopeGroup.isStaged() || scopeGroup.isStagingGroup()) {
-			_showSelectArticleLink = true;
+		StagingGroupHelper stagingGroupHelper =
+			StagingGroupHelperUtil.getStagingGroupHelper();
+
+		if (stagingGroupHelper.isLocalLiveGroup(scopeGroup) ||
+			stagingGroupHelper.isRemoteLiveGroup(scopeGroup)) {
+
+			_showSelectArticleLink = false;
 
 			return _showSelectArticleLink;
 		}
 
-		_showSelectArticleLink = false;
+		_showSelectArticleLink = true;
 
 		return _showSelectArticleLink;
 	}

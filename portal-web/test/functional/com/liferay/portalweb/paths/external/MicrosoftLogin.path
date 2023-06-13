@@ -8,20 +8,15 @@
 <tr><td rowspan="1" colspan="3">MicrosoftLogin</td></tr>
 </thead>
 <tbody>
-<tr>
-	<td>PAGE_TITLE</td>
-	<td>title=Sign in to your account</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
 <!--LOGIN-->
 <tr>
 	<td>LOGIN_EMAIL_FIELD</td>
 	<td>//input[contains(@type,'email')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>LOGIN_NEXT_BUTTON</td>
+	<td>//div[contains(@class,'inline-block')]/input[contains(@value,'Next')]</td>
 	<td></td>
 </tr>
 <tr>
@@ -31,7 +26,7 @@
 </tr>
 <tr>
 	<td>LOGIN_SIGN_IN_BUTTON</td>
-	<td>//button[contains(.,'Sign in')]</td>
+	<td>//div[contains(@class,'inline-block')]/input[contains(@value,'Sign in')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -14,10 +14,10 @@
 
 package com.liferay.reading.time.taglib.servlet.taglib;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.reading.time.message.ReadingTimeMessageProvider;
 import com.liferay.reading.time.model.ReadingTimeEntry;
@@ -45,8 +45,6 @@ public class ReadingTimeTag extends AttributesTagSupport implements BodyTag {
 	@Override
 	public int doEndTag() throws JspException {
 		try {
-			JspWriter jspWriter = pageContext.getOut();
-
 			Optional<Duration> readingTimeDurationOptional =
 				_getReadingTimeDurationOptional();
 
@@ -54,6 +52,8 @@ public class ReadingTimeTag extends AttributesTagSupport implements BodyTag {
 				this::_buildTag);
 
 			if (tagOptional.isPresent()) {
+				JspWriter jspWriter = pageContext.getOut();
+
 				jspWriter.write(tagOptional.get());
 			}
 

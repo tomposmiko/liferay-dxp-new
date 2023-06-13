@@ -81,7 +81,7 @@ public class SiteNavigationAdminDisplayContext {
 					dropdownItem -> {
 						dropdownItem.putData(
 							"action", "deleteSelectedSiteNavigationMenus");
-						dropdownItem.setIcon("trash");
+						dropdownItem.setIcon("times-circle");
 						dropdownItem.setLabel(
 							LanguageUtil.get(_request, "delete"));
 						dropdownItem.setQuickAction(true);
@@ -367,12 +367,12 @@ public class SiteNavigationAdminDisplayContext {
 	}
 
 	public boolean isShowAddButton() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		if (!hasEditPermission()) {
 			return false;
 		}
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
 		if (SiteNavigationPermission.contains(
 				themeDisplay.getPermissionChecker(),

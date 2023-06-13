@@ -187,9 +187,6 @@ public class AssetPublisherConfigurationAction
 
 		String cmd = ParamUtil.getString(actionRequest, Constants.CMD);
 
-		String portletResource = ParamUtil.getString(
-			actionRequest, "portletResource");
-
 		PortletPreferences preferences = actionRequest.getPreferences();
 
 		if (cmd.equals(Constants.TRANSLATE)) {
@@ -267,6 +264,9 @@ public class AssetPublisherConfigurationAction
 
 			if (SessionErrors.isEmpty(actionRequest)) {
 				preferences.store();
+
+				String portletResource = ParamUtil.getString(
+					actionRequest, "portletResource");
 
 				SessionMessages.add(
 					actionRequest,
@@ -411,10 +411,9 @@ public class AssetPublisherConfigurationAction
 		if (defaultAssetClassTypeId > -1) {
 			return new String[] {String.valueOf(defaultAssetClassTypeId)};
 		}
-		else {
-			return StringUtil.split(
-				getParameter(actionRequest, "classTypeIds" + assetClassName));
-		}
+
+		return StringUtil.split(
+			getParameter(actionRequest, "classTypeIds" + assetClassName));
 	}
 
 	protected AssetQueryRule getQueryRule(
@@ -666,6 +665,12 @@ public class AssetPublisherConfigurationAction
 			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
 			layout.getTypeSettings());
 
+		if (layout.isSupportsEmbeddedPortlets() &&
+			layout.isPortletEmbedded(portletResource, layout.getGroupId())) {
+
+			return;
+		}
+
 		if (LayoutStagingUtil.isBranchingLayout(layout)) {
 			HttpServletRequest request = portal.getHttpServletRequest(
 				actionRequest);
@@ -681,10 +686,10 @@ public class AssetPublisherConfigurationAction
 			LayoutRevision layoutRevision =
 				layoutRevisionLocalService.getLayoutRevision(layoutRevisionId);
 
-			PortletPreferencesImpl portletPreferences =
-				(PortletPreferencesImpl)actionRequest.getPreferences();
-
 			if (layoutRevision != null) {
+				PortletPreferencesImpl portletPreferences =
+					(PortletPreferencesImpl)actionRequest.getPreferences();
+
 				portletPreferences.setPlid(
 					layoutRevision.getLayoutRevisionId());
 			}

@@ -35,7 +35,6 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.RepositoryEntry;
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.RepositoryLocalService;
@@ -45,13 +44,10 @@ import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 import com.liferay.portal.repository.portletrepository.PortletRepository;
 import com.liferay.portal.util.RepositoryUtil;
-import com.liferay.portlet.documentlibrary.lar.FileEntryUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -269,7 +265,7 @@ public class FolderStagedModelDataHandler
 					folder.getUuid(), portletDataContext.getScopeGroupId());
 
 				if (existingFolder == null) {
-					String name = getFolderName(
+					String name = _dlFolderLocalService.getUniqueFolderName(
 						null, portletDataContext.getScopeGroupId(),
 						parentFolderId, folder.getName(), 2);
 
@@ -280,7 +276,7 @@ public class FolderStagedModelDataHandler
 						folder.getDescription(), serviceContext);
 				}
 				else {
-					String name = getFolderName(
+					String name = _dlFolderLocalService.getUniqueFolderName(
 						folder.getUuid(), portletDataContext.getScopeGroupId(),
 						parentFolderId, folder.getName(), 2);
 
@@ -291,7 +287,7 @@ public class FolderStagedModelDataHandler
 			}
 		}
 		else {
-			String name = getFolderName(
+			String name = _dlFolderLocalService.getUniqueFolderName(
 				null, portletDataContext.getScopeGroupId(), parentFolderId,
 				folder.getName(), 2);
 
@@ -317,8 +313,6 @@ public class FolderStagedModelDataHandler
 			PortletDataContext portletDataContext, Folder folder)
 		throws Exception {
 
-		long userId = portletDataContext.getUserId(folder.getUserUuid());
-
 		Folder existingFolder = fetchStagedModelByUuidAndGroupId(
 			folder.getUuid(), portletDataContext.getScopeGroupId());
 
@@ -338,6 +332,8 @@ public class FolderStagedModelDataHandler
 			DLFolder.class.getName());
 
 		if (trashHandler.isRestorable(existingFolder.getFolderId())) {
+			long userId = portletDataContext.getUserId(folder.getUserUuid());
+
 			trashHandler.restoreTrashEntry(
 				userId, existingFolder.getFolderId());
 		}
@@ -393,30 +389,6 @@ public class FolderStagedModelDataHandler
 			"defaultFileEntryTypeUuid", defaultFileEntryTypeUuid);
 	}
 
-	protected String getFolderName(
-		String uuid, long groupId, long parentFolderId, String name,
-		int count) {
-
-		DLFolder dlFolder = _dlFolderLocalService.fetchFolder(
-			groupId, parentFolderId, name);
-
-		if (dlFolder == null) {
-			FileEntry fileEntry = FileEntryUtil.fetchByR_F_T(
-				groupId, parentFolderId, name);
-
-			if (fileEntry == null) {
-				return name;
-			}
-		}
-		else if (Validator.isNotNull(uuid) && uuid.equals(dlFolder.getUuid())) {
-			return name;
-		}
-
-		name = StringUtil.appendParentheticalSuffix(name, count);
-
-		return getFolderName(uuid, groupId, parentFolderId, name, ++count);
-	}
-
 	protected void importFolderFileEntryTypes(
 		PortletDataContext portletDataContext, Element folderElement,
 		Folder folder, Folder importedFolder, ServiceContext serviceContext) {
@@ -439,8 +411,6 @@ public class FolderStagedModelDataHandler
 		for (Element referenceElement : referenceElements) {
 			long referenceDLFileEntryTypeId = GetterUtil.getLong(
 				referenceElement.attributeValue("class-pk"));
-			String referenceDLFileEntryTypeUuid =
-				referenceElement.attributeValue("uuid");
 
 			Map<Long, Long> dlFileEntryTypeIds =
 				(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
@@ -461,7 +431,9 @@ public class FolderStagedModelDataHandler
 			currentFolderFileEntryTypeIds.add(
 				existingDLFileEntryType.getFileEntryTypeId());
 
-			if (defaultFileEntryTypeUuid.equals(referenceDLFileEntryTypeUuid)) {
+			if (defaultFileEntryTypeUuid.equals(
+					referenceElement.attributeValue("uuid"))) {
+
 				defaultFileEntryTypeId =
 					existingDLFileEntryType.getFileEntryTypeId();
 			}

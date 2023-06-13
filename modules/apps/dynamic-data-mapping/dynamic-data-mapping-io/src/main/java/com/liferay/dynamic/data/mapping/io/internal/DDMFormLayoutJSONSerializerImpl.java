@@ -35,7 +35,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcellus Tavares
  */
-@Component(immediate = true)
+@Component(immediate = true, service = DDMFormLayoutJSONSerializer.class)
 public class DDMFormLayoutJSONSerializerImpl
 	implements DDMFormLayoutJSONSerializer {
 

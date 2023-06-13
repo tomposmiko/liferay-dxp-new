@@ -18,6 +18,7 @@ import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationCo
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
 import com.liferay.exportimport.web.internal.configuration.ExportImportWebConfigurationValues;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.background.task.model.BackgroundTask;
 import com.liferay.portal.background.task.service.BackgroundTaskLocalService;
@@ -43,7 +44,6 @@ import com.liferay.portal.kernel.scheduler.Trigger;
 import com.liferay.portal.kernel.scheduler.TriggerFactory;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.util.Date;
@@ -156,50 +156,36 @@ public class DraftExportImportConfigurationMessageListener
 		final Property createDate = PropertyFactoryUtil.forName("createDate");
 
 		actionableDynamicQuery.setAddCriteriaMethod(
-			new ActionableDynamicQuery.AddCriteriaMethod() {
+			dynamicQuery -> {
+				addCommonCriterions(dynamicQuery);
 
-				@Override
-				public void addCriteria(DynamicQuery dynamicQuery) {
-					addCommonCriterions(dynamicQuery);
-
-					dynamicQuery.add(createDate.lt(lastCreateDate));
-				}
-
+				dynamicQuery.add(createDate.lt(lastCreateDate));
 			});
 
 		actionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.
-				PerformActionMethod<ExportImportConfiguration>() {
+			(ExportImportConfiguration exportImportConfiguration) -> {
+				List<BackgroundTask> backgroundTasks = getParentBackgroundTasks(
+					exportImportConfiguration);
 
-				@Override
-				public void performAction(
-						ExportImportConfiguration exportImportConfiguration)
-					throws PortalException {
+				if (ListUtil.isEmpty(backgroundTasks)) {
+					_exportImportConfigurationLocalService.
+						deleteExportImportConfiguration(
+							exportImportConfiguration);
 
-					List<BackgroundTask> backgroundTasks =
-						getParentBackgroundTasks(exportImportConfiguration);
-
-					if (ListUtil.isEmpty(backgroundTasks)) {
-						_exportImportConfigurationLocalService.
-							deleteExportImportConfiguration(
-								exportImportConfiguration);
-
-						return;
-					}
-
-					// BackgroundTaskModelListener deletes the linked
-					// configuration automatically
-
-					for (BackgroundTask backgroundTask : backgroundTasks) {
-						if (isLiveGroup(backgroundTask.getGroupId())) {
-							continue;
-						}
-
-						_backgroundTaskLocalService.deleteBackgroundTask(
-							backgroundTask.getBackgroundTaskId());
-					}
+					return;
 				}
 
+				// BackgroundTaskModelListener deletes the linked
+				// configuration automatically
+
+				for (BackgroundTask backgroundTask : backgroundTasks) {
+					if (isLiveGroup(backgroundTask.getGroupId())) {
+						continue;
+					}
+
+					_backgroundTaskLocalService.deleteBackgroundTask(
+						backgroundTask.getBackgroundTaskId());
+				}
 			});
 
 		actionableDynamicQuery.performActions();

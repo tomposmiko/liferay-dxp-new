@@ -63,7 +63,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=Site Teams",
 		"javax.portlet.expiration-cache=0",
-		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + SiteTeamsPortletKeys.SITE_TEAMS,
 		"javax.portlet.resource-bundle=content.Language",
@@ -178,9 +178,6 @@ public class SiteTeamsPortlet extends MVCPortlet {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		long teamId = ParamUtil.getLong(actionRequest, "teamId");
 
 		String name = ParamUtil.getString(actionRequest, "name");
@@ -189,6 +186,9 @@ public class SiteTeamsPortlet extends MVCPortlet {
 		if (teamId <= 0) {
 
 			// Add team
+
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
 				Team.class.getName(), actionRequest);

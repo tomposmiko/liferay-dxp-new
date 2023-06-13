@@ -74,6 +74,7 @@ import com.liferay.journal.web.util.JournalPortletUtil;
 import com.liferay.journal.web.util.JournalUtil;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.diff.CompareVersionsException;
@@ -88,7 +89,7 @@ import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
-import com.liferay.portal.kernel.portlet.PortletProvider.Action;
+import com.liferay.portal.kernel.portlet.PortletProvider;
 import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.portlet.PortletRequestModel;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
@@ -112,7 +113,6 @@ import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -186,7 +186,7 @@ import org.osgi.service.component.annotations.Reference;
 		"javax.portlet.display-name=Web Content",
 		"javax.portlet.expiration-cache=0",
 		"javax.portlet.init-param.mvc-action-command-package-prefix=com.liferay.journal.web.portlet.action",
-		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + JournalPortletKeys.JOURNAL,
 		"javax.portlet.resource-bundle=content.Language",
@@ -744,13 +744,14 @@ public class JournalPortlet extends MVCPortlet {
 			uploadPortletRequest, "assetDisplayPageId");
 		int displayPageType = ParamUtil.getInteger(
 			uploadPortletRequest, "displayPageType");
+
 		String layoutUuid = ParamUtil.getString(
 			uploadPortletRequest, "layoutUuid");
 
-		Layout targetLayout = _journalHelper.getArticleLayout(
-			layoutUuid, groupId);
-
 		if (displayPageType == AssetDisplayPageConstants.TYPE_SPECIFIC) {
+			Layout targetLayout = _journalHelper.getArticleLayout(
+				layoutUuid, groupId);
+
 			if ((assetDisplayPageId != 0) || (targetLayout == null)) {
 				layoutUuid = null;
 			}
@@ -789,6 +790,7 @@ public class JournalPortlet extends MVCPortlet {
 			uploadPortletRequest, "expirationDateMinute");
 		int expirationDateAmPm = ParamUtil.getInteger(
 			uploadPortletRequest, "expirationDateAmPm");
+
 		boolean neverExpire = ParamUtil.getBoolean(
 			uploadPortletRequest, "neverExpire");
 
@@ -941,7 +943,7 @@ public class JournalPortlet extends MVCPortlet {
 
 		if (article.getClassNameId() == ddmStructureClassNameId) {
 			String ddmPortletId = PortletProviderUtil.getPortletId(
-				DDMStructure.class.getName(), Action.EDIT);
+				DDMStructure.class.getName(), PortletProvider.Action.EDIT);
 
 			MultiSessionMessages.add(
 				actionRequest, ddmPortletId + "requestProcessed");
@@ -965,7 +967,6 @@ public class JournalPortlet extends MVCPortlet {
 		long groupId = ParamUtil.getLong(actionRequest, "groupId");
 
 		String feedId = ParamUtil.getString(actionRequest, "feedId");
-		boolean autoFeedId = ParamUtil.getBoolean(actionRequest, "autoFeedId");
 
 		String name = ParamUtil.getString(actionRequest, "name");
 		String description = ParamUtil.getString(actionRequest, "description");
@@ -984,6 +985,7 @@ public class JournalPortlet extends MVCPortlet {
 			actionRequest, "targetPortletId");
 		String contentField = ParamUtil.getString(
 			actionRequest, "contentField");
+
 		String feedType = ParamUtil.getString(
 			actionRequest, "feedType", RSSUtil.FEED_TYPE_DEFAULT);
 
@@ -996,6 +998,9 @@ public class JournalPortlet extends MVCPortlet {
 		if (actionName.equals("addFeed")) {
 
 			// Add feed
+
+			boolean autoFeedId = ParamUtil.getBoolean(
+				actionRequest, "autoFeedId");
 
 			_journalFeedService.addFeed(
 				groupId, feedId, autoFeedId, name, description, ddmStructureKey,
@@ -1026,9 +1031,6 @@ public class JournalPortlet extends MVCPortlet {
 		String name = ParamUtil.getString(actionRequest, "name");
 		String description = ParamUtil.getString(actionRequest, "description");
 
-		boolean mergeWithParentFolder = ParamUtil.getBoolean(
-			actionRequest, "mergeWithParentFolder");
-
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			JournalFolder.class.getName(), actionRequest);
 
@@ -1050,6 +1052,8 @@ public class JournalPortlet extends MVCPortlet {
 				0L);
 			int restrinctionType = ParamUtil.getInteger(
 				actionRequest, "restrictionType");
+			boolean mergeWithParentFolder = ParamUtil.getBoolean(
+				actionRequest, "mergeWithParentFolder");
 
 			_journalFolderService.updateFolder(
 				serviceContext.getScopeGroupId(), folderId, parentFolderId,
@@ -1241,6 +1245,14 @@ public class JournalPortlet extends MVCPortlet {
 
 		try {
 			ActionUtil.getFolder(renderRequest);
+
+			String path = getPath(renderRequest, renderResponse);
+
+			if (Objects.equals(path, "/edit_article.jsp") ||
+				Objects.equals(path, "/view_article_history.jsp")) {
+
+				ActionUtil.getArticle(renderRequest);
+			}
 		}
 		catch (Exception e) {
 			_log.error(e.getMessage());

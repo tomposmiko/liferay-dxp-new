@@ -52,8 +52,8 @@ import org.junit.runner.RunWith;
 public class RefreshTokenTest extends BaseClientTestCase {
 
 	@Deployment
-	public static Archive<?> getDeployment() throws Exception {
-		return BaseClientTestCase.getDeployment(
+	public static Archive<?> getArchive() throws Exception {
+		return BaseClientTestCase.getArchive(
 			TokenExpeditionTestPreparatorBundleActivator.class);
 	}
 
@@ -61,7 +61,7 @@ public class RefreshTokenTest extends BaseClientTestCase {
 	public void test() throws Exception {
 		JSONObject jsonObject = getToken(
 			"oauthTestApplication", null,
-			getResourceOwnerPassword("test@liferay.com", "test"),
+			getResourceOwnerPasswordBiFunction("test@liferay.com", "test"),
 			this::parseJSONObject);
 
 		WebTarget webTarget = getWebTarget("/annotated");

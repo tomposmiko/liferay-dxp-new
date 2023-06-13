@@ -20,6 +20,7 @@ import com.liferay.knowledge.base.service.KBArticleLocalService;
 import com.liferay.knowledge.base.service.KBArticleService;
 import com.liferay.knowledge.base.util.AdminHelper;
 import com.liferay.knowledge.base.util.comparator.KBArticleVersionComparator;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.bean.BeanReference;
@@ -30,7 +31,6 @@ import com.liferay.portal.kernel.diff.DiffVersionsInfo;
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -143,13 +143,13 @@ public class AdminHelperImpl implements AdminHelper {
 		OutputDocument outputDocument = new OutputDocument(source);
 
 		for (Element element : source.getAllElements()) {
-			StringBundler sb = new StringBundler(4);
-
 			Attributes attributes = element.getAttributes();
 
 			if (attributes == null) {
 				continue;
 			}
+
+			StringBundler sb = new StringBundler(4);
 
 			Attribute changeTypeAttribute = attributes.get("changeType");
 

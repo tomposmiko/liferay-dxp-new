@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.security.access.control.AccessControlThreadLoca
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.ClassUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -102,8 +101,9 @@ public class JSONServiceAction extends JSONAction {
 			return null;
 		}
 
-		ClassLoader contextClassLoader =
-			ClassLoaderUtil.getContextClassLoader();
+		Thread currentThread = Thread.currentThread();
+
+		ClassLoader contextClassLoader = currentThread.getContextClassLoader();
 
 		Class<?> clazz = contextClassLoader.loadClass(className);
 
@@ -115,6 +115,7 @@ public class JSONServiceAction extends JSONAction {
 		}
 
 		Method method = (Method)methodAndParameterTypes[0];
+
 		Type[] parameterTypes = (Type[])methodAndParameterTypes[1];
 		Object[] args = new Object[serviceParameters.length];
 
@@ -149,9 +150,8 @@ public class JSONServiceAction extends JSONAction {
 			if (returnObj != null) {
 				return getReturnValue(returnObj);
 			}
-			else {
-				return JSONFactoryUtil.getNullJSON();
-			}
+
+			return JSONFactoryUtil.getNullJSON();
 		}
 		catch (Exception e) {
 			if (_log.isDebugEnabled()) {
@@ -268,9 +268,8 @@ public class JSONServiceAction extends JSONAction {
 
 				return doubleArray;
 			}
-			else {
-				return new boolean[0][0];
-			}
+
+			return new boolean[0][0];
 		}
 		else if (typeNameOrClassDescriptor.equals("[[D")) {
 			String[] values = request.getParameterValues(parameter);
@@ -291,9 +290,8 @@ public class JSONServiceAction extends JSONAction {
 
 				return doubleArray;
 			}
-			else {
-				return new double[0][0];
-			}
+
+			return new double[0][0];
 		}
 		else if (typeNameOrClassDescriptor.equals("[[F")) {
 			String[] values = request.getParameterValues(parameter);
@@ -314,9 +312,8 @@ public class JSONServiceAction extends JSONAction {
 
 				return doubleArray;
 			}
-			else {
-				return new float[0][0];
-			}
+
+			return new float[0][0];
 		}
 		else if (typeNameOrClassDescriptor.equals("[[I")) {
 			String[] values = request.getParameterValues(parameter);
@@ -336,9 +333,8 @@ public class JSONServiceAction extends JSONAction {
 
 				return doubleArray;
 			}
-			else {
-				return new int[0][0];
-			}
+
+			return new int[0][0];
 		}
 		else if (typeNameOrClassDescriptor.equals("[[J")) {
 			String[] values = request.getParameterValues(parameter);
@@ -358,9 +354,8 @@ public class JSONServiceAction extends JSONAction {
 
 				return doubleArray;
 			}
-			else {
-				return new long[0][0];
-			}
+
+			return new long[0][0];
 		}
 		else if (typeNameOrClassDescriptor.equals("[[S")) {
 			String[] values = request.getParameterValues(parameter);
@@ -381,9 +376,8 @@ public class JSONServiceAction extends JSONAction {
 
 				return doubleArray;
 			}
-			else {
-				return new short[0][0];
-			}
+
+			return new short[0][0];
 		}
 		else if (typeNameOrClassDescriptor.equals("[[Ljava.lang.String")) {
 			String[] values = request.getParameterValues(parameter);
@@ -400,9 +394,8 @@ public class JSONServiceAction extends JSONAction {
 
 				return doubleArray;
 			}
-			else {
-				return new String[0][0];
-			}
+
+			return new String[0][0];
 		}
 		else if (typeNameOrClassDescriptor.equals(
 					"java.util.Map<java.util.Locale, java.lang.String>")) {
@@ -654,9 +647,8 @@ public class JSONServiceAction extends JSONAction {
 
 			return true;
 		}
-		else {
-			return false;
-		}
+
+		return false;
 	}
 
 	private static final String _REROUTE_PATH = "/api/json";

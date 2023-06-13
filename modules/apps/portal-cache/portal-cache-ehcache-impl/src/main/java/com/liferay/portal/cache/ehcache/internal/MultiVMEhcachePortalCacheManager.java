@@ -23,13 +23,10 @@ import com.liferay.portal.kernel.cache.PortalCacheManagerNames;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.AggregateClassLoader;
-import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 
 import java.io.Serializable;
-
-import javax.management.MBeanServer;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
@@ -51,6 +48,8 @@ public class MultiVMEhcachePortalCacheManager
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
+		this.bundleContext = bundleContext;
+
 		setClusterAware(true);
 		setConfigFile(props.get(PropsKeys.EHCACHE_MULTI_VM_CONFIG_LOCATION));
 		setDefaultConfigFile(_DEFAULT_CONFIG_FILE_NAME);
@@ -63,17 +62,17 @@ public class MultiVMEhcachePortalCacheManager
 
 		Class<?> clazz = getClass();
 
-		ClassLoaderUtil.setContextClassLoader(
+		currentThread.setContextClassLoader(
 			AggregateClassLoader.getAggregateClassLoader(
 				contextClassLoader, clazz.getClassLoader()));
 
 		try {
 			initialize();
 
-			initPortalCacheConfiguratorSettingsServiceTracker(bundleContext);
+			initPortalCacheConfiguratorSettingsServiceTracker();
 		}
 		finally {
-			ClassLoaderUtil.setContextClassLoader(contextClassLoader);
+			currentThread.setContextClassLoader(contextClassLoader);
 		}
 
 		if (_log.isDebugEnabled()) {
@@ -84,11 +83,6 @@ public class MultiVMEhcachePortalCacheManager
 	@Deactivate
 	protected void deactivate() {
 		destroy();
-	}
-
-	@Reference(unbind = "-")
-	protected void setMBeanServer(MBeanServer mBeanServer) {
-		this.mBeanServer = mBeanServer;
 	}
 
 	@Reference(unbind = "-")

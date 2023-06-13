@@ -14,21 +14,19 @@
 
 package com.liferay.portal.kernel.util;
 
-import com.liferay.portal.kernel.security.pacl.permission.PortalRuntimePermission;
-
 import java.lang.reflect.Method;
 
 /**
  * @author Brian Wing Shun Chan
  * @author Wesley Gong
+ * @deprecated As of Judson (7.1.x), replaced by {@link
+ *             com.liferay.portal.kernel.transaction.TransactionInvokerUtil}
  */
+@Deprecated
 public class ServiceBeanMethodInvocationFactoryUtil {
 
 	public static ServiceBeanMethodInvocationFactory
 		getServiceBeanMethodInvocationFactory() {
-
-		PortalRuntimePermission.checkGetBeanProperty(
-			ServiceBeanMethodInvocationFactoryUtil.class);
 
 		return _serviceBeanMethodInvocationFactory;
 	}
@@ -44,8 +42,6 @@ public class ServiceBeanMethodInvocationFactoryUtil {
 
 	public void setServiceBeanMethodInvocationFactory(
 		ServiceBeanMethodInvocationFactory serviceBeanMethodInvocationFactory) {
-
-		PortalRuntimePermission.checkSetBeanProperty(getClass());
 
 		_serviceBeanMethodInvocationFactory =
 			serviceBeanMethodInvocationFactory;

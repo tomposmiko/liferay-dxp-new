@@ -807,9 +807,8 @@ public class AssetPublisherUtil {
 		if (ArrayUtil.isNotEmpty(classNameIds)) {
 			return classNameIds;
 		}
-		else {
-			return availableClassNameIds;
-		}
+
+		return availableClassNameIds;
 	}
 
 	public static Long[] getClassTypeIds(
@@ -855,17 +854,12 @@ public class AssetPublisherUtil {
 		if (classTypeIds != null) {
 			return classTypeIds;
 		}
-		else {
-			return availableClassTypeIds;
-		}
+
+		return availableClassTypeIds;
 	}
 
 	public static Map<Locale, String> getEmailAssetEntryAddedBodyMap(
 		PortletPreferences portletPreferences) {
-
-		LocalizedValuesMap emailAssetEntryAddedLocalizedBodyMap =
-			_assetPublisherPortletInstanceConfiguration.
-				emailAssetEntryAddedBody();
 
 		Map<Locale, String> emailAssetEntryAddedBodyMap =
 			LocalizationUtil.getLocalizationMap(
@@ -876,6 +870,10 @@ public class AssetPublisherUtil {
 		Locale defaultLocale = LocaleUtil.getSiteDefault();
 
 		if (Validator.isNull(emailAssetEntryAddedBodyMap.get(defaultLocale))) {
+			LocalizedValuesMap emailAssetEntryAddedLocalizedBodyMap =
+				_assetPublisherPortletInstanceConfiguration.
+					emailAssetEntryAddedBody();
+
 			emailAssetEntryAddedBodyMap.put(
 				defaultLocale,
 				emailAssetEntryAddedLocalizedBodyMap.getDefaultValue());
@@ -893,18 +891,13 @@ public class AssetPublisherUtil {
 		if (Validator.isNotNull(emailAssetEntryAddedEnabled)) {
 			return GetterUtil.getBoolean(emailAssetEntryAddedEnabled);
 		}
-		else {
-			return _assetPublisherPortletInstanceConfiguration.
-				emailAssetEntryAddedEnabled();
-		}
+
+		return _assetPublisherPortletInstanceConfiguration.
+			emailAssetEntryAddedEnabled();
 	}
 
 	public static Map<Locale, String> getEmailAssetEntryAddedSubjectMap(
 		PortletPreferences portletPreferences) {
-
-		LocalizedValuesMap emailAssetEntryAddedLocalizedSubjectMap =
-			_assetPublisherPortletInstanceConfiguration.
-				emailAssetEntryAddedSubject();
 
 		Map<Locale, String> emailAssetEntryAddedSubjectMap =
 			LocalizationUtil.getLocalizationMap(
@@ -916,6 +909,10 @@ public class AssetPublisherUtil {
 
 		if (Validator.isNull(
 				emailAssetEntryAddedSubjectMap.get(defaultLocale))) {
+
+			LocalizedValuesMap emailAssetEntryAddedLocalizedSubjectMap =
+				_assetPublisherPortletInstanceConfiguration.
+					emailAssetEntryAddedSubject();
 
 			emailAssetEntryAddedSubjectMap.put(
 				defaultLocale,

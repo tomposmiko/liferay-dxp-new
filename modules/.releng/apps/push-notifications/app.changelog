@@ -1,0 +1,35 @@
+#
+# Liferay App Version 3.0.0
+#
+
+app.artifacts-3.0.0=\
+	com.liferay.push.notifications.api-2.0.0.jar,\
+	com.liferay.push.notifications.sender.android-2.0.2.jar,\
+	com.liferay.push.notifications.sender.apple-2.0.4.jar,\
+	com.liferay.push.notifications.sender.firebase-2.0.2.jar,\
+	com.liferay.push.notifications.sender.microsoft-2.0.0.jar,\
+	com.liferay.push.notifications.sender.sms-2.0.2.jar,\
+	com.liferay.push.notifications.service-2.0.0.jar,\
+	com.liferay.push.notifications.web-2.0.1.jar
+
+app.change.log-3.0.0=LPS-60850 LPS-65012 LPS-66846 LPS-66891 LPS-67352 LPS-67828 LPS-68189 LPS-68289 LPS-68342 LPS-68923 LPS-69271 LPS-69926 LPS-70494 LPS-71261 LPS-71603 LPS-73967 LPS-74155 LPS-74306 LPS-74544 LPS-74849 LPS-75010 LPS-75049 LPS-75348 LPS-75859 LPS-76221 LPS-76997 LPS-77395 LPS-77425 LPS-77699 LPS-78017 LPS-78772 LPS-78901 LPS-79679 LPS-79756 LPS-79799 LPS-80054 LPS-80184 LPS-80332 LPS-81028 LPS-81069 LPS-82261 LPS-82343
+
+app.git.id-3.0.0=4cbff6b2c41192bd3b726d6120145660fc9fc397
+
+#
+# Liferay App Version 3.0.1
+#
+
+app.artifacts-3.0.1=\
+	com.liferay.push.notifications.api-2.1.2.jar,\
+	com.liferay.push.notifications.sender.android-2.0.4.jar,\
+	com.liferay.push.notifications.sender.apple-2.0.7.jar,\
+	com.liferay.push.notifications.sender.firebase-2.0.6.jar,\
+	com.liferay.push.notifications.sender.microsoft-2.0.1.jar,\
+	com.liferay.push.notifications.sender.sms-2.0.3.jar,\
+	com.liferay.push.notifications.service-2.0.2.jar,\
+	com.liferay.push.notifications.web-2.0.3.jar
+
+app.change.log-3.0.1=LPS-78938 LPS-84093 LPS-84119 LPS-84285 LPS-84294 LPS-85296 LPS-85849
+
+app.git.id-3.0.1=83bff46fc28ef911fb4512ce3bca34729a570ec4

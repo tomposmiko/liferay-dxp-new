@@ -10,7 +10,7 @@
 	</set-up>
 
 	<tear-down>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+		<var method="PropsUtil#get('test.portal.instance')" name="testPortalInstance" />
 
 		<if>
 			<equals arg1="${testPortalInstance}" arg2="true" />
@@ -199,6 +199,8 @@
 	</command>
 
 	<command name="ExportImportDDLViaGlobal" priority="5">
+		<property name="test.name.skip.portal.instance" value="ExportImport#ExportImportDDLViaGlobal" />
+
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Sites" />
 			<var name="panel" value="Control Panel" />
@@ -330,6 +332,101 @@
 		</execute>
 	</command>
 
+	<command name="ExportImportDeletions" priority="4">
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Content" />
+			<var name="panel" value="Site Administration" />
+			<var name="portlet" value="Web Content" />
+		</execute>
+
+		<execute macro="WebContentNavigator#gotoAddCP" />
+
+		<execute macro="WebContent#addCP">
+			<var name="webContentContent" value="Web Content Content" />
+			<var name="webContentTitle" value="Web Content Title" />
+		</execute>
+
+		<execute macro="PortletEntry#publish" />
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Content" />
+			<var name="panel" value="Site Administration" />
+			<var name="portlet" value="Web Content" />
+		</execute>
+
+		<execute macro="LAR#exportPortlet">
+			<var name="larFileName" value="ExportWebContent.lar" />
+		</execute>
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Content" />
+			<var name="panel" value="Site Administration" />
+			<var name="portlet" value="Web Content" />
+		</execute>
+
+		<execute macro="WebContent#deleteCP">
+			<var name="webContentTitle" value="Web Content Title" />
+		</execute>
+
+		<execute macro="LAR#exportPortlet">
+			<var name="exportIndividualDeletions" value="true" />
+			<var name="larFileName" value="ExportWebContentDeletion.lar" />
+		</execute>
+
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Content" />
+			<var name="panel" value="Site Administration" />
+			<var name="portlet" value="Web Content" />
+		</execute>
+
+		<execute macro="LAR#importPortlet">
+			<var name="larFileName" value="ExportWebContent.lar" />
+		</execute>
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Content" />
+			<var name="panel" value="Site Administration" />
+			<var name="portlet" value="Web Content" />
+		</execute>
+
+		<execute macro="WebContent#viewTitle">
+			<var name="webContentTitle" value="Web Content Title" />
+		</execute>
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Content" />
+			<var name="panel" value="Site Administration" />
+			<var name="portlet" value="Web Content" />
+		</execute>
+
+		<execute macro="LAR#importPortlet">
+			<var name="importDeletions" value="true" />
+			<var name="larFileName" value="ExportWebContentDeletion.lar" />
+		</execute>
+
+		<execute macro="Navigator#openURL" />
+
+		<execute macro="ProductMenu#gotoPortlet">
+			<var name="category" value="Content" />
+			<var name="panel" value="Site Administration" />
+			<var name="portlet" value="Web Content" />
+		</execute>
+
+		<execute macro="WebContent#viewNotPresentCP">
+			<var name="webContentTitle" value="Web Content Title" />
+		</execute>
+	</command>
+
 	<command name="ExportImportPortletWithADT" priority="3">
 		<execute macro="Navigator#openURL" />
 
@@ -404,6 +501,8 @@
 			<var name="portlet" value="Sites" />
 		</execute>
 
+		<execute function="Refresh" />
+
 		<execute macro="Site#addBlankCP">
 			<var name="siteName" value="Site Name" />
 		</execute>
@@ -425,7 +524,7 @@
 	</command>
 
 	<command name="ExportImportPrivatePage" priority="5">
-		<property name="portal.acceptance" value="false" />
+		<property name="portal.acceptance" value="true" />
 		<property name="testray.component.names" value="Training" />
 
 		<execute macro="ProductMenu#gotoPortlet">
@@ -469,6 +568,8 @@
 			<var name="portlet" value="Sites" />
 		</execute>
 
+		<execute function="Refresh" />
+
 		<execute macro="Site#addBlankCP">
 			<var name="siteName" value="Site Name" />
 		</execute>
@@ -486,8 +587,9 @@
 	</command>
 
 	<command name="ExportImportSampleLARPortlet" priority="5">
-		<property name="portal.acceptance" value="quarantine" />
+		<property name="portal.acceptance" value="true" />
 		<property name="portlet.plugins.includes" value="sample-lar-portlet" />
+		<property name="test.name.skip.portal.instance" value="ExportImport#ExportImportSampleLARPortlet" />
 
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Build" />
@@ -565,7 +667,7 @@
 	</command>
 
 	<command name="ExportImportSmoke" priority="5">
-		<property name="portal.acceptance" value="false" />
+		<property name="portal.acceptance" value="true" />
 		<property name="testray.component.names" value="Training" />
 
 		<execute macro="User#firstLoginPG" />
@@ -603,6 +705,8 @@
 	</command>
 
 	<command name="ExportImportThemeSettings" priority="4">
+		<property name="osgi.app.includes" value="frontend-theme-fjord" />
+
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Sites" />
 			<var name="panel" value="Control Panel" />
@@ -654,6 +758,8 @@
 			<var name="portlet" value="Sites" />
 		</execute>
 
+		<execute function="Refresh" />
+
 		<execute macro="Site#addBlankCP">
 			<var name="siteName" value="Site Name 2" />
 		</execute>
@@ -670,12 +776,13 @@
 
 		<execute macro="Page#viewCurrentTheme">
 			<var name="page" value="Public Pages" />
+			<var name="pageName" value="Test Page" />
 			<var name="themeName" value="Fjord" />
 		</execute>
 	</command>
 
 	<command name="ExportImportValidation" priority="5">
-		<property name="portal.acceptance" value="quarantine" />
+		<property name="portal.acceptance" value="true" />
 		<property name="test.name.skip.portal.instance" value="ExportImport#ExportImportValidation" />
 		<property name="testray.component.names" value="Training" />
 
@@ -762,6 +869,8 @@
 			<var name="dmDocumentTitle" value="DM Document Title" />
 		</execute>
 
+		<execute function="Refresh" />
+
 		<execute macro="ProductMenu#gotoPortlet">
 			<var name="category" value="Sites" />
 			<var name="panel" value="Control Panel" />
@@ -780,6 +889,8 @@
 	</command>
 
 	<command name="ExportImportWithExportTemplate" priority="4">
+		<property name="test.name.skip.portal.instance" value="ExportImport#ExportImportWithExportTemplate" />
+
 		<execute macro="Navigator#openURL" />
 
 		<execute macro="ProductMenu#gotoPortlet">
@@ -835,7 +946,7 @@
 	</command>
 
 	<command name="ImportCorruptedFile" priority="5">
-		<property name="portal.acceptance" value="quarantine" />
+		<property name="portal.acceptance" value="true" />
 		<property name="portal.release" value="false" />
 
 		<execute macro="Navigator#openURL" />

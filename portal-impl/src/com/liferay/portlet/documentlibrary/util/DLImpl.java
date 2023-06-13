@@ -508,26 +508,41 @@ public class DLImpl implements DL {
 
 	@Override
 	public String getImagePreviewURL(
-			FileEntry fileEntry, FileVersion fileVersion,
-			ThemeDisplay themeDisplay)
-		throws Exception {
+		FileEntry fileEntry, FileVersion fileVersion,
+		ThemeDisplay themeDisplay) {
 
-		String previewQueryString = null;
+		return getImagePreviewURL(
+			fileEntry, fileVersion, themeDisplay, null, true, true);
+	}
+
+	@Override
+	public String getImagePreviewURL(
+		FileEntry fileEntry, FileVersion fileVersion, ThemeDisplay themeDisplay,
+		String queryString, boolean appendVersion, boolean absoluteURL) {
+
+		String previewQueryString = queryString;
+
+		if (Validator.isNull(previewQueryString)) {
+			previewQueryString = StringPool.BLANK;
+		}
 
 		if (ImageProcessorUtil.isSupported(fileVersion.getMimeType())) {
-			previewQueryString = "&imagePreview=1";
+			previewQueryString = previewQueryString.concat("&imagePreview=1");
 		}
 		else if (PropsValues.DL_FILE_ENTRY_PREVIEW_ENABLED) {
 			if (PDFProcessorUtil.hasImages(fileVersion)) {
-				previewQueryString = "&previewFileIndex=1";
+				previewQueryString = previewQueryString.concat(
+					"&previewFileIndex=1");
 			}
 			else if (VideoProcessorUtil.hasVideo(fileVersion)) {
-				previewQueryString = "&videoThumbnail=1";
+				previewQueryString = previewQueryString.concat(
+					"&videoThumbnail=1");
 			}
 		}
 
 		return getImageSrc(
-			fileEntry, fileVersion, themeDisplay, previewQueryString);
+			fileEntry, fileVersion, themeDisplay, previewQueryString,
+			appendVersion, absoluteURL);
 	}
 
 	@Override
@@ -580,20 +595,15 @@ public class DLImpl implements DL {
 		if (appendVersion) {
 			sb.append("?version=");
 			sb.append(fileVersion.getVersion());
+			sb.append("&t=");
+		}
+		else {
+			sb.append("?t=");
 		}
 
-		if (ImageProcessorUtil.isImageSupported(fileVersion)) {
-			if (appendVersion) {
-				sb.append("&t=");
-			}
-			else {
-				sb.append("?t=");
-			}
+		Date modifiedDate = fileVersion.getModifiedDate();
 
-			Date modifiedDate = fileVersion.getModifiedDate();
-
-			sb.append(modifiedDate.getTime());
-		}
+		sb.append(modifiedDate.getTime());
 
 		sb.append(queryString);
 
@@ -1182,15 +1192,23 @@ public class DLImpl implements DL {
 	}
 
 	protected String getImageSrc(
-			FileEntry fileEntry, FileVersion fileVersion,
-			ThemeDisplay themeDisplay, String queryString)
-		throws Exception {
+		FileEntry fileEntry, FileVersion fileVersion, ThemeDisplay themeDisplay,
+		String queryString) {
+
+		return getImageSrc(
+			fileEntry, fileVersion, themeDisplay, queryString, true, true);
+	}
+
+	protected String getImageSrc(
+		FileEntry fileEntry, FileVersion fileVersion, ThemeDisplay themeDisplay,
+		String queryString, boolean appendVersion, boolean absoluteURL) {
 
 		String thumbnailSrc = StringPool.BLANK;
 
 		if (Validator.isNotNull(queryString)) {
 			thumbnailSrc = getPreviewURL(
-				fileEntry, fileVersion, themeDisplay, queryString, true, true);
+				fileEntry, fileVersion, themeDisplay, queryString,
+				appendVersion, absoluteURL);
 		}
 
 		return thumbnailSrc;
@@ -1230,55 +1248,61 @@ public class DLImpl implements DL {
 	private static final Log _log = LogFactoryUtil.getLog(DLImpl.class);
 
 	private static final Set<String> _allMediaGalleryMimeTypes =
-		new TreeSet<>();
-	private static final Set<String> _fileIcons = new HashSet<>();
+		new TreeSet<String>() {
+			{
+				addAll(
+					SetUtil.fromArray(
+						PropsUtil.getArray(
+							PropsKeys.DL_FILE_ENTRY_PREVIEW_AUDIO_MIME_TYPES)));
+				addAll(
+					SetUtil.fromArray(
+						PropsUtil.getArray(
+							PropsKeys.DL_FILE_ENTRY_PREVIEW_VIDEO_MIME_TYPES)));
+				addAll(
+					SetUtil.fromArray(
+						PropsUtil.getArray(
+							PropsKeys.DL_FILE_ENTRY_PREVIEW_IMAGE_MIME_TYPES)));
+			}
+		};
+
+	private static final Set<String> _fileIcons = new HashSet<String>() {
+		{
+			String[] fileIcons = null;
+
+			try {
+				fileIcons = PropsUtil.getArray(PropsKeys.DL_FILE_ICONS);
+			}
+			catch (Exception e) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(e, e);
+				}
+
+				fileIcons = new String[] {StringPool.BLANK};
+			}
+
+			for (int i = 0; i < fileIcons.length; i++) {
+
+				// Only process non wildcard extensions
+
+				if (!StringPool.STAR.equals(fileIcons[i])) {
+
+					// Strip starting period
+
+					String extension = fileIcons[i];
+
+					if (extension.length() > 0) {
+						extension = extension.substring(1);
+					}
+
+					add(extension);
+				}
+			}
+		}
+	};
+
 	private static final Map<String, String> _genericNames = new HashMap<>();
 
 	static {
-		_allMediaGalleryMimeTypes.addAll(
-			SetUtil.fromArray(
-				PropsUtil.getArray(
-					PropsKeys.DL_FILE_ENTRY_PREVIEW_AUDIO_MIME_TYPES)));
-		_allMediaGalleryMimeTypes.addAll(
-			SetUtil.fromArray(
-				PropsUtil.getArray(
-					PropsKeys.DL_FILE_ENTRY_PREVIEW_VIDEO_MIME_TYPES)));
-		_allMediaGalleryMimeTypes.addAll(
-			SetUtil.fromArray(
-				PropsUtil.getArray(
-					PropsKeys.DL_FILE_ENTRY_PREVIEW_IMAGE_MIME_TYPES)));
-
-		String[] fileIcons = null;
-
-		try {
-			fileIcons = PropsUtil.getArray(PropsKeys.DL_FILE_ICONS);
-		}
-		catch (Exception e) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(e, e);
-			}
-
-			fileIcons = new String[] {StringPool.BLANK};
-		}
-
-		for (int i = 0; i < fileIcons.length; i++) {
-
-			// Only process non wildcard extensions
-
-			if (!StringPool.STAR.equals(fileIcons[i])) {
-
-				// Strip starting period
-
-				String extension = fileIcons[i];
-
-				if (extension.length() > 0) {
-					extension = extension.substring(1);
-				}
-
-				_fileIcons.add(extension);
-			}
-		}
-
 		String[] genericNames = PropsUtil.getArray(
 			PropsKeys.DL_FILE_GENERIC_NAMES);
 

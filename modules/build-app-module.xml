@@ -73,6 +73,10 @@
 		</copy>
 	</target>
 
+	<target depends="get-artifact-properties" name="delete-app-artifacts">
+		<delete file="${artifact.location.src}" />
+	</target>
+
 	<target
 		depends="
 			copy-hotfix-artifact,
@@ -105,7 +109,10 @@
 		</loadproperties>
 
 		<if>
-			<contains string="${basedir}" substring="private${file.separator}" />
+			<or>
+				<contains string="${basedir}" substring="private${file.separator}" />
+				<istrue value="${download.artifact.private.override}" />
+			</or>
 			<then>
 				<get
 					dest="${dist.dir}"
@@ -155,7 +162,10 @@
 			<isset property="artifact.sources.url" />
 			<then>
 				<if>
-					<contains string="${basedir}" substring="private${file.separator}" />
+					<or>
+						<contains string="${basedir}" substring="private${file.separator}" />
+						<istrue value="${download.artifact.private.override}" />
+					</or>
 					<then>
 						<get
 							dest="${dist.dir}/sources"
@@ -201,7 +211,10 @@
 		</loadproperties>
 
 		<if>
-			<contains string="${basedir}" substring="private${file.separator}" />
+			<or>
+				<contains string="${basedir}" substring="private${file.separator}" />
+				<istrue value="${download.artifact.private.override}" />
+			</or>
 			<then>
 				<get
 					dest="${dist.dir}"
@@ -259,7 +272,7 @@
 				<tokenfilter>
 					<filetokenizer />
 
-					<replaceregex pattern="[\s\S]* Bundle Version ${artifact.version.previous.release}" replace="" />
+					<replaceregex pattern="[\s\S]* Bundle Version ${artifact.version.previous.release}\s" replace="" />
 				</tokenfilter>
 
 				<linecontainsregexp>

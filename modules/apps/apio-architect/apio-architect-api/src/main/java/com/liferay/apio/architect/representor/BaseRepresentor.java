@@ -19,9 +19,11 @@ import aQute.bnd.annotation.ProviderType;
 import com.liferay.apio.architect.alias.BinaryFunction;
 import com.liferay.apio.architect.alias.representor.FieldFunction;
 import com.liferay.apio.architect.alias.representor.NestedFieldFunction;
+import com.liferay.apio.architect.alias.representor.NestedListFieldFunction;
 import com.liferay.apio.architect.file.BinaryFile;
 import com.liferay.apio.architect.identifier.Identifier;
 import com.liferay.apio.architect.language.AcceptLanguage;
+import com.liferay.apio.architect.related.RelatedCollection;
 import com.liferay.apio.architect.related.RelatedModel;
 
 import java.util.Date;
@@ -30,6 +32,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Base class for {@code Representors}.
@@ -51,13 +54,20 @@ import java.util.function.Function;
 public interface BaseRepresentor<T> {
 
 	/**
-	 * Returns a binary resource linked to a model, if present. Returns {@code
+	 * Returns the list that contains the application relative URL field names
+	 * and the functions to get those fields.
+	 *
+	 * @return the list
+	 */
+	public List<FieldFunction<T, String>> getApplicationRelativeURLFunctions();
+
+	/**
+	 * Returns a binary resource linked to a model, if present; returns {@code
 	 * Optional#empty} otherwise.
 	 *
 	 * @param  binaryId the ID of the binary resource
-	 * @return a binary resource linked to a model if present; {@code
-	 *         Optional#empty()} otherwise
-	 * @review
+	 * @return the binary resource, if present; {@code Optional#empty()}
+	 *         otherwise
 	 */
 	public Optional<BinaryFunction<T>> getBinaryFunction(String binaryId);
 
@@ -105,9 +115,16 @@ public interface BaseRepresentor<T> {
 	/**
 	 * Returns the list of nested field functions.
 	 *
-	 * @return the list of nested field functions.
+	 * @return the list
 	 */
 	public List<NestedFieldFunction<T, ?>> getNestedFieldFunctions();
+
+	/**
+	 * Returns the list of nested list field functions.
+	 *
+	 * @return the list
+	 */
+	public List<NestedListFieldFunction<T, ?>> getNestedListFieldFunctions();
 
 	/**
 	 * Returns the list containing the number field names and the functions to
@@ -124,6 +141,21 @@ public interface BaseRepresentor<T> {
 	 * @return the list containing the number list field names and functions
 	 */
 	public List<FieldFunction<T, List<Number>>> getNumberListFunctions();
+
+	/**
+	 * Returns the primary type.
+	 *
+	 * @return the primary type
+	 */
+	public String getPrimaryType();
+
+	/**
+	 * Returns the related collections.
+	 *
+	 * @return the related collections
+	 */
+	public Stream<RelatedCollection<T, ? extends Identifier>>
+		getRelatedCollections();
 
 	/**
 	 * Returns the related models.
@@ -164,18 +196,33 @@ public interface BaseRepresentor<T> {
 	public List<String> getTypes();
 
 	/**
-	 * Returns {@code true} if this {@code Representor} is a {@link
-	 * NestedRepresentor}. Returns {@code false} otherwise.
+	 * Whether this representor is a {@link NestedRepresentor}.
 	 *
-	 * @return {@code true} if this {@code Representor} is a {@link
-	 *         NestedRepresentor}; {@code false} otherwise
-	 * @review
+	 * @return {@code true} if this this representor is a nested representor;
+	 *         {@code false} otherwise
 	 */
 	public boolean isNested();
 
 	@ProviderType
 	public interface BaseFirstStep
 		<T, S extends BaseRepresentor<T>, U extends BaseFirstStep<T, S, U>> {
+
+		/**
+		 * Adds information about a resource's application relative URL field.
+		 * This field's value will be represented as an absolute URI, by
+		 * prefixing it with the application URL.
+		 *
+		 * <p>
+		 * URLs returned by this function should already be encoded (to check
+		 * for potential security holes).
+		 * </p>
+		 *
+		 * @param  key the field's name
+		 * @param  function the function used to get the relative URL
+		 * @return the builder's step
+		 */
+		public U addApplicationRelativeURL(
+			String key, Function<T, String> function);
 
 		/**
 		 * Adds binary files to a resource.
@@ -228,13 +275,13 @@ public interface BaseRepresentor<T> {
 		 *
 		 * @param  key the relation's name
 		 * @param  identifierClass the related resource identifier's class
-		 * @param  identifierFunction the function used to get the related
-		 *         resource's identifier
+		 * @param  modelToIdentifierFunction the function used to get the
+		 *         related resource's identifier
 		 * @return the builder's step
 		 */
 		public <V> U addLinkedModel(
 			String key, Class<? extends Identifier<V>> identifierClass,
-			Function<T, V> identifierFunction);
+			Function<T, V> modelToIdentifierFunction);
 
 		/**
 		 * Provides information about a resource localized string field.
@@ -271,6 +318,20 @@ public interface BaseRepresentor<T> {
 				function);
 
 		/**
+		 * Adds a nested list field to the representor.
+		 *
+		 * @param key the field's name
+		 * @param transformFunction the function that transforms the model into
+		 *        the list whose models are used inside the nested representor
+		 * @param function the function that creates the nested representor for
+		 *        each model
+		 */
+		public <V> U addNestedList(
+			String key, Function<T, List<V>> transformFunction,
+			Function
+				<NestedRepresentor.Builder<V>, NestedRepresentor<V>> function);
+
+		/**
 		 * Adds information about a resource's number field.
 		 *
 		 * @param  key the field's name
@@ -289,12 +350,30 @@ public interface BaseRepresentor<T> {
 		public U addNumberList(String key, Function<T, List<Number>> function);
 
 		/**
+		 * Adds information about a related collection.
+		 *
+		 * @param  key the relation's name
+		 * @param  itemIdentifierClass the class of the collection items'
+		 *         identifier
+		 * @return the builder's step
+		 * @review
+		 */
+		public <V, S extends Identifier<?>> U addRelatedCollection(
+			String key, Class<S> itemIdentifierClass,
+			Function<T, V> modelToIdentifierFunction);
+
+		/**
 		 * Adds information about a resource's relative URL field. This field's
 		 * value will be represented as an absolute URI, by prefixing it with
 		 * the server URL.
 		 *
+		 * <p>
+		 * URLs returned by this function should already be encoded (to check
+		 * for potential security holes).
+		 * </p>
+		 *
 		 * @param  key the field's name
-		 * @param  function the function used to get the url
+		 * @param  function the function used to get the relative URL
 		 * @return the builder's step
 		 */
 		public U addRelativeURL(String key, Function<T, String> function);

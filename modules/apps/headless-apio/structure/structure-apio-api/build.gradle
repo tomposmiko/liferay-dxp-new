@@ -1,0 +1,4 @@
+dependencies {
+	compileOnly group: "com.liferay", name: "com.liferay.apio.architect.api", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.dynamic.data.mapping.api", version: "4.0.0"
+}

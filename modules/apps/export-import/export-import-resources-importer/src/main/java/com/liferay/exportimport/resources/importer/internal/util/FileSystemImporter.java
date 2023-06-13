@@ -46,6 +46,7 @@ import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalFolderLocalService;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -90,7 +91,6 @@ import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.MimeTypes;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -210,7 +210,7 @@ public class FileSystemImporter extends BaseImporter {
 					_log.info(
 						StringBundler.concat(
 							"DDM template with name ", name, " and version ",
-							String.valueOf(version), " already exists"));
+							version, " already exists"));
 				}
 
 				return;
@@ -295,16 +295,16 @@ public class FileSystemImporter extends BaseImporter {
 			String ddmStructureKey, String dirName, String fileName)
 		throws Exception {
 
-		DDMStructure ddmStructure = ddmStructureLocalService.getStructure(
-			groupId, portal.getClassNameId(DDLRecordSet.class),
-			ddmStructureKey);
-
 		File dir = new File(
 			_resourcesDir, dirName + StringPool.SLASH + fileName);
 
 		if (!dir.isDirectory() || !dir.canRead()) {
 			return;
 		}
+
+		DDMStructure ddmStructure = ddmStructureLocalService.getStructure(
+			groupId, portal.getClassNameId(DDLRecordSet.class),
+			ddmStructureKey);
 
 		File[] files = listFiles(dir);
 
@@ -326,16 +326,16 @@ public class FileSystemImporter extends BaseImporter {
 			String ddmStructureKey, String dirName, String fileName)
 		throws Exception {
 
-		DDMStructure ddmStructure = ddmStructureLocalService.getStructure(
-			groupId, portal.getClassNameId(DDLRecordSet.class),
-			ddmStructureKey);
-
 		File dir = new File(
 			_resourcesDir, dirName + StringPool.SLASH + fileName);
 
 		if (!dir.isDirectory() || !dir.canRead()) {
 			return;
 		}
+
+		DDMStructure ddmStructure = ddmStructureLocalService.getStructure(
+			groupId, portal.getClassNameId(DDLRecordSet.class),
+			ddmStructureKey);
 
 		File[] files = listFiles(dir);
 
@@ -386,7 +386,7 @@ public class FileSystemImporter extends BaseImporter {
 					_log.info(
 						StringBundler.concat(
 							"DDM structure with name ", name, " and version ",
-							String.valueOf(version), " already exists"));
+							version, " already exists"));
 				}
 
 				return;
@@ -491,7 +491,7 @@ public class FileSystemImporter extends BaseImporter {
 					_log.info(
 						StringBundler.concat(
 							"DDM structure with name ", name, " and version ",
-							String.valueOf(version), " already exists"));
+							version, " already exists"));
 				}
 
 				return;
@@ -524,11 +524,11 @@ public class FileSystemImporter extends BaseImporter {
 		setServiceContext(fileName);
 
 		try {
-			JournalServiceConfiguration journalServiceConfiguration =
-				ConfigurationProviderUtil.getCompanyConfiguration(
-					JournalServiceConfiguration.class, companyId);
-
 			if (!updateModeEnabled || (ddmStructure == null)) {
+				JournalServiceConfiguration journalServiceConfiguration =
+					ConfigurationProviderUtil.getCompanyConfiguration(
+						JournalServiceConfiguration.class, companyId);
+
 				ddmStructure = ddmStructureLocalService.addStructure(
 					userId, groupId, parentDDMStructureKey,
 					portal.getClassNameId(JournalArticle.class),
@@ -597,7 +597,7 @@ public class FileSystemImporter extends BaseImporter {
 					_log.info(
 						StringBundler.concat(
 							"DDM template with name ", name, " and version ",
-							String.valueOf(version), " already exists"));
+							version, " already exists"));
 				}
 
 				return;
@@ -674,8 +674,6 @@ public class FileSystemImporter extends BaseImporter {
 
 		String name = getName(fileName);
 
-		String script = StringUtil.read(inputStream);
-
 		setServiceContext(fileName);
 
 		DDMStructure ddmStructure = ddmStructureLocalService.getStructure(
@@ -692,7 +690,7 @@ public class FileSystemImporter extends BaseImporter {
 					_log.info(
 						StringBundler.concat(
 							"DDM template with name ", name, " and version ",
-							String.valueOf(version), " already exists"));
+							version, " already exists"));
 				}
 
 				return;
@@ -702,6 +700,8 @@ public class FileSystemImporter extends BaseImporter {
 				ddmTemplateLocalService.deleteTemplate(ddmTemplate);
 			}
 		}
+
+		String script = StringUtil.read(inputStream);
 
 		try {
 			if (!updateModeEnabled || (ddmTemplate == null)) {
@@ -1129,13 +1129,13 @@ public class FileSystemImporter extends BaseImporter {
 					colorSchemeId, layoutCss);
 			}
 
-			LayoutTypePortlet layoutTypePortlet =
-				(LayoutTypePortlet)layout.getLayoutType();
-
 			String layoutTemplateId = layoutJSONObject.getString(
 				"layoutTemplateId", _defaultLayoutTemplateId);
 
 			if (Validator.isNotNull(layoutTemplateId)) {
+				LayoutTypePortlet layoutTypePortlet =
+					(LayoutTypePortlet)layout.getLayoutType();
+
 				layoutTypePortlet.setLayoutTemplateId(
 					userId, layoutTemplateId, false);
 			}
@@ -1293,11 +1293,6 @@ public class FileSystemImporter extends BaseImporter {
 
 		String name = nameMap.get(Locale.getDefault());
 
-		Map<Locale, String> descriptionMap = getMap(
-			layoutTemplateJSONObject, "description");
-
-		String uuid = layoutTemplateJSONObject.getString("uuid");
-
 		LayoutPrototype layoutPrototype = getLayoutPrototype(companyId, name);
 
 		if (layoutPrototype != null) {
@@ -1306,8 +1301,7 @@ public class FileSystemImporter extends BaseImporter {
 					_log.info(
 						StringBundler.concat(
 							"Layout prototype with name ", name,
-							" already exists for company ",
-							String.valueOf(companyId)));
+							" already exists for company ", companyId));
 				}
 
 				return;
@@ -1324,9 +1318,14 @@ public class FileSystemImporter extends BaseImporter {
 		serviceContext.setCompanyId(companyId);
 		serviceContext.setUserId(userId);
 
+		String uuid = layoutTemplateJSONObject.getString("uuid");
+
 		if (Validator.isNotNull(uuid)) {
 			serviceContext.setUuid(uuid);
 		}
+
+		Map<Locale, String> descriptionMap = getMap(
+			layoutTemplateJSONObject, "description");
 
 		try {
 			if (!updateModeEnabled || (layoutPrototype == null)) {
@@ -1531,13 +1530,13 @@ public class FileSystemImporter extends BaseImporter {
 	}
 
 	protected JSONObject getJSONObject(String fileName) throws Exception {
-		String json = null;
-
 		InputStream inputStream = getInputStream(fileName);
 
 		if (inputStream == null) {
 			return null;
 		}
+
+		String json = null;
 
 		try {
 			json = StringUtil.read(inputStream);
@@ -1610,8 +1609,6 @@ public class FileSystemImporter extends BaseImporter {
 
 			String className = primaryKeysEntry.getKey();
 
-			Set<Long> primaryKeys = primaryKeysEntry.getValue();
-
 			Indexer<?> indexer = indexerRegistry.getIndexer(className);
 
 			if (indexer == null) {
@@ -1626,7 +1623,7 @@ public class FileSystemImporter extends BaseImporter {
 				_log.debug("Indexing " + className);
 			}
 
-			for (long primaryKey : primaryKeys) {
+			for (long primaryKey : primaryKeysEntry.getValue()) {
 				try {
 					indexer.reindex(className, primaryKey);
 				}
@@ -1635,8 +1632,7 @@ public class FileSystemImporter extends BaseImporter {
 						_log.warn(
 							StringBundler.concat(
 								"Unable to index entry for class name ",
-								className, " and primary key ",
-								String.valueOf(primaryKey)),
+								className, " and primary key ", primaryKey),
 							se);
 					}
 				}
@@ -2058,14 +2054,15 @@ public class FileSystemImporter extends BaseImporter {
 	private static final Log _log = LogFactoryUtil.getLog(
 		FileSystemImporter.class);
 
+	private static final Pattern _fileEntryPattern = Pattern.compile(
+		"\\[\\$FILE=([^\\$]+)\\$\\]");
+	private static final Pattern _groupIdPattern = Pattern.compile(
+		"\\[\\$GROUP_ID\\$\\]");
+
 	private final Map<String, JSONObject> _assetJSONObjectMap = new HashMap<>();
 	private final Set<String> _ddmStructureKeys = new HashSet<>();
 	private String _defaultLayoutTemplateId;
 	private final Map<String, FileEntry> _fileEntries = new HashMap<>();
-	private final Pattern _fileEntryPattern = Pattern.compile(
-		"\\[\\$FILE=([^\\$]+)\\$\\]");
-	private final Pattern _groupIdPattern = Pattern.compile(
-		"\\[\\$GROUP_ID\\$\\]");
 	private final Map<String, Set<Long>> _primaryKeys = new HashMap<>();
 	private File _resourcesDir;
 

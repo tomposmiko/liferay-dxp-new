@@ -29,14 +29,14 @@ CATALINA_OPTS=&quot;${CATALINA_OPTS} -Djavax.net.ssl.trustStore=${solr.dir}/serv
 
 	<macrodef name="configure-liferay-solr-adapter-osgi-configs">
 		<sequential>
-			<echo file="${liferay.home}/osgi/configs/com.liferay.portal.search.solr.configuration.SolrConfiguration.cfg">readURL=http://localhost:8983/solr/liferay
+			<echo file="${liferay.home}/osgi/configs/com.liferay.portal.search.solr7.configuration.SolrConfiguration.cfg">readURL=http://localhost:8983/solr/liferay
 writeURL=http://localhost:8983/solr/liferay</echo>
 		</sequential>
 	</macrodef>
 
 	<macrodef name="configure-liferay-solr-solrcloud-osgi-configs">
 		<sequential>
-			<echo append="true" file="${liferay.home}/osgi/configs/com.liferay.portal.search.solr.configuration.SolrConfiguration.cfg">
+			<echo append="true" file="${liferay.home}/osgi/configs/com.liferay.portal.search.solr7.configuration.SolrConfiguration.cfg">
 clientType=CLOUD</echo>
 		</sequential>
 	</macrodef>
@@ -44,43 +44,17 @@ clientType=CLOUD</echo>
 	<macrodef name="configure-liferay-solr-ssl-adapter-properties">
 		<sequential>
 			<replace
-				file="${liferay.home}/osgi/configs/com.liferay.portal.search.solr.configuration.SolrConfiguration.cfg"
+				file="${liferay.home}/osgi/configs/com.liferay.portal.search.solr7.configuration.SolrConfiguration.cfg"
 			>
 				<replacetoken><![CDATA[http://]]></replacetoken>
 				<replacevalue><![CDATA[https://]]></replacevalue>
 			</replace>
 
-			<echo append="true" file="${liferay.home}/osgi/configs/com.liferay.portal.search.solr.configuration.SolrConfiguration.cfg">
+			<echo append="true" file="${liferay.home}/osgi/configs/com.liferay.portal.search.solr7.configuration.SolrConfiguration.cfg">
 authenticationMode=CERT</echo>
 
-			<echo file="${liferay.home}/osgi/configs/com.liferay.portal.search.solr.configuration.SolrSSLSocketFactoryConfiguration.cfg">keyStorePath=${solr.dir}/server/etc/solr-ssl.keystore.jks
+			<echo file="${liferay.home}/osgi/configs/com.liferay.portal.search.solr7.configuration.SolrSSLSocketFactoryConfiguration.cfg">keyStorePath=${solr.dir}/server/etc/solr-ssl.keystore.jks
 trustStorePath=${solr.dir}/server/etc/solr-ssl.keystore.jks</echo>
-		</sequential>
-	</macrodef>
-
-	<macrodef name="configure-solr-logging">
-		<sequential>
-			<replace
-				file="${solr.dir}/server/solr/solr.xml"
-			>
-				<replacetoken><![CDATA[</solr>]]></replacetoken>
-				<replacevalue expandproperties="true"><![CDATA[
-	<logging>
-		<str name="enabled">true</str>
-		<watcher>
-			<int name="size">100</int>
-			<str name="threshold">INFO</str>
-		</watcher>
-	</logging>
-</solr>]]></replacevalue>
-			</replace>
-
-			<replace
-				file="${solr.dir}/server/resources/log4j.properties"
-			>
-				<replacetoken><![CDATA[WARN]]></replacetoken>
-				<replacevalue><![CDATA[INFO]]></replacevalue>
-			</replace>
 		</sequential>
 	</macrodef>
 
@@ -89,7 +63,7 @@ trustStorePath=${solr.dir}/server/etc/solr-ssl.keystore.jks</echo>
 			<if>
 				<os family="unix" />
 				<then>
-					<echo append="true" file="${solr.dir}/bin/solr.in.sh">SOLR_SSL_KEY_STORE=${solr.dir}/server/etc/solr-ssl.keystore.jks
+					<echo append="true" file="${solr.dir}/bin/solr.in.sh">${line.separator}SOLR_SSL_KEY_STORE=${solr.dir}/server/etc/solr-ssl.keystore.jks
 SOLR_SSL_KEY_STORE_PASSWORD=secret
 SOLR_SSL_TRUST_STORE=${solr.dir}/server/etc/solr-ssl.keystore.jks
 SOLR_SSL_TRUST_STORE_PASSWORD=secret
@@ -98,7 +72,7 @@ SOLR_SSL_WANT_CLIENT_AUTH=true</echo>
 				<elseif>
 					<os family="windows" />
 					<then>
-						<echo append="true" file="${solr.dir}/bin/solr.in.cmd">SOLR_SSL_KEY_STORE=${solr.dir}/server/etc/solr-ssl.keystore.jks
+						<echo append="true" file="${solr.dir}/bin/solr.in.cmd">${line.separator}SOLR_SSL_KEY_STORE=${solr.dir}/server/etc/solr-ssl.keystore.jks
 SOLR_SSL_KEY_STORE_PASSWORD=secret
 SOLR_SSL_TRUST_STORE=${solr.dir}/server/etc/solr-ssl.keystore.jks
 SOLR_SSL_TRUST_STORE_PASSWORD=secret
@@ -116,7 +90,7 @@ SOLR_SSL_WANT_CLIENT_AUTH=true</echo>
 				<then>
 					<exec dir="${solr.dir}/bin" executable="/bin/bash">
 						<arg value="-c" />
-						<arg value="./solr create_core -c liferay -d ${solr.dir}/server/solr/liferay/conf" />
+						<arg value="./solr create_core -c liferay -d ${solr.dir}/server/solr/liferay/conf -force" />
 					</exec>
 				</then>
 				<elseif>
@@ -134,13 +108,11 @@ SOLR_SSL_WANT_CLIENT_AUTH=true</echo>
 
 	<macrodef name="create-solr-ssl-keystore">
 		<sequential>
-			<get-ip-address />
-
 			<exec dir="${solr.dir}/server/etc" executable="keytool">
 				<arg value="-genkeypair" />
 				<arg line="-alias solr-ssl" />
 				<arg line="-dname &quot;CN=localhost, OU=Organizational Unit, O=Organization, L=Location, ST=State, C=Country&quot;" />
-				<arg line="-ext SAN=DNS:localhost,IP:${ip.address},IP:127.0.0.1" />
+				<arg line="-ext SAN=DNS:localhost,IP:127.0.0.1" />
 				<arg line="-keyalg RSA" />
 				<arg line="-keypass secret" />
 				<arg line="-keysize 2048" />
@@ -158,30 +130,25 @@ SOLR_SSL_WANT_CLIENT_AUTH=true</echo>
 				todir="${solr.dir}/server/solr/liferay/conf"
 			>
 				<fileset
-					dir="${solr.dir}/server/solr/configsets/data_driven_schema_configs/conf"
+					dir="${solr.dir}/server/solr/configsets/_default/conf"
 				>
 					<exclude name="solrconfig.xml" />
 				</fileset>
 
 				<fileset
-					dir="modules/apps/portal-search-solr/portal-search-solr/src/main/resources/META-INF/resources"
+					dir="modules/apps/portal-search-solr7/portal-search-solr7-impl/src/main/resources/META-INF/resources"
 				>
 					<include name="schema.xml" />
 					<include name="solrconfig.xml" />
 				</fileset>
 			</copy>
 
-			<replace
-				file="${solr.dir}/server/solr/liferay/conf/solrconfig.xml"
-			>
-				<replacetoken><![CDATA[<maxWarmingSearchers>2</maxWarmingSearchers>]]></replacetoken>
-				<replacevalue><![CDATA[<maxWarmingSearchers>5</maxWarmingSearchers>]]></replacevalue>
-			</replace>
-
 			<echo file="${solr.dir}/server/solr/liferay/core.properties">config=solrconfig.xml
 dataDir=data
 name=liferay
 schema=schema.xml</echo>
+
+			<echo append="true" file="${solr.dir}/bin/solr.in.sh">SOLR_ULIMIT_CHECKS=false</echo>
 		</sequential>
 	</macrodef>
 
@@ -235,17 +202,17 @@ schema=schema.xml</echo>
 
 					<exec dir="${solr.dir}/bin" executable="/bin/bash">
 						<arg value="-c" />
-						<arg value="./solr start -cloud -p 8983 -s ${solr.dir}/example/cloud/node1/solr" />
+						<arg value="./solr start -cloud -p 8983 -s ${solr.dir}/example/cloud/node1/solr -force" />
 					</exec>
 
 					<exec dir="${solr.dir}/bin" executable="/bin/bash">
 						<arg value="-c" />
-						<arg value="./solr start -cloud -p 7574 -s ${solr.dir}/example/cloud/node2/solr -z localhost:9983" />
+						<arg value="./solr start -cloud -p 7574 -s ${solr.dir}/example/cloud/node2/solr -z localhost:9983 -force" />
 					</exec>
 
 					<exec dir="${solr.dir}/bin" executable="/bin/bash">
 						<arg value="-c" />
-						<arg value="./solr create_collection -c liferay -p 8983 -d liferay_configs -shards 2 -replicationFactor 2" />
+						<arg value="./solr create_collection -c liferay -p 8983 -d liferay_configs -shards 2 -replicationFactor 2 -force" />
 					</exec>
 				</then>
 				<elseif>
@@ -297,11 +264,28 @@ schema=schema.xml</echo>
 	</macrodef>
 
 	<target name="deploy-solr">
-		<gradle-execute dir="modules/apps/portal-search-solr/portal-search-solr" task="deploy">
+		<gradle-execute dir="modules/apps/portal-search-solr7" task="deploy">
 			<arg value="clean" />
 		</gradle-execute>
 
 		<echo file="${liferay.home}/osgi/configs/com.liferay.portal.bundle.blacklist.internal.BundleBlacklistConfiguration.config">blacklistBundleSymbolicNames=&quot;com.liferay.portal.mobile.device.detection.fiftyonedegrees.api,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise,com.liferay.portal.mobile.device.detection.fiftyonedegrees.enterprise.test.data,com.liferay.portal.mobile.device.detection.fiftyonedegrees,com.liferay.portal.search.elasticsearch6.api,com.liferay.portal.search.elasticsearch6.impl,com.liferay.portal.search.elasticsearch6.xpack.security.impl,com.liferay.portal.search.elasticsearch6.xpack.monitoring.web&quot;</echo>
+	</target>
+
+	<target name="prepare-solr-suite">
+		<antcall target="deploy-solr" />
+
+		<condition else="${env.TEST_BATCH_NAME}" property="test.batch.name" value="${test.batch.name}">
+			<isset property="test.batch.name" />
+		</condition>
+
+		<if>
+			<not>
+				<contains string="${test.batch.name}" substring="functional" />
+			</not>
+			<then>
+				<antcall target="start-solr" />
+			</then>
+		</if>
 	</target>
 
 	<target name="start-solr">
@@ -323,15 +307,6 @@ schema=schema.xml</echo>
 				<configure-liferay-solr-ssl-adapter-properties />
 
 				<configure-app-server-ssl-jvm-arguments />
-			</then>
-		</if>
-
-		<get-testcase-property property.name="solr.logging.info.level" />
-
-		<if>
-			<equals arg1="${solr.logging.info.level}" arg2="true" />
-			<then>
-				<configure-solr-logging />
 			</then>
 		</if>
 
@@ -361,7 +336,7 @@ schema=schema.xml</echo>
 
 				<exec dir="${solr.dir}/bin" executable="/bin/bash">
 					<arg value="-c" />
-					<arg value="./solr start -V" />
+					<arg value="./solr start -V -force" />
 				</exec>
 			</then>
 			<elseif>
@@ -395,7 +370,7 @@ schema=schema.xml</echo>
 	</target>
 
 	<target name="stop-solr-core">
-		<get-testcase-property property.name="solr.solrcloud.enabled" />
+		<print-file file.name="${solr.dir}/server/logs/solr.log" />
 
 		<if>
 			<os family="unix" />

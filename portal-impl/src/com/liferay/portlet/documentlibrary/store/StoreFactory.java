@@ -18,6 +18,7 @@ import com.liferay.document.library.kernel.store.Store;
 import com.liferay.document.library.kernel.store.StoreWrapper;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
@@ -26,11 +27,14 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceReference;
+import com.liferay.registry.ServiceRegistration;
 import com.liferay.registry.ServiceTrackerCustomizer;
 import com.liferay.registry.collections.ServiceTrackerCollections;
 import com.liferay.registry.collections.ServiceTrackerMap;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -47,6 +51,25 @@ public class StoreFactory {
 		}
 
 		return _storeFactory;
+	}
+
+	public StoreFactory() {
+		_storeWrapperServiceTrackerMap =
+			ServiceTrackerCollections.openMultiValueMap(
+				StoreWrapper.class, "(store.type=*)",
+				(serviceReference, emitter) -> {
+					String storeType = (String)serviceReference.getProperty(
+						"store.type");
+
+					if (PropsValues.DL_STORE_IMPL.equals(storeType)) {
+						_store = null;
+					}
+
+					emitter.emit(storeType);
+				});
+
+		_storeServiceTrackerMap = ServiceTrackerCollections.openSingleValueMap(
+			Store.class, "store.type", new StoreServiceTrackerCustomizer());
 	}
 
 	public void checkProperties() {
@@ -131,18 +154,7 @@ public class StoreFactory {
 	public Store getStore(String key) {
 		Store store = _storeServiceTrackerMap.getService(key);
 
-		List<StoreWrapper> storeWrappers =
-			_storeWrapperServiceTrackerMap.getService(key);
-
-		if (storeWrappers == null) {
-			return store;
-		}
-
-		for (StoreWrapper storeWrapper : storeWrappers) {
-			store = storeWrapper.wrap(store);
-		}
-
-		return store;
+		return _wrapStore(store, key);
 	}
 
 	public String[] getStoreTypes() {
@@ -167,31 +179,67 @@ public class StoreFactory {
 		_storeType = key;
 	}
 
+	private Store _wrapStore(Store store, String key) {
+		List<StoreWrapper> storeWrappers =
+			_storeWrapperServiceTrackerMap.getService(key);
+
+		if (storeWrappers == null) {
+			return store;
+		}
+
+		for (StoreWrapper storeWrapper : storeWrappers) {
+			store = storeWrapper.wrap(store);
+		}
+
+		return store;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(StoreFactory.class);
 
 	private static StoreFactory _storeFactory;
 	private static boolean _warned;
 
+	private volatile ServiceRegistration<Store>
+		_currentStoreServiceRegistration;
 	private volatile Store _store;
-	private final ServiceTrackerMap<String, Store> _storeServiceTrackerMap =
-		ServiceTrackerCollections.openSingleValueMap(
-			Store.class, "store.type", new StoreServiceTrackerCustomizer());
+	private final ServiceTrackerMap<String, Store> _storeServiceTrackerMap;
 	private String _storeType;
 	private final ServiceTrackerMap<String, List<StoreWrapper>>
-		_storeWrapperServiceTrackerMap =
-			ServiceTrackerCollections.openMultiValueMap(
-				StoreWrapper.class, "store.type");
+		_storeWrapperServiceTrackerMap;
 
 	private class StoreServiceTrackerCustomizer
 		implements ServiceTrackerCustomizer<Store, Store> {
 
 		@Override
 		public Store addingService(ServiceReference<Store> serviceReference) {
+			if (GetterUtil.getBoolean(
+					serviceReference.getProperty("current.store"))) {
+
+				return null;
+			}
+
 			cleanUp(serviceReference);
 
 			Registry registry = RegistryUtil.getRegistry();
 
-			return registry.getService(serviceReference);
+			Store store = registry.getService(serviceReference);
+
+			String storeType = (String)serviceReference.getProperty(
+				"store.type");
+
+			if (PropsValues.DL_STORE_IMPL.equals(storeType)) {
+				_store = _wrapStore(store, storeType);
+
+				Map<String, Object> properties = new HashMap<>();
+
+				properties.put("current.store", "true");
+				properties.put("store.type", storeType);
+
+				_currentStoreServiceRegistration = registry.registerService(
+					Store.class, store, properties);
+			}
+
+			return store;
 		}
 
 		@Override
@@ -206,6 +254,15 @@ public class StoreFactory {
 			ServiceReference<Store> serviceReference, Store service) {
 
 			cleanUp(serviceReference);
+
+			String storeType = (String)serviceReference.getProperty(
+				"store.type");
+
+			if (PropsValues.DL_STORE_IMPL.equals(storeType)) {
+				_currentStoreServiceRegistration.unregister();
+
+				_currentStoreServiceRegistration = null;
+			}
 
 			Registry registry = RegistryUtil.getRegistry();
 

@@ -15,9 +15,9 @@
 package com.liferay.petra.mail;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
@@ -60,11 +60,11 @@ public class InternetAddressUtil {
 
 		InternetAddress[] internetAddresses = (InternetAddress[])addresses;
 
-		List<InternetAddress> list = new ArrayList<>();
-
 		if ((internetAddresses == null) || Validator.isNull(emailAddress)) {
 			return internetAddresses;
 		}
+
+		List<InternetAddress> list = new ArrayList<>();
 
 		for (InternetAddress internetAddress : internetAddresses) {
 			if (!emailAddress.equals(internetAddress.getAddress())) {

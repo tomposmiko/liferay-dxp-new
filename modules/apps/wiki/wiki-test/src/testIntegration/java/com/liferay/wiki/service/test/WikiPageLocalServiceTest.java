@@ -32,6 +32,7 @@ import com.liferay.expando.kernel.model.ExpandoColumn;
 import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.model.ExpandoValue;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -48,7 +49,6 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowThreadLocal;
@@ -448,6 +448,7 @@ public class WikiPageLocalServiceTest {
 			_group.getGroupId(), _node.getNodeId(), true);
 
 		WikiPage parentPage = pages[0];
+
 		WikiPage childPage = pages[1];
 
 		WikiPageLocalServiceUtil.restorePageFromTrash(
@@ -478,6 +479,7 @@ public class WikiPageLocalServiceTest {
 			_group.getGroupId(), _node.getNodeId(), true);
 
 		WikiPage page = pages[0];
+
 		WikiPage redirectPage = pages[1];
 
 		WikiPageLocalServiceUtil.restorePageFromTrash(
@@ -559,7 +561,7 @@ public class WikiPageLocalServiceTest {
 	}
 
 	@Test
-	public void testGetRecentChangesWithANonRecentCreatedPage()
+	public void testGetRecentChangesWithANonrecentCreatedPage()
 		throws Exception {
 
 		ServiceContext serviceContext =
@@ -592,7 +594,7 @@ public class WikiPageLocalServiceTest {
 	}
 
 	@Test
-	public void testGetRecentChangesWithAnUpdatedNonRecentCreatedPage()
+	public void testGetRecentChangesWithAnUpdatedNonrecentCreatedPage()
 		throws Exception {
 
 		ServiceContext serviceContext =

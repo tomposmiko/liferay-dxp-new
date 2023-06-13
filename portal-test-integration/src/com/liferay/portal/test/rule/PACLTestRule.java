@@ -75,9 +75,11 @@ import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
 import org.springframework.mock.web.MockServletContext;
 
 /**
- * @author Raymond Augé
- * @author Shuyang Zhou
+ * @author     Raymond Augé
+ * @author     Shuyang Zhou
+ * @deprecated As of Judson (7.1.x), with no direct replacement
  */
+@Deprecated
 public class PACLTestRule implements TestRule {
 
 	public static final String RESOURCE_PATH =

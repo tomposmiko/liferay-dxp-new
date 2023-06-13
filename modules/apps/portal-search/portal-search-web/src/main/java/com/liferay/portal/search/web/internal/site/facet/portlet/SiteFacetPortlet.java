@@ -14,11 +14,13 @@
 
 package com.liferay.portal.search.web.internal.site.facet.portlet;
 
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.Facet;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.search.facet.site.SiteFacetFactory;
 import com.liferay.portal.search.web.internal.facet.display.builder.ScopeSearchFacetDisplayBuilder;
@@ -63,7 +65,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=Site Facet",
 		"javax.portlet.expiration-cache=0",
-		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.init-param.view-template=/site/facet/view.jsp",
 		"javax.portlet.name=" + SiteFacetPortletKeys.SITE_FACET,
 		"javax.portlet.resource-bundle=content.Language",
@@ -100,7 +102,8 @@ public class SiteFacetPortlet extends MVCPortlet {
 		PortletSharedSearchResponse portletSharedSearchResponse,
 		RenderRequest renderRequest) {
 
-		Facet facet = portletSharedSearchResponse.getFacet(getFieldName());
+		Facet facet = portletSharedSearchResponse.getFacet(
+			getAggregationName(renderRequest));
 
 		ScopeFacetConfiguration siteFacetConfiguration =
 			new ScopeFacetConfigurationImpl(facet.getFacetConfiguration());
@@ -139,6 +142,12 @@ public class SiteFacetPortlet extends MVCPortlet {
 			scopeSearchFacetDisplayBuilder::setParameterValues);
 
 		return scopeSearchFacetDisplayBuilder.build();
+	}
+
+	protected String getAggregationName(RenderRequest renderRequest) {
+		String portletId = portal.getPortletId(renderRequest);
+
+		return getFieldName() + StringPool.PERIOD + portletId;
 	}
 
 	protected String getFieldName() {
@@ -182,6 +191,9 @@ public class SiteFacetPortlet extends MVCPortlet {
 
 	@Reference
 	protected GroupLocalService groupLocalService;
+
+	@Reference
+	protected Portal portal;
 
 	@Reference
 	protected PortletSharedSearchRequest portletSharedSearchRequest;

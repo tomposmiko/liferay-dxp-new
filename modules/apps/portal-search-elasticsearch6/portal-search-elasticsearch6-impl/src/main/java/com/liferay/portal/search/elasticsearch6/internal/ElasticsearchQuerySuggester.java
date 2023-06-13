@@ -48,9 +48,6 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.suggest.Suggest;
-import org.elasticsearch.search.suggest.Suggest.Suggestion;
-import org.elasticsearch.search.suggest.Suggest.Suggestion.Entry;
-import org.elasticsearch.search.suggest.Suggest.Suggestion.Entry.Option;
 import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.SuggestionBuilder;
 import org.elasticsearch.search.suggest.term.TermSuggestion;
@@ -176,8 +173,10 @@ public class ElasticsearchQuerySuggester implements QuerySuggester {
 			return StringPool.EMPTY_ARRAY;
 		}
 
-		Suggestion<? extends Entry<? extends Option>> suggestion =
-			suggest.getSuggestion(suggester.getName());
+		Suggest.Suggestion
+			<? extends Suggest.Suggestion.Entry
+				<? extends Suggest.Suggestion.Entry.Option>> suggestion =
+					suggest.getSuggestion(suggester.getName());
 
 		if (suggestion == null) {
 			return StringPool.EMPTY_ARRAY;
@@ -320,7 +319,10 @@ public class ElasticsearchQuerySuggester implements QuerySuggester {
 		}
 	}
 
-	protected Text getWord(Entry<? extends Option> suggestionEntry) {
+	protected Text getWord(
+		Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>
+			suggestionEntry) {
+
 		List<? extends Suggest.Suggestion.Entry.Option> suggestionEntryOptions =
 			suggestionEntry.getOptions();
 
@@ -363,10 +365,11 @@ public class ElasticsearchQuerySuggester implements QuerySuggester {
 			new SuggesterResult.Entry.Option(
 				text.string(), suggestionEntryOption.getScore());
 
-		Text highlighted = suggestionEntryOption.getHighlighted();
-
 		if (suggestionEntryOption.getHighlighted() != null) {
-			suggesterResultEntryOption.setHighlightedText(highlighted.string());
+			Text highlightedText = suggestionEntryOption.getHighlighted();
+
+			suggesterResultEntryOption.setHighlightedText(
+				highlightedText.string());
 		}
 
 		if (suggestionEntryOption instanceof TermSuggestion.Entry.Option) {

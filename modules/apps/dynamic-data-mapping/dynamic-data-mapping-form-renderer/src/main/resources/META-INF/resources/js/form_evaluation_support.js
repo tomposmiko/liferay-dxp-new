@@ -30,9 +30,7 @@ AUI.add(
 
 				var evaluator = instance.get('evaluator');
 
-				instance._eventHandlers.push(
-					evaluator.after('evaluationEnded', A.bind('_afterEvaluationEnded', instance))
-				);
+				evaluator.after('evaluationEnded', A.bind('_afterEvaluationEnded', instance))
 			},
 
 			destructor: function() {
@@ -89,6 +87,8 @@ AUI.add(
 								if (fieldContext.valueChanged && !Util.compare(field.get('value'), fieldContext.value)) {
 									field.setValue(fieldContext.value);
 								}
+
+								field.set('errorMessage', '');
 							}
 
 							if (fieldContext.valid) {
@@ -105,7 +105,6 @@ AUI.add(
 									readOnly: fieldContext.readOnly,
 									required: fieldContext.required,
 									valid: fieldContext.valid,
-									value: fieldContext.value,
 									visible: fieldContext.visible
 								},
 								field.getEvaluationContext(fieldContext)

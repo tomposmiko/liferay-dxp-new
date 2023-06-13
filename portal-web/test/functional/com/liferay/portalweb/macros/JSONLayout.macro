@@ -1,62 +1,59 @@
 <definition>
 	<command name="_addLayout">
 		<if>
-			<not>
-				<isset var="groupId" />
-			</not>
+			<isset var="parentLayoutName" />
 			<then>
-				<fail message="Please set 'groupId'." />
-			</then>
-		</if>
-
-		<if>
-			<isset var="layoutName" />
-			<then>
-				<execute class="java.net.URLEncoder" method="encode">
-					<arg value="${layoutName}" />
-					<arg value="UTF-8" />
-					<return name="layoutNameEncoded" />
+				<execute macro="JSONLayout#getLayoutIdByName">
+					<return name="parentLayoutId" />
+					<var name="groupId" value="${groupId}" />
+					<var name="layoutName" value="${parentLayoutName}" />
+					<var name="privateLayout" value="${privateLayout}" />
 				</execute>
 			</then>
 			<else>
-				<fail message="Please set 'layoutName'." />
+				<var name="parentLayoutId" value="0" />
 			</else>
 		</if>
 
+		<if>
+			<not>
+				<equals arg1="${privateLayout}" arg2="true" />
+			</not>
+			<then>
+				<var name="privateLayout" value="false" />
+			</then>
+		</if>
+
 		<execute macro="JSONCompany#getPortalURL">
-			<return from="portalURL" name="portalURL" />
+			<return name="portalURL" />
 		</execute>
 
-		<var name="curl">
+		<var name="curl"><![CDATA[
 			${portalURL}/api/jsonws/layout/add-layout \
 				-u test@liferay.com:test \
 				-d groupId=${groupId} \
-				-d privateLayout=false \
-				-d parentLayoutId=0 \
-				-d name=${layoutNameEncoded} \
+				-d privateLayout=${privateLayout} \
+				-d parentLayoutId=${parentLayoutId} \
+				-d name=${layoutName} \
 				-d title= \
 				-d description= \
 				-d type=portlet \
 				-d hidden=false \
 				-d friendlyURL=
-		</var>
+		]]></var>
 
 		<execute macro="JSONGroup#getGroupName">
+			<return name="groupName" />
 			<var name="groupId" value="${groupId}" />
-			<return from="groupName" name="groupName" />
 		</execute>
 
-		<echo>## Adding a 'Layout' with the following info using JSONWS:</echo>
+		<echo message="## Adding a 'Layout' with the following info using JSONWS:" />
 
-		<echo>## * Group Name: ${groupName}</echo>
+		<echo message="## * Group Name: ${groupName}" />
 
-		<echo>## * Layout Name: ${layoutName}</echo>
+		<echo message="## * Layout Name: ${layoutName}" />
 
-		<execute class="com.liferay.poshi.runner.util.JSONCurlUtil" method="post">
-			<arg value="${curl}" />
-			<arg value="$['layoutId']" />
-			<return name="layoutId" />
-		</execute>
+		<var method="JSONCurlUtil#post('${curl}', '$[\'layoutId\']')" name="layoutId" />
 	</command>
 
 	<command name="addLayoutByGroupName">
@@ -78,14 +75,64 @@
 			</then>
 		</if>
 
-		<execute macro="JSONGroup#getGroupIdByName">
+		<execute macro="JSONGroup#getSiteIdByGroupName">
+			<return name="groupId" />
 			<var name="groupName" value="${groupName}" />
-			<return from="groupId" name="groupId" />
 		</execute>
 
 		<execute macro="JSONLayout#_addLayout">
 			<var name="groupId" value="${groupId}" />
 			<var name="layoutName" value="${layoutName}" />
+			<var name="parentLayoutName" value="${parentLayoutName}" />
+			<var name="privateLayout" value="${privateLayout}" />
 		</execute>
+	</command>
+
+	<command name="getLayoutIdByName">
+		<if>
+			<not>
+				<isset var="groupId" />
+			</not>
+			<then>
+				<fail message="Please set 'groupId'." />
+			</then>
+		</if>
+
+		<if>
+			<not>
+				<isset var="layoutName" />
+			</not>
+			<then>
+				<fail message="Please set 'layoutName'." />
+			</then>
+		</if>
+
+		<if>
+			<not>
+				<equals arg1="${privateLayout}" arg2="true" />
+			</not>
+			<then>
+				<var name="privateLayout" value="false" />
+			</then>
+		</if>
+
+		<execute macro="JSONCompany#getPortalURL">
+			<return name="portalURL" />
+		</execute>
+
+		<var name="curl"><![CDATA[
+			${portalURL}/api/jsonws/layout/get-layouts \
+				-u test@liferay.com:test \
+				-d groupId=${groupId} \
+				-d privateLayout=${privateLayout}
+		]]></var>
+
+		<var method="JSONCurlUtil#post('${curl}', '$.[?(@[\'nameCurrentValue\'] == \'${layoutName}\')][\'layoutId\']')" name="layoutId" />
+
+		<var method="StringUtil#replace('${layoutId}', '[&quot;', '')" name="layoutId" />
+
+		<var method="StringUtil#replace('${layoutId}', '&quot;]', '')" name="layoutId" />
+
+		<return value="${layoutId}" />
 	</command>
 </definition>

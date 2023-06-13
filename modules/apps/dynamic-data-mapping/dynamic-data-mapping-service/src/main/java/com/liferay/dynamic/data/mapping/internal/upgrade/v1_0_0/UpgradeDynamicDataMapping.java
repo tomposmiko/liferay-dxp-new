@@ -59,7 +59,9 @@ import com.liferay.expando.kernel.service.ExpandoRowLocalService;
 import com.liferay.expando.kernel.service.ExpandoTableLocalService;
 import com.liferay.expando.kernel.service.ExpandoValueLocalService;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -87,7 +89,6 @@ import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -99,7 +100,6 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.Node;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.XPath;
-import com.liferay.portal.upgrade.AutoBatchPreparedStatementUtil;
 
 import java.io.File;
 
@@ -118,7 +118,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -207,17 +206,22 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 		String newFieldName = fieldName.replaceAll(
 			_INVALID_FIELD_NAME_CHARS_REGEX, StringPool.BLANK);
 
-		if (Validator.isNotNull(newFieldName) &&
-			!existingFieldNames.contains(newFieldName)) {
+		if (Validator.isNotNull(newFieldName)) {
+			String updatedFieldName = newFieldName;
 
-			return newFieldName;
+			for (int i = 1; existingFieldNames.contains(updatedFieldName);
+				 i++) {
+
+				updatedFieldName = newFieldName + i;
+			}
+
+			return updatedFieldName;
 		}
 
 		throw new UpgradeException(
 			String.format(
 				"Unable to automatically update field name \"%s\" because it " +
-					"only contains invalid characters or the updated value " +
-						"\"%s\" conflicts with a previous field name",
+					"only contains invalid characters",
 				fieldName, newFieldName));
 	}
 
@@ -294,7 +298,6 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
-					long parentStructureId = rs.getLong("parentStructureId");
 					String definition = rs.getString("definition");
 					String storageType = rs.getString("storageType");
 
@@ -319,6 +322,8 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 									"defined more than once",
 								mndfn.getFieldName(), structureId));
 					}
+
+					long parentStructureId = rs.getLong("parentStructureId");
 
 					if (parentStructureId > 0) {
 						DDMForm parentDDMForm = getDDMForm(parentStructureId);
@@ -788,7 +793,9 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 		Map<String, String> ddmTemplateScriptMap = getDDMTemplateScriptMap(
 			structureId);
 
-		for (Entry<String, String> entrySet : ddmTemplateScriptMap.entrySet()) {
+		for (Map.Entry<String, String> entrySet :
+				ddmTemplateScriptMap.entrySet()) {
+
 			String[] templateIdAndLanguage = StringUtil.split(
 				entrySet.getKey(), StringPool.DOLLAR);
 
@@ -940,6 +947,7 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 				String entryVersion = rs.getString("version");
 				long contentId = rs.getLong("ddmStorageId");
 				String data_ = rs.getString("data_");
+
 				long ddmStructureId = rs.getLong("structureId");
 
 				DDMForm ddmForm = getFullHierarchyDDMForm(ddmStructureId);
@@ -993,6 +1001,7 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 				String entryVersion = rs.getString("version");
 				long contentId = rs.getLong("contentId");
 				String data_ = rs.getString("data_");
+
 				long ddmStructureId = rs.getLong("structureId");
 
 				DDMForm ddmForm = getFullHierarchyDDMForm(ddmStructureId);
@@ -1055,6 +1064,7 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 					long userId = rs.getLong("userId");
 					String userName = rs.getString("userName");
 					Timestamp createDate = rs.getTimestamp("createDate");
+
 					long expandoRowId = rs.getLong("classPK");
 
 					Map<String, String> expandoValuesMap = getExpandoValuesMap(
@@ -1170,18 +1180,8 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 
 			while (rs.next()) {
 				long structureId = rs.getLong("structureId");
-				long groupId = rs.getLong("groupId");
-				long companyId = rs.getLong("companyId");
-				long userId = rs.getLong("userId");
-				String userName = rs.getString("userName");
-				Timestamp modifiedDate = rs.getTimestamp("modifiedDate");
-				long parentStructureId = rs.getLong("parentStructureId");
 				long classNameId = rs.getLong("classNameId");
 				String version = rs.getString("version");
-				String name = rs.getString("name");
-				String description = rs.getString("description");
-				String storageType = rs.getString("storageType");
-				int type = rs.getInt("type_");
 
 				_structureClassNameIds.put(structureId, classNameId);
 
@@ -1209,6 +1209,17 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 				if (hasStructureVersion(structureId, version)) {
 					continue;
 				}
+
+				long groupId = rs.getLong("groupId");
+				long companyId = rs.getLong("companyId");
+				long userId = rs.getLong("userId");
+				String userName = rs.getString("userName");
+				Timestamp modifiedDate = rs.getTimestamp("modifiedDate");
+				long parentStructureId = rs.getLong("parentStructureId");
+				String name = rs.getString("name");
+				String description = rs.getString("description");
+				String storageType = rs.getString("storageType");
+				int type = rs.getInt("type_");
 
 				long structureVersionId = increment();
 
@@ -1322,26 +1333,17 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 			PreparedStatement ps3 =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
 					connection,
-					"update DDMTemplate set script = ? where templateId = ?");
+					"update DDMTemplate set language = ?, script = ? where " +
+						"templateId = ?");
 			PreparedStatement ps4 =
 				AutoBatchPreparedStatementUtil.concurrentAutoBatch(
 					connection, sb.toString());
 			ResultSet rs = ps1.executeQuery()) {
 
 			while (rs.next()) {
-				long groupId = rs.getLong("groupId");
-				long companyId = rs.getLong("companyId");
-				long userId = rs.getLong("userId");
-				String userName = rs.getString("userName");
-				Timestamp modifiedDate = rs.getTimestamp("modifiedDate");
 				long classNameId = rs.getLong("classNameId");
 				long classPK = rs.getLong("classPK");
 				long templateId = rs.getLong("templateId");
-				String version = rs.getString("version");
-				String name = rs.getString("name");
-				String description = rs.getString("description");
-				String language = rs.getString("language");
-				String script = rs.getString("script");
 
 				// Template resource class name ID
 
@@ -1353,6 +1355,10 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 
 					continue;
 				}
+
+				String version = rs.getString("version");
+				String language = rs.getString("language");
+				String script = rs.getString("script");
 
 				ps2.setLong(1, resourceClassNameId);
 
@@ -1375,11 +1381,14 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 					ddmForm = updateDDMFormFields(ddmForm);
 
 					updatedScript = toJSON(ddmForm);
+
+					language = "json";
 				}
 
 				if (!script.equals(updatedScript)) {
-					ps3.setString(1, updatedScript);
-					ps3.setLong(2, templateId);
+					ps3.setString(1, language);
+					ps3.setString(2, updatedScript);
+					ps3.setLong(3, templateId);
 
 					ps3.addBatch();
 				}
@@ -1387,9 +1396,13 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 				// Template version
 
 				if (!hasTemplateVersion(templateId, version)) {
+					long userId = rs.getLong("userId");
+					String userName = rs.getString("userName");
+					Timestamp modifiedDate = rs.getTimestamp("modifiedDate");
+
 					ps4.setLong(1, increment());
-					ps4.setLong(2, groupId);
-					ps4.setLong(3, companyId);
+					ps4.setLong(2, rs.getLong("groupId"));
+					ps4.setLong(3, rs.getLong("companyId"));
 					ps4.setLong(4, userId);
 					ps4.setString(5, userName);
 					ps4.setTimestamp(6, modifiedDate);
@@ -1397,8 +1410,8 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 					ps4.setLong(8, classPK);
 					ps4.setLong(9, templateId);
 					ps4.setString(10, DDMStructureConstants.VERSION_DEFAULT);
-					ps4.setString(11, name);
-					ps4.setString(12, description);
+					ps4.setString(11, rs.getString("name"));
+					ps4.setString(12, rs.getString("description"));
 					ps4.setString(13, language);
 					ps4.setString(14, updatedScript);
 					ps4.setInt(15, WorkflowConstants.STATUS_APPROVED);
@@ -1977,7 +1990,15 @@ public class UpgradeDynamicDataMapping extends UpgradeProcess {
 
 				nodes = dynamicContentXPath.selectNodes(dynamicElementElement);
 
-				Element element = (Element)nodes.get(index);
+				Element element = null;
+
+				if (nodes.isEmpty()) {
+					element = dynamicElementElement.addElement(
+						"dynamic-content");
+				}
+				else {
+					element = (Element)nodes.get(index);
+				}
 
 				element.addAttribute("language-id", languageId);
 

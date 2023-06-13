@@ -45,6 +45,7 @@ import com.liferay.dynamic.data.mapping.util.DDM;
 import com.liferay.dynamic.data.mapping.util.DDMXML;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValidationException;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValidator;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManager;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -62,6 +63,7 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
+import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.kernel.util.Constants;
@@ -72,7 +74,6 @@ import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -711,6 +712,35 @@ public class DDMStructureLocalServiceImpl
 	}
 
 	@Override
+	public DDMStructure fetchStructureByUuidAndGroupId(
+		String uuid, long groupId, boolean includeAncestorStructures) {
+
+		DDMStructure structure = ddmStructurePersistence.fetchByUUID_G(
+			uuid, groupId);
+
+		if (structure != null) {
+			return structure;
+		}
+
+		if (!includeAncestorStructures) {
+			return null;
+		}
+
+		for (long ancestorSiteGroupId :
+				PortalUtil.getAncestorSiteGroupIds(groupId)) {
+
+			structure = ddmStructurePersistence.fetchByUUID_G(
+				uuid, ancestorSiteGroupId);
+
+			if (structure != null) {
+				return structure;
+			}
+		}
+
+		return null;
+	}
+
+	@Override
 	public List<DDMStructure> getChildrenStructures(long parentStructureId) {
 		return ddmStructurePersistence.findByParentStructureId(
 			parentStructureId);
@@ -884,6 +914,7 @@ public class DDMStructureLocalServiceImpl
 	}
 
 	@Override
+	@Skip
 	public DDMForm getStructureDDMForm(DDMStructure structure)
 		throws PortalException {
 
@@ -2008,9 +2039,8 @@ public class DDMStructureLocalServiceImpl
 			LocaleException le = new LocaleException(
 				LocaleException.TYPE_CONTENT,
 				StringBundler.concat(
-					"The locale ", String.valueOf(contentDefaultLocale),
-					" is not available in company ",
-					String.valueOf(companyId)));
+					"The locale ", contentDefaultLocale,
+					" is not available in company ", companyId));
 
 			le.setSourceAvailableLocales(
 				Collections.singleton(contentDefaultLocale));
@@ -2063,7 +2093,7 @@ public class DDMStructureLocalServiceImpl
 	@ServiceReference(type = JSONFactory.class)
 	protected JSONFactory jsonFactory;
 
-	private final Pattern _callFunctionPattern = Pattern.compile(
+	private static final Pattern _callFunctionPattern = Pattern.compile(
 		"call\\(\\s*\'([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-" +
 			"[0-9a-f]{12})\'\\s*,\\s*\'(.*)\'\\s*,\\s*\'(.*)\'\\s*\\)");
 

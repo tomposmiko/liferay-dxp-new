@@ -41,11 +41,11 @@ import com.liferay.portal.kernel.spring.aop.AdvisedSupport;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntry;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntryThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.kernel.util.ClassLoaderUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -459,7 +459,7 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 				}
 
 				proxiedLayout = ProxyUtil.newProxyInstance(
-					ClassLoaderUtil.getPortalClassLoader(),
+					PortalClassLoaderUtil.getClassLoader(),
 					new Class<?>[] {Layout.class, ModelWrapper.class},
 					new LayoutStagingHandler(layout));
 
@@ -470,7 +470,7 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 		}
 
 		Object proxiedLayout = ProxyUtil.newProxyInstance(
-			ClassLoaderUtil.getPortalClassLoader(),
+			PortalClassLoaderUtil.getClassLoader(),
 			new Class<?>[] {Layout.class, ModelWrapper.class},
 			new LayoutStagingHandler(layout));
 
@@ -582,6 +582,16 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 				}
 			}
 		}
+		else if (returnValue instanceof Map<?, ?>) {
+			Map<Object, Object> map = (Map<Object, Object>)returnValue;
+
+			if (map.isEmpty()) {
+				return returnValue;
+			}
+
+			map.replaceAll(
+				(key, value) -> wrapReturnValue(value, showIncomplete));
+		}
 
 		return returnValue;
 	}
@@ -601,16 +611,10 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 		LayoutLocalServiceStagingAdvice.class);
 
 	private static final Set<String>
-		_layoutLocalServiceStagingAdviceMethodNames = new HashSet<>();
-
-	static {
-		_layoutLocalServiceStagingAdviceMethodNames.add("createLayout");
-		_layoutLocalServiceStagingAdviceMethodNames.add("deleteLayout");
-		_layoutLocalServiceStagingAdviceMethodNames.add("getLayouts");
-		_layoutLocalServiceStagingAdviceMethodNames.add("updateLayout");
-		_layoutLocalServiceStagingAdviceMethodNames.add("updateLookAndFeel");
-		_layoutLocalServiceStagingAdviceMethodNames.add("updateName");
-	}
+		_layoutLocalServiceStagingAdviceMethodNames = new HashSet<>(
+			Arrays.asList(
+				"createLayout", "deleteLayout", "getLayouts", "updateLayout",
+				"updateLookAndFeel", "updateName"));
 
 	private BeanFactory _beanFactory;
 

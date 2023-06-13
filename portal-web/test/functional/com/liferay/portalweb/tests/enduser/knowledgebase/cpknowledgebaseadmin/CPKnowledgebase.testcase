@@ -10,7 +10,7 @@
 	</set-up>
 
 	<tear-down>
-		<var method="TestPropsUtil#get('test.portal.instance')" name="testPortalInstance" />
+		<var method="PropsUtil#get('test.portal.instance')" name="testPortalInstance" />
 
 		<if>
 			<equals arg1="${testPortalInstance}" arg2="true" />
@@ -358,8 +358,6 @@
 			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
 		</execute>
 
-		<execute function="Pause" value1="5000" />
-
 		<execute macro="KBArticle#viewCPWithHTML">
 			<var name="kbArticleContent" value="Knowledge Base’s Article Content" />
 			<var name="kbArticleTitle" value="Knowledge Base Article Title" />
@@ -462,7 +460,7 @@
 	</command>
 
 	<command name="AddKBFolder" priority="5">
-		<property name="portal.acceptance" value="false" />
+		<property name="portal.acceptance" value="true" />
 		<property name="testray.component.names" value="Training" />
 
 		<execute macro="Navigator#openURL" />

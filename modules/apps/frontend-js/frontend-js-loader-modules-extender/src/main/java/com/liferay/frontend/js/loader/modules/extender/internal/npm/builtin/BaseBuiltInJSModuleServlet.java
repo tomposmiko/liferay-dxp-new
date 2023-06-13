@@ -14,20 +14,35 @@
 
 package com.liferay.frontend.js.loader.modules.extender.internal.npm.builtin;
 
-import com.liferay.frontend.js.loader.modules.extender.npm.JSModule;
-import com.liferay.frontend.js.loader.modules.extender.npm.ModuleNameUtil;
+import com.liferay.frontend.js.loader.modules.extender.npm.JSBundle;
+import com.liferay.frontend.js.loader.modules.extender.npm.JSPackage;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
+import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
-import com.liferay.portal.kernel.util.StreamUtil;
+import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.MimeTypes;
+import com.liferay.portal.kernel.util.ResourceBundleLoader;
+import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
+import java.net.URL;
+
+import java.util.Locale;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * Provides a base abstract class to implement servlets that return JavaScript
@@ -38,73 +53,124 @@ import javax.servlet.http.HttpServletResponse;
  */
 public abstract class BaseBuiltInJSModuleServlet extends HttpServlet {
 
+	@Override
+	public void destroy() {
+		_bundleSymbolicNameServiceTrackerMap.close();
+	}
+
+	@Override
+	public void init() {
+		Bundle bundle = FrameworkUtil.getBundle(getClass());
+
+		_bundleSymbolicNameServiceTrackerMap =
+			ServiceTrackerMapFactory.openSingleValueMap(
+				bundle.getBundleContext(), ResourceBundleLoader.class,
+				"bundle.symbolic.name");
+	}
+
+	protected abstract MimeTypes getMimeTypes();
+
 	/**
-	 * Returns the requested module. This is a template method that must be
-	 * implemented by subclasses to lookup the requested module.
+	 * Returns the requested resource descriptor. This is a template method that
+	 * must be implemented by subclasses to lookup the requested resource.
 	 *
-	 * @param  moduleName the module's name
-	 * @return the {@link JSModule} object describing the module
+	 * @param  pathInfo the request's pathInfo
+	 * @return the {@link String} content of the resource or null
 	 */
-	protected abstract JSModule getJSModule(String moduleName);
+	protected abstract ResourceDescriptor getResourceDescriptor(
+		String pathInfo);
 
 	@Override
 	protected void service(
 			HttpServletRequest request, HttpServletResponse response)
-		throws IOException, ServletException {
+		throws IOException {
 
-		JSModule jsModule = _resolveJSModule(request);
+		String pathInfo = request.getPathInfo();
 
-		if (jsModule == null) {
+		ResourceDescriptor resourceDescriptor = getResourceDescriptor(pathInfo);
+
+		if (resourceDescriptor == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 
 			return;
 		}
 
-		String contentType = null;
-		InputStream inputStream = null;
+		_setContentType(response, pathInfo);
 
-		String pathInfo = request.getPathInfo();
+		String languageId = request.getParameter("languageId");
 
-		if (pathInfo.endsWith(".map")) {
-			contentType = ContentTypes.APPLICATION_JSON;
-			inputStream = jsModule.getSourceMapInputStream();
+		Locale locale = LocaleUtil.fromLanguageId(languageId);
+
+		_sendResource(response, resourceDescriptor, locale);
+	}
+
+	private void _sendResource(
+			HttpServletResponse response, ResourceDescriptor resourceDescriptor,
+			Locale locale)
+		throws IOException {
+
+		JSPackage jsPackage = resourceDescriptor.getJsPackage();
+
+		URL url = jsPackage.getResourceURL(resourceDescriptor.getPackagePath());
+
+		if (url == null) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+
+			return;
 		}
-		else {
-			contentType = ContentTypes.TEXT_JAVASCRIPT_UTF8;
-			inputStream = jsModule.getInputStream();
+
+		try (InputStream inputStream = url.openStream()) {
+			String content = StringUtil.read(inputStream);
+
+			response.setCharacterEncoding(StringPool.UTF8);
+
+			PrintWriter printWriter = response.getWriter();
+
+			JSBundle jsBundle = jsPackage.getJSBundle();
+
+			ResourceBundleLoader resourceBundleLoader =
+				_bundleSymbolicNameServiceTrackerMap.getService(
+					jsBundle.getName());
+
+			if (resourceBundleLoader != null) {
+				content = LanguageUtil.process(
+					() -> resourceBundleLoader.loadResourceBundle(locale),
+					locale, content);
+			}
+
+			printWriter.print(content);
 		}
+		catch (IOException ioe) {
+			_log.error("Unable to read " + resourceDescriptor.toString(), ioe);
 
-		response.setContentType(contentType);
-
-		ServletOutputStream servletOutputStream = response.getOutputStream();
-
-		try {
-			StreamUtil.transfer(inputStream, servletOutputStream, false);
-		}
-		catch (Exception e) {
 			response.sendError(
 				HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 				"Unable to read file");
 		}
-		finally {
-			inputStream.close();
+	}
+
+	private void _setContentType(
+		HttpServletResponse response, String pathInfo) {
+
+		String extension = FileUtil.getExtension(pathInfo);
+
+		if (extension.equals(".js")) {
+			response.setContentType(ContentTypes.TEXT_JAVASCRIPT_UTF8);
+		}
+		else if (extension.equals(".map")) {
+			response.setContentType(ContentTypes.APPLICATION_JSON);
+		}
+		else {
+			MimeTypes mimeTypes = getMimeTypes();
+
+			response.setContentType(mimeTypes.getContentType(pathInfo));
 		}
 	}
 
-	private JSModule _resolveJSModule(HttpServletRequest request) {
-		String pathInfo = request.getPathInfo();
+	private static final Log _log = LogFactoryUtil.getLog(
+		BaseBuiltInJSModuleServlet.class);
 
-		String identifier = pathInfo.substring(1);
-
-		if (pathInfo.endsWith(".map")) {
-			int index = identifier.lastIndexOf(StringPool.PERIOD);
-
-			identifier = identifier.substring(0, index);
-		}
-
-		String moduleName = ModuleNameUtil.toModuleName(identifier);
-
-		return getJSModule(moduleName);
-	}
+	private ServiceTrackerMap<String, ResourceBundleLoader>
+		_bundleSymbolicNameServiceTrackerMap;
 
 }

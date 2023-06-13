@@ -44,8 +44,8 @@ import org.junit.runner.RunWith;
 public class AnnotatedApplicationClientTest extends BaseClientTestCase {
 
 	@Deployment
-	public static Archive<?> getDeployment() throws Exception {
-		return BaseClientTestCase.getDeployment(
+	public static Archive<?> getArchive() throws Exception {
+		return BaseClientTestCase.getArchive(
 			AnnotatedApplicationTestPreparatorBundleActivator.class);
 	}
 
@@ -57,7 +57,7 @@ public class AnnotatedApplicationClientTest extends BaseClientTestCase {
 			webTarget.request(),
 			getToken(
 				"oauthTestApplicationAfter", null,
-				getResourceOwnerPassword("test@liferay.com", "test"),
+				getResourceOwnerPasswordBiFunction("test@liferay.com", "test"),
 				this::parseTokenString));
 
 		Assert.assertEquals(

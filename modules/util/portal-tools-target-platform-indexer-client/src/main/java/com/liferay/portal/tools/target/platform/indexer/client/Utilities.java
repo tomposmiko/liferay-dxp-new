@@ -28,30 +28,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import java.security.MessageDigest;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.zip.CRC32;
 
 /**
  * @author Shuyang Zhou
  */
 public class Utilities {
-
-	public static String bytesToHexString(byte[] bytes) {
-		char[] chars = new char[bytes.length * 2];
-
-		for (int i = 0; i < bytes.length; i++) {
-			chars[i * 2] = HEX_DIGITS[(bytes[i] & 0xFF) >> 4];
-			chars[i * 2 + 1] = HEX_DIGITS[bytes[i] & 0x0F];
-		}
-
-		return new String(chars);
-	}
 
 	public static List<File> listFiles(String dir, String glob)
 		throws IOException {
@@ -97,22 +83,13 @@ public class Utilities {
 	}
 
 	public static String toChecksum(URI uri) throws Exception {
+		CRC32 crc32 = new CRC32();
+
 		String content = readURL(uri.toURL());
 
-		Matcher matcher = _incrementPattern.matcher(content);
+		crc32.update(content.getBytes(StandardCharsets.UTF_8));
 
-		if (matcher.find()) {
-			String start = content.substring(0, matcher.start(1));
-			String end = content.substring(matcher.end(1));
-
-			content = start.concat(end);
-		}
-
-		MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-
-		messageDigest.update(content.getBytes(StandardCharsets.UTF_8));
-
-		return bytesToHexString(messageDigest.digest());
+		return Long.toHexString(crc32.getValue());
 	}
 
 	public static String toIntegrityKey(URI uri) {
@@ -126,13 +103,5 @@ public class Utilities {
 
 		return integrityKey;
 	}
-
-	protected static final char[] HEX_DIGITS = {
-		'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd',
-		'e', 'f'
-	};
-
-	private static final Pattern _incrementPattern = Pattern.compile(
-		"<repository( increment=\"\\d*\")");
 
 }

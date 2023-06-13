@@ -1,0 +1,35 @@
+#
+# Liferay App Version 1.0.0
+#
+
+app.artifacts-1.0.0=\
+	com.liferay.portal.security.audit.api-3.0.1.jar,\
+	com.liferay.portal.security.audit.event.generators.api-2.0.0.jar,\
+	com.liferay.portal.security.audit.event.generators.user.management-2.0.0.jar,\
+	com.liferay.portal.security.audit.impl-1.0.1.jar,\
+	com.liferay.portal.security.audit.router-3.0.1.jar,\
+	com.liferay.portal.security.audit.storage.api-3.0.0.jar,\
+	com.liferay.portal.security.audit.storage.service-3.0.0.jar,\
+	com.liferay.portal.security.audit.wiring-3.0.0.jar
+
+app.change.log-1.0.0=LPS-77699 LPS-80332 LPS-81805 LPS-82261 LPS-82343
+
+app.git.id-1.0.0=bf9943b93ff9473888db9fac9695168575fa3ab2
+
+#
+# Liferay App Version 1.0.1
+#
+
+app.artifacts-1.0.1=\
+	com.liferay.portal.security.audit.api-3.0.1.jar,\
+	com.liferay.portal.security.audit.event.generators.api-2.0.0.jar,\
+	com.liferay.portal.security.audit.event.generators.user.management-2.0.0.jar,\
+	com.liferay.portal.security.audit.impl-1.0.1.jar,\
+	com.liferay.portal.security.audit.router-3.0.3.jar,\
+	com.liferay.portal.security.audit.storage.api-3.0.2.jar,\
+	com.liferay.portal.security.audit.storage.service-3.0.3.jar,\
+	com.liferay.portal.security.audit.wiring-3.0.1.jar
+
+app.change.log-1.0.1=LPS-78938 LPS-84093 LPS-84119 LPS-85296 LPS-85849 
+
+app.git.id-1.0.1=fed6053fe1306a4e344abbdb5059d596af46d78b

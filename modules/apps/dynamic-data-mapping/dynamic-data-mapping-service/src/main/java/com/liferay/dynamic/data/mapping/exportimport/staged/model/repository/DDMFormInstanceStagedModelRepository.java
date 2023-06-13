@@ -23,12 +23,9 @@ import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelModifiedDateComparator;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
-import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 
 import java.util.HashSet;
@@ -142,19 +139,12 @@ public class DDMFormInstanceStagedModelRepository
 				portletDataContext);
 
 		exportActionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.PerformActionMethod<DDMFormInstance>() {
+			(DDMFormInstance ddmFormInstance) -> {
+				StagedModelDataHandlerUtil.exportStagedModel(
+					portletDataContext, ddmFormInstance);
 
-				@Override
-				public void performAction(DDMFormInstance ddmFormInstance)
-					throws PortalException {
-
-					StagedModelDataHandlerUtil.exportStagedModel(
-						portletDataContext, ddmFormInstance);
-
-					StagedModelDataHandlerUtil.exportStagedModel(
-						portletDataContext, ddmFormInstance.getStructure());
-				}
-
+				StagedModelDataHandlerUtil.exportStagedModel(
+					portletDataContext, ddmFormInstance.getStructure());
 			});
 
 		return exportActionableDynamicQuery;
@@ -205,9 +195,6 @@ public class DDMFormInstanceStagedModelRepository
 			}
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		DDMFormInstanceStagedModelRepository.class);
 
 	@Reference
 	private DDMFormInstanceLocalService _ddmFormInstanceLocalService;

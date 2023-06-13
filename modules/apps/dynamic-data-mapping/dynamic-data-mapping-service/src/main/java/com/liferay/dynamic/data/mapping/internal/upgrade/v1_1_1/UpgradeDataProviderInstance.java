@@ -24,10 +24,10 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -111,7 +111,7 @@ public class UpgradeDataProviderInstance extends UpgradeProcess {
 		}
 
 		ddmFormValues.addDDMFormFieldValue(
-			createDDMFormFieldValue(ddmFormValues, "pagination", "true"));
+			createDDMFormFieldValue(ddmFormValues, "pagination", "false"));
 	}
 
 	protected void addStartEndParameters(DDMFormValues ddmFormValues) {
@@ -200,7 +200,6 @@ public class UpgradeDataProviderInstance extends UpgradeProcess {
 			ResultSet rs = ps1.executeQuery()) {
 
 			while (rs.next()) {
-				long dataProviderInstanceId = rs.getLong(1);
 				String dataProviderInstanceDefinition = rs.getString(2);
 				String type = rs.getString(3);
 
@@ -208,6 +207,8 @@ public class UpgradeDataProviderInstance extends UpgradeProcess {
 					dataProviderInstanceDefinition, type);
 
 				ps2.setString(1, newDefinition);
+
+				long dataProviderInstanceId = rs.getLong(1);
 
 				ps2.setLong(2, dataProviderInstanceId);
 

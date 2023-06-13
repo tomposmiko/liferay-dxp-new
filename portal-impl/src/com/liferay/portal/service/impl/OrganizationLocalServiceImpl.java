@@ -15,7 +15,6 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
@@ -585,9 +584,8 @@ public class OrganizationLocalServiceImpl
 		if (organization != null) {
 			return organization.getOrganizationId();
 		}
-		else {
-			return 0;
-		}
+
+		return 0;
 	}
 
 	@Override
@@ -674,10 +672,22 @@ public class OrganizationLocalServiceImpl
 			return organizationPersistence.findByCompanyId(
 				companyId, start, end);
 		}
-		else {
+
+		return organizationPersistence.findByC_P(
+			companyId, parentOrganizationId, start, end);
+	}
+
+	public List<Organization> getOrganizations(
+		long companyId, long parentOrganizationId, String name, int start,
+		int end) {
+
+		if (Validator.isNull(name)) {
 			return organizationPersistence.findByC_P(
 				companyId, parentOrganizationId, start, end);
 		}
+
+		return organizationPersistence.findByC_P_LikeN(
+			companyId, parentOrganizationId, name, start, end);
 	}
 
 	@Override
@@ -778,10 +788,21 @@ public class OrganizationLocalServiceImpl
 
 			return organizationPersistence.countByCompanyId(companyId);
 		}
-		else {
+
+		return organizationPersistence.countByC_P(
+			companyId, parentOrganizationId);
+	}
+
+	public int getOrganizationsCount(
+		long companyId, long parentOrganizationId, String name) {
+
+		if (Validator.isNull(name)) {
 			return organizationPersistence.countByC_P(
 				companyId, parentOrganizationId);
 		}
+
+		return organizationPersistence.countByC_P_LikeN(
+			companyId, parentOrganizationId, name);
 	}
 
 	/**
@@ -2321,9 +2342,8 @@ public class OrganizationLocalServiceImpl
 
 			return true;
 		}
-		else {
-			return false;
-		}
+
+		return false;
 	}
 
 	protected boolean isUseCustomSQL(LinkedHashMap<String, Object> params) {
@@ -2351,27 +2371,20 @@ public class OrganizationLocalServiceImpl
 			});
 		indexableActionableDynamicQuery.setCompanyId(companyId);
 		indexableActionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.PerformActionMethod<User>() {
+			(User user) -> {
+				if (!user.isDefaultUser()) {
+					try {
+						Document document = indexer.getDocument(user);
 
-				@Override
-				public void performAction(User user) {
-					if (!user.isDefaultUser()) {
-						try {
-							Document document = indexer.getDocument(user);
-
-							indexableActionableDynamicQuery.addDocuments(
-								document);
-						}
-						catch (PortalException pe) {
-							if (_log.isWarnEnabled()) {
-								_log.warn(
-									"Unable to index user " + user.getUserId(),
-									pe);
-							}
+						indexableActionableDynamicQuery.addDocuments(document);
+					}
+					catch (PortalException pe) {
+						if (_log.isWarnEnabled()) {
+							_log.warn(
+								"Unable to index user " + user.getUserId(), pe);
 						}
 					}
 				}
-
 			});
 		indexableActionableDynamicQuery.setSearchEngineId(
 			indexer.getSearchEngineId());
@@ -2430,8 +2443,7 @@ public class OrganizationLocalServiceImpl
 				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID) {
 
 			if (!isRootable(type)) {
-				throw new OrganizationParentException(
-					"Organization of type " + type + " cannot be a root");
+				throw new OrganizationParentException.MustBeRootable(type);
 			}
 		}
 		else {
@@ -2440,15 +2452,14 @@ public class OrganizationLocalServiceImpl
 
 			if (parentOrganization == null) {
 				throw new OrganizationParentException(
-					"Organization " + parentOrganizationId + " doesn't exist");
+					"Organization " + parentOrganizationId + " does not exist");
 			}
 
 			String[] childrenTypes = getChildrenTypes(
 				parentOrganization.getType());
 
 			if (childrenTypes.length == 0) {
-				throw new OrganizationParentException(
-					"Organization of type " + type + " cannot have children");
+				throw new OrganizationParentException.MustNotHaveChildren(type);
 			}
 
 			if ((companyId != parentOrganization.getCompanyId()) ||
@@ -2458,10 +2469,8 @@ public class OrganizationLocalServiceImpl
 			}
 
 			if (!ArrayUtil.contains(childrenTypes, type)) {
-				throw new OrganizationParentException(
-					StringBundler.concat(
-						"Type ", type, " not allowed as child of ",
-						parentOrganization.getType()));
+				throw new OrganizationParentException.MustHaveValidChildType(
+					type, parentOrganization.getType());
 			}
 		}
 

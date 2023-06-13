@@ -47,8 +47,8 @@ import org.junit.runner.RunWith;
 public class JsonWebServiceTest extends BaseClientTestCase {
 
 	@Deployment
-	public static Archive<?> getDeployment() throws Exception {
-		return BaseClientTestCase.getDeployment(
+	public static Archive<?> getArchive() throws Exception {
+		return BaseClientTestCase.getArchive(
 			JsonWebServiceTestPreparatorBundleActivator.class);
 	}
 
@@ -68,7 +68,7 @@ public class JsonWebServiceTest extends BaseClientTestCase {
 
 		String tokenString = getToken(
 			"oauthTestApplicationRO", null,
-			getResourceOwnerPassword("test@liferay.com", "test"),
+			getResourceOwnerPasswordBiFunction("test@liferay.com", "test"),
 			this::parseTokenString);
 
 		invocationBuilder = authorize(webTarget.request(), tokenString);
@@ -99,7 +99,7 @@ public class JsonWebServiceTest extends BaseClientTestCase {
 			webTarget.request(),
 			getToken(
 				"oauthTestApplicationRW", null,
-				getResourceOwnerPassword("test@liferay.com", "test"),
+				getResourceOwnerPasswordBiFunction("test@liferay.com", "test"),
 				this::parseTokenString));
 
 		response = invocationBuilder.post(Entity.form(formData));

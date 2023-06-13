@@ -3,9 +3,6 @@ import com.liferay.gradle.util.copy.StripPathSegmentsAction
 
 task buildHtml2Canvas(type: Copy)
 
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
-
 File jsDestinationDir = file("classes/META-INF/resources/js")
 
 buildHtml2Canvas {
@@ -44,6 +41,7 @@ dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.portal.configuration.metatype.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.portal.spring.extender.api", version: "3.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.portal.template.soy.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.registry.api", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.staging.api", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.upload.api", version: "2.0.0"

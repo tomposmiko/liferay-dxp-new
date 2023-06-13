@@ -17,16 +17,15 @@ package com.liferay.forms.apio.internal.architect.form;
 import com.liferay.apio.architect.form.Form;
 
 /**
- * Instances of this class represent the values extracted from a form instance
- * record updater form.
+ * Represents the values extracted from a form instance record form.
  *
  * @author Paulo Cruz
  */
 public class FormInstanceRecordForm {
 
 	/**
-	 * Builds a {@code Form} that generates {@code FormInstanceRecordForm}
-	 * depending on the HTTP body.
+	 * Builds a {@code Form} that generates a {@code FormInstanceRecordForm}
+	 * that depends on the HTTP body.
 	 *
 	 * @param  formBuilder the {@code Form} builder
 	 * @return a form instance record form
@@ -35,15 +34,17 @@ public class FormInstanceRecordForm {
 		Form.Builder<FormInstanceRecordForm> formBuilder) {
 
 		return formBuilder.title(
-			__ -> "The form instance record form"
+			__ -> "The form instance record creator and updater form"
 		).description(
-			__ -> "This form can be used to update a form instance record"
+			__ ->
+				"This form can be used to create or update a form instance " +
+					"record"
 		).constructor(
 			FormInstanceRecordForm::new
-		).addRequiredString(
-			"fieldValues", FormInstanceRecordForm::_setFieldValues
 		).addRequiredBoolean(
-			"isDraft", FormInstanceRecordForm::_setDraft
+			"isDraft", FormInstanceRecordForm::setDraft
+		).addRequiredString(
+			"fieldValues", FormInstanceRecordForm::setFieldValues
 		).build();
 	}
 
@@ -55,11 +56,11 @@ public class FormInstanceRecordForm {
 		return _draft;
 	}
 
-	private void _setDraft(boolean draft) {
+	public void setDraft(boolean draft) {
 		_draft = draft;
 	}
 
-	private void _setFieldValues(String formValues) {
+	public void setFieldValues(String formValues) {
 		_fieldValues = formValues;
 	}
 

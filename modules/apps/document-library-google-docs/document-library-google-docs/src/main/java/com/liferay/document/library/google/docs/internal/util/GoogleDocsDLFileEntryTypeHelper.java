@@ -90,6 +90,11 @@ public class GoogleDocsDLFileEntryTypeHelper {
 			throw new PortalException(ioe);
 		}
 
+		Locale locale = _company.getLocale();
+
+		definition = StringUtil.replace(
+			definition, "[$LOCALE_DEFAULT$]", locale.toString());
+
 		DDMForm ddmForm = _ddmFormXSDDeserializer.deserialize(definition);
 
 		DDMFormLayout ddmFormLayout = _ddm.getDefaultDDMFormLayout(ddmForm);

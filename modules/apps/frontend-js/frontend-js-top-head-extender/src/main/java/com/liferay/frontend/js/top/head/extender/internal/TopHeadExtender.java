@@ -15,13 +15,15 @@
 package com.liferay.frontend.js.top.head.extender.internal;
 
 import com.liferay.osgi.felix.util.AbstractExtender;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Dictionary;
+import java.util.List;
 
 import org.apache.felix.utils.extender.Extension;
 import org.apache.felix.utils.log.Logger;
@@ -35,7 +37,7 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author Iván Zaera Avellón
  */
-@Component(immediate = true)
+@Component(immediate = true, service = {})
 public class TopHeadExtender extends AbstractExtender {
 
 	@Activate
@@ -53,8 +55,7 @@ public class TopHeadExtender extends AbstractExtender {
 	@Override
 	protected void debug(Bundle bundle, String s) {
 		_logger.log(
-			Logger.LOG_DEBUG,
-			StringBundler.concat("[", String.valueOf(bundle), "] ", s));
+			Logger.LOG_DEBUG, StringBundler.concat("[", bundle, "] ", s));
 	}
 
 	@Override
@@ -74,19 +75,28 @@ public class TopHeadExtender extends AbstractExtender {
 			return null;
 		}
 
+		List<String> jsResourcePaths = null;
+
 		if (Validator.isNull(liferayJsResourcesTopHead)) {
-			liferayJsResourcesTopHead = StringPool.BLANK;
+			jsResourcePaths = Collections.emptyList();
+		}
+		else {
+			jsResourcePaths = Arrays.asList(
+				liferayJsResourcesTopHead.split(StringPool.COMMA));
 		}
 
+		List<String> authenticatedJsResourcePaths = null;
+
 		if (Validator.isNull(liferayJsResourcesTopHeadAuthenticated)) {
-			liferayJsResourcesTopHeadAuthenticated = StringPool.BLANK;
+			authenticatedJsResourcePaths = Collections.emptyList();
+		}
+		else {
+			authenticatedJsResourcePaths = Arrays.asList(
+				liferayJsResourcesTopHeadAuthenticated.split(StringPool.COMMA));
 		}
 
 		TopHeadResourcesImpl topHeadResourcesImpl = new TopHeadResourcesImpl(
-			Arrays.asList(liferayJsResourcesTopHead.split(StringPool.COMMA)),
-			Arrays.asList(
-				liferayJsResourcesTopHeadAuthenticated.split(
-					StringPool.COMMA)));
+			jsResourcePaths, authenticatedJsResourcePaths);
 
 		int liferayTopHeadWeight = GetterUtil.getInteger(
 			headers.get("Liferay-Top-Head-Weight"));
@@ -103,8 +113,7 @@ public class TopHeadExtender extends AbstractExtender {
 	@Override
 	protected void warn(Bundle bundle, String s, Throwable t) {
 		_logger.log(
-			Logger.LOG_WARNING,
-			StringBundler.concat("[", String.valueOf(bundle), "] ", s), t);
+			Logger.LOG_WARNING, StringBundler.concat("[", bundle, "] ", s), t);
 	}
 
 	private Logger _logger;

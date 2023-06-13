@@ -403,9 +403,8 @@ public class WebServerServlet extends HttpServlet {
 		else if (path.startsWith("/user_portrait")) {
 			return ImageToolUtil.getDefaultUserMalePortrait();
 		}
-		else {
-			return null;
-		}
+
+		return null;
 	}
 
 	protected FileEntry getFileEntry(String[] pathArray) throws Exception {
@@ -427,6 +426,7 @@ public class WebServerServlet extends HttpServlet {
 		else if (pathArray.length == 3) {
 			long groupId = GetterUtil.getLong(pathArray[0]);
 			long folderId = GetterUtil.getLong(pathArray[1]);
+
 			String fileName = HttpUtil.decodeURL(pathArray[2]);
 
 			if (fileName.contains(StringPool.QUESTION)) {
@@ -1187,13 +1187,10 @@ public class WebServerServlet extends HttpServlet {
 		FileEntry fileEntry = DLAppServiceUtil.getFileEntry(
 			groupId, folderId, title);
 
-		String contentType = fileEntry.getMimeType();
-
-		response.setContentType(contentType);
-
-		InputStream inputStream = fileEntry.getContentStream();
-
-		ServletResponseUtil.write(response, inputStream, fileEntry.getSize());
+		ServletResponseUtil.sendFile(
+			null, response, title, fileEntry.getContentStream(),
+			fileEntry.getSize(), fileEntry.getMimeType(),
+			HttpHeaders.CONTENT_DISPOSITION_ATTACHMENT);
 	}
 
 	protected void sendGroups(

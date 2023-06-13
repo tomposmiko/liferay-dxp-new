@@ -15,6 +15,7 @@
 package com.liferay.friendly.url.internal.servlet;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.NoSuchGroupException;
 import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -44,12 +45,12 @@ import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.portlet.AsyncPortletServletRequest;
 import com.liferay.site.model.SiteFriendlyURL;
 import com.liferay.site.service.SiteFriendlyURLLocalService;
 
@@ -351,6 +352,17 @@ public class FriendlyURLServlet extends HttpServlet {
 			RequestDispatcher requestDispatcher =
 				servletContext.getRequestDispatcher(redirect.getPath());
 
+			if (request.isAsyncSupported()) {
+				AsyncPortletServletRequest asyncPortletServletRequest =
+					AsyncPortletServletRequest.getAsyncPortletServletRequest(
+						request);
+
+				if (asyncPortletServletRequest != null) {
+					asyncPortletServletRequest.update(
+						servletContext.getContextPath(), redirect.getPath());
+				}
+			}
+
 			if (requestDispatcher != null) {
 				requestDispatcher.forward(request, response);
 			}
@@ -400,9 +412,8 @@ public class FriendlyURLServlet extends HttpServlet {
 
 				return true;
 			}
-			else {
-				return false;
-			}
+
+			return false;
 		}
 
 		public String getPath() {
@@ -459,11 +470,10 @@ public class FriendlyURLServlet extends HttpServlet {
 		if (lifecycle.equals("1")) {
 			return new LastPath(_friendlyURLPathPrefix, pathInfo);
 		}
-		else {
-			return new LastPath(
-				_friendlyURLPathPrefix, pathInfo,
-				HttpUtil.parameterMapToString(request.getParameterMap()));
-		}
+
+		return new LastPath(
+			_friendlyURLPathPrefix, pathInfo,
+			HttpUtil.parameterMapToString(request.getParameterMap()));
 	}
 
 	protected String getPathInfo(HttpServletRequest request) {

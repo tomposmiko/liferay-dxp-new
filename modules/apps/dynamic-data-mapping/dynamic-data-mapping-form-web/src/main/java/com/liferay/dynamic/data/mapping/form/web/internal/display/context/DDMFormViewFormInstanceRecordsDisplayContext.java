@@ -104,7 +104,6 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 			_renderRequest);
 
 		return new DropdownItemList() {
-
 			{
 				add(
 					dropdownItem -> {
@@ -115,7 +114,6 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 						dropdownItem.setQuickAction(true);
 					});
 			}
-
 		};
 	}
 
@@ -480,7 +478,11 @@ public class DDMFormViewFormInstanceRecordsDisplayContext {
 							orderByCol.equals(getOrderByCol()));
 						dropdownItem.setHref(
 							getPortletURL(), "orderByCol", orderByCol);
-						dropdownItem.setLabel(orderByCol);
+						dropdownItem.setLabel(
+							LanguageUtil.get(
+								PortalUtil.getHttpServletRequest(
+									_renderRequest),
+								orderByCol));
 					});
 			}
 		};

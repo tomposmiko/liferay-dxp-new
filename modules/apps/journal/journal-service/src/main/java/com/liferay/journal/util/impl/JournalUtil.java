@@ -25,6 +25,7 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalStructureConstants;
 import com.liferay.journal.service.JournalArticleLocalServiceUtil;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.petra.xml.XMLUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -56,7 +57,6 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.Validator;
@@ -73,7 +73,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
@@ -486,9 +485,8 @@ public class JournalUtil {
 		if (nodes.size() == 1) {
 			return (Element)nodes.get(0);
 		}
-		else {
-			return null;
-		}
+
+		return null;
 	}
 
 	private static String _getTemplateScript(
@@ -587,10 +585,12 @@ public class JournalUtil {
 
 		curTypeAttribute.setValue(newTypeAttribute.getValue());
 
-		Attribute curIndexTypeAttribute = curElement.attribute("index-type");
 		Attribute newIndexTypeAttribute = newElement.attribute("index-type");
 
 		if (newIndexTypeAttribute != null) {
+			Attribute curIndexTypeAttribute = curElement.attribute(
+				"index-type");
+
 			if (curIndexTypeAttribute == null) {
 				curElement.addAttribute(
 					"index-type", newIndexTypeAttribute.getValue());
@@ -914,56 +914,6 @@ public class JournalUtil {
 
 			_removeArticleLocale(dynamicElementElement, languageId);
 		}
-	}
-
-	private static void _removeOldContent(
-		Stack<String> path, Element contentElement, Document xsdDocument) {
-
-		String elementPath = "";
-
-		for (int i = 0; i < path.size(); i++) {
-			elementPath += "/" + path.elementAt(i);
-		}
-
-		for (int i = 0; i < contentElement.nodeCount(); i++) {
-			Node contentNode = contentElement.node(i);
-
-			if (contentNode instanceof Element) {
-				_removeOldContent(
-					path, (Element)contentNode, xsdDocument, elementPath);
-			}
-		}
-	}
-
-	private static void _removeOldContent(
-		Stack<String> path, Element contentElement, Document xsdDocument,
-		String elementPath) {
-
-		String name = contentElement.attributeValue("name");
-
-		if (Validator.isNull(name)) {
-			return;
-		}
-
-		String localPath =
-			"dynamic-element[@name=" + HtmlUtil.escapeXPathAttribute(name) +
-				"]";
-
-		String fullPath = elementPath + "/" + localPath;
-
-		XPath xPathSelector = SAXReaderUtil.createXPath(fullPath);
-
-		List<Node> curNodes = xPathSelector.selectNodes(xsdDocument);
-
-		if (curNodes.isEmpty()) {
-			contentElement.detach();
-		}
-
-		path.push(localPath);
-
-		_removeOldContent(path, contentElement, xsdDocument);
-
-		path.pop();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(JournalUtil.class);

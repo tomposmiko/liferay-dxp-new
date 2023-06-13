@@ -157,14 +157,13 @@ public class DDMDisplayContext {
 				add(
 					dropdownItem -> {
 						dropdownItem.putData("action", action);
-						dropdownItem.setIcon("times");
+						dropdownItem.setIcon("times-circle");
 						dropdownItem.setLabel(
 							LanguageUtil.get(
 								_ddmWebRequestHelper.getRequest(), "delete"));
 						dropdownItem.setQuickAction(true);
 					});
 			}
-
 		};
 	}
 
@@ -237,6 +236,10 @@ public class DDMDisplayContext {
 
 				for (DDMDisplayTabItem ddmDisplayTabItem :
 						ddmDisplay.getTabItems()) {
+
+					if (!ddmDisplayTabItem.isShow(liferayPortletRequest)) {
+						continue;
+					}
 
 					String ddmDisplayTabItemTitle = GetterUtil.getString(
 						ddmDisplayTabItem.getTitle(
@@ -485,9 +488,6 @@ public class DDMDisplayContext {
 
 		return new CreationMenu() {
 			{
-
-				String message = "add";
-
 				if (getClassNameId() ==
 						PortalUtil.getClassNameId(DDMStructure.class)) {
 
@@ -506,6 +506,8 @@ public class DDMDisplayContext {
 					addTemplateURL.setParameter(
 						"resourceClassNameId",
 						String.valueOf(getResourceClassNameId()));
+
+					String message = "add";
 
 					if (containsAddTemplatePermission(
 							DDMTemplateConstants.TEMPLATE_TYPE_FORM)) {
@@ -695,9 +697,6 @@ public class DDMDisplayContext {
 	public boolean isShowAddTemplateButton() throws PortalException {
 		DDMDisplay ddmDisplay = getDDMDisplay();
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		long classNameId = getClassNameId();
 		long resourceClassNameId = PortalUtil.getClassNameId(
 			ddmDisplay.getStructureType());
@@ -705,6 +704,9 @@ public class DDMDisplayContext {
 		if ((classNameId == 0) || (resourceClassNameId == 0)) {
 			return true;
 		}
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 
 		if (ddmDisplay.isShowAddButton(themeDisplay.getScopeGroup()) &&
 			DDMTemplatePermission.containsAddTemplatePermission(
@@ -826,10 +828,8 @@ public class DDMDisplayContext {
 			portletURL.setParameter("classNameId", String.valueOf(classNameId));
 		}
 
-		long classPK = getClassPK();
-
 		if (classNameId != 0) {
-			portletURL.setParameter("classPK", String.valueOf(classPK));
+			portletURL.setParameter("classPK", String.valueOf(getClassPK()));
 		}
 
 		long resourceClassNameId = getResourceClassNameId();
@@ -894,9 +894,9 @@ public class DDMDisplayContext {
 	protected String getScopedStructureLabel() {
 		String scopeTitle = ParamUtil.getString(_renderRequest, "scopeTitle");
 
-		DDMDisplay ddmDisplay = getDDMDisplay();
-
 		if (Validator.isNull(scopeTitle)) {
+			DDMDisplay ddmDisplay = getDDMDisplay();
+
 			return ddmDisplay.getTitle(_ddmWebRequestHelper.getLocale());
 		}
 

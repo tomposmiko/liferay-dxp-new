@@ -429,17 +429,17 @@ public class AssetLinkLocalServiceImpl extends AssetLinkLocalServiceBaseImpl {
 	}
 
 	protected void addDeletionSystemEvent(AssetLink assetLink) {
-		StagedAssetLink stagedAssetLink = ModelAdapterUtil.adapt(
-			assetLink, AssetLink.class, StagedAssetLink.class);
-
-		StagedModelType stagedModelType = stagedAssetLink.getStagedModelType();
-
 		AssetEntry assetEntry = assetEntryLocalService.fetchEntry(
 			assetLink.getEntryId1());
 
 		if (assetEntry == null) {
 			return;
 		}
+
+		StagedAssetLink stagedAssetLink = ModelAdapterUtil.adapt(
+			assetLink, AssetLink.class, StagedAssetLink.class);
+
+		StagedModelType stagedModelType = stagedAssetLink.getStagedModelType();
 
 		try {
 			systemEventLocalService.addSystemEvent(
@@ -474,9 +474,6 @@ public class AssetLinkLocalServiceImpl extends AssetLinkLocalServiceBaseImpl {
 
 		return assetLinks;
 	}
-
-	private static final String _FIND_BY_ASSET_ENTRY_GROUP_ID =
-		AssetLinkLocalServiceImpl.class.getName() + ".findByAssetEntryGroupId";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		AssetLinkLocalServiceImpl.class);

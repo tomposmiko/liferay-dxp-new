@@ -1,0 +1,23 @@
+#
+# Liferay App Version 1.0.0
+#
+
+app.artifacts-1.0.0=\
+	com.liferay.hello.soy.navigation.web-2.0.0.jar,\
+	com.liferay.hello.soy.web-2.0.0.jar
+
+app.change.log-1.0.0=LPS-77699 LPS-79653 LPS-80332
+
+app.git.id-1.0.0=bf9943b93ff9473888db9fac9695168575fa3ab2
+
+#
+# Liferay App Version 1.0.1
+#
+
+app.artifacts-1.0.1=\
+	com.liferay.hello.soy.navigation.web-2.0.0.jar,\
+	com.liferay.hello.soy.web-2.0.2.jar
+
+app.change.log-1.0.1=LPS-83705 LPS-85296 
+
+app.git.id-1.0.1=3bfa1341dd1744a2268a4b735fd2c2360cdb9117

@@ -61,7 +61,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=Translator",
 		"javax.portlet.expiration-cache=0",
-		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + TranslatorPortletKeys.TRANSLATOR,
 		"javax.portlet.resource-bundle=content.Language",
@@ -91,13 +91,14 @@ public class TranslatorPortlet extends MVCPortlet {
 			TranslatorConfiguration.class.getName(), _translatorConfiguration);
 
 		try {
-			String fromLanguageId = ParamUtil.getString(
-				actionRequest, "fromLanguageId");
-			String toLanguageId = ParamUtil.getString(
-				actionRequest, "toLanguageId");
 			String fromText = ParamUtil.getString(actionRequest, "text");
 
 			if (Validator.isNotNull(fromText)) {
+				String fromLanguageId = ParamUtil.getString(
+					actionRequest, "fromLanguageId");
+				String toLanguageId = ParamUtil.getString(
+					actionRequest, "toLanguageId");
+
 				Translation translation = TranslatorUtil.getTranslation(
 					fromLanguageId, toLanguageId, fromText);
 

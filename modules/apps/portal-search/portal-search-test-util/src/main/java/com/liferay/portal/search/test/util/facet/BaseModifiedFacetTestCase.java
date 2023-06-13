@@ -18,7 +18,6 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.search.BooleanClause;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.facet.config.FacetConfiguration;
 import com.liferay.portal.kernel.search.filter.Filter;
@@ -26,14 +25,10 @@ import com.liferay.portal.search.facet.Facet;
 import com.liferay.portal.search.facet.modified.ModifiedFacetFactory;
 import com.liferay.portal.search.internal.facet.modified.ModifiedFacetFactoryImpl;
 import com.liferay.portal.search.internal.filter.FilterBuildersImpl;
-import com.liferay.portal.search.test.util.FacetsAssert;
-import com.liferay.portal.search.test.util.IdempotentRetryAssert;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -49,7 +44,7 @@ public abstract class BaseModifiedFacetTestCase extends BaseFacetTestCase {
 
 		String customRange = "[20170101000000 TO 20170105000000]";
 
-		assertSearch(
+		assertSearchFacet(
 			helper -> {
 				Facet facet = helper.addFacet(this::createFacet);
 
@@ -79,7 +74,7 @@ public abstract class BaseModifiedFacetTestCase extends BaseFacetTestCase {
 			"[11110101010101 TO 22220202020202]=1",
 			"[19990202020202 TO 22220202020202]=1");
 
-		assertSearch(
+		assertSearchFacet(
 			helper -> {
 				Facet facet = helper.addFacet(this::createFacet);
 
@@ -90,18 +85,6 @@ public abstract class BaseModifiedFacetTestCase extends BaseFacetTestCase {
 
 				helper.assertFrequencies(facet, expectedRanges);
 			});
-	}
-
-	@Test
-	public void testSearchEngineDateMath() throws Exception {
-		addDocument("17760704000000");
-		addDocument("27760704000000");
-
-		String dateMathExpressionWithAlphabeticalOrderSwitched =
-			"[now-500y TO now]";
-
-		doTestSearchEngineDateMath(
-			dateMathExpressionWithAlphabeticalOrderSwitched, 1);
 	}
 
 	protected Facet createFacet(SearchContext searchContext) {
@@ -115,6 +98,18 @@ public abstract class BaseModifiedFacetTestCase extends BaseFacetTestCase {
 		Facet facet = modifiedFacetFactory.newInstance(searchContext);
 
 		initFacet(facet);
+
+		return facet;
+	}
+
+	protected Facet createFacetWithRangeSelected(
+		String range, SearchContext searchContext) {
+
+		Facet facet = createFacet(searchContext);
+
+		setConfigurationRanges(facet, new String[] {range});
+
+		facet.select(range);
 
 		return facet;
 	}
@@ -140,36 +135,23 @@ public abstract class BaseModifiedFacetTestCase extends BaseFacetTestCase {
 	protected void doTestSearchEngineDateMath(String range, int frequency)
 		throws Exception {
 
-		IdempotentRetryAssert.retryAssert(
-			5, TimeUnit.SECONDS,
-			() -> {
-				SearchContext searchContext = createSearchContext();
+		assertSearchFacet(
+			facetTestHelper -> {
+				Facet facet = facetTestHelper.addFacet(
+					searchContext -> createFacetWithRangeSelected(
+						range, searchContext));
 
-				Facet facet = createFacet(searchContext);
+				BooleanClause<Filter> booleanClause =
+					facet.getFacetFilterBooleanClause();
 
-				setConfigurationRanges(facet, new String[] {range});
+				facetTestHelper.setPostFilter(booleanClause.getClause());
 
-				facet.select(range);
+				facetTestHelper.search();
 
-				searchContext.addFacet(facet);
+				facetTestHelper.assertResultCount(frequency);
 
-				Hits hits = search(
-					searchContext,
-					query -> {
-						BooleanClause<Filter> booleanClause =
-							facet.getFacetFilterBooleanClause();
-
-						query.setPostFilter(booleanClause.getClause());
-					});
-
-				Assert.assertEquals(
-					hits.toString(), frequency, hits.getLength());
-
-				FacetsAssert.assertFrequencies(
-					facet.getFieldName(), searchContext,
-					Arrays.asList(range + "=" + frequency));
-
-				return null;
+				facetTestHelper.assertFrequencies(
+					facet, Arrays.asList(range + "=" + frequency));
 			});
 	}
 

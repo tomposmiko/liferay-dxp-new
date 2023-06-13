@@ -14,7 +14,9 @@
 
 package com.liferay.oauth2.provider.service.impl;
 
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.store.Store;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.constants.OAuth2ProviderConstants;
 import com.liferay.oauth2.provider.exception.DuplicateOAuth2ApplicationClientIdException;
@@ -44,15 +46,19 @@ import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
+import com.liferay.portal.kernel.repository.RepositoryFactory;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.HttpUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.awt.image.RenderedImage;
 
@@ -131,7 +137,7 @@ public class OAuth2ApplicationLocalServiceImpl
 		oAuth2Application.setPrivacyPolicyURL(privacyPolicyURL);
 		oAuth2Application.setRedirectURIsList(redirectURIsList);
 
-		if ((scopeAliasesList != null) && !scopeAliasesList.isEmpty()) {
+		if (ListUtil.isNotEmpty(scopeAliasesList)) {
 			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
 				oAuth2ApplicationScopeAliasesLocalService.
 					addOAuth2ApplicationScopeAliases(
@@ -350,26 +356,42 @@ public class OAuth2ApplicationLocalServiceImpl
 		OAuth2Application oAuth2Application =
 			oAuth2ApplicationPersistence.findByPrimaryKey(oAuth2ApplicationId);
 
-		if ((scopeAliasesList == null) || scopeAliasesList.isEmpty()) {
+		if (ListUtil.isEmpty(scopeAliasesList)) {
+			if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() == 0) {
+				return oAuth2Application;
+			}
+
 			oAuth2Application.setModifiedDate(new Date());
 			oAuth2Application.setOAuth2ApplicationScopeAliasesId(0);
 
 			return oAuth2ApplicationPersistence.update(oAuth2Application);
 		}
 
-		if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() == 0) {
-			OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
-				oAuth2ApplicationScopeAliasesLocalService.
-					fetchOAuth2ApplicationScopeAliases(
-						oAuth2ApplicationId, scopeAliasesList);
+		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
+			oAuth2ApplicationScopeAliasesLocalService.
+				fetchOAuth2ApplicationScopeAliases(
+					oAuth2ApplicationId, scopeAliasesList);
 
-			if (oAuth2ApplicationScopeAliases == null) {
-				oAuth2ApplicationScopeAliases =
-					oAuth2ApplicationScopeAliasesLocalService.
-						addOAuth2ApplicationScopeAliases(
-							oAuth2Application.getCompanyId(), userId, userName,
-							oAuth2ApplicationId, scopeAliasesList);
-			}
+		if (oAuth2ApplicationScopeAliases != null) {
+			oAuth2ApplicationScopeAliases.setUserId(userId);
+			oAuth2ApplicationScopeAliases.setUserName(userName);
+
+			oAuth2ApplicationScopeAliases =
+				oAuth2ApplicationScopeAliasesLocalService.
+					updateOAuth2ApplicationScopeAliases(
+						oAuth2ApplicationScopeAliases);
+		}
+		else {
+			oAuth2ApplicationScopeAliases =
+				oAuth2ApplicationScopeAliasesLocalService.
+					addOAuth2ApplicationScopeAliases(
+						oAuth2Application.getCompanyId(), userId, userName,
+						oAuth2ApplicationId, scopeAliasesList);
+		}
+
+		if (oAuth2Application.getOAuth2ApplicationScopeAliasesId() !=
+				oAuth2ApplicationScopeAliases.
+					getOAuth2ApplicationScopeAliasesId()) {
 
 			oAuth2Application.setModifiedDate(new Date());
 			oAuth2Application.setOAuth2ApplicationScopeAliasesId(
@@ -379,36 +401,7 @@ public class OAuth2ApplicationLocalServiceImpl
 			return oAuth2ApplicationPersistence.update(oAuth2Application);
 		}
 
-		OAuth2ApplicationScopeAliases oAuth2ApplicationScopeAliases =
-			oAuth2ApplicationScopeAliasesLocalService.
-				getOAuth2ApplicationScopeAliases(
-					oAuth2Application.getOAuth2ApplicationScopeAliasesId());
-
-		List<String> actualScopeAliasesList =
-			oAuth2ApplicationScopeAliases.getScopeAliasesList();
-
-		if (actualScopeAliasesList.equals(scopeAliasesList)) {
-			return oAuth2Application;
-		}
-
-		oAuth2ApplicationScopeAliases =
-			oAuth2ApplicationScopeAliasesLocalService.
-				fetchOAuth2ApplicationScopeAliases(
-					oAuth2ApplicationId, scopeAliasesList);
-
-		if (oAuth2ApplicationScopeAliases == null) {
-			oAuth2ApplicationScopeAliases =
-				oAuth2ApplicationScopeAliasesLocalService.
-					addOAuth2ApplicationScopeAliases(
-						oAuth2Application.getCompanyId(), userId, userName,
-						oAuth2ApplicationId, scopeAliasesList);
-		}
-
-		oAuth2Application.setModifiedDate(new Date());
-		oAuth2Application.setOAuth2ApplicationScopeAliasesId(
-			oAuth2ApplicationScopeAliases.getOAuth2ApplicationScopeAliasesId());
-
-		return oAuth2ApplicationPersistence.update(oAuth2Application);
+		return oAuth2Application;
 	}
 
 	protected void validate(
@@ -596,5 +589,20 @@ public class OAuth2ApplicationLocalServiceImpl
 			"xmlrpc.beep", "xmlrpc.beeps", "xmpp", "xri", "ymsgr", "z39.50",
 			"z39.50r", "z39.50s"
 		});
+
+	@ServiceReference(
+		filterString = "(indexer.class.name=com.liferay.document.library.kernel.model.DLFileEntry)",
+		type = Indexer.class
+	)
+	private Indexer<DLFileEntry> _indexer;
+
+	@ServiceReference(
+		filterString = "(class.name=com.liferay.portal.repository.portletrepository.PortletRepository)",
+		type = RepositoryFactory.class
+	)
+	private RepositoryFactory _repositoryFactory;
+
+	@ServiceReference(filterString = "(current.store=true)", type = Store.class)
+	private Store _store;
 
 }

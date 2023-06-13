@@ -52,8 +52,8 @@ import org.junit.runner.RunWith;
 public class ScopeCheckerGuestAllowedTest extends BaseClientTestCase {
 
 	@Deployment
-	public static Archive<?> getDeployment() throws Exception {
-		return BaseClientTestCase.getDeployment(
+	public static Archive<?> getArchive() throws Exception {
+		return BaseClientTestCase.getArchive(
 			ScopeCheckerGuestAllowedTestPreparatorBundleActivator.class);
 	}
 
@@ -167,7 +167,7 @@ public class ScopeCheckerGuestAllowedTest extends BaseClientTestCase {
 			createOAuth2Application(
 				defaultCompanyId, user, "oauthTestApplication",
 				Collections.singletonList(GrantType.CLIENT_CREDENTIALS),
-				Arrays.asList(new String[] {"everything.read", "GET"}));
+				Arrays.asList("everything.read", "GET"));
 		}
 
 	}

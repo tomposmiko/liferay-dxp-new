@@ -15,6 +15,7 @@
 package com.liferay.portal.servlet;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
@@ -146,6 +147,26 @@ public class I18nServletTest {
 	}
 
 	@Test
+	public void testI18nLanguageTag() throws Exception {
+		PropsValues.LOCALE_USE_DEFAULT_IF_NOT_AVAILABLE = false;
+
+		MockHttpServletRequest mockHttpServletRequest =
+			new MockHttpServletRequest();
+
+		mockHttpServletRequest.setPathInfo(StringPool.SLASH);
+		mockHttpServletRequest.setServletPath(
+			StringPool.SLASH + Locale.CANADA_FRENCH.toLanguageTag());
+
+		I18nServlet.I18nData actualI18nData = _i18nServlet.getI18nData(
+			mockHttpServletRequest);
+
+		I18nServlet.I18nData expectedI18nData = getI18nData(
+			Locale.CANADA_FRENCH);
+
+		Assert.assertEquals(expectedI18nData, actualI18nData);
+	}
+
+	@Test
 	public void testI18nNotUseDefaultExistentLocale() throws Exception {
 		PropsValues.LOCALE_USE_DEFAULT_IF_NOT_AVAILABLE = false;
 
@@ -185,9 +206,11 @@ public class I18nServletTest {
 	public void testI18nUseDefaultNonexistentLocale() throws Exception {
 		PropsValues.LOCALE_USE_DEFAULT_IF_NOT_AVAILABLE = true;
 
-		Locale expectedLocale = LocaleUtil.CHINA;
+		Locale invalidLocale = LocaleUtil.CHINA;
 
-		testGetI18nData(expectedLocale, getI18nData(expectedLocale));
+		Locale defaultLocale = LocaleUtil.getDefault();
+
+		testGetI18nData(invalidLocale, getI18nData(defaultLocale));
 	}
 
 	@Test
@@ -211,7 +234,9 @@ public class I18nServletTest {
 		testIsNotDefaultOrFirstI18nData(_group, LocaleUtil.US, LocaleUtil.UK);
 	}
 
-	protected I18nServlet.I18nData getI18nData(Locale locale) {
+	protected I18nServlet.I18nData getI18nData(Locale locale)
+		throws PortalException {
+
 		return _i18nServlet.getI18nData(locale);
 	}
 
@@ -261,6 +286,7 @@ public class I18nServletTest {
 		throws Exception {
 
 		Locale actualDefaultLocale = _getDefaultLocale(group);
+
 		Locale actualFirstLocale = _getFirstLocale(
 			group, expectedFirstLocale.getLanguage());
 
@@ -306,9 +332,8 @@ public class I18nServletTest {
 		if (group != null) {
 			return PortalUtil.getSiteDefaultLocale(group);
 		}
-		else {
-			return LocaleUtil.getDefault();
-		}
+
+		return LocaleUtil.getDefault();
 	}
 
 	private Locale _getFirstLocale(Group group, String language)
@@ -317,12 +342,13 @@ public class I18nServletTest {
 		if (group != null) {
 			return LanguageUtil.getLocale(group.getGroupId(), language);
 		}
-		else {
-			return LanguageUtil.getLocale(language);
-		}
+
+		return LanguageUtil.getLocale(language);
 	}
 
-	private I18nServlet.I18nData _getI18nData(Group group, String path) {
+	private I18nServlet.I18nData _getI18nData(Group group, String path)
+		throws PortalException {
+
 		MockHttpServletRequest mockHttpServletRequest =
 			new MockHttpServletRequest();
 

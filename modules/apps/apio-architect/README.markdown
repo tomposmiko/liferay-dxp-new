@@ -2,8 +2,8 @@
     <a href="https://travis-ci.org/liferay/com-liferay-apio-architect">
         <img src="https://travis-ci.org/liferay/com-liferay-apio-architect.svg?branch=master" alt="Travis CI" />
     </a>
-    <a href='https://coveralls.io/github/liferay/com-liferay-apio-architect?branch=master'>
-        <img src='https://coveralls.io/repos/github/liferay/com-liferay-apio-architect/badge.svg?branch=master' alt='Coverage Status' />
+    <a href="https://codecov.io/gh/liferay/com-liferay-apio-architect">
+        <img src="https://codecov.io/gh/liferay/com-liferay-apio-architect/branch/master/graph/badge.svg" alt="Codecov"/>
     </a>
     <a href="https://codebeat.co/projects/github-com-liferay-com-liferay-apio-architect-master">
         <img alt="codebeat badge" src="https://codebeat.co/badges/bb871bcd-dd93-49f2-a8bc-6166169b0e44" />
@@ -11,6 +11,10 @@
     <a href='https://www.gnu.org/licenses/lgpl-3.0'>
         <img src='https://img.shields.io/badge/License-LGPL%20v3-blue.svg' alt='License: LGPL v3' />
     </a>
+</div>
+
+<div align="center">
+    <img src="./images/logo.png"/>
 </div>
 
 # Apio Architect
@@ -134,7 +138,7 @@ Pull requests with contributions should be sent to the GitHub user *liferay*. Th
 ## Bug Reporting and Feature Requests
 Did you find a bug? Please file an issue for it at [https://issues.liferay.com](https://issues.liferay.com) following [Liferay's JIRA Guidelines](http://www.liferay.com/community/wiki/-/wiki/Main/JIRA), and select *Apio Architect* as the component.
 
-If you'd like to suggest a new feature for Liferay, visit the [Ideas Dashboard](https://dev.liferay.com/participate/ideas) to submit and track the progress of your idea!
+If you'd like to suggest a new feature for Liferay, visit the [list of issues and suggestions](https://issues.liferay.com/projects/APIO/issues) to submit and track the progress of your idea!
 
 ## License
 This library is free software ("Licensed Software"); you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.

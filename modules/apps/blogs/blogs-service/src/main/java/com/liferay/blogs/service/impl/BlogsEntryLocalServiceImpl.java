@@ -35,6 +35,7 @@ import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.petra.reflect.ReflectionUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.comment.CommentManager;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
@@ -82,7 +83,6 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SubscriptionSender;
 import com.liferay.portal.kernel.util.Time;
@@ -315,6 +315,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 
 		User user = userLocalService.getUser(userId);
 		long groupId = serviceContext.getScopeGroupId();
+
 		int status = WorkflowConstants.STATUS_DRAFT;
 
 		validate(title, urlTitle, content, status);
@@ -772,12 +773,11 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 				queryDefinition.getStart(), queryDefinition.getEnd(),
 				queryDefinition.getOrderByComparator());
 		}
-		else {
-			return blogsEntryPersistence.findByC_LtD_S(
-				companyId, displayDate, queryDefinition.getStatus(),
-				queryDefinition.getStart(), queryDefinition.getEnd(),
-				queryDefinition.getOrderByComparator());
-		}
+
+		return blogsEntryPersistence.findByC_LtD_S(
+			companyId, displayDate, queryDefinition.getStatus(),
+			queryDefinition.getStart(), queryDefinition.getEnd(),
+			queryDefinition.getOrderByComparator());
 	}
 
 	@Override
@@ -789,10 +789,9 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			return blogsEntryPersistence.countByC_LtD_NotS(
 				companyId, displayDate, queryDefinition.getStatus());
 		}
-		else {
-			return blogsEntryPersistence.countByC_LtD_S(
-				companyId, displayDate, queryDefinition.getStatus());
-		}
+
+		return blogsEntryPersistence.countByC_LtD_S(
+			companyId, displayDate, queryDefinition.getStatus());
 	}
 
 	@Override
@@ -854,12 +853,11 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 				queryDefinition.getStart(), queryDefinition.getEnd(),
 				queryDefinition.getOrderByComparator());
 		}
-		else {
-			return blogsEntryPersistence.findByG_LtD_S(
-				groupId, displayDate, queryDefinition.getStatus(),
-				queryDefinition.getStart(), queryDefinition.getEnd(),
-				queryDefinition.getOrderByComparator());
-		}
+
+		return blogsEntryPersistence.findByG_LtD_S(
+			groupId, displayDate, queryDefinition.getStatus(),
+			queryDefinition.getStart(), queryDefinition.getEnd(),
+			queryDefinition.getOrderByComparator());
 	}
 
 	@Override
@@ -872,12 +870,10 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 				queryDefinition.getStart(), queryDefinition.getEnd(),
 				queryDefinition.getOrderByComparator());
 		}
-		else {
-			return blogsEntryPersistence.findByG_S(
-				groupId, queryDefinition.getStatus(),
-				queryDefinition.getStart(), queryDefinition.getEnd(),
-				queryDefinition.getOrderByComparator());
-		}
+
+		return blogsEntryPersistence.findByG_S(
+			groupId, queryDefinition.getStatus(), queryDefinition.getStart(),
+			queryDefinition.getEnd(), queryDefinition.getOrderByComparator());
 	}
 
 	@Override
@@ -889,10 +885,9 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			return blogsEntryPersistence.countByG_LtD_NotS(
 				groupId, displayDate, queryDefinition.getStatus());
 		}
-		else {
-			return blogsEntryPersistence.countByG_LtD_S(
-				groupId, displayDate, queryDefinition.getStatus());
-		}
+
+		return blogsEntryPersistence.countByG_LtD_S(
+			groupId, displayDate, queryDefinition.getStatus());
 	}
 
 	@Override
@@ -903,10 +898,9 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			return blogsEntryPersistence.countByG_NotS(
 				groupId, queryDefinition.getStatus());
 		}
-		else {
-			return blogsEntryPersistence.countByG_S(
-				groupId, queryDefinition.getStatus());
-		}
+
+		return blogsEntryPersistence.countByG_S(
+			groupId, queryDefinition.getStatus());
 	}
 
 	@Override
@@ -929,12 +923,11 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 				queryDefinition.getStart(), queryDefinition.getEnd(),
 				queryDefinition.getOrderByComparator());
 		}
-		else {
-			return blogsEntryPersistence.findByG_U_S(
-				groupId, userId, queryDefinition.getStatus(),
-				queryDefinition.getStart(), queryDefinition.getEnd(),
-				queryDefinition.getOrderByComparator());
-		}
+
+		return blogsEntryPersistence.findByG_U_S(
+			groupId, userId, queryDefinition.getStatus(),
+			queryDefinition.getStart(), queryDefinition.getEnd(),
+			queryDefinition.getOrderByComparator());
 	}
 
 	@Override
@@ -946,10 +939,9 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			return blogsEntryPersistence.countByG_U_LtD_NotS(
 				groupId, userId, displayDate, queryDefinition.getStatus());
 		}
-		else {
-			return blogsEntryPersistence.countByG_U_LtD_S(
-				groupId, userId, displayDate, queryDefinition.getStatus());
-		}
+
+		return blogsEntryPersistence.countByG_U_LtD_S(
+			groupId, userId, displayDate, queryDefinition.getStatus());
 	}
 
 	/**
@@ -1817,7 +1809,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			if (Validator.isNotNull(layoutURL)) {
 				return StringBundler.concat(
 					layoutURL, Portal.FRIENDLY_URL_SEPARATOR, "blogs",
-					StringPool.SLASH, String.valueOf(entry.getEntryId()));
+					StringPool.SLASH, entry.getEntryId());
 			}
 		}
 
@@ -1866,19 +1858,19 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 			Map<String, Serializable> workflowContext)
 		throws PortalException {
 
-		String entryURL = (String)workflowContext.get(
-			WorkflowConstants.CONTEXT_URL);
-
 		if (!entry.isApproved()) {
 			return;
 		}
+
+		String entryURL = (String)workflowContext.get(
+			WorkflowConstants.CONTEXT_URL);
 
 		if (Validator.isNull(entryURL)) {
 			String layoutFullURL = serviceContext.getLayoutFullURL();
 
 			entryURL = StringBundler.concat(
 				layoutFullURL, Portal.FRIENDLY_URL_SEPARATOR, "blogs",
-				StringPool.SLASH, String.valueOf(entry.getEntryId()));
+				StringPool.SLASH, entry.getEntryId());
 		}
 
 		BlogsGroupServiceSettings blogsGroupServiceSettings =
@@ -2251,14 +2243,14 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 	}
 
 	protected void validate(long smallImageFileEntryId) throws PortalException {
-		String[] imageExtensions = PrefsPropsUtil.getStringArray(
-			PropsKeys.BLOGS_IMAGE_EXTENSIONS, StringPool.COMMA);
-
 		if (smallImageFileEntryId != 0) {
 			FileEntry fileEntry = PortletFileRepositoryUtil.getPortletFileEntry(
 				smallImageFileEntryId);
 
 			boolean validSmallImageExtension = false;
+
+			String[] imageExtensions = PrefsPropsUtil.getStringArray(
+				PropsKeys.BLOGS_IMAGE_EXTENSIONS, StringPool.COMMA);
 
 			for (String imageExtension : imageExtensions) {
 				if (StringPool.STAR.equals(imageExtension) ||
@@ -2437,7 +2429,7 @@ public class BlogsEntryLocalServiceImpl extends BlogsEntryLocalServiceBaseImpl {
 		throw new PortalException(
 			StringBundler.concat(
 				"Unable to get a unique file name for ", fileName,
-				" in folder ", String.valueOf(folderId)));
+				" in folder ", folderId));
 	}
 
 	private String _getUniqueUrlTitle(BlogsEntry entry) {

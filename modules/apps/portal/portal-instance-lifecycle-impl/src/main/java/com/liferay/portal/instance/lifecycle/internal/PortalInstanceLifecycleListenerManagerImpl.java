@@ -22,7 +22,9 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
 
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -39,6 +41,10 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 public class PortalInstanceLifecycleListenerManagerImpl
 	implements PortalInstanceLifecycleManager {
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	@Override
 	public void preregisterCompany(long companyId) {
 		for (PortalInstanceLifecycleListener portalInstanceLifecycleListener :
@@ -121,9 +127,11 @@ public class PortalInstanceLifecycleListenerManagerImpl
 		}
 
 		Long companyId = CompanyThreadLocal.getCompanyId();
+		Locale siteDefaultLocale = LocaleThreadLocal.getSiteDefaultLocale();
 
 		try {
 			CompanyThreadLocal.setCompanyId(company.getCompanyId());
+			LocaleThreadLocal.setSiteDefaultLocale(null);
 
 			portalInstanceLifecycleListener.portalInstanceRegistered(company);
 		}
@@ -134,6 +142,7 @@ public class PortalInstanceLifecycleListenerManagerImpl
 		}
 		finally {
 			CompanyThreadLocal.setCompanyId(companyId);
+			LocaleThreadLocal.setSiteDefaultLocale(siteDefaultLocale);
 		}
 	}
 

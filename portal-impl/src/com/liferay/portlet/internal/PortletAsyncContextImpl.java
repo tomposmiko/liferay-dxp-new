@@ -14,36 +14,34 @@
 
 package com.liferay.portlet.internal;
 
-import com.liferay.portal.kernel.portlet.LiferayPortletAsyncContext;
+import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portlet.AsyncPortletServletRequest;
+import com.liferay.portlet.PortletAsyncListenerAdapter;
 
+import javax.portlet.PortletAsyncContext;
 import javax.portlet.PortletAsyncListener;
 import javax.portlet.PortletException;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 
 import javax.servlet.AsyncContext;
-import javax.servlet.AsyncListener;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletRequestWrapper;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Neil Griffin
+ * @author Dante Wang
+ * @author Leon Chi
  */
-public class PortletAsyncContextImpl implements LiferayPortletAsyncContext {
-
-	@Override
-	public void addListener(AsyncListener asyncListener) {
-
-		// TODO
-
-		throw new UnsupportedOperationException();
-	}
+public class PortletAsyncContextImpl implements PortletAsyncContext {
 
 	@Override
 	public void addListener(PortletAsyncListener portletAsyncListener)
 		throws IllegalStateException {
 
-		// TODO
-
-		throw new UnsupportedOperationException();
+		addListener(portletAsyncListener, null, null);
 	}
 
 	@Override
@@ -52,17 +50,19 @@ public class PortletAsyncContextImpl implements LiferayPortletAsyncContext {
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IllegalStateException {
 
-		// TODO
+		if (!_resourceRequest.isAsyncStarted() || _returnedToContainer) {
+			throw new IllegalStateException();
+		}
 
-		throw new UnsupportedOperationException();
+		_portletAsyncListenerAdapter.addListener(
+			portletAsyncListener, resourceRequest, resourceResponse);
 	}
 
 	@Override
 	public void complete() throws IllegalStateException {
+		_asyncContext.complete();
 
-		// TODO
-
-		throw new UnsupportedOperationException();
+		_calledComplete = true;
 	}
 
 	@Override
@@ -77,98 +77,152 @@ public class PortletAsyncContextImpl implements LiferayPortletAsyncContext {
 
 	@Override
 	public void dispatch() throws IllegalStateException {
-		throw new UnsupportedOperationException();
+		if (!_resourceRequest.isAsyncStarted() || _calledComplete ||
+			_calledDispatch) {
 
-		// TODO
+			throw new IllegalStateException();
+		}
 
+		HttpServletRequest originalHttpServletRequest =
+			(HttpServletRequest)_getOriginalServletRequest();
+
+		String path = StringBundler.concat(
+			originalHttpServletRequest.getRequestURI(), "?",
+			originalHttpServletRequest.getQueryString());
+
+		ServletContext servletContext =
+			originalHttpServletRequest.getServletContext();
+
+		_asyncPortletServletRequest.update(
+			servletContext.getContextPath(), path);
+
+		_asyncContext.dispatch(servletContext, path);
+
+		_calledDispatch = true;
 	}
 
 	@Override
 	public void dispatch(String path) throws IllegalStateException {
+		if (!_resourceRequest.isAsyncStarted() || _calledComplete ||
+			_calledDispatch) {
 
-		// TODO
+			throw new IllegalStateException();
+		}
 
-		throw new UnsupportedOperationException();
-	}
+		ServletRequest originalServletRequest = _getOriginalServletRequest();
 
-	@Override
-	public void doStart() {
+		ServletContext servletContext =
+			originalServletRequest.getServletContext();
 
-		// TODO
+		String contextPath = _resourceRequest.getContextPath();
 
-		throw new UnsupportedOperationException();
+		path = contextPath.concat(path);
+
+		_asyncPortletServletRequest.update(
+			servletContext.getContextPath(), path);
+
+		_asyncContext.dispatch(servletContext, path);
+
+		_calledDispatch = true;
 	}
 
 	@Override
 	public ResourceRequest getResourceRequest() throws IllegalStateException {
+		if (_calledComplete ||
+			(_calledDispatch && !_resourceRequest.isAsyncStarted())) {
 
-		// TODO
+			throw new IllegalStateException();
+		}
 
-		throw new UnsupportedOperationException();
+		return _resourceRequest;
 	}
 
 	@Override
 	public ResourceResponse getResourceResponse() throws IllegalStateException {
+		if (_calledComplete ||
+			(_calledDispatch && !_resourceRequest.isAsyncStarted())) {
 
-		// TODO
+			throw new IllegalStateException();
+		}
 
-		throw new UnsupportedOperationException();
+		return _resourceResponse;
 	}
 
 	@Override
 	public long getTimeout() {
-
-		// TODO
-
-		throw new UnsupportedOperationException();
+		return _asyncContext.getTimeout();
 	}
 
 	@Override
 	public boolean hasOriginalRequestAndResponse() {
-
-		// TODO
-
-		throw new UnsupportedOperationException();
+		return _hasOriginalRequestAndResponse;
 	}
 
-	@Override
 	public boolean isCalledDispatch() {
-
-		// TODO
-
-		throw new UnsupportedOperationException();
+		return _calledDispatch;
 	}
 
-	@Override
-	public void removeListener(AsyncListener asyncListener) {
-
-		// TODO
-
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void reset(AsyncContext asyncContext) {
-
-		// TODO
-
-		throw new UnsupportedOperationException();
+	public void setReturnedToContainer() {
+		_returnedToContainer = true;
 	}
 
 	@Override
 	public void setTimeout(long timeout) {
-
-		// TODO
-
-		throw new UnsupportedOperationException();
+		_asyncContext.setTimeout(timeout);
 	}
 
 	@Override
 	public void start(Runnable runnable) throws IllegalStateException {
-
-		// TODO
-
-		throw new UnsupportedOperationException();
+		_asyncContext.start(runnable);
 	}
+
+	protected void initialize(
+		ResourceRequest resourceRequest, ResourceResponse resourceResponse,
+		AsyncContext asyncContext, boolean hasOriginalRequestAndResponse) {
+
+		_resourceRequest = resourceRequest;
+		_resourceResponse = resourceResponse;
+		_asyncContext = asyncContext;
+		_hasOriginalRequestAndResponse = hasOriginalRequestAndResponse;
+
+		_calledDispatch = false;
+		_calledComplete = false;
+		_returnedToContainer = false;
+
+		if (_portletAsyncListenerAdapter == null) {
+			_portletAsyncListenerAdapter = new PortletAsyncListenerAdapter(
+				this);
+
+			_asyncContext.addListener(_portletAsyncListenerAdapter);
+		}
+
+		if (_asyncPortletServletRequest == null) {
+			_asyncPortletServletRequest =
+				(AsyncPortletServletRequest)_asyncContext.getRequest();
+		}
+	}
+
+	private ServletRequest _getOriginalServletRequest() {
+		ServletRequest originalServletRequest = _asyncPortletServletRequest;
+
+		while (originalServletRequest instanceof ServletRequestWrapper) {
+			ServletRequestWrapper servletRequestWrapper =
+				(ServletRequestWrapper)originalServletRequest;
+
+			originalServletRequest = servletRequestWrapper.getRequest();
+		}
+
+		return originalServletRequest;
+	}
+
+	private AsyncContext _asyncContext;
+	private AsyncPortletServletRequest _asyncPortletServletRequest;
+	private boolean _calledComplete;
+	private boolean _calledDispatch;
+	private boolean _hasOriginalRequestAndResponse;
+	private PortletAsyncListenerAdapter _portletAsyncListenerAdapter;
+	private ResourceRequest _resourceRequest;
+	private ResourceResponse _resourceResponse;
+	private boolean _returnedToContainer;
 
 }

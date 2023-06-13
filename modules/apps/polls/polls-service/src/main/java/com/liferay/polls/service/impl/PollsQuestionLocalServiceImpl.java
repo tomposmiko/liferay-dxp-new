@@ -337,11 +337,11 @@ public class PollsQuestionLocalServiceImpl
 
 		// Question
 
-		User user = userLocalService.getUser(userId);
-
 		Date expirationDate = null;
 
 		if (!neverExpire) {
+			User user = userLocalService.getUser(userId);
+
 			expirationDate = PortalUtil.getDate(
 				expirationDateMonth, expirationDateDay, expirationDateYear,
 				expirationDateHour, expirationDateMinute, user.getTimeZone(),
@@ -453,6 +453,7 @@ public class PollsQuestionLocalServiceImpl
 		OrderByComparator<PollsQuestion> orderByComparator) {
 
 		String[] fields = orderByComparator.getOrderByFields();
+
 		boolean reverse = !orderByComparator.isAscending();
 		String field = fields[0];
 

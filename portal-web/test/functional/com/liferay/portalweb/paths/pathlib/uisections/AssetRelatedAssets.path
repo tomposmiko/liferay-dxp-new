@@ -24,11 +24,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>IMAGE</td>
-	<td>//li[@class='asset-links-list-item']//i</td>
-	<td></td>
-</tr>
-<tr>
 	<td>RELATED_ASSETS_SELECT</td>
 	<td>//div[contains(@class,'select-existing')]/a[@title='Select']</td>
 	<td></td>
@@ -41,6 +36,11 @@
 <tr>
 	<td>ASSET_TITLE</td>
 	<td>//li[@class='asset-links-list-item']//a/span | //li[@class='asset-links-list-item']//a</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
 	<td></td>
 </tr>
 <!--This is temporary. After path restructure, the ideal solution is to make the path variable more generic.-->
@@ -80,17 +80,6 @@
 	<td></td>
 	<td></td>
 </tr>
-<!--BOOKMARKS_ENTRY-->
-<tr>
-	<td>BOOKMARKS_ENTRY_NAVIGATION_ADD_BOOKMARKS_ENTRY</td>
-	<td>//div[@class='navbar-inner' or contains(@class,'navbar-default')]//li/a[contains(@href,'BookmarksEntry')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
 <!--MESSAGE_BOARDS_THREAD-->
 <tr>
 	<td>MESSAGE_BOARDS_THREAD_TITLE</td>
@@ -103,11 +92,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<tr>
 	<td>SELECT_ASSET_IFRAME</td>
 	<td>//iframe[contains(@id,'selectAsset')]</td>
 	<td></td>
@@ -117,7 +101,6 @@
 	<td></td>
 	<td></td>
 </tr>
-<!--This is temporary. After path restructure, the ideal solution is to make the key_kbArticleRelatedAssetTitle path variable more generic.-->
 <!--KB_ASSET_TABLE-->
 <tr>
 	<td>KB_ASSET_TABLE_TITLE_LINK</td>
@@ -130,6 +113,11 @@
 	<td></td>
 </tr>
 <!--ASSET_TABLE-->
+<tr>
+	<td>ASSET_TABLE_CHECKBOX</td>
+	<td>//tr[contains(.,'${key_assetTitle}')]/td//input[@type='checkbox']</td>
+	<td></td>
+</tr>
 <tr>
 	<td>ASSET_TABLE_CHOOSE</td>
 	<td>//tr[contains(.,'${key_assetTitle}')]/td//a</td>

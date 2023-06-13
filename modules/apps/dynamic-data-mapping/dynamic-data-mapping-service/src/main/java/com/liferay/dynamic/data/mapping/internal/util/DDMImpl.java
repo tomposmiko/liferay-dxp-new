@@ -56,7 +56,6 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Image;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.security.pacl.DoPrivileged;
 import com.liferay.portal.kernel.service.ImageLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
@@ -107,8 +106,7 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eduardo Garcia
  * @author Marcellus Tavares
  */
-@Component(immediate = true)
-@DoPrivileged
+@Component(immediate = true, service = DDM.class)
 public class DDMImpl implements DDM {
 
 	public static final String FIELDS_DISPLAY_NAME = "_fieldsDisplay";

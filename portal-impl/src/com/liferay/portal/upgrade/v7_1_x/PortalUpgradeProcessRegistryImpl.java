@@ -41,6 +41,12 @@ public class PortalUpgradeProcessRegistryImpl
 
 		upgradeProcesses.put(
 			new Version("2.0.0"), new UpgradeAssetTagsPermission());
+
+		upgradeProcesses.put(
+			new Version("2.0.1"), new UpgradeDocumentLibrary());
+
+		upgradeProcesses.put(
+			new Version("2.0.2"), new UpgradePasswordPolicyRegex());
 	}
 
 }

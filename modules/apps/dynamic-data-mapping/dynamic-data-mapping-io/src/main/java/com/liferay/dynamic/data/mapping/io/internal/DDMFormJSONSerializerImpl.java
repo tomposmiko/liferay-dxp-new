@@ -45,7 +45,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Marcellus Tavares
  */
-@Component(immediate = true)
+@Component(immediate = true, service = DDMFormJSONSerializer.class)
 public class DDMFormJSONSerializerImpl implements DDMFormJSONSerializer {
 
 	@Override
@@ -243,9 +243,8 @@ public class DDMFormJSONSerializerImpl implements DDMFormJSONSerializer {
 
 			return toJSONObject((DDMFormFieldValidation)property);
 		}
-		else {
-			return String.valueOf(property);
-		}
+
+		return String.valueOf(property);
 	}
 
 	@Reference(unbind = "-")

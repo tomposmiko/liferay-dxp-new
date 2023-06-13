@@ -1,0 +1,25 @@
+#
+# Liferay App Version 1.0.0
+#
+
+app.artifacts-1.0.0=\
+	com.liferay.portal.background.task.api-3.0.0.jar,\
+	com.liferay.portal.background.task.service-4.0.1.jar,\
+	com.liferay.portal.background.task.web-3.0.0.jar
+
+app.change.log-1.0.0=LPS-79653 LPS-80332 LPS-82485
+
+app.git.id-1.0.0=bf9943b93ff9473888db9fac9695168575fa3ab2
+
+#
+# Liferay App Version 1.0.1
+#
+
+app.artifacts-1.0.1=\
+	com.liferay.portal.background.task.api-3.0.1.jar,\
+	com.liferay.portal.background.task.service-4.0.9.jar,\
+	com.liferay.portal.background.task.web-3.0.0.jar
+
+app.change.log-1.0.1=LPS-74544 LPS-78938 LPS-83505 LPS-84093 LPS-84119 LPS-85849 LPS-86714 
+
+app.git.id-1.0.1=9aae833f1e798f25e9186f76ab2efb63d98f7fa1

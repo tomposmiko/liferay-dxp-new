@@ -14,6 +14,7 @@
 
 package com.liferay.trash.service.impl;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DefaultActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -40,7 +41,6 @@ import com.liferay.portal.kernel.trash.TrashRenderer;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.OrderByComparator;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.trash.kernel.util.TrashUtil;
 import com.liferay.trash.model.TrashEntry;
@@ -86,7 +86,6 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 			UnicodeProperties typeSettingsProperties)
 		throws PortalException {
 
-		User user = userLocalService.getUserById(userId);
 		long classNameId = classNameLocalService.getClassNameId(className);
 
 		TrashEntry trashEntry = trashEntryPersistence.fetchByC_C(
@@ -107,9 +106,13 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 		trashEntry = trashEntryPersistence.create(entryId);
 
 		trashEntry.setGroupId(groupId);
+
+		User user = userLocalService.getUserById(userId);
+
 		trashEntry.setCompanyId(user.getCompanyId());
 		trashEntry.setUserId(user.getUserId());
 		trashEntry.setUserName(user.getFullName());
+
 		trashEntry.setCreateDate(new Date());
 		trashEntry.setClassNameId(classNameId);
 		trashEntry.setClassPK(classPK);
@@ -151,42 +154,35 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 			trashEntryLocalService.getActionableDynamicQuery();
 
 		actionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.PerformActionMethod<TrashEntry>() {
+			(TrashEntry trashEntry) -> {
+				Group group = groupLocalService.fetchGroup(
+					trashEntry.getGroupId());
 
-				@Override
-				public void performAction(TrashEntry trashEntry)
-					throws PortalException {
+				if (group == null) {
+					return;
+				}
 
-					Date createDate = trashEntry.getCreateDate();
+				Date createDate = trashEntry.getCreateDate();
 
-					Group group = groupLocalService.fetchGroup(
-						trashEntry.getGroupId());
+				Date date = getMaxAge(group);
 
-					if (group == null) {
-						return;
-					}
+				if (createDate.before(date) ||
+					!TrashUtil.isTrashEnabled(group)) {
 
-					Date date = getMaxAge(group);
+					TrashHandler trashHandler =
+						TrashHandlerRegistryUtil.getTrashHandler(
+							trashEntry.getClassName());
 
-					if (createDate.before(date) ||
-						!TrashUtil.isTrashEnabled(group)) {
-
-						TrashHandler trashHandler =
-							TrashHandlerRegistryUtil.getTrashHandler(
-								trashEntry.getClassName());
-
-						if (trashHandler != null) {
-							try {
-								trashHandler.deleteTrashEntry(
-									trashEntry.getClassPK());
-							}
-							catch (Exception e) {
-								_log.error(e, e);
-							}
+					if (trashHandler != null) {
+						try {
+							trashHandler.deleteTrashEntry(
+								trashEntry.getClassPK());
+						}
+						catch (Exception e) {
+							_log.error(e, e);
 						}
 					}
 				}
-
 			});
 		actionableDynamicQuery.setTransactionConfig(
 			DefaultActionableDynamicQuery.REQUIRES_NEW_TRANSACTION_CONFIG);
@@ -518,7 +514,7 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 					_log.warn(
 						StringBundler.concat(
 							"Unable to find trash entry for ", entryClassName,
-							" with primary key ", String.valueOf(classPK)));
+							" with primary key ", classPK));
 				}
 			}
 		}

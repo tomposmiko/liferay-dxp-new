@@ -20,12 +20,12 @@ import com.liferay.message.boards.model.MBMessage;
 import com.liferay.message.boards.model.MBThread;
 import com.liferay.message.boards.service.MBMessageLocalService;
 import com.liferay.message.boards.service.MBThreadLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.social.kernel.model.BaseSocialActivityInterpreter;
 import com.liferay.social.kernel.model.SocialActivity;
@@ -108,6 +108,7 @@ public class MBThreadActivityInterpreter extends BaseSocialActivityInterpreter {
 		ServiceContext serviceContext) {
 
 		String userName = getUserName(activity.getUserId(), serviceContext);
+
 		String receiverUserName = StringPool.BLANK;
 
 		if (activity.getReceiverUserId() > 0) {
@@ -130,9 +131,8 @@ public class MBThreadActivityInterpreter extends BaseSocialActivityInterpreter {
 			if (Validator.isNull(groupName)) {
 				return "activity-message-boards-thread-move-to-trash";
 			}
-			else {
-				return "activity-message-boards-thread-move-to-trash-in";
-			}
+
+			return "activity-message-boards-thread-move-to-trash-in";
 		}
 		else if (activityType ==
 					SocialActivityConstants.TYPE_RESTORE_FROM_TRASH) {
@@ -140,9 +140,8 @@ public class MBThreadActivityInterpreter extends BaseSocialActivityInterpreter {
 			if (Validator.isNull(groupName)) {
 				return "activity-message-boards-thread-restore-from-trash";
 			}
-			else {
-				return "activity-message-boards-thread-restore-from-trash-in";
-			}
+
+			return "activity-message-boards-thread-restore-from-trash-in";
 		}
 
 		return null;

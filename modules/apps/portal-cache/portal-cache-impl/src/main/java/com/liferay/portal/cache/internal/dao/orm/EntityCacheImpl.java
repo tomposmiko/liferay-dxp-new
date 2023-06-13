@@ -15,6 +15,7 @@
 package com.liferay.portal.cache.internal.dao.orm;
 
 import com.liferay.petra.lang.CentralizedThreadLocal;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.cache.CacheRegistryItem;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
@@ -34,7 +35,7 @@ import com.liferay.portal.kernel.model.MVCCModel;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.servlet.filters.threadlocal.ThreadLocalFilterThreadLocal;
 
 import java.io.Serializable;
 
@@ -74,14 +75,12 @@ public class EntityCacheImpl
 
 		PortalCache<?, ?> portalCache = getPortalCache(clazz);
 
-		if (portalCache != null) {
-			portalCache.removeAll();
-		}
+		portalCache.removeAll();
 	}
 
 	@Override
 	public void clearLocalCache() {
-		if (_localCacheAvailable) {
+		if (_isLocalCacheEnabled()) {
 			_localCache.remove();
 		}
 	}
@@ -150,7 +149,7 @@ public class EntityCacheImpl
 
 		Serializable localCacheKey = null;
 
-		if (_localCacheAvailable) {
+		if (_isLocalCacheEnabled()) {
 			localCache = _localCache.get();
 
 			localCacheKey = new LocalCacheKey(clazz.getName(), primaryKey);
@@ -168,7 +167,7 @@ public class EntityCacheImpl
 				result = StringPool.BLANK;
 			}
 
-			if (_localCacheAvailable) {
+			if (localCache != null) {
 				localCache.put(localCacheKey, result);
 			}
 		}
@@ -211,7 +210,7 @@ public class EntityCacheImpl
 
 		Serializable localCacheKey = null;
 
-		if (_localCacheAvailable) {
+		if (_isLocalCacheEnabled()) {
 			localCache = _localCache.get();
 
 			localCacheKey = new LocalCacheKey(clazz.getName(), primaryKey);
@@ -231,8 +230,7 @@ public class EntityCacheImpl
 				if (_log.isDebugEnabled()) {
 					_log.debug(
 						StringBundler.concat(
-							"Load ", String.valueOf(clazz), " ",
-							String.valueOf(primaryKey), " from session"));
+							"Load ", clazz, " ", primaryKey, " from session"));
 				}
 
 				Session session = null;
@@ -257,7 +255,7 @@ public class EntityCacheImpl
 				}
 			}
 
-			if (_localCacheAvailable) {
+			if (localCache != null) {
 				localCache.put(localCacheKey, result);
 			}
 		}
@@ -275,7 +273,10 @@ public class EntityCacheImpl
 
 	@Override
 	public void notifyPortalCacheRemoved(String portalCacheName) {
-		_portalCaches.remove(portalCacheName);
+		if (portalCacheName.startsWith(_GROUP_KEY_PREFIX)) {
+			_portalCaches.remove(
+				portalCacheName.substring(_GROUP_KEY_PREFIX.length()));
+		}
 	}
 
 	@Override
@@ -299,7 +300,7 @@ public class EntityCacheImpl
 
 		result = ((BaseModel<?>)result).toCacheModel();
 
-		if (_localCacheAvailable) {
+		if (_isLocalCacheEnabled()) {
 			Map<Serializable, Serializable> localCache = _localCache.get();
 
 			Serializable localCacheKey = new LocalCacheKey(
@@ -339,7 +340,7 @@ public class EntityCacheImpl
 			return;
 		}
 
-		if (_localCacheAvailable) {
+		if (_isLocalCacheEnabled()) {
 			Map<Serializable, Serializable> localCache = _localCache.get();
 
 			Serializable localCacheKey = new LocalCacheKey(
@@ -369,24 +370,18 @@ public class EntityCacheImpl
 				PropsKeys.VALUE_OBJECT_ENTITY_THREAD_LOCAL_CACHE_MAX_SIZE));
 
 		if (localCacheMaxSize > 0) {
-			_localCacheAvailable = true;
-
 			_localCache = new CentralizedThreadLocal<>(
 				EntityCacheImpl.class + "._localCache",
 				() -> new LRUMap(localCacheMaxSize));
 		}
 		else {
-			_localCacheAvailable = false;
-
 			_localCache = null;
 		}
 
-		PortalCacheManager
-			<? extends Serializable, ? extends Serializable>
-				portalCacheManager = _multiVMPool.getPortalCacheManager();
+		PortalCacheManager<? extends Serializable, ? extends Serializable>
+			portalCacheManager = _multiVMPool.getPortalCacheManager();
 
-		portalCacheManager.registerPortalCacheManagerListener(
-			EntityCacheImpl.this);
+		portalCacheManager.registerPortalCacheManagerListener(this);
 	}
 
 	@Reference(unbind = "-")
@@ -397,6 +392,14 @@ public class EntityCacheImpl
 	@Reference(unbind = "-")
 	protected void setProps(Props props) {
 		_props = props;
+	}
+
+	private boolean _isLocalCacheEnabled() {
+		if (_localCache == null) {
+			return false;
+		}
+
+		return ThreadLocalFilterThreadLocal.isFilterInvoked();
 	}
 
 	private Serializable _toEntityModel(Serializable result) {
@@ -420,7 +423,6 @@ public class EntityCacheImpl
 		EntityCacheImpl.class);
 
 	private ThreadLocal<LRUMap> _localCache;
-	private boolean _localCacheAvailable;
 	private MultiVMPool _multiVMPool;
 	private final ConcurrentMap<String, PortalCache<Serializable, Serializable>>
 		_portalCaches = new ConcurrentHashMap<>();

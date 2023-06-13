@@ -14,6 +14,7 @@
 
 package com.liferay.portal.background.task.service.persistence.impl;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.background.task.model.BackgroundTask;
 import com.liferay.portal.background.task.model.impl.BackgroundTaskImpl;
@@ -25,7 +26,6 @@ import com.liferay.portal.kernel.dao.orm.SQLQuery;
 import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.spring.extender.service.ServiceReference;
@@ -89,11 +89,11 @@ public class BackgroundTaskFinderImpl
 	}
 
 	private String _getGroupCriteria(long[] groupIds) {
-		StringBundler sb = new StringBundler();
-
 		String result = StringPool.BLANK;
 
 		if (groupIds.length > 0) {
+			StringBundler sb = new StringBundler(groupIds.length + 2);
+
 			sb.append(StringPool.OPEN_PARENTHESIS);
 
 			for (int i = 0; i < groupIds.length; i++) {
@@ -110,11 +110,11 @@ public class BackgroundTaskFinderImpl
 	}
 
 	private String _getTaskExecutorClassNameCriteria(String[] classNames) {
-		StringBundler sb = new StringBundler();
-
 		String result = StringPool.BLANK;
 
 		if (classNames.length > 0) {
+			StringBundler sb = new StringBundler(classNames.length + 2);
+
 			sb.append(StringPool.OPEN_PARENTHESIS);
 
 			for (int i = 0; i < classNames.length; i++) {

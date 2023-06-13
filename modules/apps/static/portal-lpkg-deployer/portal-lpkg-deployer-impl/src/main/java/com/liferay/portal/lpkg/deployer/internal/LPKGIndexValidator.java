@@ -48,8 +48,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import java.security.MessageDigest;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -61,8 +59,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.zip.CRC32;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -386,6 +383,8 @@ public class LPKGIndexValidator {
 	}
 
 	private String _toChecksum(URI uri) throws Exception {
+		CRC32 crc32 = new CRC32();
+
 		URL url = uri.toURL();
 
 		UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
@@ -395,20 +394,9 @@ public class LPKGIndexValidator {
 
 		String content = unsyncByteArrayOutputStream.toString(StringPool.UTF8);
 
-		Matcher matcher = _incrementPattern.matcher(content);
+		crc32.update(content.getBytes(StandardCharsets.UTF_8));
 
-		if (matcher.find()) {
-			String start = content.substring(0, matcher.start(1));
-			String end = content.substring(matcher.end(1));
-
-			content = start.concat(end);
-		}
-
-		MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-
-		messageDigest.update(content.getBytes(StandardCharsets.UTF_8));
-
-		return StringUtil.bytesToHexString(messageDigest.digest());
+		return StringUtil.toHexString(crc32.getValue());
 	}
 
 	private String _toIntegrityKey(URI uri) {
@@ -425,9 +413,6 @@ public class LPKGIndexValidator {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		LPKGIndexValidator.class);
-
-	private static final Pattern _incrementPattern = Pattern.compile(
-		"<repository( increment=\"\\d*\")");
 
 	@Reference
 	private BytesURLProtocolSupport _bytesURLProtocolSupport;

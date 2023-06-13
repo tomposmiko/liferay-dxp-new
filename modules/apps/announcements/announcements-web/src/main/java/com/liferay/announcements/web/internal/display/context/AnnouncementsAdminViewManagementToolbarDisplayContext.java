@@ -58,7 +58,7 @@ public class AnnouncementsAdminViewManagementToolbarDisplayContext {
 				add(
 					dropdownItem -> {
 						dropdownItem.putData("action", "deleteEntries");
-						dropdownItem.setIcon("trash");
+						dropdownItem.setIcon("times");
 						dropdownItem.setLabel(
 							LanguageUtil.get(_request, "delete"));
 						dropdownItem.setQuickAction(true);

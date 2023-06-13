@@ -18,9 +18,10 @@ import com.liferay.dynamic.data.mapping.io.DDMFormJSONDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormJSONSerializer;
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.model.DDMFormField;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
-import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.GetterUtil;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -62,13 +63,14 @@ public class UpgradeDDMFormFieldSettings extends UpgradeProcess {
 
 			try (ResultSet rs = ps1.executeQuery()) {
 				while (rs.next()) {
-					long structureId = rs.getLong(1);
 					String definition = rs.getString(2);
 
 					String newDefinition = upgradeRecordSetStructure(
 						definition);
 
 					ps2.setString(1, newDefinition);
+
+					long structureId = rs.getLong(1);
 
 					ps2.setLong(2, structureId);
 
@@ -89,8 +91,15 @@ public class UpgradeDDMFormFieldSettings extends UpgradeProcess {
 			Map<String, Object> properties = ddmFormField.getProperties();
 
 			if (properties.containsKey("ddmDataProviderInstanceId")) {
+				String ddmDataProviderInstanceId = GetterUtil.getString(
+					properties.get("ddmDataProviderInstanceId"));
+
 				properties.put(
-					"ddmDataProviderInstanceOutput", "Default-Output");
+					"ddmDataProviderInstanceId",
+					"[\"" + ddmDataProviderInstanceId + "\"]");
+
+				properties.put(
+					"ddmDataProviderInstanceOutput", "[\"Default-Output\"]");
 			}
 		}
 

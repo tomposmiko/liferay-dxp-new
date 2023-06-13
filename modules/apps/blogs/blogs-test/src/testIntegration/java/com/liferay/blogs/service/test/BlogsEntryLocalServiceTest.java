@@ -26,6 +26,7 @@ import com.liferay.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.blogs.test.util.BlogsTestUtil;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.message.boards.service.MBMessageLocalServiceUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
@@ -47,13 +48,13 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.OrganizationTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
+import com.liferay.portal.kernel.test.util.TestDataConstants;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -124,6 +125,44 @@ public class BlogsEntryLocalServiceTest {
 		_user = TestPropsValues.getUser();
 
 		ServiceTestUtil.setUser(TestPropsValues.getUser());
+	}
+
+	@Test
+	public void testAddCoverImageWithCoverImageURL() throws Exception {
+		BlogsEntry entry = addEntry(false);
+
+		String coverImageURL = StringUtil.randomString();
+
+		BlogsEntryLocalServiceUtil.addCoverImage(
+			entry.getEntryId(), new ImageSelector(coverImageURL));
+
+		BlogsEntry updatedEntry = BlogsEntryLocalServiceUtil.getEntry(
+			entry.getEntryId());
+
+		Assert.assertEquals(0, updatedEntry.getCoverImageFileEntryId());
+		Assert.assertEquals(coverImageURL, updatedEntry.getCoverImageURL());
+		Assert.assertFalse(updatedEntry.isSmallImage());
+	}
+
+	@Test
+	public void testAddCoverImageWithImageBytes() throws Exception {
+		BlogsEntry entry = addEntry(false);
+
+		byte[] bytes = FileUtil.getBytes(
+			new UnsyncByteArrayInputStream(TestDataConstants.TEST_BYTE_ARRAY));
+
+		BlogsEntryLocalServiceUtil.addCoverImage(
+			entry.getEntryId(),
+			new ImageSelector(
+				bytes, StringUtil.randomString() + ".bin",
+				ContentTypes.APPLICATION_OCTET_STREAM, StringPool.BLANK));
+
+		BlogsEntry updatedEntry = BlogsEntryLocalServiceUtil.getEntry(
+			entry.getEntryId());
+
+		Assert.assertNotEquals(0, updatedEntry.getCoverImageFileEntryId());
+		Assert.assertEquals(StringPool.BLANK, updatedEntry.getCoverImageURL());
+		Assert.assertFalse(updatedEntry.isSmallImage());
 	}
 
 	@Test
@@ -341,6 +380,7 @@ public class BlogsEntryLocalServiceTest {
 
 		Assert.assertEquals(0, updatedEntry.getCoverImageFileEntryId());
 		Assert.assertEquals(StringPool.BLANK, updatedEntry.getCoverImageURL());
+		Assert.assertFalse(updatedEntry.isSmallImage());
 	}
 
 	@Test
@@ -394,6 +434,23 @@ public class BlogsEntryLocalServiceTest {
 		Assert.assertEquals(BlogsConstants.SERVICE_NAME, folder.getName());
 	}
 
+	@Test
+	public void testAddSmallImageWithSmallImageURL() throws Exception {
+		BlogsEntry entry = addEntry(false);
+
+		String imageURL = StringUtil.randomString();
+
+		BlogsEntryLocalServiceUtil.addSmallImage(
+			entry.getEntryId(), new ImageSelector(imageURL));
+
+		BlogsEntry updatedEntry = BlogsEntryLocalServiceUtil.getEntry(
+			entry.getEntryId());
+
+		Assert.assertEquals(0, updatedEntry.getSmallImageFileEntryId());
+		Assert.assertEquals(imageURL, updatedEntry.getSmallImageURL());
+		Assert.assertTrue(updatedEntry.isSmallImage());
+	}
+
 	@Test(expected = NoSuchEntryException.class)
 	public void testDeleteEntry() throws Exception {
 		BlogsEntry entry = addEntry(false);
@@ -407,8 +464,13 @@ public class BlogsEntryLocalServiceTest {
 	public void testFetchNotNullAttachmentsFolder() throws Exception {
 		BlogsEntry entry = addEntry(false);
 
-		byte[] bytes = FileUtil.getBytes(
-			RandomTestUtil.randomInputStream(randomValue -> true));
+		byte[] bytes = null;
+
+		try (InputStream inputStream = new UnsyncByteArrayInputStream(
+				TestDataConstants.TEST_BYTE_ARRAY)) {
+
+			bytes = FileUtil.getBytes(inputStream);
+		}
 
 		BlogsEntryLocalServiceUtil.addOriginalImageFileEntry(
 			entry.getUserId(), entry.getGroupId(), entry.getEntryId(),

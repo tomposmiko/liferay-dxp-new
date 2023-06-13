@@ -147,7 +147,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.use-default-template=true",
 		"javax.portlet.display-name=Sites Admin",
 		"javax.portlet.expiration-cache=0",
-		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + SiteAdminPortletKeys.SITE_ADMIN,
 		"javax.portlet.resource-bundle=content.Language",
@@ -668,8 +668,6 @@ public class SiteAdminPortlet extends MVCPortlet {
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		long userId = portal.getUserId(actionRequest);
-
 		long liveGroupId = ParamUtil.getLong(actionRequest, "liveGroupId");
 
 		long parentGroupId = ParamUtil.getLong(
@@ -679,7 +677,6 @@ public class SiteAdminPortlet extends MVCPortlet {
 		Map<Locale, String> descriptionMap = null;
 		int type = 0;
 		String friendlyURL = null;
-		String name = null;
 		boolean inheritContent = false;
 		boolean active = false;
 		boolean manualMembership = true;
@@ -708,7 +705,7 @@ public class SiteAdminPortlet extends MVCPortlet {
 
 			// Add group
 
-			name = ParamUtil.getString(actionRequest, "name");
+			String name = ParamUtil.getString(actionRequest, "name");
 			nameMap = LocalizationUtil.getLocalizationMap(
 				actionRequest, "name");
 			descriptionMap = LocalizationUtil.getLocalizationMap(
@@ -721,6 +718,7 @@ public class SiteAdminPortlet extends MVCPortlet {
 			inheritContent = ParamUtil.getBoolean(
 				actionRequest, "inheritContent");
 			active = ParamUtil.getBoolean(actionRequest, "active", true);
+			long userId = portal.getUserId(actionRequest);
 
 			if (Validator.isNotNull(name)) {
 				nameMap.put(LocaleUtil.getDefault(), name);

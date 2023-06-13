@@ -187,15 +187,15 @@ public class DDMFormEvaluatorHelper {
 	protected void createDDMFormFieldRuleEvaluationResultsMap(
 		DDMFormField ddmFormField) {
 
-		List<DDMFormFieldEvaluationResult>
-			ddmFormFieldEvaluationResultInstances = new ArrayList<>();
-
 		List<DDMFormFieldValue> ddmFormFieldValues = _ddmFormFieldValuesMap.get(
 			ddmFormField.getName());
 
 		if (ddmFormFieldValues == null) {
 			return;
 		}
+
+		List<DDMFormFieldEvaluationResult>
+			ddmFormFieldEvaluationResultInstances = new ArrayList<>();
 
 		for (DDMFormFieldValue ddmFormFieldValue : ddmFormFieldValues) {
 			DDMFormFieldEvaluationResult ddmFormFieldEvaluationResult =

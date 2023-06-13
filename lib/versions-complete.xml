@@ -125,18 +125,7 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.apio.architect.api.jar!gson.jar</file-name>
-				<version>2.8.1</version>
-				<project-name>Gson</project-name>
-				<licenses>
-					<license>
-						<license-name>Apache 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.apio.architect.jaxrs.json.jar!cdi-api.jar</file-name>
+				<file-name>com.liferay.apio.architect.impl.jar!cdi-api.jar</file-name>
 				<version>2.0</version>
 				<project-name>CDI APIs</project-name>
 				<project-url>http://cdi-spec.org</project-url>
@@ -148,7 +137,7 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.apio.architect.jaxrs.json.jar!commons-fileupload.jar</file-name>
+				<file-name>com.liferay.apio.architect.impl.jar!commons-fileupload.jar</file-name>
 				<version>1.3.3</version>
 				<project-name>Apache Commons FileUpload</project-name>
 				<project-url>http://commons.apache.org/proper/commons-fileupload/</project-url>
@@ -160,7 +149,7 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.apio.architect.jaxrs.json.jar!commons-io.jar</file-name>
+				<file-name>com.liferay.apio.architect.impl.jar!commons-io.jar</file-name>
 				<version>1.3.2</version>
 				<project-name>Commons IO</project-name>
 				<project-url>http://jakarta.apache.org/commons/io/</project-url>
@@ -172,12 +161,60 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.apio.architect.jaxrs.json.jar!el-api.jar</file-name>
+				<file-name>com.liferay.apio.architect.impl.jar!commons-lang3.jar</file-name>
+				<version>3.8</version>
+				<project-name>Apache Commons Lang</project-name>
+				<project-url>http://commons.apache.org/proper/commons-lang/</project-url>
+				<licenses>
+					<license>
+						<license-name>Apache License, Version 2.0</license-name>
+						<license-url>https://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.apio.architect.impl.jar!el-api.jar</file-name>
 				<version>2.2</version>
 				<project-name>Expression Language API (2.1 Maintenance Release)</project-name>
 			</library>
 			<library>
-				<file-name>com.liferay.apio.architect.jaxrs.json.jar!javax.inject.jar</file-name>
+				<file-name>com.liferay.apio.architect.impl.jar!jackson-annotations.jar</file-name>
+				<version>2.9.6</version>
+				<project-name>Jackson-annotations</project-name>
+				<project-url>http://github.com/FasterXML/jackson</project-url>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.apio.architect.impl.jar!jackson-core.jar</file-name>
+				<version>2.9.6</version>
+				<project-name>Jackson-core</project-name>
+				<project-url>https://github.com/FasterXML/jackson-core</project-url>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.apio.architect.impl.jar!jackson-databind.jar</file-name>
+				<version>2.9.6</version>
+				<project-name>jackson-databind</project-name>
+				<project-url>http://github.com/FasterXML/jackson</project-url>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.apio.architect.impl.jar!javax.inject.jar</file-name>
 				<version>1</version>
 				<project-name>javax.inject</project-name>
 				<project-url>http://code.google.com/p/atinject/</project-url>
@@ -189,7 +226,7 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.apio.architect.jaxrs.json.jar!javax.interceptor-api.jar</file-name>
+				<file-name>com.liferay.apio.architect.impl.jar!javax.interceptor-api.jar</file-name>
 				<version>1.2</version>
 				<project-name>javax.interceptor API</project-name>
 				<project-url>http://interceptors-spec.java.net</project-url>
@@ -201,7 +238,19 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.apio.architect.jaxrs.json.jar!portlet-api.jar</file-name>
+				<file-name>com.liferay.apio.architect.impl.jar!org.osgi.service.log.jar</file-name>
+				<version>1.3.0</version>
+				<project-name>org.osgi:org.osgi.service.log</project-name>
+				<project-url>http://www.osgi.org/</project-url>
+				<licenses>
+					<license>
+						<license-name>Apache License, Version 2.0</license-name>
+						<license-url>http://opensource.org/licenses/apache2.0.php</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.apio.architect.impl.jar!portlet-api.jar</file-name>
 				<version>3.0.0</version>
 				<project-name>Java Portlet API V3.0</project-name>
 				<project-url>http://portals.apache.org/pluto/portlet-api</project-url>
@@ -213,26 +262,38 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.apio.architect.test.util.jar!java-hamcrest.jar</file-name>
-				<version>2.0.0.0</version>
-				<project-name>Java Hamcrest</project-name>
-				<project-url>http://hamcrest.org/JavaHamcrest/</project-url>
+				<file-name>com.liferay.apio.architect.test.util.jar!jackson-annotations.jar</file-name>
+				<version>2.9.6</version>
+				<project-name>Jackson-annotations</project-name>
+				<project-url>http://github.com/FasterXML/jackson</project-url>
 				<licenses>
 					<license>
-						<license-name>BSD Licence 3</license-name>
-						<license-url>http://opensource.org/licenses/BSD-3-Clause</license-url>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
 					</license>
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.apio.architect.wiring.osgi.impl.jar!org.osgi.service.log.jar</file-name>
-				<version>1.3.0</version>
-				<project-name>org.osgi:org.osgi.service.log</project-name>
-				<project-url>http://www.osgi.org/</project-url>
+				<file-name>com.liferay.apio.architect.test.util.jar!jackson-core.jar</file-name>
+				<version>2.9.6</version>
+				<project-name>Jackson-core</project-name>
+				<project-url>https://github.com/FasterXML/jackson-core</project-url>
 				<licenses>
 					<license>
-						<license-name>Apache License, Version 2.0</license-name>
-						<license-url>http://opensource.org/licenses/apache2.0.php</license-url>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.apio.architect.test.util.jar!jackson-databind.jar</file-name>
+				<version>2.9.6</version>
+				<project-name>jackson-databind</project-name>
+				<project-url>http://github.com/FasterXML/jackson</project-url>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -293,30 +354,6 @@
 				<project-name>com.liferay:nl.captcha.simplecaptcha</project-name>
 			</library>
 			<library>
-				<file-name>com.liferay.chat.service.jar!smack.jar</file-name>
-				<version>3.2.1</version>
-				<project-name>smack</project-name>
-				<project-url>http://www.igniterealtime.org/projects/smack/</project-url>
-				<licenses>
-					<license>
-						<license-name>The Apache Software License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.chat.service.jar!smackx.jar</file-name>
-				<version>3.2.1</version>
-				<project-name>smack-ext</project-name>
-				<project-url>http://www.igniterealtime.org/projects/smack/</project-url>
-				<licenses>
-					<license>
-						<license-name>The Apache Software License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>com.liferay.comment.sanitizer.jar!guava.jar</file-name>
 				<version>19.0.20150826</version>
 				<project-name>Guava: Google Core Libraries for Java</project-name>
@@ -342,7 +379,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.configuration.admin.web.jar!org.apache.felix.fileinstall.jar</file-name>
-				<version>3.5.4.LIFERAY-PATCHED-2</version>
+				<version>3.5.4.LIFERAY-PATCHED-3</version>
 				<project-name>Apache Felix File Install</project-name>
 				<project-url>http://felix.apache.org/site/apache-felix-file-install.html</project-url>
 				<licenses>
@@ -896,7 +933,18 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.fragment.entry.processor.portlet.jar!jsoup.jar</file-name>
+				<file-name>com.liferay.fragment.entry.processor.portlet.jar!org.jsoup.jar</file-name>
+				<version>1.10.2.LIFERAY-PATCHED-3</version>
+				<project-name>org.jsoup</project-name>
+				<licenses>
+					<license>
+						<license-name>LGPL 2.1</license-name>
+						<license-url>http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.fragment.impl.jar!jsoup.jar</file-name>
 				<version>1.10.2</version>
 				<project-name>jsoup Java HTML Parser</project-name>
 				<project-url>https://jsoup.org/</project-url>
@@ -1357,6 +1405,18 @@
 				</licenses>
 			</library>
 			<library>
+				<file-name>com.liferay.oauth2.provider.rest.jar!javax.annotation-api.jar</file-name>
+				<version>1.3</version>
+				<project-name>javax.annotation API</project-name>
+				<project-url>http://jcp.org/en/jsr/detail?id=250</project-url>
+				<licenses>
+					<license>
+						<license-name>CDDL + GPLv2 with classpath exception</license-name>
+						<license-url>https://glassfish.dev.java.net/nonav/public/CDDL+GPL.html</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
 				<file-name>com.liferay.petra.doulos.jar!commons-lang3.jar</file-name>
 				<version>3.4</version>
 				<project-name>Apache Commons Lang</project-name>
@@ -1536,6 +1596,77 @@
 				</licenses>
 			</library>
 			<library>
+				<file-name>com.liferay.portal.odata.impl.jar!jackson-databind.jar</file-name>
+				<version>2.8.3</version>
+				<project-name>jackson-databind</project-name>
+				<project-url>http://github.com/FasterXML/jackson</project-url>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.portal.odata.impl.jar!odata-commons-api.jar</file-name>
+				<version>4.4.0</version>
+				<project-name>odata-commons-api</project-name>
+				<project-url>http://www.apache.org/</project-url>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.portal.odata.impl.jar!odata-commons-core.jar</file-name>
+				<version>4.4.0</version>
+				<project-name>odata-commons-core</project-name>
+				<project-url>http://www.apache.org/</project-url>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.portal.odata.impl.jar!odata-server-api.jar</file-name>
+				<version>4.4.0</version>
+				<project-name>odata-server-api</project-name>
+				<project-url>http://www.apache.org/</project-url>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.portal.odata.impl.jar!odata-server-core-ext.jar</file-name>
+				<version>4.4.0</version>
+				<project-name>odata-server-core-ext</project-name>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.portal.odata.impl.jar!odata-server-core.jar</file-name>
+				<version>4.4.0</version>
+				<project-name>odata-server-core</project-name>
+				<project-url>http://www.apache.org/</project-url>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
 				<file-name>com.liferay.portal.osgi.web.servlet.jsp.compiler.jar!javax.servlet.jsp.jar</file-name>
 				<version>2.3.3-b02.LIFERAY-PATCHED-7</version>
 				<project-name>JSP implementation</project-name>
@@ -1600,20 +1731,8 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.portal.remote.cxf.common.jar!cxf-core.jar</file-name>
-				<version>3.1.9</version>
-				<project-name>Apache CXF Core</project-name>
-				<project-url>http://cxf.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>The Apache Software License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.remote.cxf.common.jar!cxf-rt-bindings-soap.jar</file-name>
-				<version>3.1.9</version>
+				<file-name>com.liferay.portal.remote.jaxrs.whiteboard.jar!cxf-rt-bindings-soap.jar</file-name>
+				<version>3.2.5</version>
 				<project-name>Apache CXF Runtime SOAP Binding</project-name>
 				<project-url>http://cxf.apache.org</project-url>
 				<licenses>
@@ -1624,8 +1743,20 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.portal.remote.cxf.common.jar!cxf-rt-databinding-jaxb.jar</file-name>
-				<version>3.1.9</version>
+				<file-name>com.liferay.portal.remote.jaxrs.whiteboard.jar!cxf-rt-bindings-xml.jar</file-name>
+				<version>3.2.5</version>
+				<project-name>Apache CXF Runtime XML Binding</project-name>
+				<project-url>http://cxf.apache.org</project-url>
+				<licenses>
+					<license>
+						<license-name>The Apache Software License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.portal.remote.jaxrs.whiteboard.jar!cxf-rt-databinding-jaxb.jar</file-name>
+				<version>3.2.5</version>
 				<project-name>Apache CXF Runtime JAXB DataBinding</project-name>
 				<project-url>http://cxf.apache.org</project-url>
 				<licenses>
@@ -1636,20 +1767,8 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.portal.remote.cxf.common.jar!cxf-rt-transports-http.jar</file-name>
-				<version>3.1.9</version>
-				<project-name>Apache CXF Runtime HTTP Transport</project-name>
-				<project-url>http://cxf.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>The Apache Software License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.remote.cxf.common.jar!cxf-rt-wsdl.jar</file-name>
-				<version>3.1.9</version>
+				<file-name>com.liferay.portal.remote.jaxrs.whiteboard.jar!cxf-rt-wsdl.jar</file-name>
+				<version>3.2.5</version>
 				<project-name>Apache CXF Runtime Core for WSDL</project-name>
 				<project-url>http://cxf.apache.org</project-url>
 				<licenses>
@@ -1660,20 +1779,8 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.portal.remote.cxf.common.jar!cxf-tools-common.jar</file-name>
-				<version>3.1.9</version>
-				<project-name>Apache CXF Command Line Tools Common</project-name>
-				<project-url>http://cxf.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>The Apache Software License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.remote.cxf.common.jar!cxf-tools-validator.jar</file-name>
-				<version>3.1.9</version>
+				<file-name>com.liferay.portal.remote.jaxrs.whiteboard.jar!cxf-tools-validator.jar</file-name>
+				<version>3.2.5</version>
 				<project-name>Apache CXF Command Line Tools Validator</project-name>
 				<project-url>http://cxf.apache.org</project-url>
 				<licenses>
@@ -1684,7 +1791,7 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.portal.remote.cxf.common.jar!wsdl4j.jar</file-name>
+				<file-name>com.liferay.portal.remote.jaxrs.whiteboard.jar!wsdl4j.jar</file-name>
 				<version>1.6.3</version>
 				<project-name>WSDL4J</project-name>
 				<project-url>http://sf.net/projects/wsdl4j</project-url>
@@ -1696,115 +1803,8 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.portal.remote.cxf.common.jar!xmlschema-core.jar</file-name>
-				<version>2.2.1</version>
-				<project-name>XmlSchema Core</project-name>
-				<project-url>http://ws.apache.org/xmlschema/</project-url>
-				<licenses>
-					<license>
-						<license-name>The Apache Software License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.remote.cxf.jaxrs.common.jar!cxf-rt-frontend-jaxrs.jar</file-name>
-				<version>3.1.9</version>
-				<project-name>Apache CXF Runtime JAX-RS Frontend</project-name>
-				<project-url>http://cxf.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>The Apache Software License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.remote.cxf.jaxrs.common.jar!cxf-rt-rs-extension-providers.jar</file-name>
-				<version>3.1.9</version>
-				<project-name>Apache CXF JAX-RS Extensions: Providers</project-name>
-				<project-url>http://cxf.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>The Apache Software License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.remote.cxf.jaxrs.common.jar!cxf-rt-rs-json-basic.jar</file-name>
-				<version>3.1.9</version>
-				<project-name>Apache CXF JAX-RS Extensions: JSON Basic</project-name>
-				<project-url>http://cxf.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>The Apache Software License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.remote.cxf.jaxrs.common.jar!javax.annotation-api.jar</file-name>
-				<version>1.2</version>
-				<project-name>javax.annotation API</project-name>
-				<project-url>http://jcp.org/en/jsr/detail?id=250</project-url>
-				<licenses>
-					<license>
-						<license-name>CDDL + GPLv2 with classpath exception</license-name>
-						<license-url>https://glassfish.dev.java.net/nonav/public/CDDL+GPL.html</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.remote.cxf.jaxrs.common.jar!javax.json-api.jar</file-name>
-				<version>1.0</version>
-				<project-name>JSR 353 (JSON Processing) API</project-name>
-				<project-url>http://json-processing-spec.java.net</project-url>
-				<licenses>
-					<license>
-						<license-name>Dual license consisting of the CDDL v1.1 and GPL v2</license-name>
-						<license-url>https://glassfish.java.net/public/CDDL+GPL_1_1.html</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.remote.cxf.jaxrs.common.jar!javax.ws.rs-api.jar</file-name>
-				<version>2.0.1</version>
-				<project-name>javax.ws.rs-api</project-name>
-				<project-url>http://jax-rs-spec.java.net</project-url>
-				<licenses>
-					<license>
-						<license-name>CDDL 1.1</license-name>
-						<license-url>http://glassfish.java.net/public/CDDL+GPL_1_1.html</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.remote.cxf.jaxrs.common.jar!jettison.jar</file-name>
-				<version>1.3.3</version>
-				<project-name>jettison</project-name>
-				<licenses>
-					<license>
-						<license-name>Apache License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.remote.soap.extender.impl.jar!cxf-rt-bindings-xml.jar</file-name>
-				<version>3.1.9</version>
-				<project-name>Apache CXF Runtime XML Binding</project-name>
-				<project-url>http://cxf.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>The Apache Software License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>com.liferay.portal.remote.soap.extender.impl.jar!cxf-rt-frontend-jaxws.jar</file-name>
-				<version>3.1.9</version>
+				<version>3.2.5</version>
 				<project-name>Apache CXF Runtime JAX-WS Frontend</project-name>
 				<project-url>http://cxf.apache.org</project-url>
 				<licenses>
@@ -1816,7 +1816,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.remote.soap.extender.impl.jar!cxf-rt-frontend-simple.jar</file-name>
-				<version>3.1.9</version>
+				<version>3.2.5</version>
 				<project-name>Apache CXF Runtime Simple Frontend</project-name>
 				<project-url>http://cxf.apache.org</project-url>
 				<licenses>
@@ -1828,7 +1828,7 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.remote.soap.extender.impl.jar!cxf-rt-ws-policy.jar</file-name>
-				<version>3.1.9</version>
+				<version>3.2.5</version>
 				<project-name>Apache CXF Runtime WS Policy</project-name>
 				<project-url>http://cxf.apache.org</project-url>
 				<licenses>
@@ -2470,12 +2470,13 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.security.antisamy.jar!antisamy.jar</file-name>
-				<version>1.5.3</version>
+				<version>1.5.7</version>
 				<project-name>OWASP AntiSamy</project-name>
+				<project-url>https://github.com/nahsra/antisamy</project-url>
 				<licenses>
 					<license>
-						<license-name>BSD License</license-name>
-						<license-url>http://www.opensource.org/licenses/bsd-license.php</license-url>
+						<license-name>BSD 3</license-name>
+						<license-url>https://opensource.org/licenses/BSD-3-Clause</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -2516,14 +2517,26 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.portal.security.antisamy.jar!commons-httpclient.jar</file-name>
-				<version>3.1</version>
-				<project-name>HttpClient</project-name>
-				<project-url>http://jakarta.apache.org/httpcomponents/httpclient-3.x/</project-url>
+				<file-name>com.liferay.portal.security.antisamy.jar!httpclient.jar</file-name>
+				<version>4.5.5</version>
+				<project-name>HttpComponents Apache HttpClient</project-name>
+				<project-url>http://hc.apache.org/httpcomponents-client</project-url>
 				<licenses>
 					<license>
-						<license-name>Apache License</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
+						<license-name>Apache License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>com.liferay.portal.security.antisamy.jar!httpcore.jar</file-name>
+				<version>4.4.9</version>
+				<project-name>HttpComponents Apache HttpCore</project-name>
+				<project-url>http://hc.apache.org/httpcomponents-core-ga</project-url>
+				<licenses>
+					<license>
+						<license-name>Apache License, Version 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -2553,13 +2566,13 @@
 			</library>
 			<library>
 				<file-name>com.liferay.portal.security.ldap.impl.jar!antlr.jar</file-name>
-				<version>3.0.1</version>
+				<version>2.7.7</version>
 				<project-name>AntLR Parser Generator</project-name>
-				<project-url>http://antlr.org/</project-url>
+				<project-url>http://www.antlr.org/</project-url>
 				<licenses>
 					<license>
-						<license-name>BSD licence</license-name>
-						<license-url>http://antlr.org/license.html</license-url>
+						<license-name>BSD License</license-name>
+						<license-url>http://www.antlr.org/license.html</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -2572,18 +2585,6 @@
 					<license>
 						<license-name>BSD License</license-name>
 						<license-url>http://www.stringtemplate.org/license.html</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.security.pacl.jar!jsqlparser.jar</file-name>
-				<version>0.9.3</version>
-				<project-name>JSQLParser library</project-name>
-				<project-url>https://github.com/JSQLParser/JSqlParser</project-url>
-				<licenses>
-					<license>
-						<license-name>GNU Library or Lesser General Public License (LGPL) V2.1</license-name>
-						<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -2686,114 +2687,6 @@
 					<license>
 						<license-name>GNU Lesser General Public License, version 2.1</license-name>
 						<license-url>http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.security.sso.openid.connect.api.jar!activation.jar</file-name>
-				<version>1.1</version>
-				<project-name>JavaBeans Activation Framework (JAF)</project-name>
-				<project-url>http://java.sun.com/products/javabeans/jaf/index.jsp</project-url>
-				<licenses>
-					<license>
-						<license-name>Common Development and Distribution License (CDDL) v1.0</license-name>
-						<license-url>https://glassfish.dev.java.net/public/CDDLv1.0.html</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.security.sso.openid.connect.api.jar!commons-collections4.jar</file-name>
-				<version>4.1</version>
-				<project-name>Apache Commons Collections</project-name>
-				<project-url>http://commons.apache.org/proper/commons-collections/</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.security.sso.openid.connect.api.jar!commons-io.jar</file-name>
-				<version>2.5</version>
-				<project-name>Apache Commons IO</project-name>
-				<project-url>http://commons.apache.org/proper/commons-io/</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.security.sso.openid.connect.api.jar!commons-lang3.jar</file-name>
-				<version>3.4</version>
-				<project-name>Apache Commons Lang</project-name>
-				<project-url>http://commons.apache.org/proper/commons-lang/</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.security.sso.openid.connect.api.jar!jcip-annotations.jar</file-name>
-				<version>1.0-1</version>
-				<project-name>JCIP Annotations under Apache License</project-name>
-				<project-url>http://stephenc.github.com/jcip-annotations</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.security.sso.openid.connect.api.jar!json-smart.jar</file-name>
-				<version>1.3.1</version>
-				<project-name>JSON Small and Fast Parser</project-name>
-				<project-url>http://www.minidev.net/</project-url>
-				<licenses>
-					<license>
-						<license-name>The Apache Software License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.security.sso.openid.connect.api.jar!lang-tag.jar</file-name>
-				<version>1.4.3</version>
-				<project-name>Nimbus LangTag</project-name>
-				<project-url>https://bitbucket.org/connect2id/nimbus-language-tags</project-url>
-				<licenses>
-					<license>
-						<license-name>The Apache Software License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.security.sso.openid.connect.api.jar!nimbus-jose-jwt.jar</file-name>
-				<version>4.26.1</version>
-				<project-name>Nimbus JOSE+JWT</project-name>
-				<project-url>https://bitbucket.org/connect2id/nimbus-jose-jwt</project-url>
-				<licenses>
-					<license>
-						<license-name>The Apache Software License, Version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.security.sso.openid.connect.api.jar!oauth2-oidc-sdk.jar</file-name>
-				<version>5.17.1</version>
-				<project-name>OAuth 2.0 SDK with OpenID Connect extensions</project-name>
-				<project-url>https://bitbucket.org/connect2id/oauth-2.0-sdk-with-openid-connect-extensions</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License, version 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0.html‎</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -3311,18 +3204,6 @@
 					<license>
 						<license-name>Apache 2</license-name>
 						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>com.liferay.portal.target.platform.indexer.impl.jar!biz.aQute.bnd.jar</file-name>
-				<version>3.5.0</version>
-				<project-name>biz.aQute.bnd</project-name>
-				<project-url>http://bnd.bndtools.org/</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache-2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -3878,6 +3759,17 @@
 				</licenses>
 			</library>
 			<library>
+				<file-name>com.liferay.structure.apio.impl.jar!gson.jar</file-name>
+				<version>2.8.1</version>
+				<project-name>Gson</project-name>
+				<licenses>
+					<license>
+						<license-name>Apache 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0.txt</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
 				<file-name>com.liferay.sync.security.jar!commons-codec.jar</file-name>
 				<version>1.4</version>
 				<project-name>Commons Codec</project-name>
@@ -4037,13 +3929,13 @@
 			</library>
 			<library>
 				<file-name>com.liferay.wiki.engine.creole.jar!antlr.jar</file-name>
-				<version>3.0.1</version>
+				<version>2.7.7</version>
 				<project-name>AntLR Parser Generator</project-name>
-				<project-url>http://antlr.org/</project-url>
+				<project-url>http://www.antlr.org/</project-url>
 				<licenses>
 					<license>
-						<license-name>BSD licence</license-name>
-						<license-url>http://antlr.org/license.html</license-url>
+						<license-name>BSD License</license-name>
+						<license-url>http://www.antlr.org/license.html</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -4072,19 +3964,14 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>com.liferay.wiki.engine.mediawiki.jar!org.jamwiki.jar</file-name>
-				<version>1.0.7</version>
-				<project-name>JAMWiki Core</project-name>
-			</library>
-			<library>
 				<file-name>com.liferay.wiki.service.jar!antlr.jar</file-name>
-				<version>3.0.1</version>
+				<version>2.7.7</version>
 				<project-name>AntLR Parser Generator</project-name>
-				<project-url>http://antlr.org/</project-url>
+				<project-url>http://www.antlr.org/</project-url>
 				<licenses>
 					<license>
-						<license-name>BSD licence</license-name>
-						<license-url>http://antlr.org/license.html</license-url>
+						<license-name>BSD License</license-name>
+						<license-url>http://www.antlr.org/license.html</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -4256,7 +4143,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/catalina.jar</file-name>
-				<version>9.0.6</version>
+				<version>9.0.10</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>
@@ -4268,7 +4155,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/com.liferay.ant.bnd.jar</file-name>
-				<version>2.0.52</version>
+				<version>2.0.53</version>
 				<project-name>Liferay Ant BND</project-name>
 				<licenses>
 					<license>
@@ -4279,7 +4166,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/com.liferay.jenkins.results.parser.jar</file-name>
-				<version>1.0.228</version>
+				<version>1.0.238</version>
 				<project-name>Liferay Jenkins Results Parser</project-name>
 				<licenses>
 					<license>
@@ -4508,7 +4395,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/jasper.jar</file-name>
-				<version>9.0.6</version>
+				<version>9.0.10</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>
@@ -5002,7 +4889,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/tomcat-api.jar</file-name>
-				<version>9.0.6</version>
+				<version>9.0.10</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>
@@ -5014,7 +4901,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/tomcat-coyote.jar</file-name>
-				<version>9.0.6</version>
+				<version>9.0.10</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>
@@ -5026,7 +4913,7 @@
 			</library>
 			<library>
 				<file-name>lib/development/tomcat-util.jar</file-name>
-				<version>9.0.6</version>
+				<version>9.0.10</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>
@@ -5120,6 +5007,18 @@
 					<license>
 						<license-name>Apache License 2.0</license-name>
 						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>lib/portal/activation.jar</file-name>
+				<version>1.2.0</version>
+				<project-name>JavaBeans Activation Framework API</project-name>
+				<project-url>https://www.oracle.com/technetwork/articles/java/index-135046.html</project-url>
+				<licenses>
+					<license>
+						<license-name>CDDL 1.1</license-name>
+						<license-url>https://oss.oracle.com/licenses/CDDL-1.1</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -5492,7 +5391,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/commons-compress.jar</file-name>
-				<version>1.9</version>
+				<version>1.18</version>
 				<project-name>Commons Compress</project-name>
 				<project-url>http://commons.apache.org/compress</project-url>
 				<licenses>
@@ -6026,6 +5925,18 @@
 				</licenses>
 			</library>
 			<library>
+				<file-name>lib/portal/jaxb-api.jar</file-name>
+				<version>2.3.0</version>
+				<project-name>JAXB-API</project-name>
+				<project-url>http://jaxb.java.net</project-url>
+				<licenses>
+					<license>
+						<license-name>CDDL 1.1</license-name>
+						<license-url>https://oss.oracle.com/licenses/CDDL-1.1</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
 				<file-name>lib/portal/jaxb-impl.jar</file-name>
 				<version>2.1.11</version>
 				<project-name>Java Architecture for XML Binding</project-name>
@@ -6062,6 +5973,30 @@
 					</license>
 				</licenses>
 			</library>
+			<library>
+				<file-name>lib/portal/jaxrs-api.jar</file-name>
+				<version>2.1</version>
+				<project-name>Java API for RESTful Web Services</project-name>
+				<project-url>http://jax-rs-spec.java.net</project-url>
+				<licenses>
+					<license>
+						<license-name>CDDL 1.1</license-name>
+						<license-url>https://oss.oracle.com/licenses/CDDL-1.1</license-url>
+					</license>
+				</licenses>
+			</library>
+			<lirbary>
+				<file-name>lib/portal/jaxws-api.jar</file-name>
+				<version>2.3.0</version>
+				<project-name>JAX-WS (JSR 224) API</project-name>
+				<project-url>https://github.com/javaee/jax-ws-spec</project-url>
+				<licenses>
+					<license>
+						<license-name>CDDL 1.1</license-name>
+						<license-url>https://oss.oracle.com/licenses/CDDL-1.1</license-url>
+					</license>
+				</licenses>
+			</lirbary>
 			<library>
 				<file-name>lib/portal/jaxws-rt.jar</file-name>
 				<version>2.1.7</version>
@@ -6171,6 +6106,18 @@
 					<license>
 						<license-name>LGPL 2.1</license-name>
 						<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>lib/portal/jersey-common.jar</file-name>
+				<version>2.26</version>
+				<project-name>Jersey core common packages</project-name>
+				<project-url>https://jersey.github.io/</project-url>
+				<licenses>
+					<license>
+						<license-name>CDDL 1.1</license-name>
+						<license-url>https://oss.oracle.com/licenses/CDDL+GPL-1.1</license-url>
 					</license>
 				</licenses>
 			</library>
@@ -6446,6 +6393,18 @@
 				</licenses>
 			</library>
 			<library>
+				<file-name>lib/portal/jws-api.jar</file-name>
+				<version>1.1</version>
+				<project-name>Java EE Web Services Metadata API</project-name>
+				<project-url>http://glassfish.java.net</project-url>
+				<licenses>
+					<license>
+						<license-name>CDDL 1.1</license-name>
+						<license-url>https://oss.oracle.com/licenses/CDDL-1.1</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
 				<file-name>lib/portal/kxml2.jar</file-name>
 				<version>2.3.0</version>
 				<project-name>kXML 2</project-name>
@@ -6631,7 +6590,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/pdfbox.jar</file-name>
-				<version>1.8.12</version>
+				<version>2.0.9</version>
 				<project-name>PDFBox</project-name>
 				<project-url>http://pdfbox.apache.org</project-url>
 				<licenses>
@@ -6694,19 +6653,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/portals-bridges.jar</file-name>
-				<version>1.0</version>
-				<project-name>Portals Bridges</project-name>
-				<project-url>http://portals.apache.org/bridges</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-						<copyright-notice>Copyright (c) 2005-2007 The Apache Software Foundation</copyright-notice>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/rdffilter.jar</file-name>
 				<version>1.0</version>
 				<project-name>RDF Filter</project-name>
@@ -6735,6 +6681,18 @@
 				<version>2.3.0</version>
 				<project-name>OpenOffice.org Java Uno</project-name>
 				<project-url>http://udk.openoffice.org</project-url>
+				<licenses>
+					<license>
+						<license-name>LGPL 2.1</license-name>
+						<license-url>http://www.gnu.org/licenses/lgpl-2.1.html</license-url>
+					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>lib/portal/rmi-api.jar</file-name>
+				<version>1.0.5.Final</version>
+				<project-name>The javax.rmi and javax.rmi.CORBA classes</project-name>
+				<project-url>https://github.com/jboss/jboss-rmi-api_spec</project-url>
 				<licenses>
 					<license>
 						<license-name>LGPL 2.1</license-name>
@@ -6830,10 +6788,10 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/simplecaptcha.jar</file-name>
-				<version>1.1.1</version>
-				<project-name>SimpleCaptcha</project-name>
-				<project-url>http://simplecaptcha.sourceforge.net</project-url>
+				<file-name>lib/portal/sigar.jar</file-name>
+				<version>1.6.4</version>
+				<project-name>Sigar</project-name>
+				<project-url>https://sourceforge.net/projects/sigar/</project-url>
 				<licenses>
 					<license>
 						<license-name>BSD Style License</license-name>
@@ -6841,6 +6799,18 @@
 					</license>
 				</licenses>
 				<comments>This includes modifications for compatibility with JDK 5.</comments>
+			</library>
+			<library>
+				<file-name>lib/portal/simplecaptcha.jar</file-name>
+				<version>1.1.1</version>
+				<project-name>SimpleCaptcha</project-name>
+				<project-url>http://simplecaptcha.sourceforge.net</project-url>
+				<licenses>
+					<license>
+						<license-name>Apache License 2.0</license-name>
+						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
+					</license>
+				</licenses>
 			</library>
 			<library>
 				<file-name>lib/portal/slf4j-api.jar</file-name>
@@ -6853,6 +6823,16 @@
 						<license-url>http://opensource.org/licenses/MIT</license-url>
 						<copyright-notice>Copyright (c) 2004-2007 QOS.ch</copyright-notice>
 					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>lib/portal/soap-api.jar</file-name>
+				<version>1.4.0</version>
+				<project-name>SAAJ API</project-name>
+				<project-url>https://javaee.github.io/javaee-spec/</project-url>
+				<licenses>
+					<license>CDDL 1.1</license>
+					<license-url>https://oss.oracle.com/licenses/CDDL-1.1</license-url>
 				</licenses>
 			</library>
 			<library>
@@ -7124,54 +7104,6 @@
 				</licenses>
 			</library>
 			<library>
-				<file-name>lib/portal/struts-el.jar</file-name>
-				<version>1.3.10</version>
-				<project-name>Struts</project-name>
-				<project-url>http://struts.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/struts-extras.jar</file-name>
-				<version>1.3.10</version>
-				<project-name>Struts</project-name>
-				<project-url>http://struts.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/struts-taglib.jar</file-name>
-				<version>1.3.10</version>
-				<project-name>Struts</project-name>
-				<project-url>http://struts.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
-				<file-name>lib/portal/struts-tiles.jar</file-name>
-				<version>1.3.10</version>
-				<project-name>Struts</project-name>
-				<project-url>http://struts.apache.org</project-url>
-				<licenses>
-					<license>
-						<license-name>Apache License 2.0</license-name>
-						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
-					</license>
-				</licenses>
-			</library>
-			<library>
 				<file-name>lib/portal/tagsoup.jar</file-name>
 				<version>1.2.1</version>
 				<project-name>TagSoup</project-name>
@@ -7185,7 +7117,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/tika-core.jar</file-name>
-				<version>1.10</version>
+				<version>1.18</version>
 				<project-name>Tika</project-name>
 				<project-url>http://tika.apache.org</project-url>
 				<licenses>
@@ -7197,7 +7129,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/tika-parsers.jar</file-name>
-				<version>1.10</version>
+				<version>1.18</version>
 				<project-name>Tika</project-name>
 				<project-url>http://tika.apache.org</project-url>
 				<licenses>
@@ -7209,7 +7141,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/tomcat-jdbc.jar</file-name>
-				<version>9.0.6</version>
+				<version>9.0.10</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>
@@ -7221,7 +7153,7 @@
 			</library>
 			<library>
 				<file-name>lib/portal/tomcat-juli.jar</file-name>
-				<version>9.0.6</version>
+				<version>9.0.10</version>
 				<project-name>Tomcat</project-name>
 				<project-url>http://tomcat.apache.org</project-url>
 				<licenses>
@@ -7229,6 +7161,16 @@
 						<license-name>Apache License 2.0</license-name>
 						<license-url>http://www.apache.org/licenses/LICENSE-2.0</license-url>
 					</license>
+				</licenses>
+			</library>
+			<library>
+				<file-name>lib/portal/transaction.jar</file-name>
+				<version>1.3</version>
+				<project-name>Project GlassFish Java Transaction API</project-name>
+				<project-url>http://jta-spec.java.net</project-url>
+				<licenses>
+					<license>CDDL 1.1</license>
+					<license-url>https://oss.oracle.com/licenses/CDDL-1.1</license-url>
 				</licenses>
 			</library>
 			<library>

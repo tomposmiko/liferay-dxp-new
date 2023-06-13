@@ -274,7 +274,6 @@ public class CallFunction extends BaseDDMFormRuleFunction {
 		Map<String, String> resultMap) {
 
 		for (Map.Entry<String, String> entry : resultMap.entrySet()) {
-			String ddmFormFieldName = entry.getKey();
 			String outputName = entry.getValue();
 
 			DDMDataProviderResponseOutput ddmDataProviderResponseOutput =
@@ -283,6 +282,8 @@ public class CallFunction extends BaseDDMFormRuleFunction {
 			if (ddmDataProviderResponseOutput == null) {
 				continue;
 			}
+
+			String ddmFormFieldName = entry.getKey();
 
 			if (Objects.equals(
 					ddmDataProviderResponseOutput.getType(), "list")) {

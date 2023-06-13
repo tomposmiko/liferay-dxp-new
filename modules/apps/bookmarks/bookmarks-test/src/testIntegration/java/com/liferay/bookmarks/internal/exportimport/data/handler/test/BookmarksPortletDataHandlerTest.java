@@ -17,11 +17,14 @@ package com.liferay.bookmarks.internal.exportimport.data.handler.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.bookmarks.constants.BookmarksPortletKeys;
 import com.liferay.bookmarks.model.BookmarksFolder;
+import com.liferay.bookmarks.service.BookmarksEntryLocalServiceUtil;
 import com.liferay.bookmarks.service.BookmarksFolderLocalServiceUtil;
 import com.liferay.bookmarks.service.BookmarksFolderServiceUtil;
 import com.liferay.bookmarks.util.test.BookmarksTestUtil;
 import com.liferay.exportimport.kernel.lar.DataLevel;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -33,6 +36,7 @@ import com.liferay.portal.lar.test.BasePortletDataHandlerTestCase;
 import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
@@ -90,18 +94,21 @@ public class BookmarksPortletDataHandlerTest
 
 	@Override
 	protected void addStagedModels() throws Exception {
-		BookmarksFolder folder = BookmarksTestUtil.addFolder(
+		BookmarksFolder folder1 = BookmarksTestUtil.addFolder(
+			stagingGroup.getGroupId(), RandomTestUtil.randomString());
+
+		BookmarksTestUtil.addFolder(
 			stagingGroup.getGroupId(), RandomTestUtil.randomString());
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext(stagingGroup.getGroupId());
 
-		BookmarksTestUtil.addEntry(folder.getFolderId(), true, serviceContext);
+		BookmarksTestUtil.addEntry(folder1.getFolderId(), true, serviceContext);
 	}
 
 	@Override
 	protected DataLevel getDataLevel() {
-		return DataLevel.SITE;
+		return DataLevel.PORTLET_INSTANCE;
 	}
 
 	@Override
@@ -115,17 +122,38 @@ public class BookmarksPortletDataHandlerTest
 	}
 
 	@Override
+	protected List<StagedModel> getStagedModels() {
+		List<StagedModel> stagedModels = new ArrayList<>();
+
+		stagedModels.addAll(
+			BookmarksEntryLocalServiceUtil.getGroupEntries(
+				portletDataContext.getGroupId(), QueryUtil.ALL_POS,
+				QueryUtil.ALL_POS));
+
+		stagedModels.addAll(
+			BookmarksFolderLocalServiceUtil.getFolders(
+				portletDataContext.getGroupId()));
+
+		return stagedModels;
+	}
+
+	@Override
 	protected boolean isDataPortalLevel() {
 		return false;
 	}
 
 	@Override
 	protected boolean isDataPortletInstanceLevel() {
-		return false;
+		return true;
 	}
 
 	@Override
 	protected boolean isDataSiteLevel() {
+		return false;
+	}
+
+	@Override
+	protected boolean isGetExportModelCountTested() {
 		return true;
 	}
 

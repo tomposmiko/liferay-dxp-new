@@ -14,6 +14,7 @@
 
 package com.liferay.document.library.internal.verify;
 
+import com.liferay.document.library.constants.DLPortletKeys;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryMetadata;
 import com.liferay.document.library.kernel.model.DLFileVersion;
@@ -24,23 +25,29 @@ import com.liferay.document.library.kernel.service.DLFileEntryMetadataLocalServi
 import com.liferay.document.library.kernel.service.DLFileVersionLocalService;
 import com.liferay.document.library.kernel.service.DLFolderLocalService;
 import com.liferay.document.library.kernel.util.DLUtil;
+import com.liferay.exportimport.kernel.staging.Staging;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Criterion;
-import com.liferay.portal.kernel.dao.orm.DynamicQuery;
+import com.liferay.portal.kernel.dao.orm.Property;
+import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.LoggingTimer;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
@@ -79,7 +86,7 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 
 				_log.debug(
 					StringBundler.concat(
-						"Deleting ", String.valueOf(size),
+						"Deleting ", size,
 						" file entry metadatas with mismatched company IDs"));
 			}
 
@@ -114,99 +121,88 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 			_dlFileVersionLocalService.getActionableDynamicQuery();
 
 		actionableDynamicQuery.setAddCriteriaMethod(
-			new ActionableDynamicQuery.AddCriteriaMethod() {
+			dynamicQuery -> {
+				Criterion criterion = RestrictionsFactoryUtil.eq(
+					"mimeType", originalMimeTypes[0]);
 
-				@Override
-				public void addCriteria(DynamicQuery dynamicQuery) {
-					Criterion criterion = RestrictionsFactoryUtil.eq(
-						"mimeType", originalMimeTypes[0]);
-
-					for (int i = 1; i < originalMimeTypes.length; i++) {
-						criterion = RestrictionsFactoryUtil.or(
-							criterion,
-							RestrictionsFactoryUtil.eq(
-								"mimeType", originalMimeTypes[i]));
-					}
-
-					dynamicQuery.add(criterion);
+				for (int i = 1; i < originalMimeTypes.length; i++) {
+					criterion = RestrictionsFactoryUtil.or(
+						criterion,
+						RestrictionsFactoryUtil.eq(
+							"mimeType", originalMimeTypes[i]));
 				}
 
+				dynamicQuery.add(criterion);
 			});
 		actionableDynamicQuery.setPerformActionMethod(
-			new ActionableDynamicQuery.PerformActionMethod<DLFileVersion>() {
+			(DLFileVersion dlFileVersion) -> {
+				String title = DLUtil.getTitleWithExtension(
+					dlFileVersion.getTitle(), dlFileVersion.getExtension());
 
-				@Override
-				public void performAction(DLFileVersion dlFileVersion) {
-					String title = DLUtil.getTitleWithExtension(
-						dlFileVersion.getTitle(), dlFileVersion.getExtension());
+				try (InputStream inputStream =
+						_dlFileEntryLocalService.getFileAsStream(
+							dlFileVersion.getFileEntryId(),
+							dlFileVersion.getVersion(), false)) {
 
-					try (InputStream inputStream =
-							_dlFileEntryLocalService.getFileAsStream(
-								dlFileVersion.getFileEntryId(),
-								dlFileVersion.getVersion(), false)) {
+					String mimeType = MimeTypesUtil.getContentType(
+						inputStream, title);
 
-						String mimeType = MimeTypesUtil.getContentType(
-							inputStream, title);
+					if (mimeType.equals(dlFileVersion.getMimeType())) {
+						return;
+					}
 
-						if (mimeType.equals(dlFileVersion.getMimeType())) {
-							return;
-						}
+					dlFileVersion.setMimeType(mimeType);
 
-						dlFileVersion.setMimeType(mimeType);
+					_dlFileVersionLocalService.updateDLFileVersion(
+						dlFileVersion);
 
-						_dlFileVersionLocalService.updateDLFileVersion(
-							dlFileVersion);
+					try {
+						DLFileEntry dlFileEntry = dlFileVersion.getFileEntry();
 
-						try {
-							DLFileEntry dlFileEntry =
-								dlFileVersion.getFileEntry();
+						if (Objects.equals(
+								dlFileEntry.getVersion(),
+								dlFileVersion.getVersion())) {
 
-							if (Objects.equals(
-									dlFileEntry.getVersion(),
-									dlFileVersion.getVersion())) {
+							dlFileEntry.setMimeType(mimeType);
 
-								dlFileEntry.setMimeType(mimeType);
-
-								_dlFileEntryLocalService.updateDLFileEntry(
-									dlFileEntry);
-							}
-						}
-						catch (PortalException pe) {
-							if (_log.isWarnEnabled()) {
-								_log.warn(
-									"Unable to get file entry " +
-										dlFileVersion.getFileEntryId(),
-									pe);
-							}
+							_dlFileEntryLocalService.updateDLFileEntry(
+								dlFileEntry);
 						}
 					}
-					catch (Exception e) {
+					catch (PortalException pe) {
 						if (_log.isWarnEnabled()) {
-							DLFileEntry dlFileEntry =
-								_dlFileEntryLocalService.fetchDLFileEntry(
-									dlFileVersion.getFileEntryId());
-
-							if (dlFileEntry == null) {
-								_log.warn(
-									"Unable to find file entry associated " +
-										"with file version " +
-											dlFileVersion.getFileVersionId(),
-									e);
-							}
-							else {
-								StringBundler sb = new StringBundler(4);
-
-								sb.append("Unable to find file version ");
-								sb.append(dlFileVersion.getVersion());
-								sb.append(" for file entry ");
-								sb.append(dlFileEntry.getName());
-
-								_log.warn(sb.toString(), e);
-							}
+							_log.warn(
+								"Unable to get file entry " +
+									dlFileVersion.getFileEntryId(),
+								pe);
 						}
 					}
 				}
+				catch (Exception e) {
+					if (_log.isWarnEnabled()) {
+						DLFileEntry dlFileEntry =
+							_dlFileEntryLocalService.fetchDLFileEntry(
+								dlFileVersion.getFileEntryId());
 
+						if (dlFileEntry == null) {
+							_log.warn(
+								"Unable to find file entry associated with " +
+									"file version " +
+										dlFileVersion.getFileVersionId(),
+								e);
+						}
+						else {
+							StringBundler sb = new StringBundler(4);
+
+							sb.append("Unable to find file version ");
+							sb.append(dlFileVersion.getVersion());
+							sb.append(" for file entry ");
+							sb.append(dlFileEntry.getName());
+
+							_log.warn(sb.toString(), e);
+						}
+					}
+				}
 			});
 
 		if (_log.isDebugEnabled()) {
@@ -214,8 +210,7 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 
 			_log.debug(
 				StringBundler.concat(
-					"Processing ", String.valueOf(count),
-					" file versions with mime types: ",
+					"Processing ", count, " file versions with mime types: ",
 					StringUtil.merge(originalMimeTypes, StringPool.COMMA)));
 		}
 
@@ -252,6 +247,7 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 		updateClassNameId();
 		updateFileEntryAssets();
 		updateFolderAssets();
+		updateStagedPortletNames();
 	}
 
 	@Reference(
@@ -295,6 +291,11 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 		DLFolderLocalService dlFolderLocalService) {
 
 		_dlFolderLocalService = dlFolderLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService groupLocalService) {
+		_groupLocalService = groupLocalService;
 	}
 
 	@Reference(
@@ -345,8 +346,8 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 						_log.warn(
 							StringBundler.concat(
 								"Unable to update asset for file entry ",
-								String.valueOf(dlFileEntry.getFileEntryId()),
-								": ", e.getMessage()));
+								dlFileEntry.getFileEntryId(), ": ",
+								e.getMessage()));
 					}
 				}
 			}
@@ -380,8 +381,7 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 						_log.warn(
 							StringBundler.concat(
 								"Unable to update asset for folder ",
-								String.valueOf(dlFolder.getFolderId()), ": ",
-								e.getMessage()));
+								dlFolder.getFolderId(), ": ", e.getMessage()));
 					}
 				}
 			}
@@ -390,6 +390,50 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 				_log.debug("Assets verified for folders");
 			}
 		}
+	}
+
+	protected void updateStagedPortletNames() throws PortalException {
+		ActionableDynamicQuery groupActionableDynamicQuery =
+			_groupLocalService.getActionableDynamicQuery();
+
+		groupActionableDynamicQuery.setAddCriteriaMethod(
+			dynamicQuery -> {
+				Property siteProperty = PropertyFactoryUtil.forName("site");
+
+				dynamicQuery.add(siteProperty.eq(Boolean.TRUE));
+			});
+		groupActionableDynamicQuery.setPerformActionMethod(
+			(ActionableDynamicQuery.PerformActionMethod<Group>)group -> {
+				UnicodeProperties typeSettingsProperties =
+					group.getTypeSettingsProperties();
+
+				if (typeSettingsProperties == null) {
+					return;
+				}
+
+				String propertyKey = _staging.getStagedPortletId(
+					DLPortletKeys.DOCUMENT_LIBRARY);
+
+				String propertyValue = typeSettingsProperties.getProperty(
+					propertyKey);
+
+				if (Validator.isNull(propertyValue)) {
+					return;
+				}
+
+				typeSettingsProperties.remove(propertyKey);
+
+				propertyKey = _staging.getStagedPortletId(
+					DLPortletKeys.DOCUMENT_LIBRARY_ADMIN);
+
+				typeSettingsProperties.put(propertyKey, propertyValue);
+
+				group.setTypeSettingsProperties(typeSettingsProperties);
+
+				_groupLocalService.updateGroup(group);
+			});
+
+		groupActionableDynamicQuery.performActions();
 	}
 
 	private static final String _MS_OFFICE_2010_TEXT_XML_UTF8 =
@@ -403,5 +447,9 @@ public class DLServiceVerifyProcess extends VerifyProcess {
 	private DLFileEntryMetadataLocalService _dlFileEntryMetadataLocalService;
 	private DLFileVersionLocalService _dlFileVersionLocalService;
 	private DLFolderLocalService _dlFolderLocalService;
+	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private Staging _staging;
 
 }

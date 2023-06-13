@@ -24,6 +24,7 @@ import com.liferay.apio.architect.routes.ItemRoutes;
 import com.liferay.apio.architect.routes.NestedCollectionRoutes;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetVocabularyService;
+import com.liferay.content.space.apio.architect.identifier.ContentSpaceIdentifier;
 import com.liferay.person.apio.architect.identifier.PersonIdentifier;
 import com.liferay.portal.apio.permission.HasPermission;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -31,10 +32,10 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.site.apio.architect.identifier.WebSiteIdentifier;
 import com.liferay.vocabulary.apio.architect.identifier.VocabularyIdentifier;
 import com.liferay.vocabulary.apio.internal.architect.form.VocabularyForm;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -48,12 +49,12 @@ import org.osgi.service.component.annotations.Reference;
  *
  * @author Javier Gamarra
  * @author Eduardo Pérez
- * @review
  */
-@Component(immediate = true)
+@Component(immediate = true, service = NestedCollectionResource.class)
 public class VocabularyNestedCollectionResource
-	implements NestedCollectionResource<AssetVocabulary, Long,
-		VocabularyIdentifier, Long, WebSiteIdentifier> {
+	implements NestedCollectionResource
+		<AssetVocabulary, Long, VocabularyIdentifier, Long,
+		 ContentSpaceIdentifier> {
 
 	@Override
 	public NestedCollectionRoutes<AssetVocabulary, Long, Long> collectionRoutes(
@@ -63,7 +64,7 @@ public class VocabularyNestedCollectionResource
 			this::_getPageItems
 		).addCreator(
 			this::_addAssetVocabulary,
-			_hasPermission.forAddingIn(WebSiteIdentifier.class),
+			_hasPermission.forAddingIn(ContentSpaceIdentifier.class),
 			VocabularyForm::buildForm
 		).build();
 	}
@@ -97,24 +98,23 @@ public class VocabularyNestedCollectionResource
 		).identifier(
 			AssetVocabulary::getVocabularyId
 		).addBidirectionalModel(
-			"interactionService", "vocabularies", WebSiteIdentifier.class,
+			"contentSpace", "vocabularies", ContentSpaceIdentifier.class,
 			AssetVocabulary::getGroupId
 		).addDate(
 			"dateCreated", AssetVocabulary::getCreateDate
 		).addDate(
 			"dateModified", AssetVocabulary::getModifiedDate
-		).addDate(
-			"datePublished", AssetVocabulary::getLastPublishDate
-		).addLinkedModel(
-			"author", PersonIdentifier.class, AssetVocabulary::getUserId
 		).addLinkedModel(
 			"creator", PersonIdentifier.class, AssetVocabulary::getUserId
 		).addLocalizedStringByLocale(
 			"description", AssetVocabulary::getDescription
 		).addLocalizedStringByLocale(
-			"title", AssetVocabulary::getTitle
-		).addString(
-			"name", AssetVocabulary::getName
+			"name", AssetVocabulary::getTitle
+		).addStringList(
+			"availableLanguages",
+			vocabulary -> Arrays.asList(
+				LocaleUtil.toW3cLanguageIds(
+					vocabulary.getAvailableLanguageIds()))
 		).build();
 	}
 

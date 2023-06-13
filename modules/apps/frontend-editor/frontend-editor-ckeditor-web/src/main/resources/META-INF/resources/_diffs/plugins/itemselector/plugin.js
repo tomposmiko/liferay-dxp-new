@@ -326,7 +326,6 @@
 					AUI().use(
 						'liferay-item-selector-dialog',
 						function(A) {
-
 							itemSelectorDialog = new A.LiferayItemSelectorDialog(
 								{
 									eventName: eventName,
@@ -359,6 +358,14 @@
 				return itemSrc;
 			},
 
+			_isEmptySelection: function(editor) {
+				var selection = editor.getSelection();
+
+				var ranges = selection.getRanges();
+
+				return selection.getType() === CKEDITOR.SELECTION_NONE || (ranges.length === 1 && ranges[0].collapsed);
+			},
+
 			_onSelectedAudioChange: function(editor, callback, event) {
 				var instance = this;
 
@@ -385,7 +392,6 @@
 
 				if (selectedItem) {
 					var eventName = editor.name + 'selectItem';
-
 					var imageSrc = instance._getItemSrc(editor, selectedItem);
 
 					Liferay.Util.getWindow(eventName).onceAfter(
@@ -396,9 +402,16 @@
 									callback(imageSrc, selectedItem);
 								}
 								else {
-									var el = CKEDITOR.dom.element.createFromHtml('<img src="' + imageSrc + '">');
+									editor.insertHtml('<img src="' + imageSrc + '">');
 
-									editor.insertElement(el);
+									if (instance._isEmptySelection(editor)) {
+										if (AUI.Env.UA.ie >= 9) {
+											editor.insertHtml('<img src="' + imageSrc + '">' + ' <br /> ');
+										}
+										else {
+											editor.execCommand('enter');
+										}
+									}
 
 									editor.focus();
 								}

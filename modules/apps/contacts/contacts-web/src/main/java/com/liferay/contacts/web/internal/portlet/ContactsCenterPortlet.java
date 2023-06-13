@@ -32,10 +32,7 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.AddressCityException;
 import com.liferay.portal.kernel.exception.AddressStreetException;
 import com.liferay.portal.kernel.exception.AddressZipException;
-import com.liferay.portal.kernel.exception.ContactFirstNameException;
-import com.liferay.portal.kernel.exception.ContactFullNameException;
-import com.liferay.portal.kernel.exception.ContactLastNameException;
-import com.liferay.portal.kernel.exception.DuplicateUserEmailAddressException;
+import com.liferay.portal.kernel.exception.ContactNameException;
 import com.liferay.portal.kernel.exception.EmailAddressException;
 import com.liferay.portal.kernel.exception.NoSuchCountryException;
 import com.liferay.portal.kernel.exception.NoSuchListTypeException;
@@ -43,8 +40,6 @@ import com.liferay.portal.kernel.exception.NoSuchRegionException;
 import com.liferay.portal.kernel.exception.NoSuchUserException;
 import com.liferay.portal.kernel.exception.PhoneNumberException;
 import com.liferay.portal.kernel.exception.PhoneNumberExtensionException;
-import com.liferay.portal.kernel.exception.ReservedUserEmailAddressException;
-import com.liferay.portal.kernel.exception.ReservedUserScreenNameException;
 import com.liferay.portal.kernel.exception.UserEmailAddressException;
 import com.liferay.portal.kernel.exception.UserScreenNameException;
 import com.liferay.portal.kernel.exception.UserSmsException;
@@ -164,18 +159,16 @@ public class ContactsCenterPortlet extends MVCPortlet {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		long[] userIds = getUserIds(actionRequest);
-
 		int type = ParamUtil.getInteger(actionRequest, "type");
 
 		if (type == SocialRelationConstants.TYPE_BI_CONNECTION) {
 			return;
 		}
 
-		for (long userId : userIds) {
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		for (long userId : getUserIds(actionRequest)) {
 			if (userId == themeDisplay.getUserId()) {
 				continue;
 			}
@@ -537,7 +530,7 @@ public class ContactsCenterPortlet extends MVCPortlet {
 			jsonObject.put("success", Boolean.TRUE);
 		}
 		catch (Exception e) {
-			if (e instanceof ContactFullNameException) {
+			if (e instanceof ContactNameException.MustHaveValidFullName) {
 				message = "full-name-cannot-be-empty";
 			}
 			else if (e instanceof DuplicateEntryEmailAddressException) {
@@ -611,16 +604,18 @@ public class ContactsCenterPortlet extends MVCPortlet {
 			else if (e instanceof AddressZipException) {
 				message = "please-enter-a-valid-postal-code";
 			}
-			else if (e instanceof ContactFirstNameException) {
+			else if (e instanceof ContactNameException.MustHaveFirstName) {
 				message = "please-enter-a-valid-first-name";
 			}
-			else if (e instanceof ContactFullNameException) {
+			else if (e instanceof ContactNameException.MustHaveValidFullName) {
 				message = "please-enter-a-valid-first-middle-and-last-name";
 			}
-			else if (e instanceof ContactLastNameException) {
+			else if (e instanceof ContactNameException.MustHaveLastName) {
 				message = "please-enter-a-valid-last-name";
 			}
-			else if (e instanceof DuplicateUserEmailAddressException) {
+			else if (e instanceof UserEmailAddressException.
+						MustNotBeDuplicate) {
+
 				message = "the-email-address-you-requested-is-already-taken";
 			}
 			else if (e instanceof EmailAddressException) {
@@ -641,10 +636,10 @@ public class ContactsCenterPortlet extends MVCPortlet {
 			else if (e instanceof PhoneNumberExtensionException) {
 				message = "please-enter-a-valid-phone-number-extension";
 			}
-			else if (e instanceof ReservedUserEmailAddressException) {
+			else if (e instanceof UserEmailAddressException.MustNotBeReserved) {
 				message = "the-email-address-you-requested-is-reserveds";
 			}
-			else if (e instanceof ReservedUserScreenNameException) {
+			else if (e instanceof UserScreenNameException.MustNotBeReserved) {
 				message = "the-screen-name-you-requested-is-reserved";
 			}
 			else if (e instanceof UserEmailAddressException) {
@@ -722,13 +717,12 @@ public class ContactsCenterPortlet extends MVCPortlet {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
 		long entryId = ParamUtil.getLong(actionRequest, "entryId");
 
 		if (entryId > 0) {
 			Entry entry = entryLocalService.getEntry(entryId);
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 
 			if (entry.getUserId() == themeDisplay.getUserId()) {
 				entryLocalService.deleteEntry(entryId);

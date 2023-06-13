@@ -15,12 +15,12 @@
 package com.liferay.portal.search.solr.internal.suggest;
 
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.suggest.NGramHolder;
 import com.liferay.portal.kernel.search.suggest.NGramHolderBuilder;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.search.solr.suggest.NGramQueryBuilder;
 
@@ -98,6 +98,7 @@ public class NGramQueryBuilderImpl implements NGramQueryBuilder {
 			Map.Entry<String, List<String>> entry = iterator.next();
 
 			String fieldName = entry.getKey();
+
 			List<String> fieldValues = entry.getValue();
 
 			Iterator<String> fieldValuesIterator = fieldValues.iterator();

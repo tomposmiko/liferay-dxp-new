@@ -608,6 +608,7 @@ public interface JournalArticleLocalService extends BaseLocalService,
 	public PersistedModel deletePersistedModel(PersistedModel persistedModel)
 		throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DynamicQuery dynamicQuery();
 
 	/**
@@ -616,6 +617,7 @@ public interface JournalArticleLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
 	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery);
 
 	/**
@@ -630,6 +632,7 @@ public interface JournalArticleLocalService extends BaseLocalService,
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
 	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
 		int end);
 
@@ -646,6 +649,7 @@ public interface JournalArticleLocalService extends BaseLocalService,
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
 	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
 		int end, OrderByComparator<T> orderByComparator);
 
@@ -655,6 +659,7 @@ public interface JournalArticleLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows matching the dynamic query
 	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long dynamicQueryCount(DynamicQuery dynamicQuery);
 
 	/**
@@ -664,6 +669,7 @@ public interface JournalArticleLocalService extends BaseLocalService,
 	* @param projection the projection to apply to the query
 	* @return the number of rows matching the dynamic query
 	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
 		Projection projection);
 
@@ -2258,21 +2264,30 @@ public interface JournalArticleLocalService extends BaseLocalService,
 	* result set.
 	* </p>
 	*
-	* @param groupId the primary key of the group (optionally <code>0</code>)
+	* @param groupId the primary key of the group (optionally
+	<code>0</code>)
 	* @param folderIds the primary keys of the web content article folders
 	(optionally {@link Collections#EMPTY_LIST})
 	* @param status the web content article's workflow status. For more
-	information see {@link WorkflowConstants} for constants starting
-	with the "STATUS_" prefix.
+	information see {@link WorkflowConstants} for constants
+	starting with the "STATUS_" prefix.
 	* @param start the lower bound of the range of web content articles to
 	return
 	* @param end the upper bound of the range of web content articles to
 	return (not inclusive)
 	* @return the matching web content articles
+	* @deprecated As of Judson (7.1.x), replaced by {@link #search(long
+	groupId, List folderIds, Locale locale, int status, int
+	start, int end)}
 	*/
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<JournalArticle> search(long groupId, List<Long> folderIds,
 		int status, int start, int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<JournalArticle> search(long groupId, List<Long> folderIds,
+		Locale locale, int status, int start, int end);
 
 	/**
 	* Returns a range of all the web content articles in a single folder

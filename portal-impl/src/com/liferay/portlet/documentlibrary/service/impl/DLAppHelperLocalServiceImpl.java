@@ -28,6 +28,7 @@ import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.model.DLSyncConstants;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.util.DLAppHelperThreadLocal;
+import com.liferay.document.library.kernel.util.DLUtil;
 import com.liferay.document.library.kernel.util.comparator.DLFileVersionVersionComparator;
 import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -66,6 +67,7 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -75,6 +77,7 @@ import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 import com.liferay.portlet.documentlibrary.service.base.DLAppHelperLocalServiceBaseImpl;
 import com.liferay.portlet.documentlibrary.social.DLActivityKeys;
+import com.liferay.portlet.documentlibrary.util.DLAppUtil;
 import com.liferay.social.kernel.model.SocialActivityConstants;
 import com.liferay.trash.kernel.exception.RestoreEntryException;
 import com.liferay.trash.kernel.exception.TrashEntryException;
@@ -667,12 +670,36 @@ public class DLAppHelperLocalServiceImpl
 			return;
 		}
 
-		dlFileEntry.setFileName(
-			TrashUtil.getOriginalTitle(dlFileEntry.getTitle(), "fileName"));
-		dlFileEntry.setTitle(
-			TrashUtil.getOriginalTitle(dlFileEntry.getTitle()));
+		String originalTitle = TrashUtil.getOriginalTitle(
+			dlFileEntry.getTitle());
+
+		String title = dlFileEntryLocalService.getUniqueTitle(
+			dlFileEntry.getGroupId(), dlFileEntry.getFolderId(),
+			dlFileEntry.getFileEntryId(), originalTitle,
+			dlFileEntry.getExtension());
+
+		String originalFileName = TrashUtil.getOriginalTitle(
+			dlFileEntry.getTitle(), "fileName");
+
+		String fileName = originalFileName;
+
+		if (!StringUtil.equals(title, originalTitle)) {
+			String extension = DLAppUtil.getExtension(title, originalFileName);
+
+			fileName = DLUtil.getSanitizedFileName(title, extension);
+		}
+
+		dlFileEntry.setFileName(fileName);
+		dlFileEntry.setTitle(title);
 
 		dlFileEntryPersistence.update(dlFileEntry);
+
+		DLFileVersion dlFileVersion = (DLFileVersion)fileVersion.getModel();
+
+		dlFileVersion.setFileName(fileName);
+		dlFileVersion.setTitle(title);
+
+		dlFileVersionPersistence.update(dlFileVersion);
 
 		TrashEntry trashEntry = trashEntryLocalService.getEntry(
 			DLFileEntryConstants.getClassName(), fileEntry.getFileEntryId());
@@ -772,7 +799,12 @@ public class DLAppHelperLocalServiceImpl
 				RestoreEntryException.INVALID_STATUS);
 		}
 
-		dlFolder.setName(TrashUtil.getOriginalTitle(dlFolder.getName()));
+		String originalName = TrashUtil.getOriginalTitle(dlFolder.getName());
+
+		dlFolder.setName(
+			dlFolderLocalService.getUniqueFolderName(
+				folder.getUuid(), folder.getGroupId(),
+				folder.getParentFolderId(), originalName, 2));
 
 		dlFolderPersistence.update(dlFolder);
 
@@ -1339,8 +1371,6 @@ public class DLAppHelperLocalServiceImpl
 
 		FileVersion fileVersion = fileEntry.getLatestFileVersion(true);
 
-		int oldStatus = fileVersion.getStatus();
-
 		dlFileEntryLocalService.updateStatus(
 			userId, fileVersion.getFileVersionId(),
 			WorkflowConstants.STATUS_IN_TRASH, new ServiceContext(),
@@ -1363,10 +1393,6 @@ public class DLAppHelperLocalServiceImpl
 
 		// Trash
 
-		DLFileVersion oldDLFileVersion = (DLFileVersion)fileVersion.getModel();
-
-		int oldDLFileVersionStatus = oldDLFileVersion.getStatus();
-
 		for (DLFileVersion curDLFileVersion : dlFileVersions) {
 			curDLFileVersion.setStatus(WorkflowConstants.STATUS_IN_TRASH);
 
@@ -1378,6 +1404,10 @@ public class DLAppHelperLocalServiceImpl
 		if (!DLAppHelperThreadLocal.isEnabled()) {
 			return fileEntry;
 		}
+
+		DLFileVersion oldDLFileVersion = (DLFileVersion)fileVersion.getModel();
+
+		int oldDLFileVersionStatus = oldDLFileVersion.getStatus();
 
 		UnicodeProperties typeSettingsProperties = new UnicodeProperties();
 
@@ -1417,6 +1447,8 @@ public class DLAppHelperLocalServiceImpl
 			extraDataJSONObject.toString(), 0);
 
 		// Workflow
+
+		int oldStatus = fileVersion.getStatus();
 
 		if (oldStatus == WorkflowConstants.STATUS_PENDING) {
 			workflowInstanceLinkLocalService.deleteWorkflowInstanceLink(

@@ -60,15 +60,6 @@ public class ExportFormInstanceMVCResourceCommand
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
-			WebKeys.THEME_DISPLAY);
-
-		long formInstanceId = ParamUtil.getLong(
-			resourceRequest, "formInstanceId");
-
-		DDMFormInstance formInstance = _formInstanceService.getFormInstance(
-			formInstanceId);
-
 		String fileExtension = ParamUtil.getString(
 			resourceRequest, "fileExtension");
 
@@ -81,6 +72,15 @@ public class ExportFormInstanceMVCResourceCommand
 
 			return;
 		}
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)resourceRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		long formInstanceId = ParamUtil.getLong(
+			resourceRequest, "formInstanceId");
+
+		DDMFormInstance formInstance = _formInstanceService.getFormInstance(
+			formInstanceId);
 
 		String fileName =
 			formInstance.getName(themeDisplay.getLocale()) + CharPool.PERIOD +

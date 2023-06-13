@@ -63,6 +63,7 @@ import com.liferay.portal.kernel.template.TemplateHandler;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ServiceProxyFactory;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -847,9 +848,8 @@ public class PortletImpl extends PortletBaseImpl {
 		if (Validator.isNull(_defaultPreferences)) {
 			return PortletConstants.DEFAULT_PREFERENCES;
 		}
-		else {
-			return _defaultPreferences;
-		}
+
+		return _defaultPreferences;
 	}
 
 	/**
@@ -859,7 +859,7 @@ public class PortletImpl extends PortletBaseImpl {
 	 */
 	@Override
 	public String getDisplayName() {
-		return _displayName;
+		return GetterUtil.getString(_displayName);
 	}
 
 	/**
@@ -2410,9 +2410,8 @@ public class PortletImpl extends PortletBaseImpl {
 		if (_portletModes.size() > 1) {
 			return true;
 		}
-		else {
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
@@ -2461,9 +2460,8 @@ public class PortletImpl extends PortletBaseImpl {
 		if (mimeTypePortletModes.contains(portletMode.toString())) {
 			return true;
 		}
-		else {
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
@@ -2513,9 +2511,8 @@ public class PortletImpl extends PortletBaseImpl {
 		if (mimeTypeWindowStates.contains(windowState.toString())) {
 			return true;
 		}
-		else {
-			return false;
-		}
+
+		return false;
 	}
 
 	/**
@@ -2757,9 +2754,8 @@ public class PortletImpl extends PortletBaseImpl {
 		if (readiness == null) {
 			return true;
 		}
-		else {
-			return readiness._ready;
-		}
+
+		return readiness._ready;
 	}
 
 	/**
@@ -4653,7 +4649,7 @@ public class PortletImpl extends PortletBaseImpl {
 	 * String)}, or {@link javax.portlet.HeaderResponse#addDependency(String,
 	 * String, String, String)} are to be referenced in the page's header.
 	 */
-	private boolean _portletDependencyCssEnabled;
+	private boolean _portletDependencyCssEnabled = true;
 
 	/**
 	 * <code>True</code> if the JavaScript resource dependencies specified in
@@ -4662,7 +4658,7 @@ public class PortletImpl extends PortletBaseImpl {
 	 * String)}, or {@link javax.portlet.HeaderResponse#addDependency(String,
 	 * String, String, String)} are to be referenced in the page's header.
 	 */
-	private boolean _portletDependencyJavaScriptEnabled;
+	private boolean _portletDependencyJavaScriptEnabled = true;
 
 	/**
 	 * The filters of the portlet.

@@ -35,11 +35,6 @@
 	<td></td>
 </tr>
 <tr>
-	<td>NAVIGATION_BACK</td>
-	<td>//button[contains(@class,'close') and not(contains(@hidden,'hidden'))]//span[contains(@class,'glyphicon')]</td>
-	<td></td>
-</tr>
-<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -69,22 +64,6 @@
 <tr>
 	<td>FILE_INFO_ICON</td>
 	<td>//div[contains(@class,'image-viewer-focused')]//span[contains(@class,'item-viewer-icon-info')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
-<!--SIDEBAR-->
-<tr>
-	<td>SIDEBAR_HEADER</td>
-	<td>//div[@class='sidebar-header']//a[contains(.,'File Info')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>SIDEBAR_CONTENT</td>
-	<td>//div[@class='tab-content']//p[contains(.,'${key_fileDetail}')]</td>
 	<td></td>
 </tr>
 <tr>

@@ -52,7 +52,7 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Juan Fernández
  */
-@Component(immediate = true)
+@Component(immediate = true, service = DDMWebDAV.class)
 public class DDMWebDAVImpl implements DDMWebDAV {
 
 	@Override
@@ -66,7 +66,6 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 		}
 
 		String type = pathArray[2];
-		String typeId = pathArray[3];
 
 		if (type.equals(TYPE_STRUCTURES)) {
 			HttpServletRequest request = webDAVRequest.getHttpServletRequest();
@@ -81,7 +80,7 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 
 			Locale defaultLocale = ddmForm.getDefaultLocale();
 
-			nameMap.put(defaultLocale, typeId);
+			nameMap.put(defaultLocale, pathArray[3]);
 
 			ServiceContext serviceContext = new ServiceContext();
 
@@ -137,9 +136,8 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 
 				return HttpServletResponse.SC_NO_CONTENT;
 			}
-			else {
-				return HttpServletResponse.SC_FORBIDDEN;
-			}
+
+			return HttpServletResponse.SC_FORBIDDEN;
 		}
 		catch (PortalException pe) {
 			if (_log.isDebugEnabled()) {
@@ -273,9 +271,8 @@ public class DDMWebDAVImpl implements DDMWebDAV {
 
 				return HttpServletResponse.SC_CREATED;
 			}
-			else {
-				return HttpServletResponse.SC_FORBIDDEN;
-			}
+
+			return HttpServletResponse.SC_FORBIDDEN;
 		}
 		catch (PortalException pe) {
 			if (_log.isDebugEnabled()) {

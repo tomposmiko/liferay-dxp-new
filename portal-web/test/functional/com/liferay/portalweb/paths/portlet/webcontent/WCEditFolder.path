@@ -8,21 +8,6 @@
 <tr><td rowspan="1" colspan="3">WCEditFolder</td></tr>
 </thead>
 <tbody>
-<tr>
-	<td>PERMISSIONS_SELECT</td>
-	<td>//select[contains(@id,'inputPermissionsViewRole')]</td>
-	<td></td>
-</tr>
-<tr>
-	<td>MERGE_WITH_PARENT_FOLDER_CHECKBOX</td>
-	<td>//input[@id='_15_mergeWithParentFolder']</td>
-	<td></td>
-</tr>
-<tr>
-	<td></td>
-	<td></td>
-	<td></td>
-</tr>
 <!--WORKFLOW -->
 <tr>
 	<td>WORKFLOW_STRUCTURE_RESTRICTIONS_TOGGLE</td>
@@ -41,7 +26,7 @@
 </tr>
 <tr>
 	<td>WORKFLOW_SPECIFIC_RESTRICTIONS_CHOOSE_STRUCTURE_BUTTON</td>
-  	<td>//span[contains(@class,'select-structure')]/a[contains(.,'Choose Structure')]</td>
+  	<td>//button[contains(@id,'selectStructure')]/span[contains(.,'Choose Structure')]</td>
   	<td></td>
 </tr>
 <tr>

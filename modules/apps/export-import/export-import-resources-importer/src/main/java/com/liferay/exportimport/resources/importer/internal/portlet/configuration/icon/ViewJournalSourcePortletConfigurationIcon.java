@@ -18,6 +18,7 @@ import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -32,7 +33,6 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -133,12 +133,13 @@ public class ViewJournalSourcePortletConfigurationIcon
 		long classNameId = ParamUtil.getLong(request, "classNameId");
 		long classPK = ParamUtil.getLong(request, "classPK");
 		String articleId = ParamUtil.getString(request, "articleId");
-		int status = ParamUtil.getInteger(
-			request, "status", WorkflowConstants.STATUS_ANY);
 
 		JournalArticle article = null;
 
 		if (Validator.isNotNull(articleId)) {
+			int status = ParamUtil.getInteger(
+				request, "status", WorkflowConstants.STATUS_ANY);
+
 			article = _journalArticleLocalService.fetchLatestArticle(
 				groupId, articleId, status);
 		}

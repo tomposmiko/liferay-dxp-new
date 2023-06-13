@@ -14,6 +14,7 @@
 
 package com.liferay.portal.template.freemarker.internal;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.model.Theme;
@@ -21,7 +22,6 @@ import com.liferay.portal.kernel.template.TemplateContextContributor;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.template.TemplateContextHelper;
@@ -107,10 +107,9 @@ public class FreeMarkerTemplateContextHelper extends TemplateContextHelper {
 		if (ftlVariables != null) {
 			for (Map.Entry<String, Object> entry : ftlVariables.entrySet()) {
 				String key = entry.getKey();
-				Object value = entry.getValue();
 
 				if (Validator.isNotNull(key)) {
-					contextObjects.put(key, value);
+					contextObjects.put(key, entry.getValue());
 				}
 			}
 		}

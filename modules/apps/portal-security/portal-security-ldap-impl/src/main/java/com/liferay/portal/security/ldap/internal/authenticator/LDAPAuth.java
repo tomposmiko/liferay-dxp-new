@@ -16,6 +16,7 @@ package com.liferay.portal.security.ldap.internal.authenticator;
 
 import com.liferay.admin.kernel.util.Omniadmin;
 import com.liferay.petra.lang.CentralizedThreadLocal;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PasswordExpiredException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -32,7 +33,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.security.ldap.PortalLDAP;
@@ -43,6 +43,7 @@ import com.liferay.portal.security.ldap.configuration.SystemLDAPConfiguration;
 import com.liferay.portal.security.ldap.constants.LDAPConstants;
 import com.liferay.portal.security.ldap.exportimport.LDAPUserImporter;
 import com.liferay.portal.security.ldap.exportimport.configuration.LDAPImportConfiguration;
+import com.liferay.portal.security.ldap.util.LDAPUtil;
 
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -158,14 +159,15 @@ public class LDAPAuth implements Authenticator {
 
 		String authMethod = ldapAuthConfiguration.method();
 
-		SystemLDAPConfiguration systemLDAPConfiguration =
-			_systemLDAPConfigurationProvider.getConfiguration(companyId);
-
 		if (authMethod.equals(LDAPConstants.AUTH_METHOD_BIND)) {
 			Hashtable<String, Object> env =
 				(Hashtable<String, Object>)ctx.getEnvironment();
 
+			SystemLDAPConfiguration systemLDAPConfiguration =
+				_systemLDAPConfigurationProvider.getConfiguration(companyId);
+
 			env.put(Context.REFERRAL, systemLDAPConfiguration.referral());
+
 			env.put(Context.SECURITY_CREDENTIALS, password);
 			env.put(Context.SECURITY_PRINCIPAL, userDN);
 
@@ -242,17 +244,17 @@ public class LDAPAuth implements Authenticator {
 			Attribute userPassword = attributes.get("userPassword");
 
 			if (userPassword != null) {
+				String encryptedPassword = password;
 				String ldapPassword = new String((byte[])userPassword.get());
 
-				String encryptedPassword = removeEncryptionAlgorithm(
-					ldapPassword);
+				if (Validator.isNotNull(
+						ldapAuthConfiguration.passwordEncryptionAlgorithm())) {
 
-				String algorithm =
-					ldapAuthConfiguration.passwordEncryptionAlgorithm();
+					ldapPassword = removeEncryptionAlgorithm(ldapPassword);
 
-				if (Validator.isNotNull(algorithm)) {
 					encryptedPassword = _passwordEncryptor.encrypt(
-						algorithm, password, ldapPassword);
+						ldapAuthConfiguration.passwordEncryptionAlgorithm(),
+						password, ldapPassword);
 				}
 
 				if (ldapPassword.equals(encryptedPassword)) {
@@ -285,8 +287,7 @@ public class LDAPAuth implements Authenticator {
 				_log.debug(
 					StringBundler.concat(
 						"No LDAP server configuration available for LDAP ",
-						"server ", String.valueOf(ldapServerId),
-						" and company ", String.valueOf(companyId)));
+						"server ", ldapServerId, " and company ", companyId));
 			}
 
 			return FAILURE;
@@ -299,12 +300,15 @@ public class LDAPAuth implements Authenticator {
 				_ldapServerConfigurationProvider.getConfiguration(
 					companyId, ldapServerId);
 
-			String baseDN = ldapServerConfiguration.baseDN();
+			String baseDN = LDAPUtil.escapeCharacters(
+				ldapServerConfiguration.baseDN());
 
 			//  Process LDAP auth search filter
 
 			String filter = _ldapSettings.getAuthSearchFilter(
-				ldapServerId, companyId, emailAddress, screenName,
+				ldapServerId, companyId,
+				_portalLDAP.encodeFilterAttribute(emailAddress, false),
+				_portalLDAP.encodeFilterAttribute(screenName, false),
 				String.valueOf(userId));
 
 			Properties userMappings = _ldapSettings.getUserMappings(
@@ -606,9 +610,8 @@ public class LDAPAuth implements Authenticator {
 		if (ldapAuthConfiguration.required()) {
 			return failureCode;
 		}
-		else {
-			return SUCCESS;
-		}
+
+		return SUCCESS;
 	}
 
 	protected LDAPAuthResult getFailedLDAPAuthResult(Map<String, Object> env) {
@@ -668,9 +671,8 @@ public class LDAPAuth implements Authenticator {
 		if (_log.isDebugEnabled()) {
 			_log.debug(
 				StringBundler.concat(
-					"Using LDAP server ",
-					String.valueOf(user.getLdapServerId()),
-					" to authenticate user ", String.valueOf(userId)));
+					"Using LDAP server ", user.getLdapServerId(),
+					" to authenticate user ", userId));
 		}
 
 		return user.getLdapServerId();
@@ -687,13 +689,13 @@ public class LDAPAuth implements Authenticator {
 			return ldapPassword;
 		}
 
-		int y = ldapPassword.indexOf(StringPool.CLOSE_CURLY_BRACE);
+		int y = ldapPassword.indexOf(StringPool.CLOSE_CURLY_BRACE, x);
 
 		if (y == -1) {
 			return ldapPassword;
 		}
 
-		return ldapPassword.substring(x, y + 1);
+		return ldapPassword.substring(y + 1);
 	}
 
 	@Reference(

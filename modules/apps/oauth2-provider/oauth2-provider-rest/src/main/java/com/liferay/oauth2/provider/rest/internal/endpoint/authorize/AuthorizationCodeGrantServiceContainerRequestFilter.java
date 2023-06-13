@@ -15,6 +15,7 @@
 package com.liferay.oauth2.provider.rest.internal.endpoint.authorize;
 
 import com.liferay.oauth2.provider.rest.internal.endpoint.authorize.configuration.AuthorizeScreenConfiguration;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
@@ -24,7 +25,6 @@ import com.liferay.portal.kernel.servlet.ProtectedPrincipal;
 import com.liferay.portal.kernel.settings.CompanyServiceSettingsLocator;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -58,7 +58,8 @@ import org.osgi.service.component.annotations.Reference;
 		"osgi.jaxrs.application.select=(osgi.jaxrs.name=Liferay.OAuth2.Application)",
 		"osgi.jaxrs.extension=true",
 		"osgi.jaxrs.name=AuthorizationCodeGrantServiceContainerRequestFilter"
-	}
+	},
+	service = ContainerRequestFilter.class
 )
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
@@ -67,8 +68,8 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 	implements ContainerRequestFilter {
 
 	@Override
-	public void filter(ContainerRequestContext requestContext) {
-		UriInfo uriInfo = requestContext.getUriInfo();
+	public void filter(ContainerRequestContext containerRequestContext) {
+		UriInfo uriInfo = containerRequestContext.getUriInfo();
 
 		if (!StringUtil.startsWith(uriInfo.getPath(), "authorize")) {
 			return;
@@ -78,10 +79,7 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 			User user = _portal.getUser(_httpServletRequest);
 
 			if ((user != null) && !user.isDefaultUser()) {
-				SecurityContext securityContext =
-					requestContext.getSecurityContext();
-
-				requestContext.setSecurityContext(
+				containerRequestContext.setSecurityContext(
 					new PortalCXFSecurityContext() {
 
 						@Override
@@ -92,7 +90,7 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 
 						@Override
 						public boolean isSecure() {
-							return securityContext.isSecure();
+							return _portal.isSecure(_httpServletRequest);
 						}
 
 					});
@@ -103,7 +101,7 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 		catch (Exception e) {
 			_log.error("Unable to resolve authenticated user", e);
 
-			requestContext.abortWith(
+			containerRequestContext.abortWith(
 				Response.status(
 					Response.Status.INTERNAL_SERVER_ERROR
 				).build());
@@ -130,7 +128,7 @@ public class AuthorizationCodeGrantServiceContainerRequestFilter
 		loginURL = _http.addParameter(
 			loginURL, "redirect", requestURI.toASCIIString());
 
-		requestContext.abortWith(
+		containerRequestContext.abortWith(
 			Response.status(
 				Response.Status.FOUND
 			).location(

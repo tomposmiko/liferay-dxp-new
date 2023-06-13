@@ -14,10 +14,10 @@
 
 package com.liferay.journal.internal.upgrade.v0_0_7;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.sql.PreparedStatement;
@@ -54,6 +54,7 @@ public class UpgradeJournalArticleDates extends UpgradeProcess {
 			try (ResultSet rs = s.executeQuery(sb.toString())) {
 				while (rs.next()) {
 					long resourcePrimKey = rs.getLong(1);
+
 					Timestamp createDate = rs.getTimestamp(2);
 
 					ps.setTimestamp(1, createDate);
@@ -98,6 +99,7 @@ public class UpgradeJournalArticleDates extends UpgradeProcess {
 				while (rs.next()) {
 					long resourcePrimKey = rs.getLong(1);
 					Double latestVersion = rs.getDouble(2);
+
 					Timestamp assetModifiedDate = rs.getTimestamp(3);
 
 					ps2.setTimestamp(1, assetModifiedDate);

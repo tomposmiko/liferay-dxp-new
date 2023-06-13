@@ -14,9 +14,9 @@
 
 package com.liferay.wiki.internal.upgrade.v1_1_0;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.LoggingTimer;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.sql.PreparedStatement;
@@ -39,17 +39,18 @@ public class UpgradeWikiNode extends UpgradeProcess {
 			ResultSet rs = ps.executeQuery()) {
 
 			while (rs.next()) {
-				long nodeId = rs.getLong("nodeId");
 				String name = rs.getString("name");
 
 				if (!Validator.isNumber(name)) {
 					continue;
 				}
 
+				long nodeId = rs.getLong("nodeId");
+
 				runSQL(
 					StringBundler.concat(
 						"update WikiNode set name = 'Node ", name,
-						"' where nodeId = ", String.valueOf(nodeId)));
+						"' where nodeId = ", nodeId));
 			}
 		}
 	}

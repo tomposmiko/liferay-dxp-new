@@ -18,7 +18,6 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetCategoryConstants;
 import com.liferay.asset.kernel.model.AssetCategoryModel;
 import com.liferay.asset.kernel.model.AssetEntryModel;
-import com.liferay.asset.kernel.model.AssetTag;
 import com.liferay.asset.kernel.model.AssetTagModel;
 import com.liferay.asset.kernel.model.AssetTagStatsModel;
 import com.liferay.asset.kernel.model.AssetVocabulary;
@@ -838,6 +837,7 @@ public class DataFactory {
 
 			for (int j = 0; j < _assetClassNameIds.length; j++) {
 				int fromIndex = j * pageSize;
+
 				int toIndex = (j + 1) * pageSize;
 
 				if (j == (_assetClassNameIds.length - 1)) {
@@ -912,6 +912,7 @@ public class DataFactory {
 
 			for (int j = 0; j < _assetClassNameIds.length; j++) {
 				int fromIndex = j * pageSize;
+
 				int toIndex = (j + 1) * pageSize;
 
 				if (j == (_assetClassNameIds.length - 1)) {
@@ -2562,14 +2563,6 @@ public class DataFactory {
 	}
 
 	public List<ResourcePermissionModel> newResourcePermissionModels(
-		AssetTagModel assetTagModel) {
-
-		return newResourcePermissionModels(
-			AssetTag.class.getName(), String.valueOf(assetTagModel.getTagId()),
-			_sampleUserId);
-	}
-
-	public List<ResourcePermissionModel> newResourcePermissionModels(
 		AssetVocabularyModel assetVocabularyModel) {
 
 		if (assetVocabularyModel.getUserId() == _defaultUserId) {
@@ -2706,11 +2699,9 @@ public class DataFactory {
 	public List<ResourcePermissionModel> newResourcePermissionModels(
 		MBMessageModel mbMessageModel) {
 
-		return Collections.singletonList(
-			newResourcePermissionModel(
-				MBMessage.class.getName(),
-				String.valueOf(mbMessageModel.getMessageId()),
-				_ownerRoleModel.getRoleId(), _sampleUserId));
+		return newResourcePermissionModels(
+			MBMessage.class.getName(),
+			String.valueOf(mbMessageModel.getMessageId()), _sampleUserId);
 	}
 
 	public List<ResourcePermissionModel> newResourcePermissionModels(
@@ -3524,6 +3515,7 @@ public class DataFactory {
 		PortletPreferencesModel portletPreferencesModel =
 			new PortletPreferencesModelImpl();
 
+		portletPreferencesModel.setCompanyId(_companyId);
 		portletPreferencesModel.setPortletPreferencesId(_counter.get());
 		portletPreferencesModel.setOwnerId(PortletKeys.PREFS_OWNER_ID_DEFAULT);
 		portletPreferencesModel.setOwnerType(

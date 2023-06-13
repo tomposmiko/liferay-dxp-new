@@ -196,6 +196,7 @@ public interface MBMessageLocalService extends BaseLocalService,
 	public void deleteTempAttachment(long groupId, long userId,
 		String folderName, String fileName) throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DynamicQuery dynamicQuery();
 
 	/**
@@ -204,6 +205,7 @@ public interface MBMessageLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @return the matching rows
 	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery);
 
 	/**
@@ -218,6 +220,7 @@ public interface MBMessageLocalService extends BaseLocalService,
 	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
 	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
 		int end);
 
@@ -234,6 +237,7 @@ public interface MBMessageLocalService extends BaseLocalService,
 	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
 	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public <T> List<T> dynamicQuery(DynamicQuery dynamicQuery, int start,
 		int end, OrderByComparator<T> orderByComparator);
 
@@ -243,6 +247,7 @@ public interface MBMessageLocalService extends BaseLocalService,
 	* @param dynamicQuery the dynamic query
 	* @return the number of rows matching the dynamic query
 	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long dynamicQueryCount(DynamicQuery dynamicQuery);
 
 	/**
@@ -252,6 +257,7 @@ public interface MBMessageLocalService extends BaseLocalService,
 	* @param projection the projection to apply to the query
 	* @return the number of rows matching the dynamic query
 	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long dynamicQueryCount(DynamicQuery dynamicQuery,
 		Projection projection);
 
@@ -489,13 +495,40 @@ public interface MBMessageLocalService extends BaseLocalService,
 	public int getPositionInThread(long messageId) throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<MBMessage> getRootDiscussionMessages(String className,
+		long classPK, int status) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<MBMessage> getRootDiscussionMessages(String className,
+		long classPK, int status, int start, int end) throws PortalException;
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getRootDiscussionMessagesCount(String className, long classPK,
+		int status);
+
+	/**
+	* @deprecated As of Judson (7.1.x), replaced by {@link #getRootDiscussionMessages(
+	String, long, int)}
+	*/
+	@Deprecated
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<MBMessage> getRootMessages(String className, long classPK,
 		int status) throws PortalException;
 
+	/**
+	* @deprecated As of Judson (7.1.x), replaced by {@link #getRootDiscussionMessages(
+	String, long, int, int, int)}
+	*/
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<MBMessage> getRootMessages(String className, long classPK,
 		int status, int start, int end) throws PortalException;
 
+	/**
+	* @deprecated As of Judson (7.1.x), replaced by {@link
+	#getRootDiscussionMessagesCount(String, long, int)}
+	*/
+	@Deprecated
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getRootMessagesCount(String className, long classPK, int status);
 

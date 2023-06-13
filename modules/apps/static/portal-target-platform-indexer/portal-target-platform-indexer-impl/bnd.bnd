@@ -1,12 +1,38 @@
 Bundle-Name: Liferay Portal Target Platform Indexer Implementation
 Bundle-SymbolicName: com.liferay.portal.target.platform.indexer.impl
-Bundle-Version: 1.0.2
+Bundle-Version: 1.0.12
 Import-Package:\
+	!aQute.configurable,\
+	\
 	!com.liferay.portal.bootstrap,\
 	\
-	!org.apache.tools.ant.*,\
-	\
-	org.osgi.framework,\
-	org.osgi.resource,\
-	\
 	*
+-conditionalpackage:\
+	aQute.bnd.*,\
+	\
+	aQute.lib.*,\
+	\
+	aQute.libg.*,\
+	\
+	aQute.service.reporter,\
+	\
+	biz.aQute.resolve,\
+	\
+	org.apache.*,\
+	\
+	org.kxml2.io.*,\
+	\
+	org.osgi.impl.bundle.*,\
+	org.osgi.service.bindex.*,\
+	org.osgi.service.coordinator.*,\
+	org.osgi.service.indexer.*,\
+	org.osgi.service.obr.*,\
+	org.osgi.service.repository.*,\
+	org.osgi.service.resolver.*,\
+	org.osgi.util.*,\
+	\
+	org.xmlpull.v1.*
+-includeresource:\
+	@biz.aQute.bndlib-*.jar!/aQute/bnd/build/model/osgi-core/*,\
+	@slf4j-api-*.jar,\
+	@slf4j-simple-*.jar

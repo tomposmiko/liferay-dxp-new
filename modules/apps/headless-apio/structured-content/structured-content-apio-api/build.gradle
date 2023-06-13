@@ -1,0 +1,7 @@
+dependencies {
+	compileOnly group: "com.liferay", name: "com.liferay.apio.architect.api", version: "1.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.dynamic.data.mapping.api", version: "4.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.portal.odata.api", version: "1.0.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "3.0.0"
+	compileOnly group: "javax.ws.rs", name: "javax.ws.rs-api", version: "2.1"
+}

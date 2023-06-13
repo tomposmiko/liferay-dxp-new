@@ -27,6 +27,7 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMFormValuesTestUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.json.JSONFactoryImpl;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -42,7 +43,6 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
@@ -152,16 +152,19 @@ public class UpgradeDynamicDataMappingTest extends PowerMockito {
 			null, null, null);
 	}
 
-	@Test(expected = UpgradeException.class)
+	@Test
 	public void testCreateNewFieldNameWithConflictingNewFieldName()
 		throws Exception {
 
 		Set<String> existingFieldNames = new HashSet<>();
 
 		existingFieldNames.add("myna");
+		existingFieldNames.add("myna1");
 
-		_upgradeDynamicDataMapping.createNewDDMFormFieldName(
-			"?my/--na", existingFieldNames);
+		Assert.assertEquals(
+			"myna2",
+			_upgradeDynamicDataMapping.createNewDDMFormFieldName(
+				"?my/--na", existingFieldNames));
 	}
 
 	@Test

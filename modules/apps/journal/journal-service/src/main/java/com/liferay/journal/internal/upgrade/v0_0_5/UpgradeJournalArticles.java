@@ -19,6 +19,7 @@ import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -32,7 +33,6 @@ import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.upgrade.BaseUpgradePortletId;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portlet.PortletPreferencesImpl;
 
 import java.sql.PreparedStatement;
@@ -161,9 +161,7 @@ public class UpgradeJournalArticles extends BaseUpgradePortletId {
 	@Override
 	protected String[][] getRenamePortletIdsArray() {
 		return new String[][] {
-			new String[] {
-				_PORTLET_ID_JOURNAL_CONTENT_LIST, _PORTLET_ID_ASSET_PUBLISHER
-			}
+			{_PORTLET_ID_JOURNAL_CONTENT_LIST, _PORTLET_ID_ASSET_PUBLISHER}
 		};
 	}
 
@@ -211,14 +209,15 @@ public class UpgradeJournalArticles extends BaseUpgradePortletId {
 			ResultSet rs = ps.executeQuery()) {
 
 			while (rs.next()) {
-				long portletPreferencesId = rs.getLong("portletPreferencesId");
-				long plid = rs.getLong("plid");
-				String portletId = rs.getString("portletId");
 				String preferences = rs.getString("preferences");
 
 				if (preferences.equals("<portlet-preferences />")) {
 					continue;
 				}
+
+				long portletPreferencesId = rs.getLong("portletPreferencesId");
+				long plid = rs.getLong("plid");
+				String portletId = rs.getString("portletId");
 
 				String newPreferences = getNewPreferences(plid, preferences);
 

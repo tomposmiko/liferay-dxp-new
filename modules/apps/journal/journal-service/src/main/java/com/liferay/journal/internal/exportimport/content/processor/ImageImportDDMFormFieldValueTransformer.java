@@ -22,6 +22,7 @@ import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.util.DDMFormFieldValueTransformer;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -29,7 +30,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.repository.model.FileEntry;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
@@ -79,18 +79,16 @@ public class ImageImportDDMFormFieldValueTransformer
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 				valueString);
 
-			String alt = jsonObject.getString("alt");
-			long oldClassPK = jsonObject.getLong("fileEntryId");
-			String type = jsonObject.getString("type");
-
 			FileEntry importedFileEntry = fetchImportedFileEntry(
-				_portletDataContext, oldClassPK);
+				_portletDataContext, jsonObject.getLong("fileEntryId"));
 
 			if (importedFileEntry == null) {
 				continue;
 			}
 
-			String fileEntryJSON = toJSON(importedFileEntry, type, alt);
+			String fileEntryJSON = toJSON(
+				importedFileEntry, jsonObject.getString("type"),
+				jsonObject.getString("alt"));
 
 			value.addString(locale, fileEntryJSON);
 

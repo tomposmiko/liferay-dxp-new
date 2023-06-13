@@ -14,13 +14,13 @@
 
 package com.liferay.wiki.web.internal.portlet.action;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.struts.BaseRSSStrutsAction;
@@ -30,8 +30,6 @@ import com.liferay.wiki.constants.WikiPortletKeys;
 import com.liferay.wiki.service.WikiPageService;
 import com.liferay.wiki.web.internal.display.context.util.WikiRequestHelper;
 import com.liferay.wiki.web.internal.util.WikiUtil;
-
-import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -49,7 +47,14 @@ public class RSSAction extends BaseRSSStrutsAction {
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		String rss = StringPool.BLANK;
+
 		long nodeId = ParamUtil.getLong(request, "nodeId");
+
+		if (nodeId <= 0) {
+			return rss.getBytes(StringPool.UTF8);
+		}
+
 		String title = ParamUtil.getString(request, "title");
 		int max = ParamUtil.getInteger(
 			request, "max", SearchContainer.DEFAULT_DELTA);
@@ -74,25 +79,18 @@ public class RSSAction extends BaseRSSStrutsAction {
 
 		String entryURL = feedURL + StringPool.SLASH + title;
 
-		Locale locale = themeDisplay.getLocale();
+		String attachmentURLPrefix = WikiUtil.getAttachmentURLPrefix(
+			themeDisplay.getPathMain(), themeDisplay.getPlid(), nodeId, title);
 
-		String rss = StringPool.BLANK;
-
-		if (nodeId > 0) {
-			String attachmentURLPrefix = WikiUtil.getAttachmentURLPrefix(
-				themeDisplay.getPathMain(), themeDisplay.getPlid(), nodeId,
-				title);
-
-			if (Validator.isNotNull(title)) {
-				rss = _wikiPageService.getPagesRSS(
-					nodeId, title, max, type, version, displayStyle, feedURL,
-					entryURL, attachmentURLPrefix, locale);
-			}
-			else {
-				rss = _wikiPageService.getNodePagesRSS(
-					nodeId, max, type, version, displayStyle, feedURL, entryURL,
-					attachmentURLPrefix);
-			}
+		if (Validator.isNotNull(title)) {
+			rss = _wikiPageService.getPagesRSS(
+				nodeId, title, max, type, version, displayStyle, feedURL,
+				entryURL, attachmentURLPrefix, themeDisplay.getLocale());
+		}
+		else {
+			rss = _wikiPageService.getNodePagesRSS(
+				nodeId, max, type, version, displayStyle, feedURL, entryURL,
+				attachmentURLPrefix);
 		}
 
 		return rss.getBytes(StringPool.UTF8);

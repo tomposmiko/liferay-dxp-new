@@ -34,7 +34,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * @author Jorge Ferrer
@@ -152,19 +151,20 @@ public abstract class BaseDDMTemplateHandler extends BaseTemplateHandler {
 				ddmFormField, fieldNameVariableNameMap);
 		}
 
-		for (Entry<String, String> fieldNameVariableName :
+		for (Map.Entry<String, String> fieldNameVariableName :
 				fieldNameVariableNameMap.entrySet()) {
 
 			String fieldName = fieldNameVariableName.getKey();
 
-			String label = ddmStructure.getFieldLabel(fieldName, locale);
-			String tip = ddmStructure.getFieldTip(fieldName, locale);
 			String dataType = ddmStructure.getFieldDataType(fieldName);
-			boolean repeatable = ddmStructure.getFieldRepeatable(fieldName);
 
 			if (Validator.isNull(dataType)) {
 				continue;
 			}
+
+			String label = ddmStructure.getFieldLabel(fieldName, locale);
+			String tip = ddmStructure.getFieldTip(fieldName, locale);
+			boolean repeatable = ddmStructure.getFieldRepeatable(fieldName);
 
 			templateVariableGroup.addFieldVariable(
 				label, getFieldVariableClass(),

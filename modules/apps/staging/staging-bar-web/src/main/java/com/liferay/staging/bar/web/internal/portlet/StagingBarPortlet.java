@@ -17,6 +17,7 @@ package com.liferay.staging.bar.web.internal.portlet;
 import com.liferay.exportimport.kernel.exception.RemoteExportException;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.Staging;
+import com.liferay.exportimport.kernel.staging.StagingURLHelper;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -95,7 +96,7 @@ import org.osgi.service.component.annotations.Reference;
 		"com.liferay.portlet.use-default-template=false",
 		"javax.portlet.display-name=Staging Bar",
 		"javax.portlet.expiration-cache=0",
-		"javax.portlet.init-param.template-path=/",
+		"javax.portlet.init-param.template-path=/META-INF/resources/",
 		"javax.portlet.init-param.view-template=/view.jsp",
 		"javax.portlet.name=" + StagingBarPortletKeys.STAGING_BAR,
 		"javax.portlet.resource-bundle=content.Language",
@@ -109,9 +110,6 @@ public class StagingBarPortlet extends MVCPortlet {
 	public void deleteLayoutRevision(
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
-
-		HttpServletRequest request = _portal.getHttpServletRequest(
-			actionRequest);
 
 		long layoutRevisionId = ParamUtil.getLong(
 			actionRequest, "layoutRevisionId");
@@ -127,6 +125,9 @@ public class StagingBarPortlet extends MVCPortlet {
 			actionRequest, "updateRecentLayoutRevisionId");
 
 		if (updateRecentLayoutRevisionId) {
+			HttpServletRequest request = _portal.getHttpServletRequest(
+				actionRequest);
+
 			_staging.setRecentLayoutRevisionId(
 				request, layoutRevision.getLayoutSetBranchId(),
 				layoutRevision.getPlid(),
@@ -200,7 +201,6 @@ public class StagingBarPortlet extends MVCPortlet {
 		Group liveGroup = _staging.getLiveGroup(group.getGroupId());
 		String liveURL = null;
 		Group stagingGroup = _staging.getStagingGroup(group.getGroupId());
-		Layout stagingLayout = null;
 		String remoteSiteURL = StringPool.BLANK;
 		String remoteURL = null;
 		String stagingURL = null;
@@ -231,9 +231,10 @@ public class StagingBarPortlet extends MVCPortlet {
 			}
 
 			if (stagingGroup != null) {
-				stagingLayout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
-					layout.getUuid(), stagingGroup.getGroupId(),
-					layout.isPrivateLayout());
+				Layout stagingLayout =
+					_layoutLocalService.fetchLayoutByUuidAndGroupId(
+						layout.getUuid(), stagingGroup.getGroupId(),
+						layout.isPrivateLayout());
 
 				if (stagingLayout != null) {
 					try {
@@ -268,7 +269,7 @@ public class StagingBarPortlet extends MVCPortlet {
 			boolean secureConnection = GetterUtil.getBoolean(
 				typeSettingsProperties.getProperty("secureConnection"));
 
-			remoteURL = _staging.buildRemoteURL(
+			remoteURL = _stagingURLHelper.buildRemoteURL(
 				remoteAddress, remotePort, remotePathContext, secureConnection);
 
 			if ((liveGroup != null) && group.isStagedRemotely()) {
@@ -581,14 +582,12 @@ public class StagingBarPortlet extends MVCPortlet {
 			return;
 		}
 
-		long layoutIconImageId = BeanPropertiesUtil.getLong(
-			layout, "iconImageId");
-
 		long layoutRevisionIconImageId = BeanPropertiesUtil.getLong(
 			layoutRevision, "iconImageId");
 
 		if (layoutRevisionIconImageId == GetterUtil.DEFAULT_LONG) {
-			layoutRevisionIconImageId = layoutIconImageId;
+			layoutRevisionIconImageId = BeanPropertiesUtil.getLong(
+				layout, "iconImageId");
 		}
 
 		DynamicQuery layoutRevisionDynamicQuery =
@@ -633,5 +632,8 @@ public class StagingBarPortlet extends MVCPortlet {
 
 	@Reference
 	private Staging _staging;
+
+	@Reference
+	private StagingURLHelper _stagingURLHelper;
 
 }

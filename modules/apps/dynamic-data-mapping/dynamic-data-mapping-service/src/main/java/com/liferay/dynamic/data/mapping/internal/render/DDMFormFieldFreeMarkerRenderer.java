@@ -28,6 +28,7 @@ import com.liferay.dynamic.data.mapping.render.DDMFormFieldRenderingContext;
 import com.liferay.dynamic.data.mapping.storage.Field;
 import com.liferay.dynamic.data.mapping.storage.Fields;
 import com.liferay.petra.string.CharPool;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.editor.Editor;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -49,7 +50,6 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.PortletKeys;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -255,12 +255,10 @@ public class DDMFormFieldFreeMarkerRenderer implements DDMFormFieldRenderer {
 
 		Set<Locale> availableLocales = ddmForm.getAvailableLocales();
 
-		Locale defaultLocale = ddmForm.getDefaultLocale();
-
 		Locale structureLocale = locale;
 
 		if (!availableLocales.contains(locale)) {
-			structureLocale = defaultLocale;
+			structureLocale = ddmForm.getDefaultLocale();
 		}
 
 		fieldContext = new HashMap<>();
@@ -318,18 +316,18 @@ public class DDMFormFieldFreeMarkerRenderer implements DDMFormFieldRenderer {
 			fieldsDisplayValues, name);
 
 		if (fieldDisplayable) {
-			Map<String, Object> parentFieldStructure =
-				(Map<String, Object>)freeMarkerContext.get(
-					"parentFieldStructure");
-
-			String parentFieldName = (String)parentFieldStructure.get("name");
-
 			offset = getFieldOffset(
 				fieldsDisplayValues, name, ddmFieldsCounter.get(name));
 
 			if (offset == fieldsDisplayValues.length) {
 				return StringPool.BLANK;
 			}
+
+			Map<String, Object> parentFieldStructure =
+				(Map<String, Object>)freeMarkerContext.get(
+					"parentFieldStructure");
+
+			String parentFieldName = (String)parentFieldStructure.get("name");
 
 			fieldRepetition = countFieldRepetition(
 				fieldsDisplayValues, parentFieldName, offset);
