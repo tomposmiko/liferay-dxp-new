@@ -41,10 +41,13 @@ import com.liferay.item.selector.criteria.info.item.criterion.InfoItemItemSelect
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectDefinitionConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.exception.NoSuchObjectLayoutException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
 import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.field.render.ObjectFieldRenderingContext;
+import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectLayout;
@@ -99,7 +102,6 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 import com.liferay.portal.vulcan.dto.converter.DefaultDTOConverterContext;
 import com.liferay.taglib.servlet.PipingServletResponseFactory;
@@ -335,6 +337,22 @@ public class ObjectEntryDisplayContext {
 		return optional.get();
 	}
 
+	public String getObjectRelationshipERCObjectFieldName() {
+		HttpServletRequest httpServletRequest =
+			_objectRequestHelper.getRequest();
+
+		return httpServletRequest.getParameter(
+			ObjectFieldSettingConstants.
+				NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME);
+	}
+
+	public String getParentObjectEntryId() {
+		HttpServletRequest httpServletRequest =
+			_objectRequestHelper.getRequest();
+
+		return httpServletRequest.getParameter("parentObjectEntryERC");
+	}
+
 	public CreationMenu getRelatedModelCreationMenu(
 			ObjectDefinition objectDefinition2)
 		throws PortalException {
@@ -346,6 +364,16 @@ public class ObjectEntryDisplayContext {
 		CreationMenu creationMenu = new CreationMenu();
 
 		ObjectDefinition objectDefinition1 = getObjectDefinition();
+
+		Map<String, String> relationshipContextParams =
+			getRelationshipContextParams();
+
+		long objectRelationshipId = GetterUtil.getLong(
+			relationshipContextParams.get("objectRelationshipId"));
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.getObjectRelationship(
+				objectRelationshipId);
 
 		ObjectScopeProvider objectScopeProvider =
 			_objectScopeProviderRegistry.getObjectScopeProvider(
@@ -363,7 +391,9 @@ public class ObjectEntryDisplayContext {
 			  StringUtil.equals(
 				  objectDefinition2.getScope(),
 				  ObjectDefinitionConstants.SCOPE_SITE)) &&
-			GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-165850"))) {
+			StringUtil.equals(
+				objectRelationship.getType(),
+				ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
 
 			ServiceContext serviceContext =
 				ServiceContextThreadLocal.getServiceContext();
@@ -382,8 +412,24 @@ public class ObjectEntryDisplayContext {
 						).setBackURL(
 							_objectRequestHelper.getCurrentURL()
 						).setParameter(
+							ObjectFieldSettingConstants.
+								NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
+							ObjectFieldSettingUtil.getValue(
+								ObjectFieldSettingConstants.
+									NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
+								_objectFieldLocalService.getObjectField(
+									objectRelationship.getObjectFieldId2()))
+						).setParameter(
 							"objectDefinitionId",
 							objectDefinition2.getObjectDefinitionId()
+						).setParameter(
+							"parentObjectEntryERC",
+							() -> {
+								ObjectEntry objectEntry = getObjectEntry();
+
+								return String.valueOf(
+									objectEntry.getExternalReferenceCode());
+							}
 						).setWindowState(
 							WindowState.MAXIMIZED
 						).buildString());
@@ -1092,20 +1138,31 @@ public class ObjectEntryDisplayContext {
 	}
 
 	private boolean _isActive(ObjectField objectField) throws PortalException {
-		if (Validator.isNotNull(objectField.getRelationshipType())) {
-			ObjectRelationship objectRelationship =
-				_objectRelationshipLocalService.
-					fetchObjectRelationshipByObjectFieldId2(
-						objectField.getObjectFieldId());
-
-			ObjectDefinition relatedObjectDefinition =
-				_objectDefinitionLocalService.getObjectDefinition(
-					objectRelationship.getObjectDefinitionId1());
-
-			return relatedObjectDefinition.isActive();
+		if (Validator.isNull(objectField.getRelationshipType())) {
+			return true;
 		}
 
-		return true;
+		if (Validator.isNotNull(getObjectRelationshipERCObjectFieldName()) &&
+			Objects.equals(
+				getObjectRelationshipERCObjectFieldName(),
+				ObjectFieldSettingUtil.getValue(
+					ObjectFieldSettingConstants.
+						NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
+					objectField))) {
+
+			return false;
+		}
+
+		ObjectRelationship objectRelationship =
+			_objectRelationshipLocalService.
+				fetchObjectRelationshipByObjectFieldId2(
+					objectField.getObjectFieldId());
+
+		ObjectDefinition relatedObjectDefinition =
+			_objectDefinitionLocalService.getObjectDefinition(
+				objectRelationship.getObjectDefinitionId1());
+
+		return relatedObjectDefinition.isActive();
 	}
 
 	private void _removeTimeFromDateString(

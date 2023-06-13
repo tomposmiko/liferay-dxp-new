@@ -49,6 +49,7 @@ const CartResource = ServiceProvider.DeliveryCartAPI('v1');
 function MiniCart({
 	cartActionURLs,
 	cartViews,
+	channel,
 	displayDiscountLevels,
 	displayTotalItemsQuantity,
 	itemsQuantity,
@@ -64,6 +65,7 @@ function MiniCart({
 	const [actionURLs, setActionURLs] = useState(cartActionURLs);
 	const [CartViews, setCartViews] = useState({});
 	const [cartState, setCartState] = useState({
+		channel: {channel},
 		id: orderId,
 		summary: {itemsQuantity},
 	});

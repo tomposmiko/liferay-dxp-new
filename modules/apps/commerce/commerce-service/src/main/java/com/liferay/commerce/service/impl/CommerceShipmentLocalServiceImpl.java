@@ -27,6 +27,7 @@ import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.model.CommerceShipment;
 import com.liferay.commerce.model.CommerceShipmentItem;
 import com.liferay.commerce.model.CommerceShippingMethod;
+import com.liferay.commerce.model.attributes.provider.CommerceModelAttributesProvider;
 import com.liferay.commerce.service.CommerceAddressLocalService;
 import com.liferay.commerce.service.CommerceOrderItemLocalService;
 import com.liferay.commerce.service.CommerceOrderLocalService;
@@ -731,15 +732,15 @@ public class CommerceShipmentLocalServiceImpl
 			() -> {
 				Message message = new Message();
 
+				DTOConverter<?, ?> commerceShipmentDTOConverter =
+					_dtoConverterRegistry.getDTOConverter(
+						CommerceShipment.class.getName());
+
 				message.setPayload(
 					JSONUtil.put(
 						"commerceShipment",
 						() -> {
-							DTOConverter<?, ?> dtoConverter =
-								_dtoConverterRegistry.getDTOConverter(
-									CommerceShipment.class.getName());
-
-							Object object = dtoConverter.toDTO(
+							Object object = commerceShipmentDTOConverter.toDTO(
 								new DefaultDTOConverterContext(
 									_dtoConverterRegistry,
 									commerceShipment.getCommerceShipmentId(),
@@ -751,6 +752,15 @@ public class CommerceShipmentLocalServiceImpl
 					).put(
 						"commerceShipmentId",
 						commerceShipment.getCommerceShipmentId()
+					).put(
+						"model" + CommerceShipment.class.getName(),
+						commerceShipment.getModelAttributes()
+					).put(
+						"modelDTO" +
+							commerceShipmentDTOConverter.getContentType(),
+						_commerceModelAttributesProvider.getModelAttributes(
+							commerceShipment, commerceShipmentDTOConverter,
+							commerceShipment.getUserId())
 					));
 
 				MessageBusUtil.sendMessage(
@@ -915,6 +925,9 @@ public class CommerceShipmentLocalServiceImpl
 
 	@Reference
 	private CommerceAddressLocalService _commerceAddressLocalService;
+
+	@Reference
+	private CommerceModelAttributesProvider _commerceModelAttributesProvider;
 
 	@Reference
 	private CommerceOrderItemLocalService _commerceOrderItemLocalService;

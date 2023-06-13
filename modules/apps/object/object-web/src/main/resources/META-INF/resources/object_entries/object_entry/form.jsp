@@ -171,6 +171,20 @@ portletDisplay.setURLBack(backURL);
 								);
 							}
 
+							const autoRelatedValue = {
+								['relationshipField']:
+									'<%= objectEntryDisplayContext.getObjectRelationshipERCObjectFieldName() %>',
+								['parentObjectEntryERC']:
+									'<%= objectEntryDisplayContext.getParentObjectEntryId() %>',
+							};
+
+							if (autoRelatedValue['relationshipField'] !== 'null') {
+								values = Object.assign(values, {
+									[autoRelatedValue['relationshipField']]:
+										autoRelatedValue['parentObjectEntryERC'],
+								});
+							}
+
 							Liferay.Util.fetch(path, {
 								body: JSON.stringify(values),
 								headers: new Headers({
