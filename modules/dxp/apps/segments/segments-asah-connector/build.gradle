@@ -16,6 +16,7 @@ dependencies {
 	compileOnly group: "org.apache.cxf", name: "cxf-rt-rs-client", version: "3.4.4"
 	compileOnly group: "org.apache.cxf", name: "cxf-rt-rs-extension-providers", version: "3.4.4"
 	compileOnly group: "org.apache.felix", name: "org.apache.felix.http.servlet-api", version: "1.1.2"
+	compileOnly group: "org.osgi", name: "org.osgi.service.cm", version: "1.6.0"
 	compileOnly group: "org.osgi", name: "org.osgi.service.component.annotations", version: "1.4.0"
 	compileOnly group: "org.osgi", name: "osgi.core", version: "6.0.0"
 	compileOnly project(":apps:asset:asset-list-api")
@@ -27,4 +28,6 @@ dependencies {
 	compileOnly project(":core:petra:petra-lang")
 	compileOnly project(":core:petra:petra-sql-dsl-api")
 	compileOnly project(":core:petra:petra-string")
+
+	testCompile project(":apps:static:portal-configuration:portal-configuration-persistence-api")
 }

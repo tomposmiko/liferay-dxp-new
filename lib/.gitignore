@@ -4,6 +4,8 @@
 /development/ant-apache-bsf.jar
 /development/ant-compress.jar
 /development/appium.jar
+/development/asm-tree.jar
+/development/asm.jar
 /development/aspectj-rt.jar
 /development/aspectj-weaver.jar
 /development/bnd-repository.jar
@@ -90,11 +92,6 @@
 /development/websocket-api.jar
 /development/xmlresolver.jar
 /portal/activation.jar
-/portal/asm-analysis.jar
-/portal/asm-commons.jar
-/portal/asm-tree.jar
-/portal/asm-util.jar
-/portal/asm.jar
 /portal/commons-beanutils.jar
 /portal/commons-codec.jar
 /portal/commons-collections.jar
@@ -135,12 +132,9 @@
 /portal/log4j-1.2-api.jar
 /portal/log4j-api.jar
 /portal/log4j-core.jar
-/portal/mimepull.jar
 /portal/persistence.jar
 /portal/portlet.jar
 /portal/portletmvc4spring-framework.jar
-/portal/saaj-api.jar
-/portal/saaj-impl.jar
 /portal/simplecaptcha.jar
 /portal/slf4j-api.jar
 /portal/soap-api.jar
@@ -159,8 +153,6 @@
 /portal/spring-web.jar
 /portal/spring-webmvc.jar
 /portal/stax-ex.jar
-/portal/stax.jar
-/portal/streambuffer.jar
 /portal/transaction.jar
 /portal/wstx.jar
 /portal/xercesImpl.jar

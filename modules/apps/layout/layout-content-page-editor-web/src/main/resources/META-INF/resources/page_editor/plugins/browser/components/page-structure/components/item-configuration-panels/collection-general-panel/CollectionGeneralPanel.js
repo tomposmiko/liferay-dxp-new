@@ -71,6 +71,7 @@ export function CollectionGeneralPanel({item}) {
 	const collectionLayoutId = useId();
 	const collectionListItemStyleId = useId();
 	const collectionPaginationTypeId = useId();
+	const collectionVerticalAlignmentId = useId();
 	const dispatch = useDispatch();
 	const getState = useGetState();
 	const segmentsExperienceId = useSelector(selectSegmentsExperienceId);
@@ -263,18 +264,20 @@ export function CollectionGeneralPanel({item}) {
 										selectedViewportSize ===
 											VIEWPORT_SIZES.desktop && (
 											<>
-												<ShowGutterSelector
-													checked={
-														item.config.gutters
-													}
-													handleConfigurationChanged={
-														handleConfigurationChanged
-													}
-												/>
+												{numberOfColumns > 1 && (
+													<ShowGutterSelector
+														checked={
+															item.config.gutters
+														}
+														handleConfigurationChanged={
+															handleConfigurationChanged
+														}
+													/>
+												)}
 
 												<VerticalAlignmentSelector
-													collectionLayoutId={
-														collectionLayoutId
+													collectionVerticalAlignmentId={
+														collectionVerticalAlignmentId
 													}
 													handleConfigurationChanged={
 														handleConfigurationChanged

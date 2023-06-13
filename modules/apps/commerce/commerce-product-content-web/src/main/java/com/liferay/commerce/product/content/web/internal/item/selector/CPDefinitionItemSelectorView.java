@@ -191,14 +191,13 @@ public class CPDefinitionItemSelectorView
 		public String getSubtitle(Locale locale) {
 			Date modifiedDate = _cpDefinition.getModifiedDate();
 
-			String modifiedDateDescription = _language.getTimeDescription(
-				locale, System.currentTimeMillis() - modifiedDate.getTime(),
-				true);
-
 			return _language.format(
 				locale, "x-ago-by-x",
 				new Object[] {
-					modifiedDateDescription,
+					_language.getTimeDescription(
+						locale,
+						System.currentTimeMillis() - modifiedDate.getTime(),
+						true),
 					HtmlUtil.escape(_cpDefinition.getUserName())
 				});
 		}
@@ -252,15 +251,11 @@ public class CPDefinitionItemSelectorView
 						JavaConstants.JAVAX_PORTLET_REQUEST),
 					_portletURL, null, "no-entries-were-found");
 
-			entriesSearchContainer.setTotal(
-				_cpDefinitionLocalService.getCPDefinitionsCount());
-
-			List<CPDefinition> cpDefinitions =
-				_cpDefinitionLocalService.getCPDefinitions(
+			entriesSearchContainer.setResultsAndTotal(
+				() -> _cpDefinitionLocalService.getCPDefinitions(
 					entriesSearchContainer.getStart(),
-					entriesSearchContainer.getEnd());
-
-			entriesSearchContainer.setResults(cpDefinitions);
+					entriesSearchContainer.getEnd()),
+				_cpDefinitionLocalService.getCPDefinitionsCount());
 
 			return entriesSearchContainer;
 		}

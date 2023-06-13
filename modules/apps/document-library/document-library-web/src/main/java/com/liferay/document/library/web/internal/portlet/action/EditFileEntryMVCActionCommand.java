@@ -82,6 +82,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.permission.ModelPermissions;
 import com.liferay.portal.kernel.service.permission.ModelPermissionsFactory;
@@ -97,6 +98,7 @@ import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.upload.UploadRequestSizeException;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.FileUtil;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.KeyValuePair;
@@ -109,6 +111,7 @@ import com.liferay.portal.kernel.util.TempFileEntryUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.RepositoryUtil;
 import com.liferay.trash.service.TrashEntryService;
@@ -235,10 +238,15 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 				String sourceFileName = uploadPortletRequest.getFileName(
 					"file");
 
-				try {
+				ServiceContext serviceContext = _createServiceContext(
+					uploadPortletRequest);
+
+				try (AutoCloseable autoCloseable = _pushServiceContext(
+						serviceContext)) {
+
 					fileEntry = _updateFileEntry(
 						portletConfig, actionRequest, actionResponse,
-						uploadPortletRequest);
+						uploadPortletRequest, serviceContext);
 				}
 				catch (PortalException portalException) {
 					if (!cmd.equals(Constants.ADD_DYNAMIC) &&
@@ -609,11 +617,21 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
+		ServiceContext serviceContext = ServiceContextFactory.getInstance(
+			DLFileEntry.class.getName(), httpServletRequest);
+
+		_setUpDDMFormValues(serviceContext);
+
+		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-150762"))) {
+			serviceContext.setAttribute(
+				"updateAutoTags",
+				ParamUtil.getBoolean(httpServletRequest, "updateAutoTags"));
+		}
+
 		String cmd = ParamUtil.getString(httpServletRequest, Constants.CMD);
 
 		if (!cmd.equals(Constants.ADD_DYNAMIC)) {
-			return ServiceContextFactory.getInstance(
-				DLFileEntry.class.getName(), httpServletRequest);
+			return serviceContext;
 		}
 
 		ThemeDisplay themeDisplay =
@@ -626,12 +644,8 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		if (layout.isPublicLayout() ||
 			(layout.isTypeControlPanel() && !group.hasPrivateLayouts())) {
 
-			return ServiceContextFactory.getInstance(
-				DLFileEntry.class.getName(), httpServletRequest);
+			return serviceContext;
 		}
-
-		ServiceContext serviceContext = ServiceContextFactory.getInstance(
-			DLFileEntry.class.getName(), httpServletRequest);
 
 		ModelPermissions modelPermissions =
 			serviceContext.getModelPermissions();
@@ -1081,6 +1095,12 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
+	private AutoCloseable _pushServiceContext(ServiceContext serviceContext) {
+		ServiceContextThreadLocal.pushServiceContext(serviceContext);
+
+		return ServiceContextThreadLocal::popServiceContext;
+	}
+
 	private void _restoreTrashEntries(ActionRequest actionRequest)
 		throws Exception {
 
@@ -1136,7 +1156,8 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 	private FileEntry _updateFileEntry(
 			PortletConfig portletConfig, ActionRequest actionRequest,
 			ActionResponse actionResponse,
-			UploadPortletRequest uploadPortletRequest)
+			UploadPortletRequest uploadPortletRequest,
+			ServiceContext serviceContext)
 		throws IOException, PortalException {
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
@@ -1238,11 +1259,6 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 				uploadPortletRequest, addDynamic, user.getTimeZone());
 			Date reviewDate = _getReviewDate(
 				uploadPortletRequest, addDynamic, user.getTimeZone());
-
-			ServiceContext serviceContext = _createServiceContext(
-				uploadPortletRequest);
-
-			_setUpDDMFormValues(serviceContext);
 
 			FileEntry fileEntry = null;
 

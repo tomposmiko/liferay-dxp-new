@@ -25,7 +25,7 @@ import {
 } from '../../../../../../app/contexts/StoreContext';
 import selectSegmentsExperienceId from '../../../../../../app/selectors/selectSegmentsExperienceId';
 import updateItemStyle from '../../../../../../app/utils/updateItemStyle';
-import {FieldSet} from './FieldSet';
+import {FieldSet, fieldIsDisabled} from './FieldSet';
 
 export function CommonStyles({
 	className,
@@ -74,15 +74,18 @@ export function CommonStyles({
 		});
 	};
 
-	let spacingField = null;
+	const spacingFieldSets = styles
+		.filter((fieldSet) => isSpacingFieldSet(fieldSet))
+		.map((fieldSet) => ({
+			...fieldSet,
+			styles: fieldSet.styles.map((field) => ({
+				...field,
+				disabled: fieldIsDisabled(item, field),
+			})),
+		}));
 
-	if (config['feature.flag.LPS-141410']) {
-		spacingField = styles.find((fieldSet) => isSpacingFieldSet(fieldSet))
-			?.styles[0];
-
-		if (spacingField) {
-			styles = styles.filter((fieldSet) => !isSpacingFieldSet(fieldSet));
-		}
+	if (spacingFieldSets.length) {
+		styles = styles.filter((fieldSet) => !isSpacingFieldSet(fieldSet));
 	}
 
 	return (
@@ -90,15 +93,16 @@ export function CommonStyles({
 			<div
 				className={classNames('page-editor__common-styles', className)}
 			>
-				{spacingField ? (
+				{spacingFieldSets.length ? (
 					<FieldSet
 						fields={[
 							{
-								...spacingField,
 								displaySize: '',
 								label: '',
 								name: '',
+								responsive: true,
 								type: 'spacing',
+								typeOptions: {spacingFieldSets},
 							},
 						]}
 						item={item}

@@ -67,9 +67,6 @@ import com.liferay.portal.kernel.util.CopyLayoutThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PortletKeys;
-import com.liferay.portal.kernel.util.UnicodeProperties;
-import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.exportimport.staging.StagingAdvicesThreadLocal;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
@@ -103,13 +100,10 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 	public Layout copyLayout(Layout sourceLayout, Layout targetLayout)
 		throws Exception {
 
-		List<SegmentsExperience> segmentsExperiences =
+		List<Long> segmentsExperiencesIds = ListUtil.toList(
 			_segmentsExperienceLocalService.getSegmentsExperiences(
 				sourceLayout.getGroupId(), _portal.getClassNameId(Layout.class),
-				sourceLayout.getPlid());
-
-		List<Long> segmentsExperiencesIds = ListUtil.toList(
-			segmentsExperiences,
+				sourceLayout.getPlid()),
 			SegmentsExperience.SEGMENTS_EXPERIENCE_ID_ACCESSOR);
 
 		segmentsExperiencesIds.add(0, SegmentsExperienceConstants.ID_DEFAULT);
@@ -554,9 +548,6 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 			List<String> portletIds = _getLayoutPortletIds(
 				sourceLayout, segmentsExperiencesIds);
 
-			List<String> targetPortletIds = _getLayoutPortletIds(
-				targetLayout, segmentsExperiencesIds);
-
 			for (String portletId : portletIds) {
 				Portlet portlet = _portletLocalService.getPortletById(
 					portletId);
@@ -564,8 +555,6 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 				if ((portlet == null) || portlet.isUndeployedPortlet()) {
 					continue;
 				}
-
-				targetPortletIds.remove(portletId);
 
 				PortletPreferencesIds portletPreferencesIds =
 					_portletPreferencesFactory.getPortletPreferencesIds(
@@ -602,23 +591,6 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 						targetLayout.getPlid(), portletId, portlet,
 						PortletPreferencesFactoryUtil.toXML(
 							jxPortletPreferences));
-				}
-			}
-
-			for (String portletId : targetPortletIds) {
-				try {
-					_portletPreferencesLocalService.deletePortletPreferences(
-						PortletKeys.PREFS_OWNER_ID_DEFAULT,
-						PortletKeys.PREFS_OWNER_TYPE_LAYOUT,
-						targetLayout.getPlid(), portletId);
-				}
-				catch (Exception exception) {
-					if (_log.isDebugEnabled()) {
-						_log.debug(
-							"Unable to delete portlet preferences for " +
-								"portlet " + portletId,
-							exception);
-					}
 				}
 			}
 		}
@@ -939,10 +911,6 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 					new ServiceContext());
 			}
 
-			_sites.copyExpandoBridgeAttributes(_sourceLayout, _targetLayout);
-			_sites.copyLookAndFeel(_targetLayout, _sourceLayout);
-			_sites.copyPortletSetups(_sourceLayout, _targetLayout);
-
 			if (Objects.equals(
 					_sourceLayout.getType(), LayoutConstants.TYPE_PORTLET)) {
 
@@ -962,30 +930,15 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 					_segmentsExperiencesIds, _sourceLayout, _targetLayout);
 			}
 
+			_sites.copyExpandoBridgeAttributes(_sourceLayout, _targetLayout);
+			_sites.copyPortletSetups(_sourceLayout, _targetLayout);
+
 			_copyAssetCategoryIdsAndAssetTagNames(_sourceLayout, _targetLayout);
 
 			_copyLayoutSEOEntry(_sourceLayout, _targetLayout);
 
 			_copyPortletPreferences(
 				_segmentsExperiencesIds, _sourceLayout, _targetLayout);
-
-			_layoutLocalService.updateMasterLayoutPlid(
-				_targetLayout.getGroupId(), _targetLayout.isPrivateLayout(),
-				_targetLayout.getLayoutId(),
-				_sourceLayout.getMasterLayoutPlid());
-
-			_layoutLocalService.updateStyleBookEntryId(
-				_targetLayout.getGroupId(), _targetLayout.isPrivateLayout(),
-				_targetLayout.getLayoutId(),
-				_sourceLayout.getStyleBookEntryId());
-
-			UnicodeProperties unicodeProperties = UnicodePropertiesBuilder.load(
-				_sourceLayout.getTypeSettings()
-			).build();
-
-			_layoutLocalService.updateLayout(
-				_targetLayout.getGroupId(), _targetLayout.isPrivateLayout(),
-				_targetLayout.getLayoutId(), unicodeProperties.toString());
 
 			Image image = _imageLocalService.getImage(
 				_sourceLayout.getIconImageId());
@@ -996,8 +949,13 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 				imageBytes = image.getTextObj();
 			}
 
-			return _layoutLocalService.updateIconImage(
-				_targetLayout.getPlid(), imageBytes);
+			return _layoutLocalService.updateLayout(
+				_targetLayout.getGroupId(), _targetLayout.isPrivateLayout(),
+				_targetLayout.getLayoutId(), _sourceLayout.getTypeSettings(),
+				imageBytes, _sourceLayout.getThemeId(),
+				_sourceLayout.getColorSchemeId(),
+				_sourceLayout.getStyleBookEntryId(), _sourceLayout.getCss(),
+				_sourceLayout.getMasterLayoutPlid());
 		}
 
 		private CopyLayoutCallable(

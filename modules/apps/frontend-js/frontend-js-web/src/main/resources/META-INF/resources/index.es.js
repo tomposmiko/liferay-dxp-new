@@ -38,6 +38,8 @@ export {default as postForm} from './liferay/util/form/post_form.es';
 // Liferay API
 
 export {default as BREAKPOINTS} from './liferay/breakpoints';
+export {default as STATUS_CODE} from './liferay/status_code';
+export {default as zIndex} from './liferay/zIndex';
 
 export {default as CompatibilityEventProxy} from './liferay/CompatibilityEventProxy.es';
 
@@ -104,5 +106,7 @@ export {default as isPhone} from './liferay/util/is_phone';
 export {default as isTablet} from './liferay/util/is_tablet';
 export {default as navigate} from './liferay/util/navigate.es';
 export {default as normalizeFriendlyURL} from './liferay/util/normalize_friendly_url';
+export {default as removeEntitySelection} from './liferay/util/remove_entity_selection';
 export {default as runScriptsInElement} from './liferay/util/run_scripts_in_element.es';
+export {default as selectFolder} from './liferay/util/select_folder';
 export {default as toggleDisabled} from './liferay/util/toggle_disabled';

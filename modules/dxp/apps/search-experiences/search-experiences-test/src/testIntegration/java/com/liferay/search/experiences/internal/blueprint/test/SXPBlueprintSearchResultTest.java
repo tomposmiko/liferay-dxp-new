@@ -22,6 +22,8 @@ import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.asset.test.util.AssetTestUtil;
+import com.liferay.document.library.kernel.model.DLFolderConstants;
+import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
 import com.liferay.expando.kernel.model.ExpandoColumn;
 import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.model.ExpandoTable;
@@ -31,6 +33,7 @@ import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalFolderServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.test.util.ConfigurationTemporarySwapper;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -52,9 +55,12 @@ import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.CalendarFactoryUtil;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.DateUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Time;
@@ -83,6 +89,9 @@ import com.liferay.segments.criteria.contributor.SegmentsCriteriaContributor;
 import com.liferay.segments.model.SegmentsEntry;
 import com.liferay.segments.test.util.SegmentsTestUtil;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -93,6 +102,8 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import org.apache.commons.lang.StringUtils;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -100,6 +111,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 
 /**
@@ -147,17 +159,13 @@ public class SXPBlueprintSearchResultTest {
 
 	@Test
 	public void testBoostAssetType() throws Exception {
-		_sxpBlueprint.setConfigurationJSON(
+		_updateConfigurationJSON(
+			"generalConfiguration",
 			JSONUtil.put(
-				"generalConfiguration",
-				JSONUtil.put(
-					"searchableAssetTypes",
-					JSONUtil.putAll(
-						"com.liferay.journal.model.JournalArticle",
-						"com.liferay.journal.model.JournalFolder"))
-			).put(
-				"queryConfiguration", JSONUtil.put("applyIndexerClauses", true)
-			).toString());
+				"searchableAssetTypes",
+				JSONUtil.putAll(
+					"com.liferay.journal.model.JournalArticle",
+					"com.liferay.journal.model.JournalFolder")));
 
 		_updateSXPBlueprint();
 
@@ -187,6 +195,45 @@ public class SXPBlueprintSearchResultTest {
 		_updateElementInstancesJSON(null, null);
 
 		_assertSearch("[Folder cola, Article coca cola, Article pepsi cola]");
+	}
+
+	@Test
+	public void testBoostContentsForTheCurrentLanguage() throws Exception {
+		_setUpJournalArticles(
+			new String[] {"Article", ""},
+			new String[] {"Article beta en_US", "Article delta en_US"});
+
+		LocaleThreadLocal.setDefaultLocale(LocaleUtil.SPAIN);
+
+		_setUpJournalArticles(
+			new String[] {"Article Article", ""},
+			new String[] {"Article alpha es_ES", "Article omega es_ES"});
+
+		_updateElementInstancesJSON(
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", 1000
+				).build()
+			},
+			new String[] {"Boost Contents for the Current Language"});
+
+		_keywords = "Article";
+
+		_assertSearch(
+			"[Article alpha es_ES, Article omega es_ES, Article beta" +
+				" en_US, Article delta en_US]");
+
+		LocaleThreadLocal.setDefaultLocale(LocaleUtil.US);
+
+		_assertSearch(
+			"[Article beta en_US, Article delta en_US, Article alpha" +
+				" es_ES, Article omega es_ES]");
+
+		_updateElementInstancesJSON(null, null);
+
+		_assertSearch(
+			"[Article alpha es_ES, Article beta en_US, Article delta" +
+				" en_US, Article omega es_ES]");
 	}
 
 	@Test
@@ -442,6 +489,56 @@ public class SXPBlueprintSearchResultTest {
 	}
 
 	@Test
+	public void testBoostContentsInACategoryForTheTimeOfDay() throws Exception {
+		LocalDateTime localDateTime = LocalDateTime.now();
+
+		_addAssetCategory("Time", _user);
+
+		_setUpJournalArticles(
+			new String[] {"", "", ""},
+			new String[] {"Article", "Article With Category"});
+
+		String[] timeOfDays = _getTimeOfDayAndNextTimeOfDay(
+			localDateTime.toLocalTime());
+
+		_updateElementInstancesJSON(
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"asset_category_id",
+					String.valueOf(_assetCategory.getCategoryId())
+				).put(
+					"boost", 100
+				).put(
+					"time_of_day", timeOfDays[0]
+				).build()
+			},
+			new String[] {"Boost Contents in a Category for the Time of Day"});
+
+		_keywords = "Article";
+
+		_assertSearch("[Article With Category, Article]");
+
+		_updateElementInstancesJSON(
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"asset_category_id",
+					String.valueOf(_assetCategory.getCategoryId())
+				).put(
+					"boost", 100
+				).put(
+					"time_of_day", timeOfDays[1]
+				).build()
+			},
+			new String[] {"Boost Contents in a Category for the Time of Day"});
+
+		_assertSearch("[Article, Article With Category]");
+
+		_updateElementInstancesJSON(null, null);
+
+		_assertSearch("[Article, Article With Category]");
+	}
+
+	@Test
 	public void testBoostContentsOnMySites() throws Exception {
 		_addGroupAAndGroupB();
 
@@ -541,6 +638,33 @@ public class SXPBlueprintSearchResultTest {
 		_updateElementInstancesJSON(null, null);
 
 		_assertSearch("[First Created, Second Created]");
+	}
+
+	@Test
+	public void testBoostLongerContents() throws Exception {
+		_setUpJournalArticles(
+			new String[] {"Article", "Content Content"},
+			new String[] {"Article 1", "Article 2"});
+
+		_updateElementInstancesJSON(
+			new Object[] {
+				HashMapBuilder.<String, Object>put(
+					"boost", 1000
+				).put(
+					"factor", 1.5
+				).put(
+					"modifier", "ln"
+				).build()
+			},
+			new String[] {"Boost Longer Contents"});
+
+		_keywords = "Article";
+
+		_assertSearch("[Article 2, Article 1]");
+
+		_updateElementInstancesJSON(null, null);
+
+		_assertSearch("[Article 1, Article 2]");
 	}
 
 	@Test
@@ -726,13 +850,11 @@ public class SXPBlueprintSearchResultTest {
 	public void testCustomParameterWithinPasteAnyElasticSearchQueryElement()
 		throws Exception {
 
-		_sxpBlueprint.setConfigurationJSON(
-			_configurationJSONObject.put(
-				"parameterConfiguration",
-				JSONUtil.put(
-					"parameters",
-					JSONUtil.put("myparam", JSONUtil.put("type", "String")))
-			).toString());
+		_updateConfigurationJSON(
+			"parameterConfiguration",
+			JSONUtil.put(
+				"parameters",
+				JSONUtil.put("myparam", JSONUtil.put("type", "String"))));
 
 		_updateSXPBlueprint();
 
@@ -1091,6 +1213,35 @@ public class SXPBlueprintSearchResultTest {
 		_updateElementInstancesJSON(null, null);
 
 		_assertSearchIgnoreRelevance("[Current Site, Site A, Site B]");
+	}
+
+	@Test
+	public void testLimitSearchToPDFFiles() throws Exception {
+		_updateConfigurationJSON(
+			"generalConfiguration",
+			JSONUtil.put(
+				"searchableAssetTypes",
+				JSONUtil.putAll(
+					"com.liferay.document.library.kernel.model.DLFileEntry",
+					"com.liferay.journal.model.JournalArticle")));
+
+		_addFileEntry("PDF file", ".pdf");
+
+		_setUpJournalArticles(
+			new String[] {"", "", ""},
+			new String[] {"Article file 1", "Article file 2"});
+
+		_updateElementInstancesJSON(
+			null, new String[] {"Limit Search to PDF Files"});
+
+		_keywords = "file";
+
+		_assertSearch("[PDF file]");
+
+		_updateElementInstancesJSON(null, null);
+
+		_assertSearchIgnoreRelevance(
+			"[Article file 1, Article file 2, PDF file]");
 	}
 
 	@Test
@@ -1637,6 +1788,9 @@ public class SXPBlueprintSearchResultTest {
 		_assertSearch("[watch birds on the sky, clouds]");
 	}
 
+	@Rule
+	public TestName testName = new TestName();
+
 	private void _addAssetCategory(String title, User user) throws Exception {
 		if (_assetVocabulary == null) {
 			_assetVocabulary =
@@ -1647,6 +1801,27 @@ public class SXPBlueprintSearchResultTest {
 		_assetCategory = AssetCategoryLocalServiceUtil.addCategory(
 			user.getUserId(), _group.getGroupId(), title,
 			_assetVocabulary.getVocabularyId(), _serviceContext);
+	}
+
+	private void _addFileEntry(String sourceFileName, String extension)
+		throws Exception {
+
+		Class<?> clazz = getClass();
+
+		String clazzName = clazz.getName();
+
+		String fileName = StringBundler.concat(
+			"dependencies/", clazz.getSimpleName(), StringPool.PERIOD,
+			testName.getMethodName(), extension);
+
+		DLAppLocalServiceUtil.addFileEntry(
+			null, _user.getUserId(), _group.getGroupId(),
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, sourceFileName,
+			ContentTypes.APPLICATION_PDF,
+			FileUtil.getBytes(
+				SXPBlueprintSearchResultTest.class,
+				StringUtils.replace(clazzName, ".", "/") + fileName),
+			null, null, _serviceContext);
 	}
 
 	private void _addGroupAAndGroupB() throws Exception {
@@ -1803,6 +1978,32 @@ public class SXPBlueprintSearchResultTest {
 			).build());
 	}
 
+	private String[] _getTimeOfDayAndNextTimeOfDay(LocalTime localTime) {
+		if (_isBetween(localTime, _LOCAL_TIME_04, _LOCAL_TIME_12)) {
+			return new String[] {"morning", "afternoon"};
+		}
+		else if (_isBetween(localTime, _LOCAL_TIME_12, _LOCAL_TIME_17)) {
+			return new String[] {"afternoon", "evening"};
+		}
+		else if (_isBetween(localTime, _LOCAL_TIME_17, _LOCAL_TIME_20)) {
+			return new String[] {"evening", "night"};
+		}
+
+		return new String[] {"night", "morning"};
+	}
+
+	private boolean _isBetween(
+		LocalTime localTime, LocalTime startLocalTime, LocalTime endLocalTime) {
+
+		if (!localTime.isBefore(startLocalTime) &&
+			localTime.isBefore(endLocalTime)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	private void _setUpJournalArticles(
 			String[] journalArticleContents, String[] journalArticleTitles)
 		throws Exception {
@@ -1904,6 +2105,15 @@ public class SXPBlueprintSearchResultTest {
 		}
 	}
 
+	private void _updateConfigurationJSON(
+		String configurationName, JSONObject jsonObject) {
+
+		_sxpBlueprint.setConfigurationJSON(
+			_configurationJSONObject.put(
+				configurationName, jsonObject
+			).toString());
+	}
+
 	private void _updateElementInstancesJSON(
 			Object[] configurationValuesArray, String[] sxpElementNames)
 		throws Exception {
@@ -1930,6 +2140,14 @@ public class SXPBlueprintSearchResultTest {
 			_sxpBlueprint.getSchemaVersion(), _sxpBlueprint.getTitleMap(),
 			_serviceContext);
 	}
+
+	private static final LocalTime _LOCAL_TIME_04 = LocalTime.of(4, 0, 0);
+
+	private static final LocalTime _LOCAL_TIME_12 = LocalTime.of(12, 0, 0);
+
+	private static final LocalTime _LOCAL_TIME_17 = LocalTime.of(17, 0, 0);
+
+	private static final LocalTime _LOCAL_TIME_20 = LocalTime.of(20, 0, 0);
 
 	private static List<SXPElement> _sxpElements;
 

@@ -1177,6 +1177,24 @@ public class LayoutImpl extends LayoutBaseImpl {
 		return !isPrivateLayout();
 	}
 
+	@Override
+	public boolean isPublished() {
+		if (!isTypeContent()) {
+			return true;
+		}
+
+		Layout draftLayout = fetchDraftLayout();
+
+		if ((draftLayout == null) ||
+			GetterUtil.getBoolean(
+				draftLayout.getTypeSettingsProperty("published"))) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * Returns <code>true</code> if the current layout is the root layout.
 	 *

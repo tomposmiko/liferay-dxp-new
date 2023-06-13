@@ -29,6 +29,7 @@ import java.sql.Types;
 import java.util.Objects;
 
 import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.usertype.UserType;
 
 /**
@@ -78,7 +79,10 @@ public class StringClobType implements Serializable, UserType {
 	}
 
 	@Override
-	public Object nullSafeGet(ResultSet resultSet, String[] names, Object owner)
+	public Object nullSafeGet(
+			ResultSet resultSet, String[] names,
+			SharedSessionContractImplementor sharedSessionContractImplementor,
+			Object owner)
 		throws HibernateException, SQLException {
 
 		Reader reader = resultSet.getCharacterStream(names[0]);
@@ -105,7 +109,8 @@ public class StringClobType implements Serializable, UserType {
 
 	@Override
 	public void nullSafeSet(
-			PreparedStatement preparedStatement, Object value, int index)
+			PreparedStatement preparedStatement, Object value, int index,
+			SharedSessionContractImplementor sharedSessionContractImplementor)
 		throws HibernateException, SQLException {
 
 		if (value != null) {

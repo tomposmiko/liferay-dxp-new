@@ -102,6 +102,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 
 /**
@@ -307,26 +308,6 @@ public class ObjectEntryLocalServiceTest {
 				HashMapBuilder.<String, Serializable>put(
 					"emailAddressRequired", "matthew@liferay.com"
 				).put(
-					"firstName", RandomTestUtil.randomString(281)
-				).put(
-					"listTypeEntryKeyRequired", "listTypeEntryKey1"
-				).build());
-
-			Assert.fail();
-		}
-		catch (ObjectEntryValuesException.Exceeds280Characters
-					objectEntryValuesException) {
-
-			Assert.assertEquals(
-				"The maximum length is 280 characters for text fields",
-				objectEntryValuesException.getMessage());
-		}
-
-		try {
-			_addObjectEntry(
-				HashMapBuilder.<String, Serializable>put(
-					"emailAddressRequired", "matthew@liferay.com"
-				).put(
 					"listTypeEntryKeyRequired", "listTypeEntryKey1"
 				).put(
 					"numberOfBooksWritten", "2147483648"
@@ -398,7 +379,7 @@ public class ObjectEntryLocalServiceTest {
 					objectEntryValuesException) {
 
 			Assert.assertEquals(
-				"Object entry value falls bellow minimum long field allowed " +
+				"Object entry value falls below minimum long field allowed " +
 					"size",
 				objectEntryValuesException.getMessage());
 		}
@@ -440,6 +421,85 @@ public class ObjectEntryLocalServiceTest {
 
 			Assert.assertEquals(
 				"Object entry value exceeds long field allowed size",
+				objectEntryValuesException.getMessage());
+		}
+
+		try {
+			_addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddressRequired", "matthew@liferay.com"
+				).put(
+					"firstName", RandomTestUtil.randomString(281)
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).build());
+
+			Assert.fail();
+		}
+		catch (ObjectEntryValuesException.ExceedsTextMaxLength
+					objectEntryValuesException) {
+
+			Assert.assertEquals(
+				"Object entry value exceeds the maximum length of 280 " +
+					"characters for object field \"firstName\"",
+				objectEntryValuesException.getMessage());
+		}
+
+		try {
+			_addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddressRequired", "matthew@liferay.com"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).put(
+					"script", RandomTestUtil.randomString(65001)
+				).build());
+
+			Assert.fail();
+		}
+		catch (ObjectEntryValuesException.ExceedsTextMaxLength
+					objectEntryValuesException) {
+
+			Assert.assertEquals(
+				"Object entry value exceeds the maximum length of 65000 " +
+					"characters for object field \"script\"",
+				objectEntryValuesException.getMessage());
+		}
+
+		try {
+			ObjectField objectField = _objectFieldLocalService.fetchObjectField(
+				_objectDefinition.getObjectDefinitionId(), "upload");
+
+			ObjectFieldSetting objectFieldSetting =
+				_objectFieldSettingLocalService.fetchObjectFieldSetting(
+					objectField.getObjectFieldId(), "acceptedFileExtensions");
+
+			_objectFieldSettingLocalService.updateObjectFieldSetting(
+				objectFieldSetting.getObjectFieldSettingId(), "jpg, png");
+
+			FileEntry fileEntry = _dlAppLocalService.addFileEntry(
+				null, TestPropsValues.getUserId(), TestPropsValues.getGroupId(),
+				DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+				StringUtil.randomString() + ".txt", ContentTypes.TEXT_PLAIN,
+				RandomTestUtil.randomBytes(), null, null,
+				ServiceContextTestUtil.getServiceContext());
+
+			_addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"emailAddressRequired", "peter@liferay.com"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).put(
+					"upload", fileEntry.getFileEntryId()
+				).build());
+
+			Assert.fail();
+		}
+		catch (ObjectEntryValuesException.InvalidFileExtension
+					objectEntryValuesException) {
+
+			Assert.assertEquals(
+				"The file extension txt is invalid for object field \"upload\"",
 				objectEntryValuesException.getMessage());
 		}
 
@@ -504,7 +564,8 @@ public class ObjectEntryLocalServiceTest {
 				TestPropsValues.getUserId(),
 				_objectDefinition.getObjectDefinitionId(), true,
 				ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
-				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				LocalizedMapUtil.getLocalizedMap(
+					"Field must be an email address"),
 				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
 				"isEmailAddress(emailAddress)");
 
@@ -525,7 +586,8 @@ public class ObjectEntryLocalServiceTest {
 		catch (ModelListenerException modelListenerException) {
 			String message = modelListenerException.getMessage();
 
-			Assert.assertTrue(message.contains(RandomTestUtil.randomString()));
+			Assert.assertTrue(
+				message.contains("Field must be an email address"));
 		}
 
 		objectEntry = _addObjectEntry(
@@ -562,13 +624,14 @@ public class ObjectEntryLocalServiceTest {
 
 		Assert.assertNotNull(objectEntry);
 
-		_objectValidationRuleLocalService.addObjectValidationRule(
-			TestPropsValues.getUserId(),
-			_objectDefinition.getObjectDefinitionId(), true,
-			ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
-			LocalizedMapUtil.getLocalizedMap("Names must be equals"),
-			LocalizedMapUtil.getLocalizedMap("Name Validation"),
-			"equals(lastName, middleName)");
+		objectValidationRule =
+			_objectValidationRuleLocalService.addObjectValidationRule(
+				TestPropsValues.getUserId(),
+				_objectDefinition.getObjectDefinitionId(), true,
+				ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
+				LocalizedMapUtil.getLocalizedMap("Names must be equals"),
+				LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+				"equals(lastName, middleName)");
 
 		try {
 			objectEntry = _addObjectEntry(
@@ -612,6 +675,56 @@ public class ObjectEntryLocalServiceTest {
 
 		Assert.assertEquals("Doe", values.get("lastName"));
 		Assert.assertEquals("Doe", values.get("middleName"));
+
+		_objectValidationRuleLocalService.updateObjectValidationRule(
+			objectValidationRule.getObjectValidationRuleId(), false,
+			ObjectValidationRuleConstants.ENGINE_TYPE_DDM,
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			"equals(lastName, middleName)");
+
+		Class<?> clazz = getClass();
+
+		_objectValidationRuleLocalService.addObjectValidationRule(
+			TestPropsValues.getUserId(),
+			_objectDefinition.getObjectDefinitionId(), true,
+			ObjectValidationRuleConstants.ENGINE_TYPE_GROOVY,
+			LocalizedMapUtil.getLocalizedMap("Must be over 18 years old"),
+			LocalizedMapUtil.getLocalizedMap(RandomTestUtil.randomString()),
+			StringUtil.read(
+				clazz,
+				StringBundler.concat(
+					"dependencies/", clazz.getSimpleName(), StringPool.PERIOD,
+					testName.getMethodName(), ".groovy")));
+
+		try {
+			objectEntry = _addObjectEntry(
+				HashMapBuilder.<String, Serializable>put(
+					"birthday", "2010-12-25"
+				).put(
+					"emailAddressRequired", "bob@liferay.com"
+				).put(
+					"listTypeEntryKeyRequired", "listTypeEntryKey1"
+				).build());
+
+			Assert.fail();
+		}
+		catch (ModelListenerException modelListenerException) {
+			String message = modelListenerException.getMessage();
+
+			Assert.assertTrue(message.contains("Must be over 18 years old"));
+		}
+
+		objectEntry = _addObjectEntry(
+			HashMapBuilder.<String, Serializable>put(
+				"birthday", "2000-12-25"
+			).put(
+				"emailAddressRequired", "bob@liferay.com"
+			).put(
+				"listTypeEntryKeyRequired", "listTypeEntryKey1"
+			).build());
+
+		Assert.assertNotNull(objectEntry);
 	}
 
 	@Test
@@ -1338,62 +1451,6 @@ public class ObjectEntryLocalServiceTest {
 
 		_assertCount(1);
 
-		/*Assert.assertEquals(2, _messages.size());
-
-		Message message = _messages.poll();
-
-		JSONObject payloadJSONObject = _jsonFactory.createJSONObject(
-			(String)message.getPayload());
-
-		Assert.assertEquals(
-			"onBeforeUpdate", payloadJSONObject.getString("webhookEventKey"));
-		Assert.assertEquals(
-			WorkflowConstants.STATUS_APPROVED,
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/objectEntry", "Object/status"));
-		Assert.assertEquals(
-			"João",
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/objectEntry",
-				"JSONObject/values", "Object/firstName"));
-		Assert.assertEquals(
-			WorkflowConstants.STATUS_APPROVED,
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/originalObjectEntry",
-				"Object/status"));
-		Assert.assertEquals(
-			"John",
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/originalObjectEntry",
-				"JSONObject/values", "Object/firstName"));
-
-		message = _messages.poll();
-
-		payloadJSONObject = _jsonFactory.createJSONObject(
-			(String)message.getPayload());
-
-		Assert.assertEquals(
-			"onAfterUpdate", payloadJSONObject.getString("webhookEventKey"));
-		Assert.assertEquals(
-			WorkflowConstants.STATUS_APPROVED,
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/objectEntry", "Object/status"));
-		Assert.assertEquals(
-			"João",
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/objectEntry",
-				"JSONObject/values", "Object/firstName"));
-		Assert.assertEquals(
-			WorkflowConstants.STATUS_APPROVED,
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/originalObjectEntry",
-				"Object/status"));
-		Assert.assertEquals(
-			"John",
-			JSONUtil.getValue(
-				payloadJSONObject, "JSONObject/originalObjectEntry",
-				"JSONObject/values", "Object/firstName"));*/
-
 		objectEntry = _objectEntryLocalService.getObjectEntry(
 			objectEntry.getObjectEntryId());
 
@@ -1579,24 +1636,6 @@ public class ObjectEntryLocalServiceTest {
 			_objectEntryLocalService.updateObjectEntry(
 				TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
 				HashMapBuilder.<String, Serializable>put(
-					"firstName", RandomTestUtil.randomString(281)
-				).build(),
-				ServiceContextTestUtil.getServiceContext());
-
-			Assert.fail();
-		}
-		catch (ObjectEntryValuesException.Exceeds280Characters
-					objectEntryValuesException) {
-
-			Assert.assertEquals(
-				"The maximum length is 280 characters for text fields",
-				objectEntryValuesException.getMessage());
-		}
-
-		try {
-			_objectEntryLocalService.updateObjectEntry(
-				TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
-				HashMapBuilder.<String, Serializable>put(
 					"numberOfBooksWritten", "2147483648"
 				).build(),
 				ServiceContextTestUtil.getServiceContext());
@@ -1661,7 +1700,7 @@ public class ObjectEntryLocalServiceTest {
 					objectEntryValuesException) {
 
 			Assert.assertEquals(
-				"Object entry value falls bellow minimum long field allowed " +
+				"Object entry value falls below minimum long field allowed " +
 					"size",
 				objectEntryValuesException.getMessage());
 		}
@@ -1701,6 +1740,25 @@ public class ObjectEntryLocalServiceTest {
 				"Object entry value exceeds long field allowed size",
 				objectEntryValuesException.getMessage());
 		}
+
+		try {
+			_objectEntryLocalService.updateObjectEntry(
+				TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
+				HashMapBuilder.<String, Serializable>put(
+					"firstName", RandomTestUtil.randomString(281)
+				).build(),
+				ServiceContextTestUtil.getServiceContext());
+
+			Assert.fail();
+		}
+		catch (ObjectEntryValuesException.ExceedsTextMaxLength
+					objectEntryValuesException) {
+
+			Assert.assertEquals(
+				"Object entry value exceeds the maximum length of 280 " +
+					"characters for object field \"firstName\"",
+				objectEntryValuesException.getMessage());
+		}
 	}
 
 	@Test
@@ -1718,6 +1776,9 @@ public class ObjectEntryLocalServiceTest {
 			PermissionThreadLocal.setPermissionChecker(permissionChecker);
 		}
 	}
+
+	@Rule
+	public TestName testName = new TestName();
 
 	private ObjectEntry _addObjectEntry(Map<String, Serializable> values)
 		throws Exception {
