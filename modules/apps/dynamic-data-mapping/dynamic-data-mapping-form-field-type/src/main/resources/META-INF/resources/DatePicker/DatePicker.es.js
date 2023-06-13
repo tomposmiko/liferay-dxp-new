@@ -21,7 +21,7 @@ import {FieldBase} from '../FieldBase/ReactFieldBase.es';
 import {createAutoCorrectedDatePipe} from './createAutoCorrectedDatePipe';
 
 const DIGIT_REGEX = /\d/;
-const PIPE_FORBIDDEN_ENDING_CHAR_REGEX = /[^\w]|[a]$/i;
+const PIPE_FORBIDDEN_ENDING_CHAR_REGEX = /[^\w]/i;
 const LETTER_REGEX = /[a-z]/i;
 const SERVER_DATE_FORMAT = 'YYYY-MM-DD';
 const SERVER_DATE_TIME_FORMAT = 'YYYY-MM-DD HH:mm';
@@ -50,8 +50,6 @@ export default function DatePicker({
 }) {
 	const inputRef = useRef(null);
 	const maskRef = useRef();
-	const [expanded, setExpand] = useState(false);
-
 	const {
 		clayFormat,
 		isDateTime,
@@ -185,8 +183,11 @@ export default function DatePicker({
 						return `${format} dd`;
 					case 'mm':
 						return `${format} MM`;
-					case '':
+					case 'A':
+					case 'a':
 						return format;
+					case '':
+						return `${format} `;
 					default:
 						return `${format} ${item}`;
 				}
@@ -203,11 +204,7 @@ export default function DatePicker({
 		});
 	}, [momentFormat]);
 
-	const handleValueChange = (value, eventType) => {
-		if (eventType === 'click') {
-			setExpand(false);
-			inputRef.current.focus();
-		}
+	const handleValueChange = (value) => {
 
 		/**
 		 * TODO When Clay change their implementation of the default time
@@ -254,10 +251,8 @@ export default function DatePicker({
 				dateFormat={clayFormat}
 				dir={dir}
 				disabled={readOnly}
-				expanded={expanded}
 				months={months}
 				onBlur={onBlur}
-				onExpandedChange={setExpand}
 				onFocus={onFocus}
 				onInput={({target: {value}}) => maskRef.current.update(value)}
 				onValueChange={handleValueChange}
