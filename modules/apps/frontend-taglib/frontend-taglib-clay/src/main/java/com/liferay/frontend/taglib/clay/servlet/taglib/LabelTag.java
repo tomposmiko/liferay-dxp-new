@@ -16,6 +16,7 @@ package com.liferay.frontend.taglib.clay.servlet.taglib;
 
 import com.liferay.frontend.taglib.clay.internal.servlet.taglib.BaseContainerTag;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.taglib.util.TagResourceBundleUtil;
 
@@ -110,6 +111,10 @@ public class LabelTag extends BaseContainerTag {
 		return getDisplayType();
 	}
 
+	public boolean isTranslated() {
+		return _translated;
+	}
+
 	/**
 	 * @deprecated As of Athanasius (7.3.x), replaced by {@link
 	 *             #setDismissible(boolean)}
@@ -177,6 +182,10 @@ public class LabelTag extends BaseContainerTag {
 		setDisplayType(style);
 	}
 
+	public void setTranslated(boolean translated) {
+		_translated = translated;
+	}
+
 	@Override
 	protected void cleanUp() {
 		super.cleanUp();
@@ -188,6 +197,7 @@ public class LabelTag extends BaseContainerTag {
 		_large = false;
 		_message = null;
 		_spritemap = null;
+		_translated = true;
 	}
 
 	@Override
@@ -215,10 +225,15 @@ public class LabelTag extends BaseContainerTag {
 
 			jspWriter.write("<span class=\"label-item label-item-expand\">");
 
-			jspWriter.write(
-				LanguageUtil.get(
+			String translatedLabel = _label;
+
+			if (_translated) {
+				translatedLabel = LanguageUtil.get(
 					TagResourceBundleUtil.getResourceBundle(pageContext),
-					_label));
+					_label);
+			}
+
+			jspWriter.write(HtmlUtil.escape(translatedLabel));
 
 			jspWriter.write("</span>");
 
@@ -252,5 +267,6 @@ public class LabelTag extends BaseContainerTag {
 	private boolean _large;
 	private String _message;
 	private String _spritemap;
+	private boolean _translated = true;
 
 }

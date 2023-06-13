@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -214,13 +215,16 @@ public class AssetVocabularyStagedModelDataHandler
 				null, portletDataContext.getScopeGroupId(),
 				vocabulary.getName(), 2);
 
+			Map<Locale, String> vocabularyTitleMap = getVocabularyTitleMap(
+				portletDataContext.getScopeGroupId(), vocabulary, name);
+
 			serviceContext.setUuid(vocabulary.getUuid());
 
 			importedVocabulary = _assetVocabularyLocalService.addVocabulary(
 				userId, portletDataContext.getScopeGroupId(), StringPool.BLANK,
-				getVocabularyTitleMap(
-					portletDataContext.getScopeGroupId(), vocabulary, name),
-				vocabulary.getDescriptionMap(), vocabulary.getSettings(),
+				vocabularyTitleMap.get(LocaleUtil.getSiteDefault()),
+				vocabularyTitleMap, vocabulary.getDescriptionMap(),
+				vocabulary.getSettings(), vocabulary.getVisibilityType(),
 				serviceContext);
 		}
 		else {

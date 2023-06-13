@@ -797,13 +797,28 @@ public class FragmentEntryLinkLocalServiceImpl
 					continue;
 				}
 
-				Iterator<String> iterator =
+				Iterator<String> defaultEditableValuesIterator =
 					defaultEditableFragmentEntryProcessorJSONObject.keys();
 
-				while (iterator.hasNext()) {
-					String key = iterator.next();
+				while (defaultEditableValuesIterator.hasNext()) {
+					String key = defaultEditableValuesIterator.next();
 
 					if (editableFragmentEntryProcessorJSONObject.has(key)) {
+						defaultEditableFragmentEntryProcessorJSONObject.put(
+							key,
+							editableFragmentEntryProcessorJSONObject.get(key));
+					}
+				}
+
+				Iterator<String> editableValuesIterator =
+					editableFragmentEntryProcessorJSONObject.keys();
+
+				while (editableValuesIterator.hasNext()) {
+					String key = editableValuesIterator.next();
+
+					if (!defaultEditableFragmentEntryProcessorJSONObject.has(
+							key)) {
+
 						defaultEditableFragmentEntryProcessorJSONObject.put(
 							key,
 							editableFragmentEntryProcessorJSONObject.get(key));

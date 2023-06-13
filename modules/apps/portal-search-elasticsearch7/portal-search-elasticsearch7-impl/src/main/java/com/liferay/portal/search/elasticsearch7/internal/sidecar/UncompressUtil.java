@@ -14,6 +14,7 @@
 
 package com.liferay.portal.search.elasticsearch7.internal.sidecar;
 
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -62,6 +63,13 @@ public class UncompressUtil {
 						tarArchiveInputStream.getNextTarEntry()) != null) {
 
 				if (tarArchiveInputStream.canReadEntryData(tarArchiveEntry)) {
+					if (_isZipSlipVulnerable(
+							destinationDirectoryPath,
+							tarArchiveEntry.getName())) {
+
+						continue;
+					}
+
 					if (rootArchiveName.equals(StringPool.BLANK)) {
 						rootArchiveName = tarArchiveEntry.getName();
 					}
@@ -102,6 +110,12 @@ public class UncompressUtil {
 			ZipEntry zipEntry;
 
 			while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+				if (_isZipSlipVulnerable(
+						destinationDirectoryPath, zipEntry.getName())) {
+
+					continue;
+				}
+
 				Path path = destinationDirectoryPath.resolve(
 					zipEntry.getName());
 
@@ -115,6 +129,37 @@ public class UncompressUtil {
 				_setFilePermission(path);
 			}
 		}
+	}
+
+	private static boolean _isZipSlipVulnerable(
+			Path destinationPath, String tarArchiveEntryName)
+		throws IOException {
+
+		File canonicalDirectoryFile = destinationPath.toFile();
+
+		String canonicalDirectoryPath =
+			canonicalDirectoryFile.getCanonicalPath();
+
+		File destinationFile = new File(
+			destinationPath.toFile(), tarArchiveEntryName);
+
+		String canonicalDestinationFile = destinationFile.getCanonicalPath();
+
+		if (!canonicalDestinationFile.startsWith(
+				canonicalDirectoryPath + File.separator)) {
+
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					StringBundler.concat(
+						"Entry ", tarArchiveEntryName,
+						" is outside of the target directory ",
+						canonicalDirectoryPath));
+			}
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private static void _setFilePermission(Path path) throws IOException {
