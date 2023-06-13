@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Carolina Barbosa
@@ -63,22 +64,29 @@ public class ObjectEntryVariablesUtil {
 		// TODO Remove all references to version 1 after March 2023
 
 		if (PropsValues.OBJECT_ENTRY_SCRIPT_VARIABLES_VERSION == 2) {
+			Map<String, Object> currentVariables = _getVariables(
+				dtoConverterRegistry, objectDefinition, false,
+				payloadJSONObject, systemObjectDefinitionMetadataRegistry);
+
 			return HashMapBuilder.<String, Object>put(
-				"objectEntry",
-				_getVariables(
-					dtoConverterRegistry, objectDefinition, false,
-					payloadJSONObject, systemObjectDefinitionMetadataRegistry)
+				"baseModel", currentVariables
 			).put(
-				"originalObjectEntry",
+				"originalBaseModel",
 				() -> {
-					if (payloadJSONObject.has("originalObjectEntry")) {
+					String suffix = _getSuffix(
+						objectDefinition,
+						systemObjectDefinitionMetadataRegistry);
+
+					if (payloadJSONObject.has("original" + suffix)) {
 						return _getVariables(
 							dtoConverterRegistry, objectDefinition, true,
 							payloadJSONObject,
 							systemObjectDefinitionMetadataRegistry);
 					}
 
-					return Collections.emptyMap();
+					return _getDefaultVariables(
+						objectDefinition,
+						Collections.unmodifiableSet(currentVariables.keySet()));
 				}
 			).build();
 		}
@@ -95,7 +103,7 @@ public class ObjectEntryVariablesUtil {
 			}
 
 			return HashMapBuilder.<String, Object>put(
-				"objectEntry",
+				"baseModel",
 				() -> HashMapBuilder.<String, Object>putAll(
 					(Map<String, Object>)object
 				).putAll(
@@ -116,12 +124,12 @@ public class ObjectEntryVariablesUtil {
 					"status", payloadJSONObject.get("status")
 				).build()
 			).put(
-				"originalObjectEntry", Collections.emptyMap()
+				"originalBaseModel", Collections.emptyMap()
 			).build();
 		}
 
 		return HashMapBuilder.<String, Object>put(
-			"objectEntry",
+			"baseModel",
 			() -> {
 				Map<String, Object> variables = new HashMap<>(
 					(Map)payloadJSONObject.get("objectEntry"));
@@ -142,7 +150,7 @@ public class ObjectEntryVariablesUtil {
 				return variables;
 			}
 		).put(
-			"originalObjectEntry", Collections.emptyMap()
+			"originalBaseModel", Collections.emptyMap()
 		).build();
 	}
 
@@ -156,22 +164,29 @@ public class ObjectEntryVariablesUtil {
 		throws PortalException {
 
 		if (PropsValues.OBJECT_ENTRY_SCRIPT_VARIABLES_VERSION == 2) {
+			Map<String, Object> currentVariables = _getVariables(
+				dtoConverterRegistry, objectDefinition, false,
+				payloadJSONObject, systemObjectDefinitionMetadataRegistry);
+
 			return HashMapBuilder.<String, Object>put(
-				"objectEntry",
-				_getVariables(
-					dtoConverterRegistry, objectDefinition, false,
-					payloadJSONObject, systemObjectDefinitionMetadataRegistry)
+				"baseModel", currentVariables
 			).put(
-				"originalObjectEntry",
+				"originalBaseModel",
 				() -> {
-					if (payloadJSONObject.has("originalObjectEntry")) {
+					String suffix = _getSuffix(
+						objectDefinition,
+						systemObjectDefinitionMetadataRegistry);
+
+					if (payloadJSONObject.has("original" + suffix)) {
 						return _getVariables(
 							dtoConverterRegistry, objectDefinition, true,
 							payloadJSONObject,
 							systemObjectDefinitionMetadataRegistry);
 					}
 
-					return Collections.emptyMap();
+					return _getDefaultVariables(
+						objectDefinition,
+						Collections.unmodifiableSet(currentVariables.keySet()));
 				}
 			).build();
 		}
@@ -200,9 +215,9 @@ public class ObjectEntryVariablesUtil {
 					GetterUtil.getLong(baseModel.getPrimaryKeyObj())));
 
 		return HashMapBuilder.<String, Object>put(
-			"objectEntry", variables
+			"baseModel", variables
 		).put(
-			"originalObjectEntry", Collections.emptyMap()
+			"originalBaseModel", Collections.emptyMap()
 		).build();
 	}
 
@@ -234,11 +249,11 @@ public class ObjectEntryVariablesUtil {
 						).withDDMExpressionParameterAccessor(
 							new ObjectEntryDDMExpressionParameterAccessor(
 								(Map<String, Object>)variables.get(
-									"originalObjectEntry"))
+									"originalBaseModel"))
 						).build());
 
 				ddmExpression.setVariables(
-					(Map<String, Object>)variables.get("objectEntry"));
+					(Map<String, Object>)variables.get("baseModel"));
 
 				value = ddmExpression.evaluate();
 			}
@@ -277,6 +292,45 @@ public class ObjectEntryVariablesUtil {
 		return dtoConverter.getContentType();
 	}
 
+	private static Map<String, Object> _getDefaultVariables(
+		ObjectDefinition objectDefinition, Set<String> keys) {
+
+		Map<String, Object> defaultVariables = new HashMap<>();
+
+		for (ObjectField objectField :
+				ObjectFieldLocalServiceUtil.getObjectFields(
+					objectDefinition.getObjectDefinitionId())) {
+
+			String defaultValue = objectField.getDefaultValue();
+
+			if (Validator.isNotNull(defaultValue) &&
+				keys.contains(objectField.getName())) {
+
+				defaultVariables.put(objectField.getName(), defaultValue);
+			}
+		}
+
+		return defaultVariables;
+	}
+
+	private static String _getSuffix(
+		ObjectDefinition objectDefinition,
+		SystemObjectDefinitionMetadataRegistry
+			systemObjectDefinitionMetadataRegistry) {
+
+		if (!objectDefinition.isSystem()) {
+			return "ObjectEntry";
+		}
+
+		SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
+			systemObjectDefinitionMetadataRegistry.
+				getSystemObjectDefinitionMetadata(objectDefinition.getName());
+
+		Class<?> modelClass = systemObjectDefinitionMetadata.getModelClass();
+
+		return modelClass.getSimpleName();
+	}
+
 	private static Map<String, Object> _getVariables(
 		DTOConverterRegistry dtoConverterRegistry,
 		ObjectDefinition objectDefinition, boolean oldValues,
@@ -296,6 +350,13 @@ public class ObjectEntryVariablesUtil {
 		if (objectDefinition.isSystem()) {
 			Object object = payloadJSONObject.get(
 				"model" + objectDefinition.getName());
+
+			if (oldValues) {
+				String suffix = _getSuffix(
+					objectDefinition, systemObjectDefinitionMetadataRegistry);
+
+				object = payloadJSONObject.get("original" + suffix);
+			}
 
 			if (object == null) {
 				object = payloadJSONObject.get(
@@ -328,13 +389,22 @@ public class ObjectEntryVariablesUtil {
 				(Map<String, Object>)payloadJSONObject.get(
 					"modelDTO" + contentType);
 
+			if (oldValues) {
+				map = (Map<String, Object>)payloadJSONObject.get(
+					"originalDTO" + contentType);
+			}
+
 			if (map != null) {
 				variables.putAll(map);
 			}
 
-			variables.putAll(
+			Map<String, Object> extendedProperties =
 				(Map<String, Object>)payloadJSONObject.get(
-					"extendedProperties"));
+					"extendedProperties");
+
+			if (extendedProperties != null) {
+				variables.putAll(extendedProperties);
+			}
 		}
 		else {
 			if (oldValues) {

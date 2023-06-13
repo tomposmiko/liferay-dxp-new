@@ -33,10 +33,15 @@ export default function EditListTypeDefinition({
 	readOnly,
 }: IProps) {
 	const onSubmit = async (values: PickList) => {
+		if (!Liferay.FeatureFlags['LPS-167536']) {
+			values.listTypeEntries = [];
+		}
+
 		try {
 			await API.updatePickList({
 				externalReferenceCode: values.externalReferenceCode,
 				id: parseInt(listTypeDefinitionId, 10),
+				listTypeEntries: values.listTypeEntries,
 				name_i18n: values.name_i18n,
 			});
 			saveAndReload();

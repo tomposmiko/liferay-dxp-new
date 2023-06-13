@@ -16,7 +16,7 @@ import TestrayError from '../../TestrayError';
 import i18n from '../../i18n';
 import yupSchema from '../../schema/yup';
 import {DISPATCH_TRIGGER_TYPE} from '../../util/enum';
-import {SearchBuilder, searchUtil} from '../../util/search';
+import {SearchBuilder} from '../../util/search';
 import {DispatchTriggerStatuses, TaskStatuses} from '../../util/statuses';
 import {liferayDispatchTriggerImpl} from './LiferayDispatchTrigger';
 import Rest from './Rest';
@@ -26,6 +26,7 @@ import {testrayTaskUsersImpl} from './TestrayTaskUsers';
 import {APIResponse, TestrayTask} from './types';
 
 type TaskForm = typeof yupSchema.task.__outputType & {
+	assignedUsers: string;
 	dispatchTriggerId: number;
 	projectId: number;
 };
@@ -39,12 +40,14 @@ class TestrayTaskImpl extends Rest<TaskForm, TestrayTask, NestedObjectOptions> {
 	constructor() {
 		super({
 			adapter: ({
+				assignedUsers,
 				dispatchTriggerId,
 				buildId: r_buildToTasks_c_buildId,
 				caseTypes: taskToTasksCaseTypes,
 				dueStatus = TaskStatuses.OPEN,
 				name,
 			}) => ({
+				assignedUsers,
 				dispatchTriggerId,
 				dueStatus,
 				name,
@@ -164,7 +167,7 @@ class TestrayTaskImpl extends Rest<TaskForm, TestrayTask, NestedObjectOptions> {
 
 	public getTasksByBuildId(buildId: number) {
 		return this.fetcher<APIResponse<TestrayTask>>(
-			`/tasks?filter=${searchUtil.eq('buildId', buildId)}`
+			`/tasks?filter=${SearchBuilder.eq('buildId', buildId)}`
 		);
 	}
 

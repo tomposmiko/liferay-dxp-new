@@ -75,7 +75,7 @@ public class LayoutUtilityPageEntryLocalServiceUtil {
 	public static LayoutUtilityPageEntry copyLayoutUtilityPageEntry(
 			long userId, long groupId, long layoutUtilityPageEntryId,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
-		throws PortalException {
+		throws Exception {
 
 		return getService().copyLayoutUtilityPageEntry(
 			userId, groupId, layoutUtilityPageEntryId, serviceContext);
@@ -248,6 +248,12 @@ public class LayoutUtilityPageEntryLocalServiceUtil {
 
 		return getService().fetchLayoutUtilityPageEntry(
 			LayoutUtilityPageEntryId);
+	}
+
+	public static LayoutUtilityPageEntry fetchLayoutUtilityPageEntry(
+		long groupId, String name, String type) {
+
+		return getService().fetchLayoutUtilityPageEntry(groupId, name, type);
 	}
 
 	public static LayoutUtilityPageEntry

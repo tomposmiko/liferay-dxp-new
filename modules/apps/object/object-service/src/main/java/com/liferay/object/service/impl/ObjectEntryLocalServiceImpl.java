@@ -3200,6 +3200,17 @@ public class ObjectEntryLocalServiceImpl
 			_listTypeEntryLocalService.getListTypeEntry(
 				listTypeDefinitionId, String.valueOf(entry.getValue()));
 
+		ObjectState targetObjectState =
+			_objectStateLocalService.getObjectStateFlowObjectState(
+				listTypeEntry.getListTypeEntryId(),
+				objectStateFlow.getObjectStateFlowId());
+
+		if (sourceObjectState.getObjectStateId() ==
+				targetObjectState.getObjectStateId()) {
+
+			return;
+		}
+
 		boolean invalidObjectStateTransition = true;
 
 		for (ObjectState nextObjectState :
@@ -3207,25 +3218,15 @@ public class ObjectEntryLocalServiceImpl
 					sourceObjectState.getObjectStateId())) {
 
 			if (nextObjectState.getListTypeEntryId() ==
-					listTypeEntry.getListTypeEntryId()) {
+					targetObjectState.getListTypeEntryId()) {
 
 				invalidObjectStateTransition = false;
 			}
 		}
 
 		if (invalidObjectStateTransition) {
-			ObjectState targetObjectState =
-				_objectStateLocalService.getObjectStateFlowObjectState(
-					listTypeEntry.getListTypeEntryId(),
-					objectStateFlow.getObjectStateFlowId());
-
-			if (sourceObjectState.getObjectStateId() !=
-					targetObjectState.getObjectStateId()) {
-
-				throw new ObjectEntryValuesException.
-					InvalidObjectStateTransition(
-						sourceObjectState, targetObjectState);
-			}
+			throw new ObjectEntryValuesException.InvalidObjectStateTransition(
+				sourceObjectState, targetObjectState);
 		}
 	}
 
@@ -3400,6 +3401,33 @@ public class ObjectEntryLocalServiceImpl
 			_validateTextMaxLength(
 				65000, GetterUtil.getString(entry.getValue()),
 				objectField.getObjectFieldId(), objectField.getName());
+		}
+		else if (StringUtil.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP)) {
+
+			ObjectDefinition objectDefinition =
+				objectField.getObjectDefinition();
+
+			if (!objectDefinition.isAccountEntryRestricted() ||
+				!Objects.equals(
+					objectField.getObjectFieldId(),
+					objectDefinition.
+						getAccountEntryRestrictedObjectFieldId()) ||
+				(objectEntry == null)) {
+
+				return;
+			}
+
+			Map<String, Serializable> originalValues = objectEntry.getValues();
+
+			if (!Objects.equals(
+					GetterUtil.getLong(originalValues.get(entry.getKey())),
+					GetterUtil.getLong(entry.getValue()))) {
+
+				throw new ObjectEntryValuesException.
+					UnmodifiableAccountEntryObjectField(objectField.getName());
+			}
 		}
 		else if (StringUtil.equals(
 					objectField.getDBType(),

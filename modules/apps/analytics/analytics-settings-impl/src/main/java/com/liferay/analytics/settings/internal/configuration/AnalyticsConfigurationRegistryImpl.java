@@ -73,7 +73,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.Configuration;
@@ -131,34 +130,25 @@ public class AnalyticsConfigurationRegistryImpl
 			return null;
 		}
 
-		Set<Map.Entry<String, Long>> entries = _companyIds.entrySet();
+		for (Map.Entry<String, Long> entry : _companyIds.entrySet()) {
+			if (Objects.equals(entry.getValue(), companyId)) {
+				try {
+					Configuration configuration =
+						_configurationAdmin.getConfiguration(
+							entry.getKey(), StringPool.QUESTION);
 
-		Stream<Map.Entry<String, Long>> stream = entries.stream();
+					return configuration.getProperties();
+				}
+				catch (Exception exception) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							"Unable to get configuration for company " +
+								companyId,
+							exception);
+					}
 
-		String pid = stream.filter(
-			entry -> Objects.equals(entry.getValue(), companyId)
-		).map(
-			Map.Entry::getKey
-		).findFirst(
-		).orElse(
-			null
-		);
-
-		if (pid == null) {
-			return null;
-		}
-
-		try {
-			Configuration configuration = _configurationAdmin.getConfiguration(
-				pid, StringPool.QUESTION);
-
-			return configuration.getProperties();
-		}
-		catch (Exception exception) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(
-					"Unable to get configuration for company " + companyId,
-					exception);
+					break;
+				}
 			}
 		}
 
@@ -379,7 +369,9 @@ public class AnalyticsConfigurationRegistryImpl
 		try {
 			if (companyId != CompanyConstants.SYSTEM) {
 				if (GetterUtil.getBoolean(
-						PropsUtil.get("feature.flag.LRAC-10632"))) {
+						PropsUtil.get("feature.flag.LRAC-10632")) ||
+					GetterUtil.getBoolean(
+						PropsUtil.get("feature.flag.LRAC-10757"))) {
 
 					_analyticsDXPEntityBatchExporter.unscheduleExportTriggers(
 						companyId,
@@ -488,7 +480,9 @@ public class AnalyticsConfigurationRegistryImpl
 			}
 
 			if (GetterUtil.getBoolean(
-					PropsUtil.get("feature.flag.LRAC-10632"))) {
+					PropsUtil.get("feature.flag.LRAC-10632")) ||
+				GetterUtil.getBoolean(
+					PropsUtil.get("feature.flag.LRAC-10757"))) {
 
 				Set<String> refreshDispatchTriggerNames = new HashSet<>();
 				Set<String> unscheduleDispatchTriggerNames = new HashSet<>();
@@ -563,31 +557,35 @@ public class AnalyticsConfigurationRegistryImpl
 					}
 				}
 
-				if (_analyticsSettingsManager.syncedContactSettingsChanged(
-						companyId)) {
+				if (GetterUtil.getBoolean(
+						PropsUtil.get("feature.flag.LRAC-10632"))) {
+
+					if (_analyticsSettingsManager.syncedContactSettingsChanged(
+							companyId)) {
+
+						if (_analyticsSettingsManager.
+								syncedContactSettingsEnabled(companyId)) {
+
+							refreshDispatchTriggerNames.add(
+								AnalyticsDXPEntityBatchExporterConstants.
+									DISPATCH_TRIGGER_NAME_USER_DXP_ENTITIES);
+						}
+						else {
+							unscheduleDispatchTriggerNames.add(
+								AnalyticsDXPEntityBatchExporterConstants.
+									DISPATCH_TRIGGER_NAME_USER_DXP_ENTITIES);
+						}
+					}
 
 					if (_analyticsSettingsManager.syncedContactSettingsEnabled(
+							companyId) &&
+						_analyticsSettingsManager.syncedUserFieldsChanged(
 							companyId)) {
 
 						refreshDispatchTriggerNames.add(
 							AnalyticsDXPEntityBatchExporterConstants.
 								DISPATCH_TRIGGER_NAME_USER_DXP_ENTITIES);
 					}
-					else {
-						unscheduleDispatchTriggerNames.add(
-							AnalyticsDXPEntityBatchExporterConstants.
-								DISPATCH_TRIGGER_NAME_USER_DXP_ENTITIES);
-					}
-				}
-
-				if (_analyticsSettingsManager.syncedContactSettingsEnabled(
-						companyId) &&
-					_analyticsSettingsManager.syncedUserFieldsChanged(
-						companyId)) {
-
-					refreshDispatchTriggerNames.add(
-						AnalyticsDXPEntityBatchExporterConstants.
-							DISPATCH_TRIGGER_NAME_USER_DXP_ENTITIES);
 				}
 
 				if (!refreshDispatchTriggerNames.isEmpty()) {
@@ -595,9 +593,18 @@ public class AnalyticsConfigurationRegistryImpl
 						companyId,
 						refreshDispatchTriggerNames.toArray(new String[0]));
 
-					_analyticsDXPEntityBatchExporter.export(
-						companyId,
-						refreshDispatchTriggerNames.toArray(new String[0]));
+					if (GetterUtil.getBoolean(
+							PropsUtil.get("feature.flag.LRAC-10632")) &&
+						!GetterUtil.getBoolean(
+							PropsUtil.get("feature.flag.LRAC-10757"))) {
+
+						_analyticsDXPEntityBatchExporter.export(
+							companyId,
+							new String[] {
+								AnalyticsDXPEntityBatchExporterConstants.
+									DISPATCH_TRIGGER_NAME_USER_DXP_ENTITIES
+							});
+					}
 				}
 
 				if (!unscheduleDispatchTriggerNames.isEmpty()) {
@@ -606,7 +613,11 @@ public class AnalyticsConfigurationRegistryImpl
 						unscheduleDispatchTriggerNames.toArray(new String[0]));
 				}
 
-				return;
+				if (GetterUtil.getBoolean(
+						PropsUtil.get("feature.flag.LRAC-10632"))) {
+
+					return;
+				}
 			}
 
 			String[] previousSyncedContactFieldNames =

@@ -347,11 +347,12 @@ export async function addPickListItem({
 export async function updatePickList({
 	externalReferenceCode,
 	id,
+	listTypeEntries,
 	name_i18n,
 }: Partial<PickList>) {
 	return await save(
 		`/o/headless-admin-list-type/v1.0/list-type-definitions/${id}`,
-		{externalReferenceCode, name_i18n},
+		{externalReferenceCode, listTypeEntries, name_i18n},
 		'PUT'
 	);
 }
