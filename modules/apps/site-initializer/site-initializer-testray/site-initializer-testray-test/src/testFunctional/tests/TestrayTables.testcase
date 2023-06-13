@@ -1,11 +1,10 @@
 @component-name = "portal-solutions"
 definition {
 
-	property osgi.module.configuration.file.names = "com.liferay.release.feature.flag.web.internal.configuration.ReleaseFeatureFlagConfiguration.config";
-	property osgi.module.configurations = "disabledReleaseFeatureFlags=[&quot;DISABLE_PRIVATE_LAYOUTS&quot;]";
 	property osgi.modules.includes = "site-initializer-testray";
 	property portal.release = "false";
 	property portal.upstream = "true";
+	property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 	property testray.main.component.name = "Testray 2";
 
 	setUp {
@@ -33,6 +32,8 @@ definition {
 	test CanUserEnterAProject {
 		ApplicationsMenu.gotoSite(site = "Testray 2");
 
+		Testray.createProjectTestray(key_name = "Liferay Portal 7.3");
+
 		Testray.goToProjectPage(projectName = "Liferay Portal 7.3");
 
 		Testray.assertProjectTitleHeader(projectName = "Liferay Portal 7.3");
@@ -41,6 +42,8 @@ definition {
 	@description = "LPS-150031 - Verify that user can access a Task on Testflow."
 	@priority = "5"
 	test CanUserEnterATask {
+		property portal.upstream = "quarantine";
+
 		ApplicationsMenu.gotoSite(site = "Testray 2");
 
 		Testray.goToTestflow();

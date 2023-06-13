@@ -1,0 +1,32 @@
+#
+# Liferay App Version 1.0.0
+#
+
+app.artifacts-1.0.0=\
+	
+
+app.change.log-1.0.0=LPS-152249
+
+app.git.id-1.0.0=d755a323821f133035170b1581d8adebad1fbcdc
+
+#
+# Liferay App Version 1.0.1
+#
+
+app.artifacts-1.0.1=\
+	
+
+app.change.log-1.0.1=LPS-152249 LPS-152617
+
+app.git.id-1.0.1=bb501db32ca2e6a9345a0631dd5597f3a30e60d0
+
+#
+# Liferay App Version 1.0.2
+#
+
+app.artifacts-1.0.2=\
+	
+
+app.change.log-1.0.2=LPS-152249 LPS-152617
+
+app.git.id-1.0.2=e1338a7276cea6a6a955d07fe4d6f69bfcaf3813

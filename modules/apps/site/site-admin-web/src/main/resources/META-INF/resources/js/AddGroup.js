@@ -18,12 +18,24 @@ export default function ({namespace}) {
 		'.add-group-form .add-group-content'
 	);
 	const footer = document.querySelector('.add-group-form .sheet-footer');
-
 	const form = document.getElementById(`${namespace}fm`);
+	const formInput = document.getElementById(`${namespace}name`);
+
+	setTimeout(() => {
+		formInput.focus();
+	}, 100);
 
 	form.addEventListener('submit', (event) => {
 		event.preventDefault();
 		event.stopPropagation();
+
+		const alertContainer = document.querySelector(
+			'.add-group-alert-container'
+		);
+
+		if (alertContainer.hasChildNodes()) {
+			alertContainer.firstChild.remove();
+		}
 
 		content.classList.toggle('d-none');
 		loading.classList.add('d-flex');
@@ -57,8 +69,14 @@ export default function ({namespace}) {
 				}
 				else {
 					Liferay.Util.openToast({
+						autoClose: false,
+						container: alertContainer,
 						message: response.error,
+						toastProps: {
+							onClose: null,
+						},
 						type: 'danger',
+						variant: 'stripe',
 					});
 
 					content.classList.toggle('d-none');

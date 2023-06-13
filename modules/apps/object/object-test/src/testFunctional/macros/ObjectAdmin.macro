@@ -783,7 +783,7 @@ definition {
 	macro editObjectAction {
 		ObjectAdmin.goToActionDetails(viewEntry = "${viewEntry}");
 
-		ObjectAdmin.viewFieldDetails();
+		ObjectAdmin.viewSidePanel();
 
 		if (isSet(newActionName)) {
 			Type(
@@ -849,6 +849,8 @@ definition {
 		Click(
 			key_name = "${fieldName}",
 			locator1 = "CreateObject#SELECT_OBJECT_FIELD_IN_TABLE");
+
+		SelectFrame(locator1 = "IFrame#IFRAME");
 	}
 
 	macro gotoRelationshipsTab {
@@ -1074,6 +1076,14 @@ definition {
 		AssertTextEquals.assertPartialText(
 			locator1 = "TextInput#REQUIRED_ALERT",
 			value1 = "${requiredAlert}");
+	}
+
+	macro viewSidePanel {
+		SelectFrame(locator1 = "IFrame#IFRAME");
+
+		AssertElementPresent(locator1 = "ObjectAdmin#SIDE_PANEL");
+
+		AssertElementPresent(locator1 = "ObjectAdmin#SIDE_PANEL_TITLE");
 	}
 
 	macro viewSystemObject {

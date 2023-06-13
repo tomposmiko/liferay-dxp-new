@@ -16,7 +16,7 @@ package com.liferay.cookies.banner.web.internal.portlet;
 
 import com.liferay.cookies.banner.web.internal.constants.CookiesBannerPortletKeys;
 import com.liferay.cookies.banner.web.internal.constants.CookiesBannerWebKeys;
-import com.liferay.cookies.banner.web.internal.display.context.CookiesBannerConfigurationDisplayContext;
+import com.liferay.portal.kernel.cookies.CookiesManager;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 
 import java.io.IOException;
@@ -27,6 +27,7 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Eduardo García
@@ -37,7 +38,6 @@ import org.osgi.service.component.annotations.Component;
 		"com.liferay.portlet.add-default-resource=true",
 		"com.liferay.portlet.css-class-wrapper=portlet-cookies-banner-configuration",
 		"com.liferay.portlet.display-category=category.tools",
-		"com.liferay.portlet.header-portlet-css=/cookies_banner_configuration/css/main.css",
 		"com.liferay.portlet.private-request-attributes=false",
 		"com.liferay.portlet.private-session-attributes=false",
 		"com.liferay.portlet.render-weight=50",
@@ -57,20 +57,17 @@ import org.osgi.service.component.annotations.Component;
 public class CookiesBannerConfigurationPortlet extends MVCPortlet {
 
 	@Override
-	public void render(
+	protected void doDispatch(
 			RenderRequest renderRequest, RenderResponse renderResponse)
 		throws IOException, PortletException {
 
-		CookiesBannerConfigurationDisplayContext
-			cookiesBannerConfigurationDisplayContext =
-				new CookiesBannerConfigurationDisplayContext(
-					renderRequest, renderResponse);
-
 		renderRequest.setAttribute(
-			CookiesBannerWebKeys.COOKIES_BANNER_CONFIGURATION_DISPLAY_CONTEXT,
-			cookiesBannerConfigurationDisplayContext);
+			CookiesBannerWebKeys.COOKIES_MANAGER, _cookiesManager);
 
-		super.render(renderRequest, renderResponse);
+		super.doDispatch(renderRequest, renderResponse);
 	}
+
+	@Reference
+	private CookiesManager _cookiesManager;
 
 }

@@ -14,6 +14,7 @@
 
 import {useQuery} from '@apollo/client';
 import ClayButton from '@clayui/button';
+import ClayIcon from '@clayui/icon';
 import ClayLayout from '@clayui/layout';
 import {useState} from 'react';
 import {Link, useOutletContext} from 'react-router-dom';
@@ -25,32 +26,60 @@ import StatusBadge from '../../../../../../components/StatusBadge';
 import QATable, {Orientation} from '../../../../../../components/Table/QATable';
 import {
 	CTypePagination,
+	TestrayAttachment,
 	TestrayCaseResult,
-} from '../../../../../../graphql/queries';
-import {
 	TestrayWarning,
+	getAttachments,
 	getWarnings,
-} from '../../../../../../graphql/queries/testrayWarning';
+} from '../../../../../../graphql/queries';
 import i18n from '../../../../../../i18n';
 import {getStatusLabel} from '../../../../../../util/constants';
 import {getTimeFromNow} from '../../../../../../util/date';
 
+type CollapsableItemProps = {
+	count: number;
+	title: string;
+};
+
+const CollapsableItem: React.FC<CollapsableItemProps> = ({
+	children,
+	count,
+	title,
+}) => {
+	const [visible, setVisible] = useState(false);
+
+	return (
+		<>
+			<span className="custom-link" onClick={() => setVisible(!visible)}>
+				{`${visible ? 'Hide' : 'Show'} ${count} ${title}`}
+			</span>
+
+			{visible && <div>{children}</div>}
+		</>
+	);
+};
+
 const CaseResult = () => {
 	const {caseResult}: {caseResult: TestrayCaseResult} = useOutletContext();
-	const [showWarning, setShowWarning] = useState(false);
 
 	const {data} = useQuery<CTypePagination<'warnings', TestrayWarning>>(
 		getWarnings
 	);
 
-	const totalCount = data?.c.warnings.totalCount || 0;
+	const {data: attachmentData} = useQuery<
+		CTypePagination<'attachments', TestrayAttachment>
+	>(getAttachments);
 
-	const warnings = data?.c.warnings.items || [];
+	const {totalCount: warningTotalCount = 0, items: warnings = []} =
+		data?.c.warnings || {};
+
+	const {totalCount: attachmentTotalCount = 0, items: attachments = []} =
+		attachmentData?.c.attachments || {};
 
 	return (
 		<ClayLayout.Row>
-			<ClayLayout.Col xs={12}>
-				<ClayButton.Group className="ml-3" spaced>
+			<ClayLayout.Col className="p-0" xs={12}>
+				<ClayButton.Group className="mb-3 ml-3" spaced>
 					<ClayButton>{i18n.translate('assign')}</ClayButton>
 
 					<ClayButton displayType="secondary">
@@ -76,7 +105,7 @@ const CaseResult = () => {
 			</ClayLayout.Col>
 
 			<ClayLayout.Col xs={9}>
-				<Container className="mt-4" title="Test Details">
+				<Container className="mt-4" collapsable title="Test Details">
 					<QATable
 						items={[
 							{
@@ -99,41 +128,54 @@ const CaseResult = () => {
 								flexHeading: true,
 								title: i18n.sub(
 									'warnings-x',
-									totalCount.toString()
+									warningTotalCount.toString()
 								),
 								value: (
-									<>
-										<span
-											className="custom-link"
-											onClick={() =>
-												setShowWarning(!showWarning)
-											}
-										>
-											{`${
-												showWarning ? 'Hide' : 'Show'
-											} ${totalCount} Warnings`}
-										</span>
-
-										{showWarning && (
-											<div>
-												{warnings.map(
-													(warning, index) => (
-														<Code
-															className="mt-2"
-															key={index}
-														>
-															{warning.content}
-														</Code>
-													)
-												)}
-											</div>
-										)}
-									</>
+									<CollapsableItem
+										count={warningTotalCount}
+										title={i18n.translate('warning')}
+									>
+										{warnings.map((warning, index) => (
+											<Code className="mt-2" key={index}>
+												{warning.content}
+											</Code>
+										))}
+									</CollapsableItem>
 								),
 							},
 							{
-								title: i18n.translate('attachments'),
-								value: '',
+								flexHeading: true,
+								title: i18n.sub(
+									'attachments-x',
+									attachmentTotalCount.toString()
+								),
+								value: (
+									<CollapsableItem
+										count={attachments.length}
+										title={i18n.translate('attachment')}
+									>
+										<div className="d-flex flex-column">
+											{attachments.map(
+												(attachment, index) => (
+													<a
+														href={attachment.url}
+														key={index}
+														rel="noopener noreferrer"
+														target="_blank"
+													>
+														{attachment.name}
+
+														<ClayIcon
+															className="ml-2"
+															fontSize={12}
+															symbol="shortcut"
+														/>
+													</a>
+												)
+											)}
+										</div>
+									</CollapsableItem>
+								),
 							},
 							{
 								title: i18n.translate('git-hash'),
@@ -147,7 +189,7 @@ const CaseResult = () => {
 					/>
 				</Container>
 
-				<Container className="mt-4" title="Case Details">
+				<Container className="mt-4" collapsable title="Case Details">
 					<QATable
 						items={[
 							{
@@ -188,7 +230,11 @@ const CaseResult = () => {
 			</ClayLayout.Col>
 
 			<ClayLayout.Col xs={3}>
-				<Container className="mt-4" title={i18n.translate('dates')}>
+				<Container
+					className=""
+					collapsable
+					title={i18n.translate('dates')}
+				>
 					<QATable
 						items={[
 							{

@@ -27,8 +27,6 @@ definition {
 
 	@priority = "4"
 	test ContentPageChangesCanBeAutomaticallyResolved {
-		property test.assert.warning.exceptions = "true";
-
 		JSONGroup.addGroup(groupName = "Site Name");
 
 		JSONLayout.addPublicLayout(
@@ -165,8 +163,7 @@ definition {
 
 	@priority = "4"
 	test PublishPrivateContentPageWithFragment {
-		property osgi.module.configuration.file.names = "com.liferay.release.feature.flag.web.internal.configuration.ReleaseFeatureFlagConfiguration.config";
-		property osgi.module.configurations = "disabledReleaseFeatureFlags=[&quot;DISABLE_PRIVATE_LAYOUTS&quot;]";
+		property release.feature.flags.disable.DISABLE_PRIVATE_LAYOUTS = "true";
 		property test.assert.warning.exceptions = "true";
 
 		JSONPublications.addPublication(publicationName = "Publication Name");

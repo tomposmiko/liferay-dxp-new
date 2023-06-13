@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -428,6 +429,38 @@ public abstract class TopLevelBuild extends BaseBuild {
 			downstreamBatchBuilds, new BaseBuild.BuildDisplayNameComparator());
 
 		return downstreamBatchBuilds;
+	}
+
+	public DownstreamBuild getDownstreamBuild(String axisName) {
+		for (Build downstreamBuild : getDownstreamBuilds(null)) {
+			String downstreamAxisName = downstreamBuild.getParameterValue(
+				"JOB_VARIANT");
+
+			if (JenkinsResultsParserUtil.isNullOrEmpty(downstreamAxisName)) {
+				continue;
+			}
+
+			String downstreamAxisVariable = downstreamBuild.getParameterValue(
+				"AXIS_VARIABLE");
+
+			if (JenkinsResultsParserUtil.isNullOrEmpty(
+					downstreamAxisVariable)) {
+
+				continue;
+			}
+
+			downstreamAxisName += "/" + downstreamAxisVariable;
+
+			if (!axisName.equals(downstreamAxisName) ||
+				!(downstreamBuild instanceof DownstreamBuild)) {
+
+				continue;
+			}
+
+			return (DownstreamBuild)downstreamBuild;
+		}
+
+		return null;
 	}
 
 	@Override
@@ -1502,10 +1535,39 @@ public abstract class TopLevelBuild extends BaseBuild {
 			builds.addAll(getDownstreamBuilds(null));
 		}
 
+		Element batchListElement = null;
+		String batchName = null;
+
 		for (Build build : builds) {
 			String result = build.getResult();
 
 			if (result.equals("SUCCESS") == success) {
+				if (build instanceof DownstreamBuild) {
+					DownstreamBuild downstreamBuild = (DownstreamBuild)build;
+
+					if (!Objects.equals(
+							batchName, downstreamBuild.getBatchName())) {
+
+						batchName = downstreamBuild.getBatchName();
+
+						Element batchListItemElement = Dom4JUtil.getNewElement(
+							"li", jobSummaryListElement);
+
+						batchListItemElement.addText(batchName);
+
+						batchListElement = Dom4JUtil.getNewElement(
+							"ul", batchListItemElement);
+					}
+
+					Element batchListItemElement = Dom4JUtil.getNewElement(
+						"li", batchListElement);
+
+					batchListItemElement.add(
+						build.getGitHubMessageBuildAnchorElement());
+
+					continue;
+				}
+
 				Element jobSummaryListItemElement = Dom4JUtil.getNewElement(
 					"li", jobSummaryListElement);
 

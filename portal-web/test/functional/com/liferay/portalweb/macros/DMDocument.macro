@@ -58,11 +58,9 @@ definition {
 		if (isSet(displayPageTemplateDisabled)) {
 			Portlet.waitForForm();
 
-			var key_panel = "Display Page Template";
+			var key_panel = "Display Page";
 
-			AssertElementNotPresent(locator1 = "Panel#PANEL_COLLAPSED");
-
-			AssertElementNotPresent(locator1 = "Panel#PANEL_EXPANDED");
+			AssertElementNotPresent(locator1 = "Panel#PANEL");
 		}
 
 		if (isSet(vocabularyName)) {
@@ -678,6 +676,19 @@ definition {
 				value1 = "${viewableBy}");
 		}
 
+		if (isSet(textField)) {
+			if (isSet(fieldFieldLabel)) {
+				var key_fieldLabel = "${fieldFieldLabel}";
+			}
+			else {
+				var key_fieldLabel = "Text";
+			}
+
+			Type(
+				locator1 = "TextInput#GENERIC_TEXT_INPUT",
+				value1 = "${textField}");
+		}
+
 		AssertClick(
 			locator1 = "Button#PUBLISH",
 			value1 = "Publish");
@@ -813,6 +824,17 @@ definition {
 		var key_dmDocumentTitle = "${dmDocumentTitle}";
 
 		LexiconEntry.viewEntryName(rowEntry = "${dmDocumentTitle}");
+	}
+
+	macro assertDownloadedFileContent {
+		var fileContent = TestCase.getTempFileContent(fileName = "${fileName}");
+
+		if (contains("${fileContent}", "${downloadedContent}")) {
+			echo("The downloaded file content matches the expected file content.");
+		}
+		else {
+			fail("The downloaded file content does not match the expected file content.");
+		}
 	}
 
 	macro assertFileNameFromTempFolder {
@@ -1306,11 +1328,16 @@ definition {
 			key_rowEntry = "${dmDocumentTitle}",
 			locator1 = "Icon#ROW_VERTICAL_ELLIPSIS");
 
-		AssertClick.assertPartialTextClickAt(
-			locator1 = "MenuItem#DOWNLOAD",
-			value1 = "Download");
+		if (isSet(noDownloadOption)) {
+			AssertElementNotPresent(locator1 = "MenuItem#DOWNLOAD");
+		}
+		else {
+			AssertClick.assertPartialTextClickAt(
+				locator1 = "MenuItem#DOWNLOAD",
+				value1 = "Download");
 
-		DownloadTempFile();
+			DownloadTempFile();
+		}
 	}
 
 	macro downloadMultipleCP {
@@ -1341,6 +1368,19 @@ definition {
 		AssertClick.assertPartialTextClickAt(
 			locator1 = "Button#DOWNLOAD_SIDEBAR",
 			value1 = "Download");
+	}
+
+	macro downloadWithDirectoryIndexing {
+		var portalURL = PropsUtil.get("portal.url");
+
+		Navigator.openSpecificURL(url = "${portalURL}/documents/${siteURLKey}/");
+
+		AssertClick(
+			key_text = "${dmDocumentTitle}",
+			locator1 = "Link#ANY",
+			value1 = "${dmDocumentTitle}");
+
+		DownloadTempFile();
 	}
 
 	macro editCategoryTags {
@@ -1544,11 +1584,9 @@ definition {
 		if (isSet(displayPageTemplateDisabled)) {
 			Portlet.waitForForm();
 
-			var key_panel = "Display Page Template";
+			var key_panel = "Display Page";
 
-			AssertElementNotPresent(locator1 = "Panel#PANEL_COLLAPSED");
-
-			AssertElementNotPresent(locator1 = "Panel#PANEL_EXPANDED");
+			AssertElementNotPresent(locator1 = "Panel#PANEL");
 		}
 
 		if (isSet(customFieldTextEdit)) {
@@ -1811,6 +1849,18 @@ definition {
 		PortletEntry.save();
 
 		IFrame.closeFrame();
+	}
+
+	macro enableDirectoryIndexing {
+		DMNavigator.openToConfigInSiteSettings(
+			portlet = "Documents and Media",
+			siteURLKey = "${siteURLKey}");
+
+		FormFields.enableSwitch(fieldName = "Enable Directory Indexing");
+
+		Button.clickSave();
+
+		Alert.viewSuccessMessage();
 	}
 
 	macro expandInfo {
@@ -2495,10 +2545,23 @@ definition {
 			key_text = "fileExtensions",
 			locator1 = "TextArea#ANY");
 
-		Type(
-			key_text = "fileExtensions",
-			locator1 = "TextArea#ANY",
-			value1 = "${fieldValue}");
+		if ("${indexNumber}" == "2") {
+			Click(
+				key_label = "Add Duplicate Field File Extensions",
+				locator1 = "Button#DUPLICATE_SPECIFIC");
+
+			Type(
+				key_indexNumber = "${indexNumber}",
+				key_label = "File Extensions",
+				locator1 = "TextArea#ANY_LABELED_N",
+				value1 = "${fieldValue}");
+		}
+		else {
+			Type(
+				key_text = "fileExtensions",
+				locator1 = "TextArea#ANY",
+				value1 = "${fieldValue}");
+		}
 
 		SystemSettings.saveConfiguration();
 	}

@@ -99,7 +99,19 @@ public class RenderLayoutStructureDisplayContext {
 	}
 
 	public List<String> getCollectionStyledLayoutStructureItemIds() {
-		return _collectionStyledLayoutStructureItemIds;
+		List<String> collectionStyledLayoutStructureItemIds =
+			(List<String>)_httpServletRequest.getAttribute(
+				_COLLECTION_STYLED_LAYOUT_STRUCTURE_ITEM_IDS);
+
+		if (collectionStyledLayoutStructureItemIds == null) {
+			collectionStyledLayoutStructureItemIds = new ArrayList<>();
+
+			_httpServletRequest.setAttribute(
+				_COLLECTION_STYLED_LAYOUT_STRUCTURE_ITEM_IDS,
+				collectionStyledLayoutStructureItemIds);
+		}
+
+		return collectionStyledLayoutStructureItemIds;
 	}
 
 	public String getContainerLinkHref(
@@ -465,7 +477,6 @@ public class RenderLayoutStructureDisplayContext {
 
 	public DefaultFragmentRendererContext getDefaultFragmentRendererContext(
 		FragmentEntryLink fragmentEntryLink, String itemId,
-		List<String> collectionStyledLayoutStructureItemIds,
 		int collectionElementIndex) {
 
 		DefaultFragmentRendererContext defaultFragmentRendererContext =
@@ -500,7 +511,7 @@ public class RenderLayoutStructureDisplayContext {
 
 		defaultFragmentRendererContext.
 			setCollectionStyledLayoutStructureItemIds(
-				collectionStyledLayoutStructureItemIds);
+				getCollectionStyledLayoutStructureItemIds());
 		defaultFragmentRendererContext.setCollectionElementIndex(
 			collectionElementIndex);
 
@@ -1167,11 +1178,12 @@ public class RenderLayoutStructureDisplayContext {
 		return _segmentsEntryIds;
 	}
 
+	private static final String _COLLECTION_STYLED_LAYOUT_STRUCTURE_ITEM_IDS =
+		"COLLECTION_STYLED_LAYOUT_STRUCTURE_ITEM_IDS";
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		RenderLayoutStructureDisplayContext.class);
 
-	private final List<String> _collectionStyledLayoutStructureItemIds =
-		new ArrayList<>();
 	private JSONObject _frontendTokensJSONObject;
 	private final HttpServletRequest _httpServletRequest;
 	private final LayoutStructure _layoutStructure;

@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 /**
  * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
  *
@@ -16,14 +17,29 @@ import {createContext, useEffect, useReducer} from 'react';
 
 import apolloClient from '../graphql/apolloClient';
 import {UserAccount, getLiferayMyUserAccount} from '../graphql/queries';
+import {Security} from '../security';
 import {ActionMap} from '../types';
 
 type InitialState = {
 	myUserAccount?: UserAccount;
+	security: Security;
 };
 
 const initialState: InitialState = {
 	myUserAccount: undefined,
+	security: new Security(
+		{
+			additionalName: '',
+			alternateName: '',
+			emailAddress: '',
+			familyName: '',
+			givenName: '',
+			id: 0,
+			image: '',
+			roleBriefs: [],
+		},
+		true
+	),
 };
 
 export enum AccountTypes {
@@ -31,7 +47,10 @@ export enum AccountTypes {
 }
 
 type AccountPayload = {
-	[AccountTypes.SET_MY_USER_ACCOUNT]: UserAccount;
+	[AccountTypes.SET_MY_USER_ACCOUNT]: {
+		account: UserAccount;
+		skipRoleCheck: boolean;
+	};
 };
 
 type AppActions = ActionMap<AccountPayload>[keyof ActionMap<AccountPayload>];
@@ -43,9 +62,13 @@ export const AccountContext = createContext<
 const reducer = (state: InitialState, action: AppActions) => {
 	switch (action.type) {
 		case AccountTypes.SET_MY_USER_ACCOUNT:
+			const {account, skipRoleCheck} = action.payload;
+			const security = new Security(account, skipRoleCheck);
+
 			return {
 				...state,
-				myUserAccount: action.payload,
+				myUserAccount: account,
+				security,
 			};
 
 		default:
@@ -53,7 +76,10 @@ const reducer = (state: InitialState, action: AppActions) => {
 	}
 };
 
-const AccountContextProvider: React.FC = ({children}) => {
+const AccountContextProvider: React.FC<{skipRoleCheck: boolean}> = ({
+	children,
+	skipRoleCheck,
+}) => {
 	const [state, dispatch] = useReducer(reducer, initialState);
 
 	useEffect(() => {
@@ -61,16 +87,19 @@ const AccountContextProvider: React.FC = ({children}) => {
 			.query({query: getLiferayMyUserAccount})
 			.then((response) =>
 				dispatch({
-					payload: response.data.myUserAccount as UserAccount,
+					payload: {
+						account: response.data.myUserAccount as UserAccount,
+						skipRoleCheck,
+					},
 					type: AccountTypes.SET_MY_USER_ACCOUNT,
 				})
 			)
 			.catch(console.error);
-	}, []);
+	}, [skipRoleCheck]);
 
 	return (
 		<AccountContext.Provider value={[state, dispatch]}>
-			{children}
+			{state.security.ready && children}
 		</AccountContext.Provider>
 	);
 };

@@ -18,6 +18,7 @@
 
 <%
 CookiesBannerDisplayContext cookiesBannerDisplayContext = (CookiesBannerDisplayContext)request.getAttribute(CookiesBannerWebKeys.COOKIES_BANNER_DISPLAY_CONTEXT);
+CookiesManager cookiesManager = (CookiesManager)request.getAttribute(CookiesBannerWebKeys.COOKIES_MANAGER);
 %>
 
 <clay:container-fluid
@@ -31,13 +32,13 @@ CookiesBannerDisplayContext cookiesBannerDisplayContext = (CookiesBannerDisplayC
 			<clay:content-col
 				expand="<%= true %>"
 			>
-				<span><%= LanguageUtil.get(request, "cookies-banner-message") %></span>
+				<span><liferay-ui:message key="cookies-banner-message" /></span>
 			</clay:content-col>
 
 			<clay:content-col>
 				<clay:button
-					cssClass="cookies-banner-button-configuration"
 					displayType="link"
+					id='<%= liferayPortletResponse.getNamespace() + "configurationButton" %>'
 					label='<%= LanguageUtil.get(request, "configuration") %>'
 					small="<%= true %>"
 				/>
@@ -45,8 +46,8 @@ CookiesBannerDisplayContext cookiesBannerDisplayContext = (CookiesBannerDisplayC
 
 			<clay:content-col>
 				<clay:button
-					cssClass="cookies-banner-button-accept"
 					displayType="secondary"
+					id='<%= liferayPortletResponse.getNamespace() + "acceptAllButton" %>'
 					label='<%= LanguageUtil.get(request, "accept-all") %>'
 					small="<%= true %>"
 				/>
@@ -54,8 +55,8 @@ CookiesBannerDisplayContext cookiesBannerDisplayContext = (CookiesBannerDisplayC
 
 			<clay:content-col>
 				<clay:button
-					cssClass="cookies-banner-button-decline"
-					displayType="primary"
+					displayType="secondary"
+					id='<%= liferayPortletResponse.getNamespace() + "declineAllButton" %>'
 					label='<%= LanguageUtil.get(request, "decline-all") %>'
 					small="<%= true %>"
 				/>
@@ -69,6 +70,10 @@ CookiesBannerDisplayContext cookiesBannerDisplayContext = (CookiesBannerDisplayC
 	context='<%=
 		HashMapBuilder.<String, Object>put(
 			"configurationUrl", cookiesBannerDisplayContext.getConfigurationURL()
+		).put(
+			"optionalCookieNames", cookiesManager.getOptionalCookieNames()
+		).put(
+			"requiredCookieNames", cookiesManager.getRequiredCookieNames()
 		).build()
 	%>'
 	module="cookies_banner/js/CookiesBanner"
