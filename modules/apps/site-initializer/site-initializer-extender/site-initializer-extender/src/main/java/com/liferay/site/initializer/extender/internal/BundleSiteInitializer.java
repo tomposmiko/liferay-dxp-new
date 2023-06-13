@@ -52,12 +52,16 @@ import com.liferay.headless.admin.user.dto.v1_0.UserAccount;
 import com.liferay.headless.admin.user.resource.v1_0.AccountResource;
 import com.liferay.headless.admin.user.resource.v1_0.AccountRoleResource;
 import com.liferay.headless.admin.user.resource.v1_0.UserAccountResource;
+import com.liferay.headless.admin.workflow.dto.v1_0.WorkflowDefinition;
+import com.liferay.headless.admin.workflow.resource.v1_0.WorkflowDefinitionResource;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Catalog;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.Option;
 import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductOption;
+import com.liferay.headless.commerce.admin.catalog.dto.v1_0.ProductSpecification;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.CatalogResource;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.OptionResource;
 import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductOptionResource;
+import com.liferay.headless.commerce.admin.catalog.resource.v1_0.ProductSpecificationResource;
 import com.liferay.headless.commerce.admin.channel.dto.v1_0.Channel;
 import com.liferay.headless.commerce.admin.channel.resource.v1_0.ChannelResource;
 import com.liferay.headless.delivery.dto.v1_0.Document;
@@ -118,6 +122,7 @@ import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ThemeLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
+import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.service.permission.ModelPermissionsFactory;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.ModifiableSettings;
@@ -240,7 +245,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 		TaxonomyVocabularyResource.Factory taxonomyVocabularyResourceFactory,
 		ThemeLocalService themeLocalService,
 		UserAccountResource.Factory userAccountResourceFactory,
-		UserLocalService userLocalService) {
+		UserLocalService userLocalService,
+		WorkflowDefinitionLinkLocalService workflowDefinitionLinkLocalService,
+		WorkflowDefinitionResource.Factory workflowDefinitionResourceFactory) {
 
 		_accountResourceFactory = accountResourceFactory;
 		_accountRoleLocalService = accountRoleLocalService;
@@ -293,6 +300,9 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_themeLocalService = themeLocalService;
 		_userAccountResourceFactory = userAccountResourceFactory;
 		_userLocalService = userLocalService;
+		_workflowDefinitionLinkLocalService =
+			workflowDefinitionLinkLocalService;
+		_workflowDefinitionResourceFactory = workflowDefinitionResourceFactory;
 
 		BundleWiring bundleWiring = _bundle.adapt(BundleWiring.class);
 
@@ -406,11 +416,20 @@ public class BundleSiteInitializer implements SiteInitializer {
 			Map<String, String> listTypeDefinitionIdsStringUtilReplaceValues =
 				_invoke(() -> _addListTypeDefinitions(serviceContext));
 
+			ObjectDefinitionResource.Builder objectDefinitionResourceBuilder =
+				_objectDefinitionResourceFactory.create();
+
+			ObjectDefinitionResource objectDefinitionResource =
+				objectDefinitionResourceBuilder.user(
+					serviceContext.fetchUser()
+				).build();
+
 			Map<String, String> objectDefinitionIdsStringUtilReplaceValues =
 				_invoke(
 					() -> _addObjectDefinitions(
 						listTypeDefinitionIdsStringUtilReplaceValues,
-						serviceContext, siteNavigationMenuItemSettingsBuilder));
+						objectDefinitionResource, serviceContext,
+						siteNavigationMenuItemSettingsBuilder));
 
 			_invoke(
 				() -> _addCPDefinitions(
@@ -437,6 +456,15 @@ public class BundleSiteInitializer implements SiteInitializer {
 					documentsStringUtilReplaceValues, layouts,
 					remoteAppEntryIdsStringUtilReplaceValues, serviceContext,
 					siteNavigationMenuItemSettingsBuilder.build()));
+
+			TransactionCommitCallbackUtil.registerCallback(
+				() -> {
+					_invoke(
+						() -> _addWorkflowDefinitions(
+							objectDefinitionResource, serviceContext));
+
+					return null;
+				});
 		}
 		catch (Exception exception) {
 			_log.error(exception);
@@ -625,6 +653,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		for (String resourcePath : resourcePaths) {
 			if (resourcePath.endsWith(".options.json") ||
 				resourcePath.endsWith(".products.json") ||
+				resourcePath.endsWith(".products.specifications.json") ||
 				resourcePath.endsWith(
 					".products.subscriptions.properties.json") ||
 				!resourcePath.endsWith(".json")) {
@@ -660,6 +689,11 @@ public class BundleSiteInitializer implements SiteInitializer {
 				assetVocabularyName, catalog, channel,
 				commerceInventoryWarehouses,
 				StringUtil.replaceLast(resourcePath, ".json", ".products.json"),
+				serviceContext);
+
+			_addCommerceProductSpecifications(
+				StringUtil.replaceLast(
+					resourcePath, ".json", ".products.specifications.json"),
 				serviceContext);
 
 			TransactionCommitCallbackUtil.registerCallback(
@@ -833,6 +867,59 @@ public class BundleSiteInitializer implements SiteInitializer {
 				commerceChannelId, documentsStringUtilReplaceValues,
 				objectDefinitionIdsStringUtilReplaceValues, resourcePath,
 				serviceContext);
+		}
+	}
+
+	private void _addCommerceProductSpecifications(
+			String resourcePath, ServiceContext serviceContext)
+		throws Exception {
+
+		ProductSpecificationResource.Builder
+			productSpecificationResourceBuilder =
+				_commerceReferencesHolder.productSpecificationResourceFactory.
+					create();
+
+		ProductSpecificationResource productSpecificationResource =
+			productSpecificationResourceBuilder.user(
+				serviceContext.fetchUser()
+			).build();
+
+		String json = _read(resourcePath);
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray(json);
+
+		_commerceReferencesHolder.cpSpecificationOptionsImporter.
+			importCPSpecificationOptions(
+				jsonArray, serviceContext.getScopeGroupId(),
+				serviceContext.getUserId());
+
+		for (int i = 0; i < jsonArray.length(); i++) {
+			JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+			CPDefinition cpDefinition =
+				_commerceReferencesHolder.cpDefinitionLocalService.
+					fetchCPDefinitionByCProductExternalReferenceCode(
+						jsonObject.getString(
+							"cpDefinitionExternalReferenceCode"),
+						serviceContext.getCompanyId());
+
+			if (cpDefinition == null) {
+				continue;
+			}
+
+			ProductSpecification productSpecification =
+				new ProductSpecification() {
+					{
+						productId = cpDefinition.getCPDefinitionId();
+						specificationKey = jsonObject.getString("key");
+						value = JSONUtil.toStringMap(
+							jsonObject.getJSONObject(
+								"productSpecificationValue"));
+					}
+				};
+
+			productSpecificationResource.postProductIdProductSpecification(
+				cpDefinition.getCPDefinitionId(), productSpecification);
 		}
 	}
 
@@ -1977,6 +2064,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 
 	private Map<String, String> _addObjectDefinitions(
 			Map<String, String> listTypeDefinitionIdsStringUtilReplaceValues,
+			ObjectDefinitionResource objectDefinitionResource,
 			ServiceContext serviceContext,
 			SiteNavigationMenuItemSettingsBuilder
 				siteNavigationMenuItemSettingsBuilder)
@@ -1991,14 +2079,6 @@ public class BundleSiteInitializer implements SiteInitializer {
 		if (SetUtil.isEmpty(resourcePaths)) {
 			return objectDefinitionIdsStringUtilReplaceValues;
 		}
-
-		ObjectDefinitionResource.Builder objectDefinitionResourceBuilder =
-			_objectDefinitionResourceFactory.create();
-
-		ObjectDefinitionResource objectDefinitionResource =
-			objectDefinitionResourceBuilder.user(
-				serviceContext.fetchUser()
-			).build();
 
 		for (String resourcePath : resourcePaths) {
 			if (resourcePath.endsWith(".object-entries.json")) {
@@ -2985,6 +3065,98 @@ public class BundleSiteInitializer implements SiteInitializer {
 		}
 	}
 
+	private void _addWorkflowDefinitions(
+			ObjectDefinitionResource objectDefinitionResource,
+			ServiceContext serviceContext)
+		throws Exception {
+
+		Set<String> resourcePaths = _servletContext.getResourcePaths(
+			"/site-initializer/workflow-definitions");
+
+		if (SetUtil.isEmpty(resourcePaths)) {
+			return;
+		}
+
+		WorkflowDefinitionResource.Builder workflowDefinitionResourceBuilder =
+			_workflowDefinitionResourceFactory.create();
+
+		WorkflowDefinitionResource workflowDefinitionResource =
+			workflowDefinitionResourceBuilder.user(
+				serviceContext.fetchUser()
+			).build();
+
+		for (String resourcePath : resourcePaths) {
+			JSONObject workflowDefinitionJSONObject =
+				JSONFactoryUtil.createJSONObject(_read(resourcePath + ".json"));
+
+			workflowDefinitionJSONObject.put(
+				"content", _read(resourcePath + ".content.xml"));
+
+			WorkflowDefinition workflowDefinition =
+				workflowDefinitionResource.postWorkflowDefinitionDeploy(
+					WorkflowDefinition.toDTO(
+						workflowDefinitionJSONObject.toString()));
+
+			String propertiesJSON = _read(resourcePath + ".properties.json");
+
+			if (propertiesJSON == null) {
+				continue;
+			}
+
+			JSONArray propertiesJSONArray = JSONFactoryUtil.createJSONArray(
+				propertiesJSON);
+
+			for (int i = 0; i < propertiesJSONArray.length(); i++) {
+				JSONObject propertiesJSONObject =
+					propertiesJSONArray.getJSONObject(i);
+
+				long groupId = 0;
+
+				if (StringUtil.equals(
+						propertiesJSONObject.getString("scope"), "site")) {
+
+					groupId = serviceContext.getScopeGroupId();
+				}
+
+				String className = propertiesJSONObject.getString("className");
+
+				if (StringUtil.equals(
+						className,
+						com.liferay.object.model.ObjectDefinition.class.
+							getName())) {
+
+					Page<ObjectDefinition> objectDefinitionsPage =
+						objectDefinitionResource.getObjectDefinitionsPage(
+							null, null,
+							objectDefinitionResource.toFilter(
+								StringBundler.concat(
+									"name eq '",
+									propertiesJSONObject.getString("assetName"),
+									"'")),
+							null, null);
+
+					ObjectDefinition objectDefinition =
+						objectDefinitionsPage.fetchFirstItem();
+
+					if (objectDefinition == null) {
+						continue;
+					}
+
+					className = StringBundler.concat(
+						className, "#", objectDefinition.getId());
+				}
+
+				_workflowDefinitionLinkLocalService.
+					updateWorkflowDefinitionLink(
+						serviceContext.getUserId(),
+						serviceContext.getCompanyId(), groupId, className, 0, 0,
+						StringBundler.concat(
+							workflowDefinition.getName(), "@",
+							workflowDefinition.getVersion()));
+			}
+		}
+	}
+
 	private void _associateUserAccounts(
 			JSONObject accountBriefsJSONObject, String emailAddress,
 			ServiceContext serviceContext)
@@ -3401,6 +3573,10 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private final ThemeLocalService _themeLocalService;
 	private final UserAccountResource.Factory _userAccountResourceFactory;
 	private final UserLocalService _userLocalService;
+	private final WorkflowDefinitionLinkLocalService
+		_workflowDefinitionLinkLocalService;
+	private final WorkflowDefinitionResource.Factory
+		_workflowDefinitionResourceFactory;
 
 	private class SiteNavigationMenuItemSetting {
 

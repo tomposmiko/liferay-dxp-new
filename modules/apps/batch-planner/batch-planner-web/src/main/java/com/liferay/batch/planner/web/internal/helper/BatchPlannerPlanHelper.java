@@ -17,12 +17,21 @@ package com.liferay.batch.planner.web.internal.helper;
 import com.liferay.batch.engine.constants.BatchEngineImportTaskConstants;
 import com.liferay.batch.planner.model.BatchPlannerMapping;
 import com.liferay.batch.planner.model.BatchPlannerPlan;
+import com.liferay.batch.planner.model.BatchPlannerPolicy;
+import com.liferay.batch.planner.service.BatchPlannerMappingLocalService;
 import com.liferay.batch.planner.service.BatchPlannerMappingService;
+import com.liferay.batch.planner.service.BatchPlannerPlanLocalService;
 import com.liferay.batch.planner.service.BatchPlannerPlanService;
+import com.liferay.batch.planner.service.BatchPlannerPolicyLocalService;
 import com.liferay.batch.planner.service.BatchPlannerPolicyService;
 import com.liferay.batch.planner.service.persistence.BatchPlannerMappingUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
+import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -134,6 +143,27 @@ public class BatchPlannerPlanHelper {
 		return batchPlannerPlan;
 	}
 
+	public BatchPlannerPlan copyBatchPlannerPlan(
+			long userId, long batchPlannerPlanId, String externalURL,
+			String name)
+		throws PortalException {
+
+		User user = _userLocalService.fetchUser(userId);
+
+		PermissionChecker permissionChecker =
+			PermissionThreadLocal.getPermissionChecker();
+
+		PermissionThreadLocal.setPermissionChecker(
+			PermissionCheckerFactoryUtil.create(user));
+
+		try {
+			return _copyBatchPlannerPlan(batchPlannerPlanId, externalURL, name);
+		}
+		finally {
+			PermissionThreadLocal.setPermissionChecker(permissionChecker);
+		}
+	}
+
 	public BatchPlannerPlan updateExportBatchPlannerPlan(
 			PortletRequest portletRequest)
 		throws PortalException {
@@ -148,6 +178,58 @@ public class BatchPlannerPlanHelper {
 
 		return _updateBatchPlannerPlan(
 			portletRequest, _getImportBatchPlannerMappings(portletRequest));
+	}
+
+	private BatchPlannerPlan _copyBatchPlannerPlan(
+			long batchPlannerPlanId, String externalURL, String name)
+		throws PortalException {
+
+		BatchPlannerPlan templateBatchPlannerPlan =
+			_batchPlannerPlanService.fetchBatchPlannerPlan(batchPlannerPlanId);
+
+		if ((templateBatchPlannerPlan == null) ||
+			!templateBatchPlannerPlan.isTemplate()) {
+
+			throw new IllegalArgumentException(
+				"Bbatch planner plan " + batchPlannerPlanId +
+					" is not a template");
+		}
+
+		BatchPlannerPlan batchPlannerPlan =
+			_batchPlannerPlanService.addBatchPlannerPlan(
+				templateBatchPlannerPlan.isExport(),
+				templateBatchPlannerPlan.getExternalType(),
+				"file://" + externalURL,
+				templateBatchPlannerPlan.getInternalClassName(), name, null,
+				false);
+
+		List<BatchPlannerMapping> batchPlannerMappings =
+			_batchPlannerMappingService.getBatchPlannerMappings(
+				templateBatchPlannerPlan.getBatchPlannerPlanId());
+
+		for (BatchPlannerMapping batchPlannerMapping : batchPlannerMappings) {
+			_batchPlannerMappingLocalService.addBatchPlannerMapping(
+				batchPlannerPlan.getUserId(),
+				batchPlannerPlan.getBatchPlannerPlanId(),
+				batchPlannerMapping.getExternalFieldName(),
+				batchPlannerMapping.getExternalFieldType(),
+				batchPlannerMapping.getInternalFieldName(),
+				batchPlannerMapping.getInternalFieldType(),
+				batchPlannerMapping.getScript());
+		}
+
+		List<BatchPlannerPolicy> batchPlannerPolicies =
+			_batchPlannerPolicyService.getBatchPlannerPolicies(
+				templateBatchPlannerPlan.getBatchPlannerPlanId());
+
+		for (BatchPlannerPolicy batchPlannerPolicy : batchPlannerPolicies) {
+			_batchPlannerPolicyLocalService.addBatchPlannerPolicy(
+				batchPlannerPlan.getUserId(),
+				batchPlannerPlan.getBatchPlannerPlanId(),
+				batchPlannerPolicy.getName(), batchPlannerPolicy.getValue());
+		}
+
+		return batchPlannerPlan;
 	}
 
 	private String _getCheckboxValue(
@@ -267,12 +349,24 @@ public class BatchPlannerPlanHelper {
 	}
 
 	@Reference
+	private BatchPlannerMappingLocalService _batchPlannerMappingLocalService;
+
+	@Reference
 	private BatchPlannerMappingService _batchPlannerMappingService;
+
+	@Reference
+	private BatchPlannerPlanLocalService _batchPlannerPlanLocalService;
 
 	@Reference
 	private BatchPlannerPlanService _batchPlannerPlanService;
 
 	@Reference
+	private BatchPlannerPolicyLocalService _batchPlannerPolicyLocalService;
+
+	@Reference
 	private BatchPlannerPolicyService _batchPlannerPolicyService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }

@@ -14,6 +14,9 @@
 
 import {gql} from '@apollo/client';
 
+import {TestrayProject} from './testrayProject';
+import {TestrayRoutine} from './testrayRoutine';
+
 export type TestrayBuild = {
 	dateCreated: string;
 	description: string;
@@ -21,6 +24,8 @@ export type TestrayBuild = {
 	gitHash: string;
 	name: string;
 	promoted: boolean;
+	testrayProject?: TestrayProject;
+	testrayRoutine?: TestrayRoutine;
 };
 
 export const getTestrayBuilds = gql`

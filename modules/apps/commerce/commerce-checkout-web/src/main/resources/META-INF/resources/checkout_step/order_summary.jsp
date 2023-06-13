@@ -496,6 +496,35 @@ if (priceDisplayType.equals(CommercePricingConstants.TAX_INCLUDED_IN_PRICE)) {
 			</c:if>
 
 			<%
+			String deliveryTermEntryName = orderSummaryCheckoutStepDisplayContext.getDeliveryTermEntryName(locale);
+			%>
+
+			<c:if test="<%= Validator.isNotNull(deliveryTermEntryName) %>">
+				<div class="panel-body payment-method">
+					<h5>
+						<liferay-ui:message key="delivery-terms" />
+					</h5>
+
+					<div class="shipping-description">
+						<a href="#" id="<%= commerceOrder.getDeliveryCommerceTermEntryId() %>"><%= HtmlUtil.escape(deliveryTermEntryName) %></a>
+
+						<liferay-frontend:component
+							context='<%=
+								HashMapBuilder.<String, Object>put(
+									"HTMLElementId", commerceOrder.getDeliveryCommerceTermEntryId()
+								).put(
+									"modalContent", commerceOrder.getDeliveryCommerceTermEntryDescription()
+								).put(
+									"modalTitle", deliveryTermEntryName
+								).build()
+							%>'
+							module="js/attachModalToHTMLElement"
+						/>
+					</div>
+				</div>
+			</c:if>
+
+			<%
 			String paymentTermEntryName = orderSummaryCheckoutStepDisplayContext.getPaymentTermEntryName(locale);
 			%>
 
@@ -506,7 +535,20 @@ if (priceDisplayType.equals(CommercePricingConstants.TAX_INCLUDED_IN_PRICE)) {
 					</h5>
 
 					<div class="shipping-description">
-						<%= HtmlUtil.escape(paymentTermEntryName) %>
+						<a href="#" id="<%= commerceOrder.getPaymentCommerceTermEntryId() %>"><%= HtmlUtil.escape(paymentTermEntryName) %></a>
+
+						<liferay-frontend:component
+							context='<%=
+								HashMapBuilder.<String, Object>put(
+									"HTMLElementId", commerceOrder.getPaymentCommerceTermEntryId()
+								).put(
+									"modalContent", commerceOrder.getPaymentCommerceTermEntryDescription()
+								).put(
+									"modalTitle", paymentTermEntryName
+								).build()
+							%>'
+							module="js/attachModalToHTMLElement"
+						/>
 					</div>
 				</div>
 			</c:if>

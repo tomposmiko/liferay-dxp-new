@@ -1,7 +1,6 @@
 @component-name = "portal-object"
 definition {
 
-	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Object";
@@ -95,13 +94,28 @@ definition {
 	}
 
 	@description = "LPS-135394 - Verify it is possible to delete a View"
-	@ignore = "Test Stub"
 	@priority = "5"
 	test CanDeleteView {
 		property portal.acceptance = "true";
 
-		// TODO LPS-147758 CanDeleteView pending implementation
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 171623",
+			objectName = "CustomObject171623",
+			pluralLabelName = "Custom Objects 171623");
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object 171623");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.assertObjectView(viewLabel = "Custom Views");
+
+		ObjectCustomViews.deleteObjectCustomViewViaUI(viewLabel = "Custom Views");
+
+		ObjectCustomViews.assertObjectViewNotPresent(viewLabel = "Custom Views");
 	}
 
 	@description = "LPS-135394 - Verify it is possible to drag the columns"
@@ -124,12 +138,34 @@ definition {
 	}
 
 	@description = "LPS-135394 - Verify that it is not possible to save another View as default"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CannotSaveAnotherViewAsDefault {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 171624",
+			objectName = "CustomObject171624",
+			pluralLabelName = "Custom Objects 171624");
 
-		// TODO LPS-147759 CannotSaveAnotherViewAsDefault pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object 171624");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views A");
+
+		ObjectCustomViews.addColumnsViaUI(
+			columnOption = "Workflow Status",
+			viewLabel = "Custom Views A");
+
+		Refresh();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views B");
+
+		ObjectCustomViews.addColumnsViaUI(
+			columnOption = "Author",
+			viewLabel = "Custom Views B");
+
+		Alert.viewErrorMessage(errorMessage = "There can only be one default object view");
 	}
 
 	@description = "LPS-135394 - Verify it is possible to search for a column on the View Builder tab"
@@ -229,20 +265,34 @@ definition {
 	}
 
 	@description = "LPS-135394 - Verify the empty state for the View Builder tab"
-	@ignore = "Test Stub"
 	@priority = "3"
 	test EmptyStateViewBuilder {
-		property portal.acceptance = "false";
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object 147760",
+			objectName = "CustomObject147760",
+			pluralLabelName = "Custom Objects 147760");
 
-		// TODO LPS-147760 EmptyStateViewBuilder pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object 147760");
+
+		ObjectCustomViews.goToViewsTab();
+
+		ObjectCustomViews.addObjectViewViaUI(viewName = "Custom Views");
+
+		ObjectCustomViews.goToViewsDetails(label = "Custom Views");
+
+		ObjectCustomViews.goToViewsBuilderTab();
+
+		ObjectCustomViews.assertEmptyStateTextOnViewBuilder(text = "No columns added yet.");
+
+		ObjectCustomViews.assertEmptyStateTextOnViewBuilder(text = "Add columns to start creating a view.");
 	}
 
 	@description = "LPS-135394 - Verify the empty state for the View tab"
 	@ignore = "Test Stub"
 	@priority = "3"
 	test EmptyStateViewTab {
-		property portal.acceptance = "false";
 
 		// TODO LPS-147751 EmptyStateViewTab pending implementation
 
@@ -262,7 +312,6 @@ definition {
 	@ignore = "Test Stub"
 	@priority = "3"
 	test NoResultMessageView {
-		property portal.acceptance = "false";
 
 		// TODO LPS-147752 NoResultMessageView pending implementation
 
@@ -272,7 +321,6 @@ definition {
 	@ignore = "Test Stub"
 	@priority = "3"
 	test NoResultMessageViewBuilder {
-		property portal.acceptance = "false";
 
 		// TODO LPS-147761 NoResultMessageViewBuilder pending implementation
 

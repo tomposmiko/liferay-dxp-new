@@ -15,11 +15,18 @@
 package com.liferay.portal.upgrade.v7_0_0;
 
 import com.liferay.petra.lang.SafeCloseable;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.dao.orm.common.SQLTransformer;
+import com.liferay.portal.kernel.dao.jdbc.AutoBatchPreparedStatementUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
+import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.UnicodePropertiesBuilder;
 import com.liferay.portal.language.LanguageResources;
 import com.liferay.portal.util.PropsValues;
 
@@ -45,6 +52,7 @@ public class UpgradeGroup extends UpgradeProcess {
 				"Group_", false, "classNameId", "classPK")) {
 
 			updateGlobalGroupName();
+			updateGroupsNames();
 		}
 	}
 
@@ -88,6 +96,73 @@ public class UpgradeGroup extends UpgradeProcess {
 
 				preparedStatement.executeUpdate();
 			}
+		}
+	}
+
+	protected void updateGroupsNames() throws Exception {
+		try (PreparedStatement preparedStatement1 = connection.prepareStatement(
+				SQLTransformer.transform(
+					"select groupId, name, typeSettings from Group_ where " +
+						"site = [$TRUE$] and friendlyURL != '/global'"));
+			ResultSet resultSet = preparedStatement1.executeQuery();
+			PreparedStatement preparedStatement2 =
+				AutoBatchPreparedStatementUtil.autoBatch(
+					connection.prepareStatement(
+						"update Group_ set name = ? where groupId = ?"))) {
+
+			while (resultSet.next()) {
+				long groupId = resultSet.getLong("groupId");
+				String name = resultSet.getString("name");
+
+				String typeSettings = resultSet.getString("typeSettings");
+
+				UnicodeProperties typeSettingsUnicodeProperties =
+					UnicodePropertiesBuilder.create(
+						true
+					).fastLoad(
+						typeSettings
+					).build();
+
+				String defaultLanguageId =
+					typeSettingsUnicodeProperties.getProperty("languageId");
+
+				Locale currentDefaultLocale =
+					LocaleThreadLocal.getSiteDefaultLocale();
+
+				try {
+					LocaleThreadLocal.setSiteDefaultLocale(
+						LocaleUtil.fromLanguageId(defaultLanguageId));
+
+					LocalizedValuesMap localizedValuesMap =
+						new LocalizedValuesMap();
+
+					for (String languageId :
+							StringUtil.split(
+								typeSettingsUnicodeProperties.getProperty(
+									"locales"))) {
+
+						Locale locale = LocaleUtil.fromLanguageId(languageId);
+
+						localizedValuesMap.put(locale, name);
+					}
+
+					String nameXML = LocalizationUtil.updateLocalization(
+						localizedValuesMap.getValues(), StringPool.BLANK,
+						"name", defaultLanguageId);
+
+					preparedStatement2.setString(1, nameXML);
+
+					preparedStatement2.setLong(2, groupId);
+
+					preparedStatement2.addBatch();
+				}
+				finally {
+					LocaleThreadLocal.setSiteDefaultLocale(
+						currentDefaultLocale);
+				}
+			}
+
+			preparedStatement2.executeBatch();
 		}
 	}
 

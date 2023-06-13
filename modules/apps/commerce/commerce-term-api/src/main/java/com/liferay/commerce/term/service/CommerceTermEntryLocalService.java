@@ -270,6 +270,10 @@ public interface CommerceTermEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CommerceTermEntry> getCommerceTermEntries(int start, int end);
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<CommerceTermEntry> getCommerceTermEntries(
+		long companyId, String type);
+
 	/**
 	 * Returns the number of commerce term entries.
 	 *
@@ -314,6 +318,11 @@ public interface CommerceTermEntryLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CTermEntryLocalization> getCTermEntryLocalizations(
 		long commerceTermEntryId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<CommerceTermEntry> getDeliveryCommerceTermEntries(
+		long companyId, long commerceOrderTypeId,
+		long commerceShippingOptionId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();

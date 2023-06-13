@@ -20,7 +20,6 @@ import com.liferay.commerce.currency.util.CommercePriceFormatter;
 import com.liferay.commerce.model.CommerceAddress;
 import com.liferay.commerce.model.CommerceOrder;
 import com.liferay.commerce.model.CommerceOrderItem;
-import com.liferay.commerce.product.model.CommerceChannel;
 import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.commerce.report.exporter.CommerceReportExporter;
 import com.liferay.commerce.service.CommerceOrderService;
@@ -143,6 +142,10 @@ public class ExportCommerceOrderReportMVCResourceCommand
 		).put(
 			"companyId", commerceAccount.getCompanyId()
 		).put(
+			"externalReferenceCode",
+			(commerceOrder.getExternalReferenceCode() != null) ?
+				commerceOrder.getExternalReferenceCode() : StringPool.BLANK
+		).put(
 			"locale", themeDisplay.getLocale()
 		).put(
 			"logoURL", _getLogoURL(themeDisplay)
@@ -230,13 +233,9 @@ public class ExportCommerceOrderReportMVCResourceCommand
 			commerceOrder.getTotalWithTaxAmountMoney()
 		);
 
-		CommerceChannel commerceChannel =
-			_commerceChannelService.getCommerceChannelByOrderGroupId(
-				commerceOrder.getGroupId());
-
 		FileEntry fileEntry =
 			_dlAppLocalService.fetchFileEntryByExternalReferenceCode(
-				commerceChannel.getGroupId(), "ORDER_PRINT_TEMPLATE");
+				commerceOrder.getGroupId(), "ORDER_PRINT_TEMPLATE");
 
 		PortletResponseUtil.write(
 			resourceResponse,

@@ -10,6 +10,11 @@
 </thead>
 
 <tbody>
+<tr>
+	<td>COLLECTION_DISPLAY_LIST</td>
+	<td>//*[contains(@class,'asset-summary') and contains(.,'${key_title}')]</td>
+	<td></td>
+</tr>
 <!--FRAGMENT-->
 <tr>
 	<td>FRAGMENT_HEADER</td>
@@ -24,6 +29,11 @@
 <tr>
 	<td>FRAGMENT_TEXT_BLOCK</td>
 	<td>//*[contains(@class,'text-block') and contains(.,'${key_description}')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>FRAGMENT_BUTTON</td>
+	<td>//*[contains(@class,'btn') and contains(.,'${key_buttonName}')]//a[contains(@href,'${key_href}')]</td>
 	<td></td>
 </tr>
 <tr>

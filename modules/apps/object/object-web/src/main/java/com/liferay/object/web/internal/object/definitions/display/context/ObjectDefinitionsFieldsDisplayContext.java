@@ -24,21 +24,27 @@ import com.liferay.object.model.ObjectField;
 import com.liferay.object.web.internal.configuration.FFBusinessTypeAttachmentConfiguration;
 import com.liferay.object.web.internal.constants.ObjectWebKeys;
 import com.liferay.object.web.internal.display.context.helper.ObjectRequestHelper;
+import com.liferay.object.web.internal.util.ObjectFieldBusinessTypeUtil;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
-import com.liferay.portal.kernel.util.HashMapBuilder;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
@@ -133,48 +139,53 @@ public class ObjectDefinitionsFieldsDisplayContext {
 	}
 
 	public List<Map<String, String>> getObjectFieldBusinessTypeMaps(
-		Locale locale) {
+		boolean includeRelationshipObjectFieldBusinessType, Locale locale) {
 
-		List<Map<String, String>> objectFieldBusinessTypeMaps =
-			new ArrayList<>();
+		List<ObjectFieldBusinessType> objectFieldBusinessTypes =
+			_objectFieldBusinessTypeServicesTracker.
+				getObjectFieldBusinessTypes();
 
-		for (ObjectFieldBusinessType objectFieldBusinessType :
-				_objectFieldBusinessTypeServicesTracker.
-					getObjectFieldBusinessTypes()) {
+		Stream<ObjectFieldBusinessType> stream =
+			objectFieldBusinessTypes.stream();
 
-			if (!objectFieldBusinessType.isVisible() ||
-				(StringUtil.equals(
-					objectFieldBusinessType.getName(),
-					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT) &&
-				 !_ffBusinessTypeAttachmentConfiguration.enabled())) {
-
-				continue;
-			}
-
-			objectFieldBusinessTypeMaps.add(
-				HashMapBuilder.put(
-					"businessType", objectFieldBusinessType.getName()
-				).put(
-					"dbType", objectFieldBusinessType.getDBType()
-				).put(
-					"description",
-					objectFieldBusinessType.getDescription(locale)
-				).put(
-					"label", objectFieldBusinessType.getLabel(locale)
-				).build());
-		}
-
-		return objectFieldBusinessTypeMaps;
+		return ObjectFieldBusinessTypeUtil.getObjectFieldBusinessTypeMaps(
+			locale,
+			stream.filter(
+				objectFieldBusinessType ->
+					objectFieldBusinessType.isVisible() &&
+					(!StringUtil.equals(
+						objectFieldBusinessType.getName(),
+						ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT) ||
+					 _ffBusinessTypeAttachmentConfiguration.enabled()) &&
+					(!StringUtil.equals(
+						objectFieldBusinessType.getName(),
+						ObjectFieldConstants.BUSINESS_TYPE_RELATIONSHIP) ||
+					 includeRelationshipObjectFieldBusinessType)
+			).collect(
+				Collectors.toList()
+			));
 	}
 
-	public Map<String, Object> getObjectFieldProperties(
-		Locale locale, ObjectField objectField) {
-
-		ObjectFieldBusinessType objectFieldBusinessType =
-			_objectFieldBusinessTypeServicesTracker.getObjectFieldBusinessType(
-				objectField.getBusinessType());
-
-		return objectFieldBusinessType.getProperties(locale, objectField);
+	public JSONObject getObjectFieldJSONObject(ObjectField objectField) {
+		return JSONUtil.put(
+			"businessType", objectField.getBusinessType()
+		).put(
+			"DBType", objectField.getDBType()
+		).put(
+			"id", objectField.getObjectFieldId()
+		).put(
+			"indexed", objectField.isIndexed()
+		).put(
+			"label", objectField.getLabelMap()
+		).put(
+			"name", objectField.getName()
+		).put(
+			"objectFieldSettings", _getObjectFieldSettingsJSONArray(objectField)
+		).put(
+			"relationshipType", objectField.getRelationshipType()
+		).put(
+			"required", objectField.isRequired()
+		);
 	}
 
 	public PortletURL getPortletURL() throws PortletException {
@@ -191,6 +202,25 @@ public class ObjectDefinitionsFieldsDisplayContext {
 		return _objectDefinitionModelResourcePermission.contains(
 			_objectRequestHelper.getPermissionChecker(),
 			getObjectDefinitionId(), ActionKeys.UPDATE);
+	}
+
+	private JSONArray _getObjectFieldSettingsJSONArray(
+		ObjectField objectField) {
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		ListUtil.isNotEmptyForEach(
+			objectField.getObjectFieldSettings(),
+			objectFieldSetting -> jsonArray.put(
+				JSONUtil.put(
+					"name", objectFieldSetting.getName()
+				).put(
+					"required", objectFieldSetting.isRequired()
+				).put(
+					"value", objectFieldSetting.getValue()
+				)));
+
+		return jsonArray;
 	}
 
 	private final FFBusinessTypeAttachmentConfiguration

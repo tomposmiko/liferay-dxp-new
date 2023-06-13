@@ -128,7 +128,7 @@ app.artifacts-1.0.11=\
 
 app.change.log-1.0.11=LPS-105380 LPS-140911 LPS-146840
 
-app.git.id-1.0.11=9751e5b7432463810e50d06dded05512828f0d7f
+app.git.id-1.0.11=d7ac4dbd1858712135df22bb46b6b6c48a27fafd
 
 #
 # Liferay App Version 1.0.12
@@ -139,15 +139,4 @@ app.artifacts-1.0.12=\
 
 app.change.log-1.0.12=LPS-105380 LPS-140911 LPS-146840
 
-app.git.id-1.0.12=d4ad5ced7c79b24a3a5024fc5610785a879c882f
-
-#
-# Liferay App Version 1.0.13
-#
-
-app.artifacts-1.0.13=\
-	
-
-app.change.log-1.0.13=LPS-105380 LPS-140911 LPS-146840
-
-app.git.id-1.0.13=651fd35bf2e4b372719be4b95e3baed4b0ddcd25
+app.git.id-1.0.12=217843934aafd4b1a1b641cec1db0d2e16fff3a3

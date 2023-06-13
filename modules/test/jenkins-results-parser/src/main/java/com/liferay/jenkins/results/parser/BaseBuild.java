@@ -16,7 +16,6 @@ package com.liferay.jenkins.results.parser;
 
 import com.liferay.jenkins.results.parser.failure.message.generator.FailureMessageGenerator;
 import com.liferay.jenkins.results.parser.failure.message.generator.GenericFailureMessageGenerator;
-import com.liferay.jenkins.results.parser.testray.TestrayS3Bucket;
 
 import java.io.File;
 import java.io.IOException;
@@ -229,6 +228,12 @@ public abstract class BaseBuild implements Build {
 		Build parentBuild = getParentBuild();
 
 		if (parentBuild == null) {
+			return _archiveRootDir;
+		}
+
+		if (equals(parentBuild)) {
+			System.out.println("STACKOVERFLOW CATCH");
+
 			return _archiveRootDir;
 		}
 
@@ -3016,43 +3021,10 @@ public abstract class BaseBuild implements Build {
 	}
 
 	protected StopWatchRecordsGroup getStopWatchRecordsGroup() {
-		String consoleText = null;
-		int consoleTextLength = 0;
-		int retries = 0;
+		StopWatchRecordsGroup stopWatchRecordsGroup =
+			new StopWatchRecordsGroup();
 
-		while (true) {
-			try {
-				consoleText = getConsoleText();
-
-				consoleTextLength = consoleText.length();
-
-				if (stopWatchRecordConsoleReadCursor > 0) {
-					consoleText = consoleText.substring(
-						stopWatchRecordConsoleReadCursor);
-				}
-			}
-			catch (StringIndexOutOfBoundsException
-						stringIndexOutOfBoundsException) {
-
-				if (retries == 2) {
-					throw stringIndexOutOfBoundsException;
-				}
-
-				System.out.println(
-					JenkinsResultsParserUtil.combine(
-						"Retrying. Console log length (",
-						String.valueOf(consoleTextLength),
-						") is shorter than previous (",
-						String.valueOf(stopWatchRecordConsoleReadCursor),
-						")."));
-
-				retries++;
-
-				JenkinsResultsParserUtil.sleep(1000 * 5);
-			}
-
-			break;
-		}
+		String consoleText = getConsoleText();
 
 		for (String line : consoleText.split("\n")) {
 			Matcher matcher = stopWatchStartTimestampPattern.matcher(line);
@@ -3104,8 +3076,6 @@ public abstract class BaseBuild implements Build {
 				}
 			}
 		}
-
-		stopWatchRecordConsoleReadCursor = consoleTextLength;
 
 		return stopWatchRecordsGroup;
 	}
@@ -3546,9 +3516,6 @@ public abstract class BaseBuild implements Build {
 	protected Long startTime;
 	protected Map<String, Long> statusDurations = new HashMap<>();
 	protected long statusModifiedTime;
-	protected int stopWatchRecordConsoleReadCursor;
-	protected StopWatchRecordsGroup stopWatchRecordsGroup =
-		new StopWatchRecordsGroup();
 	protected Element upstreamJobFailureMessageElement;
 
 	protected static class TimelineData {
@@ -3912,7 +3879,10 @@ public abstract class BaseBuild implements Build {
 			"\\d+)/?"));
 	private static final Pattern _testrayAttachmentURLPattern = Pattern.compile(
 		"\\[beanshell\\] Uploaded (?<url>https://testray.liferay.com/[^\\s]+)");
-	private static final Pattern _testrayS3ObjectURLPattern;
+	private static final Pattern _testrayS3ObjectURLPattern = Pattern.compile(
+		JenkinsResultsParserUtil.combine(
+			"\\[beanshell\\] Created S3 Object (?<url>",
+			"https://storage.cloud.google.com/[^\\s?]+).*"));
 
 	static {
 		Properties properties = null;
@@ -3927,13 +3897,6 @@ public abstract class BaseBuild implements Build {
 
 		_NAME_JENKINS_REPORT_TIME_ZONE = properties.getProperty(
 			"jenkins.report.time.zone");
-
-		TestrayS3Bucket testrayS3Bucket = TestrayS3Bucket.getInstance();
-
-		_testrayS3ObjectURLPattern = Pattern.compile(
-			JenkinsResultsParserUtil.combine(
-				"\\[beanshell\\] Created S3 Object (?<url>",
-				testrayS3Bucket.getTestrayS3BaseURL(), "/[^\\s?]+).*"));
 	}
 
 	private String _archiveName = "archive";
