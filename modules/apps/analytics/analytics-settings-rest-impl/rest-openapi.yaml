@@ -4,6 +4,8 @@ components:
             properties:
                 channelId:
                     type: string
+                commerceSyncEnabled:
+                    type: boolean
                 createDate:
                     format: date
                     type: string
@@ -24,6 +26,51 @@ components:
                     type: string
                 siteName:
                     type: string
+        ContactAccountGroup:
+            properties:
+                id:
+                    format: int64
+                    type: integer
+                name:
+                    type: string
+                selected:
+                    type: boolean
+        ContactConfiguration:
+            properties:
+                syncAllAccounts:
+                    type: boolean
+                syncAllContacts:
+                    type: boolean
+                syncedAccountGroupIds:
+                    items:
+                        type: string
+                    type: array
+                syncedOrganizationIds:
+                    items:
+                        type: string
+                    type: array
+                syncedUserGroupIds:
+                    items:
+                        type: string
+                    type: array
+        ContactOrganization:
+            properties:
+                id:
+                    format: int64
+                    type: integer
+                name:
+                    type: string
+                selected:
+                    type: boolean
+        ContactUserGroup:
+            properties:
+                id:
+                    format: int64
+                    type: integer
+                name:
+                    type: string
+                selected:
+                    type: boolean
         DataSource:
             properties:
                 commerceChannelIds:
@@ -70,10 +117,6 @@ paths:
                   schema:
                       type: string
                 - in: query
-                  name: filter
-                  schema:
-                      type: string
-                - in: query
                   name: page
                   schema:
                       type: integer
@@ -81,6 +124,10 @@ paths:
                   name: pageSize
                   schema:
                       type: integer
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
             responses:
                 200:
                     content:
@@ -164,6 +211,10 @@ paths:
             operationId: getCommerceChannelsPage
             parameters:
                 - in: query
+                  name: keywords
+                  schema:
+                      type: string
+                - in: query
                   name: page
                   schema:
                       type: integer
@@ -171,6 +222,10 @@ paths:
                   name: pageSize
                   schema:
                       type: integer
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
             responses:
                 200:
                     content:
@@ -185,6 +240,137 @@ paths:
                                     $ref: "#/components/schemas/CommerceChannel"
                                 type: array
             tags: ["CommerceChannel"]
+    "/contacts/account-groups":
+        get:
+            operationId: getContactAccountGroupsPage
+            parameters:
+                - in: query
+                  name: keywords
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContactAccountGroup"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContactAccountGroup"
+                                type: array
+            tags: ["ContactAccountGroup"]
+    "/contacts/configuration":
+        get:
+            operationId: getContactConfiguration
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ContactConfiguration"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ContactConfiguration"
+            tags: ["ContactConfiguration"]
+        put:
+            operationId: putContactConfiguration
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ContactConfiguration"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ContactConfiguration"
+            responses:
+                204:
+                    content:
+                        application/json: {}
+                        application/xml: {}
+            tags: ["ContactConfiguration"]
+    "/contacts/organizations":
+        get:
+            operationId: getContactOrganizationsPage
+            parameters:
+                - in: query
+                  name: keywords
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContactOrganization"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContactOrganization"
+                                type: array
+            tags: ["ContactOrganization"]
+    "/contacts/user-groups":
+        get:
+            operationId: getContactUserGroupsPage
+            parameters:
+                - in: query
+                  name: keywords
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContactUserGroup"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ContactUserGroup"
+                                type: array
+            tags: ["ContactUserGroup"]
     "/data-sources":
         delete:
             operationId: deleteDataSource
@@ -239,6 +425,10 @@ paths:
             operationId: getSitesPage
             parameters:
                 - in: query
+                  name: keywords
+                  schema:
+                      type: string
+                - in: query
                   name: page
                   schema:
                       type: integer
@@ -246,6 +436,10 @@ paths:
                   name: pageSize
                   schema:
                       type: integer
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
             responses:
                 200:
                     content:

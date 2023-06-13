@@ -64,14 +64,16 @@ const ModalDXPCActivationStatus = ({
 		await client.mutate({
 			context: {
 				displaySuccess: false,
+				type: 'liferay-rest',
 			},
-
 			mutation: updateAccountSubscriptionGroups,
 			variables: {
 				accountSubscriptionGroup: {
 					accountKey: project.accountKey,
 					activationStatus: STATUS_TAG_TYPE_NAMES.active,
 					manageContactsURL: `https://console.liferay.cloud/projects/${projectIdValue}/overview`,
+					r_accountEntryToAccountSubscriptionGroup_accountEntryId:
+						project?.id,
 				},
 				id: dxpCloudSubscriptionGroup?.accountSubscriptionGroupId,
 			},
@@ -116,12 +118,14 @@ const ModalDXPCActivationStatus = ({
 			await client.mutate({
 				context: {
 					displaySuccess: false,
+					type: 'liferay-rest',
 				},
-
 				mutation: updateDXPCloudEnvironment,
 				variables: {
 					DXPCloudEnvironment: {
 						projectId: projectIdValue,
+						r_accountEntryToDXPCloudEnvironment_accountEntryId:
+							project?.id,
 					},
 					dxpCloudEnvironmentId:
 						dxpCloudEnvironment.dxpCloudEnvironmentId,

@@ -690,6 +690,8 @@ definition {
 	@description = "This test asserts that a user can update the general informations. Including update the default site name, default mail domain and so."
 	@priority = "4"
 	test CanUpdateGeneralInfos {
+		property portal.acceptance = "true";
+
 		PortalSettings.gotoConfiguration(
 			configurationCategory = "Instance Configuration",
 			configurationName = "General",
@@ -703,9 +705,19 @@ definition {
 			fieldName = "mx",
 			fieldValue = "newliferay.com");
 
+		FormFields.editText(
+			fieldName = "virtualHostname",
+			fieldValue = "www.able.com");
+
 		PortletEntry.save();
 
 		ApplicationsMenu.gotoSite(site = "EditedLiferay");
+
+		Navigator.openSpecificURL(url = "http://www.able.com:8080");
+
+		AssertElementPresent(
+			key_pageName = "Home",
+			locator1 = "Home#PAGE");
 
 		User.logoutPG();
 
@@ -825,10 +837,11 @@ definition {
 		}
 
 		task ("Then new instance config is changed and companyWebId is changed to companyId in config file") {
-			SystemSettings.viewTextareaValue(
-				fieldName = "charactersblacklist",
-				fieldValue = "'",
-				repeatableFieldNumber = "2");
+			AssertTextNotEquals.assertNotValue(
+				key_fieldName = "charactersblacklist",
+				key_repeatableFieldNumber = "2",
+				locator1 = "FormFields#REPEATABLE_TEXT_MULTILINE_FIELD",
+				value1 = "'");
 
 			OSGiConfig.assertTextNotInOSGIConfig(
 				osgiConfigFileName = "${exportConfigFileName}",
@@ -842,14 +855,7 @@ definition {
 
 	@priority = "5"
 	test EditDefaultUserAssociationsOrganizationSites {
-		ApplicationsMenu.gotoPortlet(
-			category = "Users",
-			panel = "Control Panel",
-			portlet = "Users and Organizations");
-
-		Organization.addCP(
-			orgName = "Organization Name",
-			orgType = "Organization");
+		JSONOrganization.addOrganization(organizationName = "Organization Name");
 
 		Organization.openOrganizationsAdmin();
 
@@ -1405,8 +1411,7 @@ definition {
 		AssetPublisherPortlet.viewConfigureSiteScopeContentSharingPG(
 			childSite = "true",
 			contentSharingAcrossSitesEnabled = "false",
-			liferaySiteName = "${siteName}",
-			liferaySiteType = "Site");
+			liferaySiteName = "${siteName}");
 
 		Navigator.openSiteURL(siteName = "Site Name");
 
@@ -1436,8 +1441,7 @@ definition {
 		AssetPublisherPortlet.viewConfigureSiteScopeContentSharingPG(
 			childSite = "true",
 			contentSharingAcrossSitesEnabled = "false",
-			liferaySiteName = "${siteName}",
-			liferaySiteType = "Site");
+			liferaySiteName = "${siteName}");
 
 		Navigator.openSiteURL(siteName = "Child SiteName");
 
@@ -1482,8 +1486,7 @@ definition {
 
 		AssetPublisherPortlet.viewConfigureSiteScopeContentSharingPG(
 			contentSharingAcrossSitesEnabled = "true",
-			liferaySiteName = "${siteName}",
-			liferaySiteType = "Site");
+			liferaySiteName = "${siteName}");
 
 		Navigator.openSiteURL(siteName = "Site Name");
 
@@ -1508,8 +1511,7 @@ definition {
 		AssetPublisherPortlet.viewConfigureSiteScopeContentSharingPG(
 			contentSharingAcrossSitesEnabled = "true",
 			currentSite = "true",
-			liferaySiteName = "${siteName}",
-			liferaySiteType = "Current Site");
+			liferaySiteName = "${siteName}");
 
 		Navigator.gotoPage(pageName = "AP Test Page");
 

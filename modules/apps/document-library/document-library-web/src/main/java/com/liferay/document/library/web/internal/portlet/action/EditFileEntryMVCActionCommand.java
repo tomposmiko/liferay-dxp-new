@@ -42,7 +42,6 @@ import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.document.library.kernel.service.DLTrashService;
 import com.liferay.document.library.kernel.util.DLUtil;
-import com.liferay.document.library.kernel.util.DLValidator;
 import com.liferay.document.library.web.internal.exception.FileEntryExpirationDateException;
 import com.liferay.document.library.web.internal.exception.FileEntryReviewDateException;
 import com.liferay.document.library.web.internal.exception.FileNameExtensionException;
@@ -50,8 +49,6 @@ import com.liferay.document.library.web.internal.settings.DLPortletInstanceSetti
 import com.liferay.dynamic.data.mapping.exception.StorageFieldRequiredException;
 import com.liferay.dynamic.data.mapping.form.values.factory.DDMFormValuesFactory;
 import com.liferay.dynamic.data.mapping.kernel.DDMStructure;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLinkLocalService;
-import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.util.DDMBeanTranslator;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidationException;
@@ -1439,12 +1436,6 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 	private DDMFormValuesFactory _ddmFormValuesFactory;
 
 	@Reference
-	private DDMStructureLinkLocalService _ddmStructureLinkLocalService;
-
-	@Reference
-	private DDMStructureLocalService _ddmStructureLocalService;
-
-	@Reference
 	private DLAppService _dlAppService;
 
 	private volatile DLConfiguration _dlConfiguration;
@@ -1454,9 +1445,6 @@ public class EditFileEntryMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private DLTrashService _dlTrashService;
-
-	@Reference
-	private DLValidator _dlValidator;
 
 	@Reference
 	private FriendlyURLEntryLocalService _friendlyURLEntryLocalService;

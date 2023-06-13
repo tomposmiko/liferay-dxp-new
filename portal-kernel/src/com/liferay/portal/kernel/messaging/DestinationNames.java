@@ -99,17 +99,12 @@ public interface DestinationNames {
 	public static final String MESSAGE_BOARDS_MAILING_LIST =
 		"liferay/message_boards_mailing_list";
 
-	public static final String MESSAGE_BUS_MESSAGE_STATUS =
-		"liferay/message_bus/message_status";
-
 	public static final String MONITORING = "liferay/monitoring";
 
 	public static final String POLLER = "liferay/poller";
 
 	public static final String POLLER_COMET_RESPONSE =
 		"liferay/poller_comet_response";
-
-	public static final String POLLER_RESPONSE = "liferay/poller_response";
 
 	public static final String SCHEDULER_DISPATCH =
 		"liferay/scheduler_dispatch";

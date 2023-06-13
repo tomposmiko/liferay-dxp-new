@@ -129,7 +129,6 @@ const SetupDXPCloudPage = ({
 					scopeKey: Liferay.ThemeDisplay.getScopeGroupId(),
 				},
 			});
-
 			if (data) {
 				const status = !!data.c?.dXPCloudEnvironments?.items?.length;
 
@@ -150,6 +149,7 @@ const SetupDXPCloudPage = ({
 			const {data} = await client.mutate({
 				context: {
 					displaySuccess: false,
+					type: 'liferay-rest',
 				},
 				mutation: addDXPCloudEnvironment,
 				variables: {
@@ -158,6 +158,8 @@ const SetupDXPCloudPage = ({
 						dataCenterRegion: dxp.dataCenterRegion,
 						disasterDataCenterRegion: dxp.disasterDataCenterRegion,
 						projectId: dxp.projectId,
+						r_accountEntryToDXPCloudEnvironment_accountEntryId:
+							project?.id,
 					},
 					scopeKey: Liferay.ThemeDisplay.getScopeGroupId(),
 				},
@@ -165,12 +167,13 @@ const SetupDXPCloudPage = ({
 
 			if (data) {
 				const dxpCloudEnvironmentId =
-					data.c?.createDXPCloudEnvironment?.dxpCloudEnvironmentId;
+					data?.createDXPCloudEnvironment?.id;
 				await Promise.all(
 					dxp.admins.map(({email, firstName, github, lastName}) =>
 						client.mutate({
 							context: {
 								displaySuccess: false,
+								type: 'liferay-rest',
 							},
 							mutation: addAdminDXPCloud,
 							variables: {
@@ -180,6 +183,8 @@ const SetupDXPCloudPage = ({
 									firstName,
 									githubUsername: github,
 									lastName,
+									r_accountEntryToDXPCloudEnvironment_accountEntryId:
+										project?.id,
 								},
 								scopeKey: Liferay.ThemeDisplay.getScopeGroupId(),
 							},
@@ -188,12 +193,17 @@ const SetupDXPCloudPage = ({
 				);
 
 				await client.mutate({
+					context: {
+						type: 'liferay-rest',
+					},
 					mutation: updateAccountSubscriptionGroups,
 					variables: {
 						accountSubscriptionGroup: {
 							accountKey: project.accountKey,
 							activationStatus: STATUS_TAG_TYPE_NAMES.inProgress,
 							manageContactsURL: `https://console.liferay.cloud/projects/${dxpCloudEnvironmentId}/overview`,
+							r_accountEntryToAccountSubscriptionGroup_accountEntryId:
+								project.id,
 						},
 						id: subscriptionGroupId,
 					},

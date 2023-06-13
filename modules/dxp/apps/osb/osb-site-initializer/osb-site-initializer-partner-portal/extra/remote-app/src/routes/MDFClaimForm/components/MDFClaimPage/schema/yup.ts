@@ -11,43 +11,127 @@
 
 import {array, boolean, mixed, number, object, string} from 'yup';
 
-const validDocument = {
-	maxSize: 100000,
-	types: [
-		'image/jpg',
-		'image/jpeg',
-		'image/gif',
-		'image/png',
-		'application/pdf',
-	],
+const KB_TO_MB = 1024;
+const MAX_MB = KB_TO_MB * 3;
+
+const validateDocument = {
+	fileSize: {
+		maxSize: MAX_MB,
+		message: 'File Size is too large',
+	},
+	imageDocument: {
+		message:
+			'Unsupported File Format, upload a valid format *jpg *jpeg *tiff *png *pdf *doc *docx',
+		types: [
+			'image/jpg',
+			'image/jpeg',
+			'image/tiff',
+			'image/png',
+			'application/pdf',
+			'application/msword',
+			'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+		],
+	},
+	listOfLeadsDocuments: {
+		message:
+			'Unsupported File Format, upload a valid format *csv *xlsx *xls',
+		types: [
+			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+			'text/csv',
+		],
+	},
 };
 
 const claimSchema = object({
 	activities: array()
 		.of(
 			object({
-				budgets: array().of(object({invoice: mixed()})),
+				budgets: array().when('selected', {
+					is: (selected: boolean) => selected,
+					then: (schema) =>
+						schema.of(
+							object({
+								invoice: mixed().when('selected', {
+									is: (selected: boolean) => selected,
+									then: (schema) =>
+										schema
+											.test(
+												'fileSize',
+												validateDocument.fileSize
+													.message,
+												(invoice) => {
+													return invoice
+														? Math.ceil(
+																invoice.size /
+																	1000
+														  ) <=
+																validateDocument
+																	.fileSize
+																	.maxSize
+														: false;
+												}
+											)
+											.test(
+												'fileType',
+												validateDocument.imageDocument
+													.message,
+												(invoice) =>
+													invoice
+														? validateDocument.imageDocument.types.includes(
+																invoice.type
+														  )
+														: false
+											),
+								}),
+								invoiceAmount: number().when('selected', {
+									is: (selected: boolean) => selected,
+									then: (schema) =>
+										schema
+											.moreThan(
+												0,
+												'Need be bigger than 0'
+											)
+											.test(
+												'biggerAmount',
+												'Invoice amount is bigger than requested amount early',
+												(invoiceAmount, testContext) =>
+													Number(invoiceAmount) <=
+													Number(
+														testContext.parent
+															.requestAmount
+													)
+											),
+								}),
+
+								requestAmount: number(),
+							})
+						),
+				}),
+
 				listQualifiedLeads: mixed().when('selected', {
 					is: (selected: boolean) => selected,
 					then: (schema) =>
 						schema
 							.test(
 								'fileSize',
-								'File Size is too large',
+								validateDocument.fileSize.message,
 								(listQualifiedLeads) =>
-									validDocument.types.includes(
-										listQualifiedLeads?.type
-									)
+									listQualifiedLeads
+										? Math.ceil(
+												listQualifiedLeads.size / 1000
+										  ) <= validateDocument.fileSize.maxSize
+										: false
 							)
 							.test(
 								'fileType',
-								'Unsupported File Format',
+								validateDocument.listOfLeadsDocuments.message,
 								(listQualifiedLeads) =>
-									validDocument.types.includes(
-										listQualifiedLeads?.type
-									)
-							)
-							.required('Required'),
+									listQualifiedLeads
+										? validateDocument.listOfLeadsDocuments.types.includes(
+												listQualifiedLeads.type
+										  )
+										: false
+							),
 				}),
 				metrics: string().max(
 					350,
@@ -58,13 +142,25 @@ const claimSchema = object({
 		)
 		.test(
 			'needAtLeatOneSelectedActivity',
-			'Need at least one selected activity',
+			'Need at least one activity selected',
 			(activities) =>
 				Boolean(activities?.some((activity) => activity.selected))
 		)
 		.test(
-			'needMoreThanOneSelectedActivity',
-			'Need at least one invoice uploaded',
+			'needMoreThanOneBudgetSelected',
+			'Need at least one budget selected',
+			(activities) =>
+				Boolean(
+					activities?.some((activity) =>
+						Boolean(
+							activity.budgets?.some((budget) => budget.selected)
+						)
+					)
+				)
+		)
+		.test(
+			'needMoreThanOneBudgetInvoice',
+			'Need at least one budget invoice added',
 			(activities) =>
 				Boolean(
 					activities?.some((activity) =>
@@ -74,16 +170,27 @@ const claimSchema = object({
 					)
 				)
 		),
+
 	reimbursementInvoice: mixed()
 		.required('Required')
 		.test(
 			'fileSize',
-			'File Size is too large',
+			validateDocument.fileSize.message,
 			(reimbursementInvoice) =>
-				reimbursementInvoice?.size <= validDocument.maxSize
+				reimbursementInvoice
+					? Math.ceil(reimbursementInvoice.size / 1000) <=
+					  validateDocument.fileSize.maxSize
+					: false
 		)
-		.test('fileType', 'Unsupported File Format', (reimbursementInvoice) =>
-			validDocument.types.includes(reimbursementInvoice?.type)
+		.test(
+			'fileType',
+			validateDocument.imageDocument.message,
+			(reimbursementInvoice) =>
+				reimbursementInvoice
+					? validateDocument.imageDocument.types.includes(
+							reimbursementInvoice.type
+					  )
+					: false
 		),
 	totalClaimAmount: number()
 		.moreThan(0, 'Need be bigger than 0')

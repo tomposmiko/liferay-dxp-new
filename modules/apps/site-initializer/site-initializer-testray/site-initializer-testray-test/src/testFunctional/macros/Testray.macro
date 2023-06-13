@@ -171,7 +171,7 @@ definition {
 
 		PortletEntry.inputName(name = "${siteName}");
 
-		Click(locator1 = "Button#ADD");
+		Button.click(button = "Add");
 
 		Alert.viewSuccessMessage();
 	}
@@ -315,6 +315,14 @@ definition {
 
 	macro goToTestflow {
 		Click(locator1 = "Testray#TESTFLOW_SIDEBAR");
+	}
+
+	macro kebabMenuOption {
+		Click(locator1 = "ObjectAdmin#KEBAB_MENU");
+
+		Click(
+			key_kebabOption = "${kebabOption}",
+			locator1 = "ObjectAdmin#KEBAB_MENU_OPTION");
 	}
 
 	macro projectTabNavigator {

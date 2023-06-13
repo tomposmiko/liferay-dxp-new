@@ -106,6 +106,17 @@ public class AccountEntryUserRelServiceUtil {
 		return getService().getOSGiServiceIdentifier();
 	}
 
+	public static void inviteUser(
+			long accountEntryId, long[] accountRoleIds, String emailAddress,
+			com.liferay.portal.kernel.model.User inviter,
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
+		throws PortalException {
+
+		getService().inviteUser(
+			accountEntryId, accountRoleIds, emailAddress, inviter,
+			serviceContext);
+	}
+
 	public static void setPersonTypeAccountEntryUser(
 			long accountEntryId, long userId)
 		throws PortalException {

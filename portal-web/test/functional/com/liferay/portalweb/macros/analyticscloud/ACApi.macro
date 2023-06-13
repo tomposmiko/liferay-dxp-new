@@ -1,7 +1,23 @@
 definition {
 
+	macro assertSearchKeywordNotPresent {
+		if (!(isSet(keywordPosition))) {
+			var keywordPosition = "0";
+		}
+
+		var actual = JSONUtil.getWithJSONPath("${apiResponse}", "$..search-keywords[${keywordPosition}].keywords");
+
+		TestUtils.assertNotEquals(
+			actual = "${actual}",
+			expected = "${expected}");
+	}
+
 	macro assertSearchResponse {
-		var actual = JSONUtil.getWithJSONPath("${apiResponse}", "$..search-keywords[0].keywords");
+		if (!(isSet(keywordPosition))) {
+			var keywordPosition = "0";
+		}
+
+		var actual = JSONUtil.getWithJSONPath("${apiResponse}", "$..search-keywords[${keywordPosition}].keywords");
 
 		TestUtils.assertEquals(
 			actual = "${actual}",
@@ -53,15 +69,22 @@ definition {
 
 		Pause(locator1 = "10000");
 
-		if (isSet(displayLanguageId) && isSet(groupId) && isSet(page) && isSet(size) && isSet(sort)) {
+		if (isSet(parameters)) {
 			var curl = '''
-				${faroBackendURL}/api/1.0/pages/search-keywords?size=${size}&displayLanguageId=${displayLanguageId}&page=${page}&groupId=${groupId}&sort=${sort} \
+				${faroBackendURL}/api/1.0/pages/search-keywords?${parameters} \
 				-H "OSB-Asah-Faro-Backend-Security-Signature: ${osbAsahFaroBackendSS}" \
 				-H "OSB-Asah-Project-ID: ${osbAsahProjectId}"
 				''';
-
-			static var apiResponse = JSONCurlUtil.get("${curl}");
 		}
+		else {
+			var curl = '''
+				${faroBackendURL}/api/1.0/pages/search-keywords \
+				-H "OSB-Asah-Faro-Backend-Security-Signature: ${osbAsahFaroBackendSS}" \
+				-H "OSB-Asah-Project-ID: ${osbAsahProjectId}"
+				''';
+		}
+
+		static var apiResponse = JSONCurlUtil.get("${curl}");
 
 		return "${apiResponse}";
 	}

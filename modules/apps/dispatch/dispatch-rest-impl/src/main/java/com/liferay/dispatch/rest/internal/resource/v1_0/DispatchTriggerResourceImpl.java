@@ -27,7 +27,6 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.vulcan.pagination.Page;
-import com.liferay.portal.vulcan.util.TransformUtil;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -45,7 +44,7 @@ public class DispatchTriggerResourceImpl
 
 	public Page<DispatchTrigger> getDispatchTriggersPage() throws Exception {
 		return Page.of(
-			TransformUtil.transform(
+			transform(
 				_dispatchTriggerService.getDispatchTriggers(
 					QueryUtil.ALL_POS, QueryUtil.ALL_POS),
 				dispatchTrigger -> DispatchTriggerUtil.toDispatchTrigger(

@@ -46,8 +46,7 @@ class TestrayCaseRest extends Rest<Case, TestrayCase> {
 				steps,
 				stepsType,
 			}),
-			nestedFields:
-				'build.project,build.routine,caseType,component.team&nestedFieldsDepth=3',
+			nestedFields: 'build.project,build.routine,caseType,component.team',
 			transformData: (testrayCase) => ({
 				...testrayCase,
 				caseType: testrayCase?.r_caseTypeToCases_c_caseType,
@@ -59,6 +58,7 @@ class TestrayCaseRest extends Rest<Case, TestrayCase> {
 									?.r_teamToComponents_c_team,
 					  }
 					: undefined,
+				project: testrayCase?.r_projectToCases_c_project,
 			}),
 			uri: 'cases',
 		});

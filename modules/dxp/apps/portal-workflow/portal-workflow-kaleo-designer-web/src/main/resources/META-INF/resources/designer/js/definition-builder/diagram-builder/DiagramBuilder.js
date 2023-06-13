@@ -43,6 +43,7 @@ const deserializeUtil = new DeserializeUtil();
 
 export default function DiagramBuilder() {
 	const {
+		clientExtensions,
 		currentEditor,
 		definitionId,
 		deserialize,
@@ -357,7 +358,9 @@ export default function DiagramBuilder() {
 							totalModifications: version,
 						});
 
-						deserializeUtil.updateXMLDefinition(content);
+						deserializeUtil.updateXMLDefinition(
+							encodeURIComponent(content)
+						);
 
 						const metadata = deserializeUtil.getMetadata();
 
@@ -378,6 +381,7 @@ export default function DiagramBuilder() {
 	}, [definitionId, version]);
 
 	const contextProps = {
+		clientExtensions,
 		collidingElements,
 		elementRectangle,
 		selectedItem,

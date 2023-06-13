@@ -123,6 +123,28 @@ definition {
 		}
 	}
 
+	@description = "Automation ID: LPS-151407 | Test Summary: Verify if the text 'Select the Liferay Portal version for which you want to download a developer key.' above the drop-down menu is present."
+	@priority = "3"
+	test CanViewTheProductSubtitle {
+		task ("Go to CP2.0 and join a project") {
+			ApplicationsMenu.gotoSite(key_site = "${testSiteName}");
+
+			CustomerPortal.enterOnProject(
+				status = "Future",
+				title = "Test Account Portal");
+		}
+
+		task ("Go to the product activation page and Portal product") {
+			CP2NavigationMenu.goToProductActivation();
+
+			CP2NavigationMenu.clickOnProductButton(product = "Portal");
+		}
+
+		task ("Assert if the text above the 'Download key' drop-down menu is present") {
+			AssertElementPresent(locator1 = "CP2Utils#DESCRIPTION_DEVELOPER_KEYS");
+		}
+	}
+
 	@description = "Automation ID:LPS-146192 | Test Summary: Verify that clicking on the link 'Deploying Activation Keys article.' redirects you to another page (Deploying Activation Keys)"
 	@priority = "3"
 	test ConfirmRedirectionToAnotherPage {
@@ -148,6 +170,42 @@ definition {
 			AssertElementPresent(locator1 = "CustomerPortalSite#DEPLOY_ACTIVATION_PAGE");
 
 			Navigator.closeWindow();
+		}
+	}
+
+	@description = "Automation ID: LPS-151406 | Test Summary: Verify that if the user clicks the Download Key button an xml file is downloaded."
+	@ignore = "true"
+	@priority = "4"
+	test ConfirmTheDownloadKeyFromPortal {
+
+		// Needs refactor since it depends on real projects Portals account
+
+		task ("Given a user signs in on OKTA to update the Customer Portal") {
+			CustomerPortal.loginOktaToUpdateCP();
+
+			Navigator.openURL();
+
+			ApplicationsMenu.gotoSite(key_site = "${testSiteName}");
+		}
+
+		task ("Selects a project in Customer Portal") {
+			CustomerPortal.enterOnProject(
+				status = "Future",
+				title = "Test Account Portal");
+		}
+
+		task ("Go to the product activation page and Download Key") {
+			CP2NavigationMenu.goToProductActivation();
+
+			CP2NavigationMenu.clickOnProductButton(product = "Portal");
+
+			Button.click(button = "Download Key");
+		}
+
+		task ("Assert the alert message 'Activation Key Was Downloaded Successfully' is visible") {
+			CustomerPortal.viewAlert(alertText = "Activation Key was downloaded successfully");
+
+			CP2FileUtil.assertDownloadedFileIsPresent(downloadedFileName = "Document_1.xml");
 		}
 	}
 

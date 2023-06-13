@@ -55,7 +55,10 @@ import com.liferay.petra.sql.dsl.Table;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.aop.AopService;
+import com.liferay.portal.kernel.dao.db.DB;
+import com.liferay.portal.kernel.dao.jdbc.CurrentConnection;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.SystemEventConstants;
@@ -73,6 +76,8 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
+
+import java.sql.Connection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -144,16 +149,29 @@ public class ObjectFieldLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ObjectField addOrUpdateCustomObjectField(
-			String externalReferenceCode, long userId, long objectDefinitionId,
-			long listTypeDefinitionId, String businessType, String dbType,
-			String defaultValue, boolean indexed, boolean indexedAsKeyword,
-			String indexedLanguageId, Map<Locale, String> labelMap, String name,
-			boolean required, boolean state,
-			List<ObjectFieldSetting> objectFieldSettings)
+			String externalReferenceCode, long objectFieldId, long userId,
+			long listTypeDefinitionId, long objectDefinitionId,
+			String businessType, String dbType, String defaultValue,
+			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
+			Map<Locale, String> labelMap, String name, boolean required,
+			boolean state, List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
 
-		ObjectField existingObjectField = objectFieldPersistence.fetchByODI_N(
-			objectDefinitionId, name);
+		ObjectField existingObjectField = null;
+
+		if (Validator.isNull(externalReferenceCode)) {
+			existingObjectField = objectFieldPersistence.fetchByPrimaryKey(
+				objectFieldId);
+		}
+		else {
+			ObjectDefinition objectDefinition =
+				_objectDefinitionPersistence.findByPrimaryKey(
+					objectDefinitionId);
+
+			existingObjectField = objectFieldPersistence.fetchByERC_C_ODI(
+				externalReferenceCode, objectDefinition.getCompanyId(),
+				objectDefinitionId);
+		}
 
 		if (existingObjectField == null) {
 			return objectFieldLocalService.addCustomObjectField(
@@ -527,7 +545,8 @@ public class ObjectFieldLocalServiceImpl
 			newObjectField.getCompanyId(),
 			newObjectField.getObjectDefinitionId());
 
-		_validateListTypeDefinitionId(listTypeDefinitionId, businessType);
+		_validateListTypeDefinitionId(
+			listTypeDefinitionId, businessType, false);
 		_validateDefaultValue(
 			businessType, defaultValue, listTypeDefinitionId, state);
 		_validateIndexed(
@@ -591,12 +610,13 @@ public class ObjectFieldLocalServiceImpl
 
 	@Override
 	public ObjectField updateObjectField(
-			String externalReferenceCode, long userId, long objectDefinitionId,
-			long objectFieldId, long listTypeDefinitionId, String businessType,
-			String dbColumnName, String dbTableName, String dbType,
-			String defaultValue, boolean indexed, boolean indexedAsKeyword,
-			String indexedLanguageId, Map<Locale, String> labelMap, String name,
-			boolean required, boolean state, boolean system,
+			String externalReferenceCode, long objectFieldId, long userId,
+			long listTypeDefinitionId, long objectDefinitionId,
+			String businessType, String dbColumnName, String dbTableName,
+			String dbType, String defaultValue, boolean indexed,
+			boolean indexedAsKeyword, String indexedLanguageId,
+			Map<Locale, String> labelMap, String name, boolean required,
+			boolean state, boolean system,
 			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException {
 
@@ -608,8 +628,8 @@ public class ObjectFieldLocalServiceImpl
 		}
 
 		return objectFieldLocalService.addOrUpdateCustomObjectField(
-			externalReferenceCode, userId, objectDefinitionId,
-			listTypeDefinitionId, businessType, dbType, defaultValue, indexed,
+			externalReferenceCode, objectFieldId, userId, listTypeDefinitionId,
+			objectDefinitionId, businessType, dbType, defaultValue, indexed,
 			indexedAsKeyword, indexedLanguageId, labelMap, name, required,
 			state, objectFieldSettings);
 	}
@@ -651,7 +671,8 @@ public class ObjectFieldLocalServiceImpl
 			externalReferenceCode, 0, objectDefinition.getCompanyId(),
 			objectDefinitionId);
 
-		_validateListTypeDefinitionId(listTypeDefinitionId, businessType);
+		_validateListTypeDefinitionId(
+			listTypeDefinitionId, businessType, system);
 		_validateDefaultValue(
 			businessType, defaultValue, listTypeDefinitionId, state);
 		_validateIndexed(
@@ -757,6 +778,20 @@ public class ObjectFieldLocalServiceImpl
 				newObjectField.getObjectFieldId()));
 	}
 
+	private void _alterTableDropColumn(String tableName, String columnName) {
+		try {
+			Connection connection = _currentConnection.getConnection(
+				objectFieldPersistence.getDataSource());
+
+			DB db = objectFieldPersistence.getDB();
+
+			db.alterTableDropColumn(connection, tableName, columnName);
+		}
+		catch (Exception exception) {
+			throw new SystemException(exception);
+		}
+	}
+
 	private ObjectField _deleteObjectField(ObjectField objectField)
 		throws PortalException {
 
@@ -845,10 +880,8 @@ public class ObjectFieldLocalServiceImpl
 			!objectField.compareBusinessType(
 				ObjectFieldConstants.BUSINESS_TYPE_FORMULA)) {
 
-			runSQL(
-				DynamicObjectDefinitionTable.getAlterTableDropColumnSQL(
-					objectField.getDBTableName(),
-					objectField.getDBColumnName()));
+			_alterTableDropColumn(
+				objectField.getDBTableName(), objectField.getDBColumnName());
 		}
 
 		return objectField;
@@ -1003,13 +1036,14 @@ public class ObjectFieldLocalServiceImpl
 	}
 
 	private void _validateListTypeDefinitionId(
-			long listTypeDefinitionId, String businessType)
+			long listTypeDefinitionId, String businessType, boolean system)
 		throws PortalException {
 
 		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164278")) &&
 			(listTypeDefinitionId == 0) &&
 			StringUtil.equals(
-				businessType, ObjectFieldConstants.BUSINESS_TYPE_PICKLIST)) {
+				businessType, ObjectFieldConstants.BUSINESS_TYPE_PICKLIST) &&
+			!system) {
 
 			throw new ObjectFieldListTypeDefinitionIdException(
 				"List type definition ID is 0");
@@ -1109,6 +1143,9 @@ public class ObjectFieldLocalServiceImpl
 	).put(
 		"String", "Text"
 	).build();
+
+	@Reference
+	private CurrentConnection _currentConnection;
 
 	@Reference
 	private DLFileEntryLocalService _dlFileEntryLocalService;

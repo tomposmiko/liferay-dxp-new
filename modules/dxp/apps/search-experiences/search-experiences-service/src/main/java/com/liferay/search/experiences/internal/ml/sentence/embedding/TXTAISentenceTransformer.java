@@ -19,6 +19,8 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.util.Http;
+import com.liferay.portal.kernel.util.HttpComponentsUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.search.experiences.configuration.SemanticSearchConfiguration;
@@ -53,7 +55,7 @@ public class TXTAISentenceTransformer
 		return _getSentenceEmbedding(semanticSearchConfiguration, input);
 	}
 
-	private Double[] _getSentenceEmbedding(
+	private String _getLocation(
 		SemanticSearchConfiguration semanticSearchConfiguration, String text) {
 
 		String hostAddress = semanticSearchConfiguration.txtaiHostAddress();
@@ -62,19 +64,58 @@ public class TXTAISentenceTransformer
 			hostAddress += "/";
 		}
 
-		try {
-			List<Double> list = JSONUtil.toDoubleList(
-				_jsonFactory.createJSONArray(
-					_http.URLtoString(
-						StringBundler.concat(
-							hostAddress, "transform?text=",
-							URLCodec.encodeURL(text, false)))));
+		return StringBundler.concat(
+			hostAddress, "transform?text=", URLCodec.encodeURL(text, false));
+	}
 
-			return list.toArray(new Double[0]);
+	private Double[] _getSentenceEmbedding(
+		SemanticSearchConfiguration semanticSearchConfiguration, String text) {
+
+		try {
+			Http.Options options = new Http.Options();
+
+			if (!Validator.isBlank(
+					semanticSearchConfiguration.txtaiUsername())) {
+
+				_setAuthOptions(options, semanticSearchConfiguration);
+			}
+
+			options.setLocation(
+				_getLocation(semanticSearchConfiguration, text));
+
+			String responseJSON = _http.URLtoString(options);
+
+			if (_isJSONArray(responseJSON)) {
+				List<Double> list = JSONUtil.toDoubleList(
+					_jsonFactory.createJSONArray(responseJSON));
+
+				return list.toArray(new Double[0]);
+			}
+
+			throw new IllegalArgumentException(responseJSON);
 		}
 		catch (Exception exception) {
 			return ReflectionUtil.throwException(exception);
 		}
+	}
+
+	private boolean _isJSONArray(String s) {
+		if (StringUtil.startsWith(s, "[") && StringUtil.endsWith(s, "]")) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private void _setAuthOptions(
+		Http.Options options,
+		SemanticSearchConfiguration semanticSearchConfiguration) {
+
+		options.setAuth(
+			HttpComponentsUtil.getDomain(
+				semanticSearchConfiguration.txtaiHostAddress()),
+			-1, null, semanticSearchConfiguration.txtaiUsername(),
+			semanticSearchConfiguration.txtaiPassword());
 	}
 
 	@Reference

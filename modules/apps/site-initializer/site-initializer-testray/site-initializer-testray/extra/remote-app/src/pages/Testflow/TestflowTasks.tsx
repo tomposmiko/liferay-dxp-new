@@ -14,8 +14,10 @@
 
 import ClayIcon from '@clayui/icon';
 import {Link, useOutletContext} from 'react-router-dom';
+import {KeyedMutator} from 'swr';
 
 import Avatar from '../../components/Avatar';
+import AssignToMe from '../../components/Avatar/AssigneToMe';
 import Code from '../../components/Code';
 import Container from '../../components/Layout/Container';
 import ListView from '../../components/ListView';
@@ -27,21 +29,28 @@ import QATable from '../../components/Table/QATable';
 import useCaseResultGroupBy from '../../data/useCaseResultGroupBy';
 import {useFetch} from '../../hooks/useFetch';
 import useHeader from '../../hooks/useHeader';
+import useMutate from '../../hooks/useMutate';
 import i18n from '../../i18n';
+import {filters} from '../../schema/filter';
 import {
 	APIResponse,
 	PickList,
+	TestraySubTask,
 	TestrayTask,
 	TestrayTaskUser,
 	UserAccount,
 	testrayTaskImpl,
 	testrayTaskUsersImpl,
 } from '../../services/rest';
+import {testraySubTaskImpl} from '../../services/rest/TestraySubtask';
 import {StatusesProgressScore, chartClassNames} from '../../util/constants';
 import {getTimeFromNow} from '../../util/date';
 import {searchUtil} from '../../util/search';
+import SubtaskCompleteModal from './Subtask/SubtaskCompleteModal';
+import useSubtasksActions from './Subtask/useSubtasksActions';
 
 type OutletContext = {
+	mutateTask?: KeyedMutator<TestrayTask>;
 	testrayTask: TestrayTask;
 };
 
@@ -50,7 +59,9 @@ const ShortcutIcon = () => (
 );
 
 const TestFlowTasks = () => {
-	const {testrayTask} = useOutletContext<OutletContext>();
+	const {mutateTask, testrayTask} = useOutletContext<OutletContext>();
+	const {updateItemFromList} = useMutate();
+	const {actions, completeModal} = useSubtasksActions();
 
 	const {data: taskUserResponse} = useFetch<APIResponse<TestrayTaskUser>>(
 		testrayTask?.id
@@ -210,13 +221,18 @@ const TestFlowTasks = () => {
 
 			<Container className="mt-3">
 				<ListView
-					managementToolbarProps={{title: i18n.translate('subtasks')}}
-					resource="/subtasks"
+					managementToolbarProps={{
+						filterFields: filters.subtasks as any,
+						title: i18n.translate('subtasks'),
+					}}
+					resource={testraySubTaskImpl.resource}
 					tableProps={{
+						actions,
 						columns: [
 							{
 								clickable: true,
 								key: 'name',
+								sorteable: true,
 								value: i18n.translate('name'),
 							},
 							{
@@ -224,17 +240,18 @@ const TestFlowTasks = () => {
 								key: 'dueStatus',
 								render: (dueStatus: PickList) => (
 									<StatusBadge
-										type={dueStatus.key as StatusBadgeType}
+										type={dueStatus?.key as StatusBadgeType}
 									>
-										{dueStatus.name}
+										{dueStatus?.name}
 									</StatusBadge>
 								),
-
+								sorteable: true,
 								value: i18n.translate('status'),
 							},
 							{
 								clickable: true,
 								key: 'score',
+								sorteable: true,
 								value: i18n.translate('score'),
 							},
 							{
@@ -243,34 +260,71 @@ const TestFlowTasks = () => {
 								value: i18n.translate('tests'),
 							},
 							{
-								clickable: true,
-								key: 'error',
+								key: 'errors',
 								render: (value) => <Code>{value}</Code>,
 								size: 'xl',
 								value: i18n.translate('errors'),
 							},
 							{
-								clickable: true,
-								key: 'assignee',
-								render: (assignee: any) =>
-									assignee && (
-										<Avatar
-											displayName
-											name={assignee[0]?.name}
-											url={assignee[0]?.url}
+								key: 'user',
+								render: (
+									_: any,
+									subtask: TestraySubTask,
+									mutate
+								) => {
+									if (subtask.user) {
+										return (
+											<Avatar
+												className="text-capitalize"
+												displayName
+												name={`${subtask?.user?.emailAddress
+													.split('@')[0]
+													.replace('.', ' ')}`}
+												size="sm"
+											/>
+										);
+									}
+
+									return (
+										<AssignToMe
+											onClick={() =>
+												testraySubTaskImpl
+													.assignToMe(subtask)
+													.then(() => {
+														updateItemFromList(
+															mutate,
+															0,
+															{},
+															{
+																revalidate: true,
+															}
+														);
+													})
+											}
 										/>
-									),
-								size: 'sm',
+									);
+								},
 								value: i18n.translate('assignee'),
 							},
 						],
 						navigateTo: (subtask) => `subtasks/${subtask.id}`,
+						rowSelectable: true,
+						rowWrap: true,
 					}}
+					transformData={(response) =>
+						testraySubTaskImpl.transformDataFromList(response)
+					}
 					variables={{
 						filter: searchUtil.eq('taskId', testrayTask.id),
 					}}
 				/>
 			</Container>
+
+			<SubtaskCompleteModal
+				modal={completeModal}
+				mutate={mutateTask}
+				subtask={completeModal.modalState}
+			/>
 		</>
 	);
 };

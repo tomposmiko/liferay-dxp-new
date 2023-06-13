@@ -44,9 +44,9 @@
 	</liferay-frontend:edit-form-body>
 
 	<liferay-frontend:edit-form-footer>
-		<aui:button name="saveButton" type="submit" />
+		<liferay-frontend:edit-form-buttons
 
-		<aui:button href='<%= ParamUtil.getString(request, "redirect") %>' type="cancel" />
+		/>
 	</liferay-frontend:edit-form-footer>
 </liferay-frontend:edit-form>
 
@@ -64,9 +64,10 @@
 		event.preventDefault();
 
 		Liferay.Util.openSelectionModal({
-			onSelect: function (selectedItem) {
-				if (selectedItem) {
-					retrieveWebContent(selectedItem.assetclasspk);
+			onSelect: function (data) {
+				if (data.value && data.value.length) {
+					const selectedItem = JSON.parse(data.value);
+					retrieveWebContent(selectedItem.classPK);
 				}
 			},
 			selectEventName: '<portlet:namespace />selectedItem',

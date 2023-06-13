@@ -53,9 +53,13 @@ export default function AssetDisplayPagePreview({
 			onClick: () => {
 				setActive(false);
 				setSelectedSite({groupId: site.groupId, name: site.name});
+
+				if (site.groupId !== selectedSite?.groupId) {
+					setAssetDisplayPageSelected(null);
+				}
 			},
 		}));
-	}, [sites]);
+	}, [sites, selectedSite?.groupId]);
 
 	return (
 		<>
@@ -171,9 +175,11 @@ function AssetDisplayPageSelector({
 				className: 'cadmin',
 			},
 			onSelect(selectedItem) {
+				const itemValue = JSON.parse(selectedItem.value);
+
 				setAssetDisplayPageSelected({
-					name: selectedItem.name,
-					plid: selectedItem.plid,
+					name: itemValue.name,
+					plid: itemValue.plid,
 				});
 			},
 			selectEventName: selectAssetDisplayPageEventName,
@@ -329,9 +335,12 @@ function AssetDisplayPageSelector({
 							});
 						});
 				}}
-				title={Liferay.Language.get(
-					'a-draft-will-be-saved-before-displaying-the-preview'
-				)}
+				title={
+					assetDisplayPageSelected &&
+					Liferay.Language.get(
+						'a-draft-will-be-saved-before-displaying-the-preview'
+					)
+				}
 			>
 				{Liferay.Language.get('preview')}
 			</ClayButton>

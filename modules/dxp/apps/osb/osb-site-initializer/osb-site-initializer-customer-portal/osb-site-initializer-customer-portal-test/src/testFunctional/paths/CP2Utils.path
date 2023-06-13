@@ -55,6 +55,16 @@
 	<td>//*[contains(@class, 'cp-project-breadcrumbs-menu')]//*[@placeholder="Search"]</td>
 	<td></td>
 </tr>
+<tr>
+	<td>DESCRIPTION_DEVELOPER_KEYS</td>
+	<td>//*[contains(@class, 'cp-activation-key-container')]/following::p[contains(text(),'download a developer key.')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>CAPTION_ABOVE_MENU</td>
+	<td>//div[contains(@class, 'cp-activation-key-container')]/following::div//p[contains(text(),'your developer key to download.')]</td>
+	<td></td>
+</tr>
 </tbody>
 </table>
 </body>

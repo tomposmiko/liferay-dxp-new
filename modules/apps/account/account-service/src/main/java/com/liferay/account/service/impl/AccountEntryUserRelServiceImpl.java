@@ -19,6 +19,7 @@ import com.liferay.account.model.AccountEntryUserRel;
 import com.liferay.account.service.base.AccountEntryUserRelServiceBaseImpl;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionFactory;
@@ -129,6 +130,20 @@ public class AccountEntryUserRelServiceImpl
 
 		accountEntryUserRelLocalService.deleteAccountEntryUserRels(
 			accountEntryId, accountUserIds);
+	}
+
+	@Override
+	public void inviteUser(
+			long accountEntryId, long[] accountRoleIds, String emailAddress,
+			User inviter, ServiceContext serviceContext)
+		throws PortalException {
+
+		_modelResourcePermission.check(
+			getPermissionChecker(), accountEntryId, ActionKeys.MANAGE_USERS);
+
+		accountEntryUserRelLocalService.inviteUser(
+			accountEntryId, accountRoleIds, emailAddress, inviter,
+			serviceContext);
 	}
 
 	@Override

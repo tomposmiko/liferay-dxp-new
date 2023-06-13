@@ -49,6 +49,7 @@ export default {
 	'assigned': 'Assigned',
 	'assigned-users': 'Assigned Users',
 	'assignee': 'Assignee',
+	'associated-requirements': 'Associated Requirements',
 	'at-least-one-environment-stack-is-required':
 		'At least one environment stack is required.',
 	'attachment': 'Attachment',
@@ -98,6 +99,7 @@ export default {
 	'compare-runs': 'Compare Runs',
 	'complete': 'Complete',
 	'complete-test': 'Complete Test',
+	'complete-x': 'Complete {0}',
 	'component': 'Component',
 	'components': 'Components',
 	'confirm-password': 'Confirm Password',
@@ -199,6 +201,7 @@ export default {
 	'manage-x': 'Manage {0}',
 	'mark-at-last-one-user-or-user-group-for-assignment':
 		'Mark at least one user or user group for assignment.',
+	'mark-at-least-one-case-to-export': 'Mark at least one case to export.',
 	'mark-at-least-one-case-type-for-processing':
 		'Mark at least one case type for processing.',
 	'merged-with': 'Merged With',
@@ -274,6 +277,7 @@ export default {
 	'select-build': 'Select Build',
 	'select-case-parameters': 'Select Case Parameters',
 	'select-cases': 'Select Cases',
+	'select-cases-to-export': 'Select Cases to Export',
 	'select-default-environment-factors': 'Select Default Environment Factors',
 	'select-environment-factors': 'Select Environment Factors',
 	'select-options': 'Select Options',
@@ -297,6 +301,7 @@ export default {
 	'steps-type': 'Steps type',
 	'subcomponents': 'SubComponents',
 	'subtask': 'Subtask',
+	'subtask-name': 'Subtask Name',
 	'subtasks': 'Subtasks',
 	'suite': 'Suite',
 	'suite-name': 'Suite Name',
