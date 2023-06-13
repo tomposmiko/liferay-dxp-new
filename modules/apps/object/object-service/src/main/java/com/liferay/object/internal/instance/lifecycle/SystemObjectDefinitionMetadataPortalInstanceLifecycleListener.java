@@ -37,7 +37,7 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
+import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.petra.string.StringBundler;
@@ -239,11 +239,12 @@ public class SystemObjectDefinitionMetadataPortalInstanceLifecycleListener
 			_bundleContext.registerService(
 				ObjectRelatedModelsProvider.class,
 				new SystemObject1toMObjectRelatedModelsProviderImpl(
-					objectDefinition, _objectEntryLocalService,
-					_objectFieldLocalService, _objectRelationshipLocalService,
+					objectDefinition, _objectDefinitionLocalService,
+					_objectEntryLocalService, _objectFieldLocalService,
+					_objectRelationshipLocalService,
 					_persistedModelLocalServiceRegistry,
 					systemObjectDefinitionMetadata,
-					_systemObjectDefinitionMetadataTracker),
+					_systemObjectDefinitionMetadataRegistry),
 				null);
 			_bundleContext.registerService(
 				ObjectRelatedModelsProvider.class,
@@ -252,7 +253,7 @@ public class SystemObjectDefinitionMetadataPortalInstanceLifecycleListener
 					_objectFieldLocalService, _objectRelationshipLocalService,
 					_persistedModelLocalServiceRegistry,
 					systemObjectDefinitionMetadata,
-					_systemObjectDefinitionMetadataTracker),
+					_systemObjectDefinitionMetadataRegistry),
 				null);
 			_bundleContext.registerService(
 				RESTContextPathResolver.class,
@@ -320,8 +321,8 @@ public class SystemObjectDefinitionMetadataPortalInstanceLifecycleListener
 		_serviceTrackerList;
 
 	@Reference
-	private SystemObjectDefinitionMetadataTracker
-		_systemObjectDefinitionMetadataTracker;
+	private SystemObjectDefinitionMetadataRegistry
+		_systemObjectDefinitionMetadataRegistry;
 
 	@Reference
 	private UserLocalService _userLocalService;

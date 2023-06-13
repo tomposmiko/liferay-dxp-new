@@ -18,9 +18,8 @@ import com.liferay.headless.delivery.dto.v1_0.RenderedContent;
 import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.item.InfoItemDetails;
 import com.liferay.info.item.InfoItemReference;
-import com.liferay.info.item.InfoItemServiceTracker;
+import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.info.item.provider.InfoItemDetailsProvider;
-import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageObjectProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageProvider;
 import com.liferay.layout.display.page.LayoutDisplayPageProviderTracker;
@@ -68,7 +67,7 @@ public class DisplayPageRendererUtil {
 		Class<?> baseClass, String itemClassName, long itemClassPK,
 		long itemClassTypeId, DTOConverterContext dtoConverterContext,
 		long groupId, Object item,
-		InfoItemServiceTracker infoItemServiceTracker,
+		InfoItemServiceRegistry infoItemServiceRegistry,
 		LayoutDisplayPageProviderTracker layoutDisplayPageProviderTracker,
 		LayoutLocalService layoutLocalService,
 		LayoutPageTemplateEntryService layoutPageTemplateEntryService,
@@ -125,7 +124,7 @@ public class DisplayPageRendererUtil {
 								groupId,
 								dtoConverterContext.getHttpServletRequest(),
 								new DummyHttpServletResponse(), item,
-								infoItemServiceTracker,
+								infoItemServiceRegistry,
 								layoutDisplayPageProviderTracker,
 								layoutLocalService,
 								layoutPageTemplateEntryService);
@@ -139,7 +138,7 @@ public class DisplayPageRendererUtil {
 			String itemClassName, long itemClassTypeId, String displayPageKey,
 			long groupId, HttpServletRequest httpServletRequest,
 			HttpServletResponse httpServletResponse, Object item,
-			InfoItemServiceTracker infoItemServiceTracker,
+			InfoItemServiceRegistry infoItemServiceRegistry,
 			LayoutDisplayPageProviderTracker layoutDisplayPageProviderTracker,
 			LayoutLocalService layoutLocalService,
 			LayoutPageTemplateEntryService layoutPageTemplateEntryService)
@@ -167,7 +166,7 @@ public class DisplayPageRendererUtil {
 		httpServletRequest.setAttribute(InfoDisplayWebKeys.INFO_ITEM, item);
 
 		InfoItemDetailsProvider infoItemDetailsProvider =
-			infoItemServiceTracker.getFirstInfoItemService(
+			infoItemServiceRegistry.getFirstInfoItemService(
 				InfoItemDetailsProvider.class, itemClassName);
 
 		InfoItemDetails infoItemDetails =
@@ -175,16 +174,12 @@ public class DisplayPageRendererUtil {
 
 		httpServletRequest.setAttribute(
 			InfoDisplayWebKeys.INFO_ITEM_DETAILS, infoItemDetails);
-
-		httpServletRequest.setAttribute(
-			InfoDisplayWebKeys.INFO_ITEM_FIELD_VALUES_PROVIDER,
-			infoItemServiceTracker.getFirstInfoItemService(
-				InfoItemFieldValuesProvider.class, itemClassName));
 		httpServletRequest.setAttribute(
 			LayoutDisplayPageWebKeys.LAYOUT_DISPLAY_PAGE_OBJECT_PROVIDER,
 			_getLayoutDisplayPageObjectProvider(
 				infoItemDetails.getInfoItemReference(),
 				layoutDisplayPageProviderTracker));
+
 		httpServletRequest.setAttribute(
 			WebKeys.THEME_DISPLAY,
 			_getThemeDisplay(httpServletRequest, layout));

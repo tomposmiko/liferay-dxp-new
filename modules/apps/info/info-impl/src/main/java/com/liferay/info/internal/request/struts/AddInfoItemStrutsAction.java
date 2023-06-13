@@ -20,6 +20,8 @@ import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
+import com.liferay.fragment.util.configuration.FragmentConfigurationField;
+import com.liferay.fragment.util.configuration.FragmentEntryConfigurationParser;
 import com.liferay.info.exception.InfoFormException;
 import com.liferay.info.exception.InfoFormInvalidGroupException;
 import com.liferay.info.exception.InfoFormInvalidLayoutModeException;
@@ -32,9 +34,10 @@ import com.liferay.info.field.type.RelationshipInfoFieldType;
 import com.liferay.info.internal.request.helper.InfoRequestFieldValuesProviderHelper;
 import com.liferay.info.item.InfoItemFieldValues;
 import com.liferay.info.item.InfoItemReference;
-import com.liferay.info.item.InfoItemServiceTracker;
+import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.info.item.creator.InfoItemCreator;
 import com.liferay.layout.page.template.util.LayoutStructureUtil;
+import com.liferay.layout.util.constants.LayoutDataItemTypeConstants;
 import com.liferay.layout.util.structure.FragmentStyledLayoutStructureItem;
 import com.liferay.layout.util.structure.LayoutStructure;
 import com.liferay.layout.util.structure.LayoutStructureItem;
@@ -57,6 +60,8 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.struts.StrutsAction;
 import com.liferay.portal.kernel.upload.UploadServletRequest;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
@@ -145,11 +150,13 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 				CaptchaUtil.check(httpServletRequest);
 			}
 
+			_validateRequiredFields(httpServletRequest, infoFieldValues);
+
 			String className = _portal.getClassName(
 				ParamUtil.getLong(httpServletRequest, "classNameId"));
 
 			InfoItemCreator<Object> infoItemCreator =
-				_infoItemServiceTracker.getFirstInfoItemService(
+				_infoItemServiceRegistry.getFirstInfoItemService(
 					InfoItemCreator.class, className);
 
 			if (infoItemCreator == null) {
@@ -266,7 +273,7 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 	@Modified
 	protected void activate() {
 		_infoRequestFieldValuesProviderHelper =
-			new InfoRequestFieldValuesProviderHelper(_infoItemServiceTracker);
+			new InfoRequestFieldValuesProviderHelper(_infoItemServiceRegistry);
 	}
 
 	private String _getValue(InfoFieldValue<?> infoFieldValue) {
@@ -401,12 +408,115 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 			formLayoutStructureItem.getChildrenItemIds(), layoutStructure);
 	}
 
+	private void _validateRequiredField(
+			List<InfoFieldValue<Object>> infoFieldValues,
+			LayoutStructureItem layoutStructureItem)
+		throws InfoFormValidationException.RequiredInfoField {
+
+		if (!Objects.equals(
+				LayoutDataItemTypeConstants.TYPE_FRAGMENT,
+				layoutStructureItem.getItemType())) {
+
+			return;
+		}
+
+		FragmentStyledLayoutStructureItem fragmentStyledLayoutStructureItem =
+			(FragmentStyledLayoutStructureItem)layoutStructureItem;
+
+		FragmentEntryLink fragmentEntryLink =
+			_fragmentEntryLinkLocalService.fetchFragmentEntryLink(
+				fragmentStyledLayoutStructureItem.getFragmentEntryLinkId());
+
+		if ((fragmentEntryLink == null) ||
+			!GetterUtil.getBoolean(
+				_fragmentEntryConfigurationParser.getFieldValue(
+					fragmentEntryLink.getEditableValues(),
+					new FragmentConfigurationField(
+						"inputRequired", "boolean", "false", false, "checkbox"),
+					LocaleUtil.getMostRelevantLocale()))) {
+
+			return;
+		}
+
+		String inputFieldId = GetterUtil.getString(
+			_fragmentEntryConfigurationParser.getFieldValue(
+				fragmentEntryLink.getEditableValues(),
+				new FragmentConfigurationField(
+					"inputFieldId", "string", "", false, "text"),
+				LocaleUtil.getMostRelevantLocale()));
+
+		for (InfoFieldValue<Object> infoFieldValue : infoFieldValues) {
+			InfoField infoField = infoFieldValue.getInfoField();
+
+			if (!Objects.equals(inputFieldId, infoField.getUniqueId())) {
+				continue;
+			}
+
+			if (Validator.isNotNull(infoFieldValue.getValue())) {
+				return;
+			}
+
+			break;
+		}
+
+		throw new InfoFormValidationException.RequiredInfoField(inputFieldId);
+	}
+
+	private void _validateRequiredFields(
+			HttpServletRequest httpServletRequest,
+			List<InfoFieldValue<Object>> infoFieldValues)
+		throws InfoFormException {
+
+		LayoutStructure layoutStructure =
+			LayoutStructureUtil.getLayoutStructure(
+				ParamUtil.getLong(httpServletRequest, "plid"),
+				ParamUtil.getLong(httpServletRequest, "segmentsExperienceId"));
+
+		if (layoutStructure == null) {
+			throw new InfoFormException();
+		}
+
+		String formItemId = ParamUtil.getString(
+			httpServletRequest, "formItemId");
+
+		LayoutStructureItem formLayoutStructureItem =
+			layoutStructure.getLayoutStructureItem(formItemId);
+
+		if (formLayoutStructureItem == null) {
+			throw new InfoFormException();
+		}
+
+		_validateRequiredFields(
+			infoFieldValues, formLayoutStructureItem.getChildrenItemIds(),
+			layoutStructure);
+	}
+
+	private void _validateRequiredFields(
+			List<InfoFieldValue<Object>> infoFieldValues, List<String> itemIds,
+			LayoutStructure layoutStructure)
+		throws InfoFormValidationException.RequiredInfoField {
+
+		for (String itemId : itemIds) {
+			LayoutStructureItem layoutStructureItem =
+				layoutStructure.getLayoutStructureItem(itemId);
+
+			_validateRequiredField(infoFieldValues, layoutStructureItem);
+
+			_validateRequiredFields(
+				infoFieldValues, layoutStructureItem.getChildrenItemIds(),
+				layoutStructure);
+		}
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		AddInfoItemStrutsAction.class);
 
 	@Reference
 	private FragmentCollectionContributorTracker
 		_fragmentCollectionContributorTracker;
+
+	@Reference
+	private FragmentEntryConfigurationParser _fragmentEntryConfigurationParser;
 
 	@Reference
 	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
@@ -418,7 +528,7 @@ public class AddInfoItemStrutsAction implements StrutsAction {
 	private GroupLocalService _groupLocalService;
 
 	@Reference
-	private InfoItemServiceTracker _infoItemServiceTracker;
+	private InfoItemServiceRegistry _infoItemServiceRegistry;
 
 	private volatile InfoRequestFieldValuesProviderHelper
 		_infoRequestFieldValuesProviderHelper;

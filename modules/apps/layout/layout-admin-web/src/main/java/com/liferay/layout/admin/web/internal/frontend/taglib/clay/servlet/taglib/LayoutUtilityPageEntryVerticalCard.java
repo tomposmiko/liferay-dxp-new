@@ -23,10 +23,16 @@ import com.liferay.layout.utility.page.constants.LayoutUtilityPageEntryConstants
 import com.liferay.layout.utility.page.model.LayoutUtilityPageEntry;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.HttpComponentsUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.kernel.util.WebKeys;
 
 import java.util.Collections;
 import java.util.List;
@@ -69,8 +75,40 @@ public class LayoutUtilityPageEntryVerticalCard extends BaseVerticalCard {
 	}
 
 	@Override
+	public String getHref() {
+		try {
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)renderRequest.getAttribute(WebKeys.THEME_DISPLAY);
+
+			String layoutFullURL = PortalUtil.getLayoutFullURL(
+				_draftLayout, themeDisplay);
+
+			layoutFullURL = HttpComponentsUtil.setParameter(
+				layoutFullURL, "p_l_mode", Constants.EDIT);
+
+			return HttpComponentsUtil.setParameter(
+				layoutFullURL, "p_l_back_url", themeDisplay.getURLCurrent());
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
+		}
+
+		return null;
+	}
+
+	@Override
 	public String getIcon() {
 		return "list";
+	}
+
+	@Override
+	public String getImageSrc() {
+		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		return _layoutUtilityPageEntry.getImagePreviewURL(themeDisplay);
 	}
 
 	@Override
@@ -82,6 +120,11 @@ public class LayoutUtilityPageEntryVerticalCard extends BaseVerticalCard {
 		return LabelItemListBuilder.add(
 			labelItem -> labelItem.setStatus(_draftLayout.getStatus())
 		).build();
+	}
+
+	@Override
+	public String getStickerCssClass() {
+		return "sticker-user-icon";
 	}
 
 	@Override
@@ -116,6 +159,9 @@ public class LayoutUtilityPageEntryVerticalCard extends BaseVerticalCard {
 	public boolean isSelectable() {
 		return true;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		LayoutUtilityPageEntryVerticalCard.class);
 
 	private final Layout _draftLayout;
 	private final HttpServletRequest _httpServletRequest;

@@ -30,9 +30,9 @@ import com.liferay.object.exception.ObjectFieldRelationshipTypeException;
 import com.liferay.object.exception.ObjectFieldStateException;
 import com.liferay.object.exception.RequiredObjectFieldException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
-import com.liferay.object.field.business.type.ObjectFieldBusinessTypeTracker;
+import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributor;
-import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributorTracker;
+import com.liferay.object.internal.field.setting.contributor.ObjectFieldSettingContributorRegistry;
 import com.liferay.object.internal.petra.sql.dsl.DynamicObjectDefinitionTable;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -545,8 +545,7 @@ public class ObjectFieldLocalServiceImpl
 			newObjectField.getCompanyId(),
 			newObjectField.getObjectDefinitionId());
 
-		_validateListTypeDefinitionId(
-			listTypeDefinitionId, businessType, false);
+		_validateListTypeDefinitionId(listTypeDefinitionId, businessType);
 		_validateDefaultValue(
 			businessType, defaultValue, listTypeDefinitionId, state);
 		_validateIndexed(
@@ -671,8 +670,7 @@ public class ObjectFieldLocalServiceImpl
 			externalReferenceCode, 0, objectDefinition.getCompanyId(),
 			objectDefinitionId);
 
-		_validateListTypeDefinitionId(
-			listTypeDefinitionId, businessType, system);
+		_validateListTypeDefinitionId(listTypeDefinitionId, businessType);
 		_validateDefaultValue(
 			businessType, defaultValue, listTypeDefinitionId, state);
 		_validateIndexed(
@@ -718,7 +716,7 @@ public class ObjectFieldLocalServiceImpl
 		throws PortalException {
 
 		ObjectFieldBusinessType objectFieldBusinessType =
-			_objectFieldBusinessTypeTracker.getObjectFieldBusinessType(
+			_objectFieldBusinessTypeRegistry.getObjectFieldBusinessType(
 				newObjectField.getBusinessType());
 
 		objectFieldBusinessType.validateObjectFieldSettings(
@@ -748,7 +746,7 @@ public class ObjectFieldLocalServiceImpl
 		}
 
 		objectFieldBusinessType.predefineObjectFieldSettings(
-			newObjectField, oldObjectField);
+			newObjectField, oldObjectField, objectFieldSettings);
 
 		for (ObjectFieldSetting newObjectFieldSetting : objectFieldSettings) {
 			ObjectFieldSetting oldObjectFieldSetting =
@@ -757,7 +755,7 @@ public class ObjectFieldLocalServiceImpl
 					newObjectFieldSetting.getName());
 
 			ObjectFieldSettingContributor objectFieldSettingContributor =
-				_objectFieldSettingContributorTracker.
+				_objectFieldSettingContributorRegistry.
 					getObjectFieldSettingContributor(
 						newObjectFieldSetting.getName());
 
@@ -918,11 +916,11 @@ public class ObjectFieldLocalServiceImpl
 		}
 
 		ObjectFieldBusinessType objectFieldBusinessType =
-			_objectFieldBusinessTypeTracker.getObjectFieldBusinessType(
+			_objectFieldBusinessTypeRegistry.getObjectFieldBusinessType(
 				GetterUtil.getString(businessType));
 
 		Set<String> objectFieldDBTypes =
-			_objectFieldBusinessTypeTracker.getObjectFieldDBTypes();
+			_objectFieldBusinessTypeRegistry.getObjectFieldDBTypes();
 
 		if (objectFieldBusinessType != null) {
 			objectField.setBusinessType(businessType);
@@ -1036,14 +1034,16 @@ public class ObjectFieldLocalServiceImpl
 	}
 
 	private void _validateListTypeDefinitionId(
-			long listTypeDefinitionId, String businessType, boolean system)
+			long listTypeDefinitionId, String businessType)
 		throws PortalException {
 
 		if (GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164278")) &&
 			(listTypeDefinitionId == 0) &&
-			StringUtil.equals(
-				businessType, ObjectFieldConstants.BUSINESS_TYPE_PICKLIST) &&
-			!system) {
+			(StringUtil.equals(
+				businessType,
+				ObjectFieldConstants.BUSINESS_TYPE_MULTISELECT_PICKLIST) ||
+			 StringUtil.equals(
+				 businessType, ObjectFieldConstants.BUSINESS_TYPE_PICKLIST))) {
 
 			throw new ObjectFieldListTypeDefinitionIdException(
 				"List type definition ID is 0");
@@ -1160,11 +1160,11 @@ public class ObjectFieldLocalServiceImpl
 	private ObjectEntryPersistence _objectEntryPersistence;
 
 	@Reference
-	private ObjectFieldBusinessTypeTracker _objectFieldBusinessTypeTracker;
+	private ObjectFieldBusinessTypeRegistry _objectFieldBusinessTypeRegistry;
 
 	@Reference
-	private ObjectFieldSettingContributorTracker
-		_objectFieldSettingContributorTracker;
+	private ObjectFieldSettingContributorRegistry
+		_objectFieldSettingContributorRegistry;
 
 	@Reference
 	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;

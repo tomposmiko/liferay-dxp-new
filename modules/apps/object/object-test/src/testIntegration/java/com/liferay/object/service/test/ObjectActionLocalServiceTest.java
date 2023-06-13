@@ -21,6 +21,7 @@ import com.liferay.object.constants.ObjectActionConstants;
 import com.liferay.object.constants.ObjectActionExecutorConstants;
 import com.liferay.object.constants.ObjectActionTriggerConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.field.util.ObjectFieldUtil;
 import com.liferay.object.model.ObjectAction;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
@@ -29,7 +30,6 @@ import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.test.util.ObjectDefinitionTestUtil;
-import com.liferay.object.util.ObjectFieldUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -56,7 +56,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Queue;
-import java.util.Set;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -79,9 +78,6 @@ public class ObjectActionLocalServiceTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_objectActionIdsThreadLocal = ReflectionTestUtil.getFieldValue(
-			_objectActionEngine, "_objectActionIdsThreadLocal");
-
 		_objectDefinition = ObjectDefinitionTestUtil.addObjectDefinition(
 			_objectDefinitionLocalService,
 			Arrays.asList(
@@ -105,8 +101,6 @@ public class ObjectActionLocalServiceTest {
 
 	@After
 	public void tearDown() {
-		_objectActionIdsThreadLocal.remove();
-
 		ReflectionTestUtil.setFieldValue(
 			_objectActionExecutorRegistry.getObjectActionExecutor(
 				ObjectActionExecutorConstants.KEY_WEBHOOK),
@@ -212,8 +206,6 @@ public class ObjectActionLocalServiceTest {
 
 		// Update object entry
 
-		_objectActionIdsThreadLocal.remove();
-
 		Assert.assertEquals(0, _argumentsList.size());
 
 		_objectEntryLocalService.updateObjectEntry(
@@ -272,8 +264,6 @@ public class ObjectActionLocalServiceTest {
 		Assert.assertEquals("https://onafterupdate.com", options.getLocation());
 
 		// Delete object entry
-
-		_objectActionIdsThreadLocal.remove();
 
 		Assert.assertEquals(0, _argumentsList.size());
 
@@ -388,6 +378,51 @@ public class ObjectActionLocalServiceTest {
 	}
 
 	@Test
+	public void testAddObjectActionWithMoreThanOneObjectEntry()
+		throws Exception {
+
+		ObjectAction objectAction = _objectActionLocalService.addObjectAction(
+			TestPropsValues.getUserId(),
+			_objectDefinition.getObjectDefinitionId(), true, StringPool.BLANK,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(),
+			ObjectActionExecutorConstants.KEY_WEBHOOK,
+			ObjectActionTriggerConstants.KEY_ON_AFTER_ADD,
+			UnicodePropertiesBuilder.put(
+				"secret", "onafteradd"
+			).put(
+				"url", "https://onafteradd.com"
+			).build());
+
+		Assert.assertEquals(0, _argumentsList.size());
+
+		ObjectEntry objectEntry1 = _objectEntryLocalService.addObjectEntry(
+			TestPropsValues.getUserId(), 0,
+			_objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"firstName", "John"
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		_objectEntryLocalService.deleteObjectEntry(objectEntry1);
+
+		Assert.assertEquals(1, _argumentsList.size());
+
+		ObjectEntry objectEntry2 = _objectEntryLocalService.addObjectEntry(
+			TestPropsValues.getUserId(), 0,
+			_objectDefinition.getObjectDefinitionId(),
+			HashMapBuilder.<String, Serializable>put(
+				"firstName", "John"
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		_objectEntryLocalService.deleteObjectEntry(objectEntry2);
+
+		Assert.assertEquals(2, _argumentsList.size());
+
+		_objectActionLocalService.deleteObjectAction(objectAction);
+	}
+
+	@Test
 	public void testUpdateObjectAction() throws Exception {
 		ObjectAction objectAction = _objectActionLocalService.addObjectAction(
 			TestPropsValues.getUserId(),
@@ -491,8 +526,6 @@ public class ObjectActionLocalServiceTest {
 
 	@Inject
 	private ObjectActionExecutorRegistry _objectActionExecutorRegistry;
-
-	private ThreadLocal<Set<Long>> _objectActionIdsThreadLocal;
 
 	@Inject
 	private ObjectActionLocalService _objectActionLocalService;

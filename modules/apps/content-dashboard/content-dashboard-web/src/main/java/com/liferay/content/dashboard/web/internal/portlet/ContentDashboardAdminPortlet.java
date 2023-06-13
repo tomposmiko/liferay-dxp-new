@@ -18,7 +18,7 @@ import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.content.dashboard.item.ContentDashboardItem;
-import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtypeFactoryTracker;
+import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtypeFactoryRegistry;
 import com.liferay.content.dashboard.web.internal.constants.ContentDashboardPortletKeys;
 import com.liferay.content.dashboard.web.internal.constants.ContentDashboardWebKeys;
 import com.liferay.content.dashboard.web.internal.dao.search.ContentDashboardItemSearchContainerFactory;
@@ -26,8 +26,8 @@ import com.liferay.content.dashboard.web.internal.data.provider.ContentDashboard
 import com.liferay.content.dashboard.web.internal.display.context.ContentDashboardAdminDisplayContext;
 import com.liferay.content.dashboard.web.internal.display.context.ContentDashboardAdminManagementToolbarDisplayContext;
 import com.liferay.content.dashboard.web.internal.display.context.ContentDashboardAdminSharingDisplayContext;
-import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactoryTracker;
-import com.liferay.content.dashboard.web.internal.item.filter.ContentDashboardItemFilterProviderTracker;
+import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactoryRegistry;
+import com.liferay.content.dashboard.web.internal.item.filter.ContentDashboardItemFilterProviderRegistry;
 import com.liferay.content.dashboard.web.internal.provider.AssetVocabulariesProvider;
 import com.liferay.content.dashboard.web.internal.search.request.ContentDashboardSearchContextBuilder;
 import com.liferay.content.dashboard.web.internal.searcher.ContentDashboardSearchRequestBuilderFactory;
@@ -120,7 +120,7 @@ public class ContentDashboardAdminPortlet extends MVCPortlet {
 			contentDashboardItemSearchContainerFactory =
 				ContentDashboardItemSearchContainerFactory.getInstance(
 					_assetCategoryLocalService, _assetVocabularyLocalService,
-					_contentDashboardItemFactoryTracker,
+					_contentDashboardItemFactoryRegistry,
 					_contentDashboardSearchRequestBuilderFactory,
 					_infoSearchClassMapperTracker, _portal, renderRequest,
 					renderResponse, _searcher);
@@ -141,7 +141,7 @@ public class ContentDashboardAdminPortlet extends MVCPortlet {
 					new ContentDashboardDropdownItemsProvider(
 						_language, liferayPortletRequest,
 						liferayPortletResponse, _portal),
-					_contentDashboardItemSubtypeFactoryTracker, _itemSelector,
+					_contentDashboardItemSubtypeFactoryRegistry, _itemSelector,
 					_language.get(
 						_portal.getLocale(liferayPortletRequest),
 						LanguageConstants.KEY_DIR),
@@ -157,7 +157,7 @@ public class ContentDashboardAdminPortlet extends MVCPortlet {
 				new ContentDashboardAdminManagementToolbarDisplayContext(
 					_assetCategoryLocalService, _assetVocabularyLocalService,
 					contentDashboardAdminDisplayContext,
-					_contentDashboardItemFilterProviderTracker,
+					_contentDashboardItemFilterProviderRegistry,
 					_groupLocalService,
 					_portal.getHttpServletRequest(renderRequest), _language,
 					liferayPortletRequest, liferayPortletResponse,
@@ -172,7 +172,7 @@ public class ContentDashboardAdminPortlet extends MVCPortlet {
 			ContentDashboardWebKeys.
 				CONTENT_DASHBOARD_ADMIN_SHARING_DISPLAY_CONTEXT,
 			new ContentDashboardAdminSharingDisplayContext(
-				_contentDashboardItemFactoryTracker,
+				_contentDashboardItemFactoryRegistry,
 				_portal.getHttpServletRequest(liferayPortletRequest),
 				_infoSearchClassMapperTracker));
 
@@ -194,16 +194,16 @@ public class ContentDashboardAdminPortlet extends MVCPortlet {
 	private AssetVocabularyLocalService _assetVocabularyLocalService;
 
 	@Reference
-	private ContentDashboardItemFactoryTracker
-		_contentDashboardItemFactoryTracker;
+	private ContentDashboardItemFactoryRegistry
+		_contentDashboardItemFactoryRegistry;
 
 	@Reference
-	private ContentDashboardItemFilterProviderTracker
-		_contentDashboardItemFilterProviderTracker;
+	private ContentDashboardItemFilterProviderRegistry
+		_contentDashboardItemFilterProviderRegistry;
 
 	@Reference
-	private ContentDashboardItemSubtypeFactoryTracker
-		_contentDashboardItemSubtypeFactoryTracker;
+	private ContentDashboardItemSubtypeFactoryRegistry
+		_contentDashboardItemSubtypeFactoryRegistry;
 
 	@Reference
 	private ContentDashboardSearchRequestBuilderFactory

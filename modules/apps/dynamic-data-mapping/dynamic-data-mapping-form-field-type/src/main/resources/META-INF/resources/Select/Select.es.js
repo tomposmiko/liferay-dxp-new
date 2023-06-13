@@ -229,10 +229,7 @@ const DropdownListWithSearch = ({
 
 	return (
 		<>
-			<ClayDropDown.Search
-				onChange={(event) => setQuery(event.target.value)}
-				value={query}
-			/>
+			<ClayDropDown.Search onChange={setQuery} value={query} />
 			{filteredOptions.length ? (
 				<DropdownList
 					currentValue={currentValue}
@@ -430,7 +427,6 @@ const Select = ({
 				active={expand}
 				alignElementRef={triggerElementRef}
 				alignmentPosition={0}
-				autoBestAlign={false}
 				className="ddm-btn-full ddm-select-dropdown"
 				onKeyDown={(event) => {
 					switch (event.keyCode) {

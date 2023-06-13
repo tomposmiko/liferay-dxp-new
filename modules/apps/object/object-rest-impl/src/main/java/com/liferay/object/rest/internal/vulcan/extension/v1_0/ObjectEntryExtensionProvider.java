@@ -17,19 +17,17 @@ package com.liferay.object.rest.internal.vulcan.extension.v1_0;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.constants.ObjectRelationshipConstants;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
-import com.liferay.object.field.business.type.ObjectFieldBusinessTypeTracker;
+import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
+import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.rest.internal.util.ObjectEntryValuesUtil;
 import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
-import com.liferay.object.util.ObjectFieldSettingValueUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.vulcan.extension.ExtensionProvider;
 import com.liferay.portal.vulcan.extension.PropertyDefinition;
 
@@ -67,9 +65,7 @@ public class ObjectEntryExtensionProvider extends BaseObjectExtensionProvider {
 					_objectFieldLocalService.getObjectFields(
 						objectDefinition.getObjectDefinitionId(), false)) {
 
-				if (GetterUtil.getBoolean(
-						PropsUtil.get("feature.flag.LPS-164801")) &&
-					Objects.equals(
+				if (Objects.equals(
 						objectField.getRelationshipType(),
 						ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
 
@@ -103,7 +99,7 @@ public class ObjectEntryExtensionProvider extends BaseObjectExtensionProvider {
 					objectDefinition.getObjectDefinitionId(), false)) {
 
 			ObjectFieldBusinessType objectFieldBusinessType =
-				_objectFieldBusinessTypeTracker.getObjectFieldBusinessType(
+				_objectFieldBusinessTypeRegistry.getObjectFieldBusinessType(
 					objectField.getBusinessType());
 
 			extendedPropertyDefinitions.put(
@@ -113,17 +109,15 @@ public class ObjectEntryExtensionProvider extends BaseObjectExtensionProvider {
 					objectFieldBusinessType.getPropertyType(),
 					objectField.isRequired()));
 
-			if (GetterUtil.getBoolean(
-					PropsUtil.get("feature.flag.LPS-164801")) &&
-				Objects.equals(
+			if (Objects.equals(
 					objectField.getRelationshipType(),
 					ObjectRelationshipConstants.TYPE_ONE_TO_MANY)) {
 
 				String objectRelationshipERCFieldName =
-					ObjectFieldSettingValueUtil.getObjectFieldSettingValue(
-						objectField,
+					ObjectFieldSettingUtil.getValue(
 						ObjectFieldSettingConstants.
-							NAME_OBJECT_RELATIONSHIP_ERC_FIELD_NAME);
+							NAME_OBJECT_RELATIONSHIP_ERC_FIELD_NAME,
+						objectField);
 
 				extendedPropertyDefinitions.put(
 					objectRelationshipERCFieldName,
@@ -152,7 +146,7 @@ public class ObjectEntryExtensionProvider extends BaseObjectExtensionProvider {
 
 				Object value = ObjectEntryValuesUtil.getValue(
 					objectDefinitionLocalService, _objectEntryLocalService,
-					objectField, _objectFieldBusinessTypeTracker, userId,
+					objectField, _objectFieldBusinessTypeRegistry, userId,
 					new HashMap<>(extendedProperties));
 
 				if (value == null) {
@@ -188,7 +182,7 @@ public class ObjectEntryExtensionProvider extends BaseObjectExtensionProvider {
 	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Reference
-	private ObjectFieldBusinessTypeTracker _objectFieldBusinessTypeTracker;
+	private ObjectFieldBusinessTypeRegistry _objectFieldBusinessTypeRegistry;
 
 	@Reference
 	private ObjectFieldLocalService _objectFieldLocalService;

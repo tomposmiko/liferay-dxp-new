@@ -19,7 +19,7 @@ import com.liferay.content.dashboard.item.ContentDashboardItemFactory;
 import com.liferay.content.dashboard.item.ContentDashboardItemVersion;
 import com.liferay.content.dashboard.item.VersionableContentDashboardItem;
 import com.liferay.content.dashboard.web.internal.constants.ContentDashboardPortletKeys;
-import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactoryTracker;
+import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactoryRegistry;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
@@ -51,7 +51,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Stefan Tanasie
  */
 @Component(
-	immediate = true,
 	property = {
 		"javax.portlet.name=" + ContentDashboardPortletKeys.CONTENT_DASHBOARD_ADMIN,
 		"mvc.command.name=/content_dashboard/get_content_dashboard_item_versions"
@@ -118,7 +117,7 @@ public class GetContentDashboardItemVersionsMVCResourceCommand
 		String className = ParamUtil.getString(resourceRequest, "className");
 
 		ContentDashboardItemFactory<?> contentDashboardItemFactory =
-			_contentDashboardItemFactoryTracker.getContentDashboardItemFactory(
+			_contentDashboardItemFactoryRegistry.getContentDashboardItemFactory(
 				className);
 
 		if (contentDashboardItemFactory == null) {
@@ -174,8 +173,8 @@ public class GetContentDashboardItemVersionsMVCResourceCommand
 		GetContentDashboardItemVersionsMVCResourceCommand.class);
 
 	@Reference
-	private ContentDashboardItemFactoryTracker
-		_contentDashboardItemFactoryTracker;
+	private ContentDashboardItemFactoryRegistry
+		_contentDashboardItemFactoryRegistry;
 
 	@Reference
 	private JSONFactory _jsonFactory;

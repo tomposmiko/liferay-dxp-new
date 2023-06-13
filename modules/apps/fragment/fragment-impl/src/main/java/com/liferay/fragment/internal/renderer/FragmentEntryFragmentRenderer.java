@@ -207,7 +207,7 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			Layout layout = _layoutLocalService.fetchLayout(
 				fragmentEntryLink.getPlid());
 
-			if (layout.isDraftLayout()) {
+			if (layout.isDraftLayout() || layout.isTypeAssetDisplay()) {
 				return false;
 			}
 		}
@@ -255,45 +255,56 @@ public class FragmentEntryFragmentRenderer implements FragmentRenderer {
 			fragmentRendererContext.getFragmentEntryLink();
 
 		if (Validator.isNotNull(css)) {
-			String outputKey = fragmentEntryLink.getFragmentEntryId() + "_CSS";
-
-			OutputData outputData = (OutputData)httpServletRequest.getAttribute(
-				WebKeys.OUTPUT_DATA);
-
-			boolean cssLoaded = false;
-
-			if (outputData != null) {
-				Set<String> outputKeys = outputData.getOutputKeys();
-
-				cssLoaded = outputKeys.contains(outputKey);
-
-				StringBundler cssSB = outputData.getDataSB(
-					outputKey, StringPool.BLANK);
-
-				if (cssSB != null) {
-					cssLoaded = Objects.equals(cssSB.toString(), css);
-				}
-			}
-			else {
-				outputData = new OutputData();
-			}
-
-			if (!cssLoaded ||
+			if (Objects.equals(
+					fragmentRendererContext.getMode(),
+					FragmentEntryLinkConstants.EDIT) ||
 				Objects.equals(
 					fragmentRendererContext.getMode(),
-					FragmentEntryLinkConstants.EDIT)) {
+					FragmentEntryLinkConstants.INDEX)) {
 
 				sb.append("<style>");
 				sb.append(css);
 				sb.append("</style>");
+			}
+			else {
+				String outputKey =
+					fragmentEntryLink.getFragmentEntryId() + "_CSS";
 
-				outputData.addOutputKey(outputKey);
+				OutputData outputData =
+					(OutputData)httpServletRequest.getAttribute(
+						WebKeys.OUTPUT_DATA);
 
-				outputData.setDataSB(
-					outputKey, StringPool.BLANK, new StringBundler(css));
+				boolean cssLoaded = false;
 
-				httpServletRequest.setAttribute(
-					WebKeys.OUTPUT_DATA, outputData);
+				if (outputData != null) {
+					Set<String> outputKeys = outputData.getOutputKeys();
+
+					cssLoaded = outputKeys.contains(outputKey);
+
+					StringBundler cssSB = outputData.getDataSB(
+						outputKey, StringPool.BLANK);
+
+					if (cssSB != null) {
+						cssLoaded = Objects.equals(cssSB.toString(), css);
+					}
+				}
+				else {
+					outputData = new OutputData();
+				}
+
+				if (!cssLoaded) {
+					sb.append("<style>");
+					sb.append(css);
+					sb.append("</style>");
+
+					outputData.addOutputKey(outputKey);
+
+					outputData.setDataSB(
+						outputKey, StringPool.BLANK, new StringBundler(css));
+
+					httpServletRequest.setAttribute(
+						WebKeys.OUTPUT_DATA, outputData);
+				}
 			}
 		}
 

@@ -14,11 +14,12 @@
 
 package com.liferay.object.rest.internal.resource.v1_0;
 
+import com.liferay.object.entry.util.ObjectEntryNameUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerTracker;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.rest.odata.entity.v1_0.ObjectEntryEntityModel;
 import com.liferay.object.rest.petra.sql.dsl.expression.FilterPredicateFactory;
 import com.liferay.object.scope.ObjectScopeProvider;
@@ -28,14 +29,14 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.object.service.ObjectFieldLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
+import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.petra.function.UnsafeConsumer;
+import com.liferay.petra.sql.dsl.expression.Predicate;
 import com.liferay.portal.kernel.model.BaseModel;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.search.filter.Filter;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.vulcan.aggregation.Aggregation;
@@ -62,22 +63,22 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		FilterPredicateFactory filterPredicateFactory,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
 		ObjectEntryLocalService objectEntryLocalService,
-		ObjectEntryManagerTracker objectEntryManagerTracker,
+		ObjectEntryManagerRegistry objectEntryManagerRegistry,
 		ObjectFieldLocalService objectFieldLocalService,
 		ObjectRelationshipService objectRelationshipService,
 		ObjectScopeProviderRegistry objectScopeProviderRegistry,
-		SystemObjectDefinitionMetadataTracker
-			systemObjectDefinitionMetadataTracker) {
+		SystemObjectDefinitionMetadataRegistry
+			systemObjectDefinitionMetadataRegistry) {
 
 		_filterPredicateFactory = filterPredicateFactory;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
-		_objectEntryManagerTracker = objectEntryManagerTracker;
+		_objectEntryManagerRegistry = objectEntryManagerRegistry;
 		_objectFieldLocalService = objectFieldLocalService;
 		_objectRelationshipService = objectRelationshipService;
 		_objectScopeProviderRegistry = objectScopeProviderRegistry;
-		_systemObjectDefinitionMetadataTracker =
-			systemObjectDefinitionMetadataTracker;
+		_systemObjectDefinitionMetadataRegistry =
+			systemObjectDefinitionMetadataRegistry;
 	}
 
 	@Override
@@ -141,7 +142,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		throws Exception {
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		objectEntryManager.deleteObjectEntry(
@@ -152,7 +153,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 	@Override
 	public void deleteObjectEntry(Long objectEntryId) throws Exception {
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		objectEntryManager.deleteObjectEntry(_objectDefinition, objectEntryId);
@@ -164,7 +165,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		throws Exception {
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		objectEntryManager.deleteObjectEntry(
@@ -177,7 +178,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		throws Exception {
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		return objectEntryManager.getObjectEntry(
@@ -192,7 +193,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		throws Exception {
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		Page<ObjectEntry> page =
@@ -232,22 +233,27 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		throws Exception {
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
+
+		Predicate predicate = null;
+
+		if (contextHttpServletRequest != null) {
+			predicate = _filterPredicateFactory.create(
+				ParamUtil.getString(contextHttpServletRequest, "filter"),
+				_objectDefinition.getObjectDefinitionId());
+		}
 
 		return objectEntryManager.getObjectEntries(
 			contextCompany.getCompanyId(), _objectDefinition, null, aggregation,
-			_getDTOConverterContext(null), pagination,
-			_filterPredicateFactory.create(
-				ParamUtil.getString(contextHttpServletRequest, "filter"),
-				_objectDefinition.getObjectDefinitionId()),
-			search, sorts);
+			_getDTOConverterContext(null), pagination, predicate, search,
+			sorts);
 	}
 
 	@Override
 	public ObjectEntry getObjectEntry(Long objectEntryId) throws Exception {
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		return objectEntryManager.getObjectEntry(
@@ -261,7 +267,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		throws Exception {
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		return objectEntryManager.getObjectEntry(
@@ -277,7 +283,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		throws Exception {
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		return objectEntryManager.getObjectEntries(
@@ -294,7 +300,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		throws Exception {
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		return objectEntryManager.addObjectEntry(
@@ -308,7 +314,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		throws Exception {
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		return objectEntryManager.addObjectEntry(
@@ -322,7 +328,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		throws Exception {
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		return objectEntryManager.addOrUpdateObjectEntry(
@@ -338,17 +344,13 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 				String relatedExternalReferenceCode)
 		throws Exception {
 
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164801"))) {
-			throw new UnsupportedOperationException();
-		}
-
 		ObjectRelationship objectRelationship =
 			_objectRelationshipService.getObjectRelationship(
 				_objectDefinition.getObjectDefinitionId(),
 				objectRelationshipName);
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		long primaryKey1 = _getPrimaryKey(
@@ -378,7 +380,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 				objectRelationshipName);
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		return _getRelatedObjectEntry(
@@ -396,7 +398,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		throws Exception {
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		return objectEntryManager.updateObjectEntry(
@@ -411,7 +413,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 		throws Exception {
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				_objectDefinition.getStorageType());
 
 		return objectEntryManager.addOrUpdateObjectEntry(
@@ -494,7 +496,7 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 
 		if (objectDefinition.isSystem()) {
 			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-				_systemObjectDefinitionMetadataTracker.
+				_systemObjectDefinitionMetadataRegistry.
 					getSystemObjectDefinitionMetadata(
 						objectDefinition.getName());
 
@@ -548,9 +550,12 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 			"taskItemDelegateName");
 
 		if (taskItemDelegateName != null) {
+			taskItemDelegateName = ObjectEntryNameUtil.fromTechnicalName(
+				taskItemDelegateName);
+
 			_objectDefinition =
 				_objectDefinitionLocalService.fetchObjectDefinition(
-					contextCompany.getCompanyId(), "C_" + taskItemDelegateName);
+					contextCompany.getCompanyId(), taskItemDelegateName);
 
 			if (_objectDefinition != null) {
 				return;
@@ -582,11 +587,11 @@ public class ObjectEntryResourceImpl extends BaseObjectEntryResourceImpl {
 
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryLocalService _objectEntryLocalService;
-	private final ObjectEntryManagerTracker _objectEntryManagerTracker;
+	private final ObjectEntryManagerRegistry _objectEntryManagerRegistry;
 	private final ObjectFieldLocalService _objectFieldLocalService;
 	private final ObjectRelationshipService _objectRelationshipService;
 	private final ObjectScopeProviderRegistry _objectScopeProviderRegistry;
-	private final SystemObjectDefinitionMetadataTracker
-		_systemObjectDefinitionMetadataTracker;
+	private final SystemObjectDefinitionMetadataRegistry
+		_systemObjectDefinitionMetadataRegistry;
 
 }

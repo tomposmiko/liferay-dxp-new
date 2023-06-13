@@ -56,21 +56,6 @@ public class ListTypeDefinitionLocalServiceImpl
 	@Indexable(type = IndexableType.REINDEX)
 	@Override
 	public ListTypeDefinition addListTypeDefinition(
-			long userId, Map<Locale, String> nameMap)
-		throws PortalException {
-
-		_validateName(nameMap, LocaleUtil.getSiteDefault());
-
-		ListTypeDefinition listTypeDefinition =
-			listTypeDefinitionPersistence.create(
-				counterLocalService.increment());
-
-		return _addListTypeDefinition(userId, listTypeDefinition, nameMap);
-	}
-
-	@Indexable(type = IndexableType.REINDEX)
-	@Override
-	public ListTypeDefinition addListTypeDefinition(
 			String externalReferenceCode, long userId)
 		throws PortalException {
 
@@ -88,12 +73,27 @@ public class ListTypeDefinitionLocalServiceImpl
 			}
 		}
 
-		listTypeDefinition.setExternalReferenceCode(externalReferenceCode);
-
 		return _addListTypeDefinition(
-			userId, listTypeDefinition,
+			listTypeDefinition, externalReferenceCode, userId,
 			Collections.singletonMap(
 				LocaleUtil.getDefault(), externalReferenceCode));
+	}
+
+	@Indexable(type = IndexableType.REINDEX)
+	@Override
+	public ListTypeDefinition addListTypeDefinition(
+			String externalReferenceCode, long userId,
+			Map<Locale, String> nameMap)
+		throws PortalException {
+
+		_validateName(nameMap, LocaleUtil.getSiteDefault());
+
+		ListTypeDefinition listTypeDefinition =
+			listTypeDefinitionPersistence.create(
+				counterLocalService.increment());
+
+		return _addListTypeDefinition(
+			listTypeDefinition, externalReferenceCode, userId, nameMap);
 	}
 
 	@Indexable(type = IndexableType.DELETE)
@@ -156,9 +156,11 @@ public class ListTypeDefinitionLocalServiceImpl
 	}
 
 	private ListTypeDefinition _addListTypeDefinition(
-			long userId, ListTypeDefinition listTypeDefinition,
-			Map<Locale, String> nameMap)
+			ListTypeDefinition listTypeDefinition, String externalReferenceCode,
+			long userId, Map<Locale, String> nameMap)
 		throws PortalException {
+
+		listTypeDefinition.setExternalReferenceCode(externalReferenceCode);
 
 		User user = _userLocalService.getUser(userId);
 

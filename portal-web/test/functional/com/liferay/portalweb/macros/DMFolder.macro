@@ -426,7 +426,9 @@ definition {
 		var key_roleTitle = "${roleTitle}";
 
 		for (var permissionName : list "${permissionNameList}") {
-			Uncheck(locator1 = "Permissions#CONTENT_PERMISSIONS_${permissionName}_CHECKBOX");
+			ScrollWebElementIntoView(locator1 = "Permissions#CONTENT_PERMISSIONS_${permissionName}_CHECKBOX");
+
+			Uncheck.uncheckNotVisible(locator1 = "Permissions#CONTENT_PERMISSIONS_${permissionName}_CHECKBOX");
 		}
 
 		PortletEntry.save();

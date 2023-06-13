@@ -63,7 +63,6 @@ import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
@@ -148,36 +147,29 @@ public class ContentUtil {
 			ThemeDisplay themeDisplay, HttpServletRequest httpServletRequest)
 		throws Exception {
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
 		String className = layoutClassedModelUsage.getClassName();
+
+		boolean hasUpdatePermission = ModelResourcePermissionUtil.contains(
+			themeDisplay.getPermissionChecker(), className,
+			layoutClassedModelUsage.getClassPK(), ActionKeys.UPDATE);
 
 		LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
 			LayoutDisplayPageProviderTrackerUtil.getLayoutDisplayPageProvider(
-				layoutClassedModelUsage.getClassName());
+				className);
 
 		LayoutDisplayPageObjectProvider<?> layoutDisplayPageObjectProvider =
 			layoutDisplayPageProvider.getLayoutDisplayPageObjectProvider(
 				new InfoItemReference(
 					className, layoutClassedModelUsage.getClassPK()));
 
-		if (ModelResourcePermissionUtil.contains(
-				themeDisplay.getPermissionChecker(),
-				layoutClassedModelUsage.getClassName(),
-				layoutClassedModelUsage.getClassPK(), ActionKeys.UPDATE)) {
+		return JSONUtil.put(
+			"editImage",
+			() -> {
+				if (!hasUpdatePermission ||
+					!Objects.equals(className, FileEntry.class.getName())) {
 
-			String editURL = InfoEditURLProviderUtil.getURLEdit(
-				layoutClassedModelUsage.getClassName(),
-				layoutDisplayPageObjectProvider.getDisplayObject(),
-				httpServletRequest);
-
-			if (editURL != null) {
-				jsonObject.put("editURL", editURL);
-			}
-
-			if (Objects.equals(
-					layoutClassedModelUsage.getClassName(),
-					FileEntry.class.getName())) {
+					return null;
+				}
 
 				FileEntry fileEntry =
 					(FileEntry)
@@ -198,55 +190,77 @@ public class ContentUtil {
 					ActionRequest.ACTION_NAME,
 					"/document_library/edit_file_entry_image_editor");
 
-				jsonObject.put(
-					"editImage",
-					JSONUtil.put(
-						"editImageURL", portletURL.toString()
-					).put(
-						"fileEntryId", fileEntry.getFileEntryId()
-					).put(
-						"previewURL",
-						DLURLHelperUtil.getPreviewURL(
-							fileEntry, fileEntry.getFileVersion(), themeDisplay,
-							StringPool.BLANK)
-					));
+				return JSONUtil.put(
+					"editImageURL", portletURL.toString()
+				).put(
+					"fileEntryId", fileEntry.getFileEntryId()
+				).put(
+					"previewURL",
+					DLURLHelperUtil.getPreviewURL(
+						fileEntry, fileEntry.getFileVersion(), themeDisplay,
+						StringPool.BLANK)
+				);
 			}
-		}
+		).put(
+			"editURL",
+			() -> {
+				if (!hasUpdatePermission) {
+					return null;
+				}
 
-		if (ModelResourcePermissionUtil.contains(
-				themeDisplay.getPermissionChecker(),
-				layoutClassedModelUsage.getClassName(),
-				layoutClassedModelUsage.getClassPK(), ActionKeys.PERMISSIONS)) {
-
-			String permissionsURL = PermissionsURLTag.doTag(
-				StringPool.BLANK, layoutClassedModelUsage.getClassName(),
-				HtmlUtil.escape(
-					layoutDisplayPageObjectProvider.getTitle(
-						themeDisplay.getLocale())),
-				null, String.valueOf(layoutClassedModelUsage.getClassPK()),
-				LiferayWindowState.POP_UP.toString(), null, httpServletRequest);
-
-			if (Validator.isNotNull(permissionsURL)) {
-				jsonObject.put("permissionsURL", permissionsURL);
+				return InfoEditURLProviderUtil.getURLEdit(
+					className,
+					layoutDisplayPageObjectProvider.getDisplayObject(),
+					httpServletRequest);
 			}
-		}
+		).put(
+			"permissionsURL",
+			() -> {
+				if (!ModelResourcePermissionUtil.contains(
+						themeDisplay.getPermissionChecker(), className,
+						layoutClassedModelUsage.getClassPK(),
+						ActionKeys.PERMISSIONS)) {
 
-		return jsonObject.put(
+					return null;
+				}
+
+				return PermissionsURLTag.doTag(
+					StringPool.BLANK, className,
+					HtmlUtil.escape(
+						layoutDisplayPageObjectProvider.getTitle(
+							themeDisplay.getLocale())),
+					null, String.valueOf(layoutClassedModelUsage.getClassPK()),
+					LiferayWindowState.POP_UP.toString(), null,
+					httpServletRequest);
+			}
+		).put(
 			"viewUsagesURL",
-			PortletURLBuilder.create(
-				PortletURLFactoryUtil.create(
-					httpServletRequest,
-					ContentPageEditorPortletKeys.CONTENT_PAGE_EDITOR_PORTLET,
-					PortletRequest.RENDER_PHASE)
-			).setMVCPath(
-				"/view_layout_classed_model_usages.jsp"
-			).setParameter(
-				"className", layoutClassedModelUsage.getClassName()
-			).setParameter(
-				"classPK", layoutClassedModelUsage.getClassPK()
-			).setWindowState(
-				LiferayWindowState.POP_UP
-			).buildString());
+			() -> {
+				if (!ModelResourcePermissionUtil.contains(
+						themeDisplay.getPermissionChecker(), className,
+						layoutClassedModelUsage.getClassPK(),
+						ActionKeys.VIEW)) {
+
+					return null;
+				}
+
+				return PortletURLBuilder.create(
+					PortletURLFactoryUtil.create(
+						httpServletRequest,
+						ContentPageEditorPortletKeys.
+							CONTENT_PAGE_EDITOR_PORTLET,
+						PortletRequest.RENDER_PHASE)
+				).setMVCPath(
+					"/view_layout_classed_model_usages.jsp"
+				).setParameter(
+					"className", className
+				).setParameter(
+					"classPK", layoutClassedModelUsage.getClassPK()
+				).setWindowState(
+					LiferayWindowState.POP_UP
+				).buildString();
+			}
+		);
 	}
 
 	private static AssetRendererFactory<?> _getAssetRendererFactory(

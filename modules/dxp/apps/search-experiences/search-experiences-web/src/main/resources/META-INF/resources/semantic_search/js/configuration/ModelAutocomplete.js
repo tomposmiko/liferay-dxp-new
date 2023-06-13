@@ -12,8 +12,7 @@
 import ClayAutocomplete from '@clayui/autocomplete';
 import {useResource} from '@clayui/data-provider';
 import ClayDropDown from '@clayui/drop-down';
-import {FocusScope} from '@clayui/shared';
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 /**
  * When Hugging Face is selected as the Sentence Transform Provider, this input
@@ -37,6 +36,8 @@ function ModelAutocomplete({
 		networkStatus: 4,
 	}));
 	const [showDropDown, setShowDropDown] = useState(false);
+
+	const currentItemSelectedRef = useRef(value);
 
 	const {resource} = useResource({
 		fetchOptions: {
@@ -65,74 +66,114 @@ function ModelAutocomplete({
 		},
 	});
 
-	const _handleBlur = () => {
-		if (!autocompleteSearchValue) {
+	const _handleInputChange = (event) => {
+
+		// Immediately show loading spinner when typing.
+
+		if (!networkState.loading) {
+			setNetworkState({
+				error: false,
+				loading: true,
+				networkStatus: 4,
+			});
+		}
+
+		if (!event.target.value) {
+			currentItemSelectedRef.current = '';
 			onChange('');
 		}
-		else if (value !== autocompleteSearchValue) {
-			setAutocompleteSearchValue(value);
-		}
 
-		onBlur();
-	};
-
-	const _handleFocus = () => {
-		setShowDropDown(true);
-	};
-
-	const _handleInputChange = (event) => {
 		setAutocompleteSearchValue(event.target.value);
 		setShowDropDown(true);
 	};
 
+	const _handleInputFocus = () => {
+		setShowDropDown(true);
+	};
+
+	const _handleInputKeyDown = (event) => {
+
+		// Prevent form submission to prevent saving an input that isn't one of
+		// the autocomplete items from the models endpoint.
+
+		if (event.key === 'Enter') {
+			event.preventDefault();
+		}
+	};
+
 	const _handleItemChange = (item) => {
+		currentItemSelectedRef.current = item;
 		onChange(item);
 
 		setAutocompleteSearchValue(item);
 		setShowDropDown(false);
 	};
 
-	return (
-		<FocusScope>
-			<ClayAutocomplete>
-				<ClayAutocomplete.Input
-					aria-label={label}
-					id={name}
-					name={name}
-					onBlur={_handleBlur}
-					onChange={_handleInputChange}
-					onFocus={_handleFocus}
-					required={required}
-					value={autocompleteSearchValue}
-				/>
+	const _renderAutocompleteDropdownItems = () => {
 
-				<ClayAutocomplete.DropDown
-					active={showDropDown}
-					onSetActive={setShowDropDown}
+		// Loading
+
+		if (networkState.loading) {
+			return (
+				<ClayDropDown.Item disabled>
+					{Liferay.Language.get('loading')}
+				</ClayDropDown.Item>
+			);
+		}
+
+		// No Results
+
+		if (!resource?.items?.length) {
+			return (
+				<ClayDropDown.Item disabled>
+					{Liferay.Language.get('no-results-found')}
+				</ClayDropDown.Item>
+			);
+		}
+
+		// Has Results
+
+		if (resource?.items) {
+			return (resource?.items || []).map(({modelId}) => (
+				<ClayDropDown.Item
+					key={modelId}
+					onClick={() => _handleItemChange(modelId)}
 				>
-					<ClayDropDown.ItemList>
-						{(resource?.items || []).map(({modelId}) => (
-							<ClayDropDown.Item
-								key={modelId}
-								onClick={() => _handleItemChange(modelId)}
-							>
-								{modelId}
-							</ClayDropDown.Item>
-						))}
+					{modelId}
+				</ClayDropDown.Item>
+			));
+		}
+	};
 
-						{!resource?.items?.length && (
-							<ClayDropDown.Item>
-								{networkState.loading ? (
-									<ClayAutocomplete.LoadingIndicator />
-								) : (
-									Liferay.Language.get('no-results-found')
-								)}
-							</ClayDropDown.Item>
-						)}
-					</ClayDropDown.ItemList>
-				</ClayAutocomplete.DropDown>
-			</ClayAutocomplete>
-		</FocusScope>
+	useEffect(() => {
+		if (!showDropDown) {
+			setAutocompleteSearchValue(currentItemSelectedRef.current);
+		}
+	}, [showDropDown]);
+
+	return (
+		<ClayAutocomplete>
+			<ClayAutocomplete.Input
+				aria-label={label}
+				id={name}
+				name={name}
+				onBlur={onBlur}
+				onChange={_handleInputChange}
+				onFocus={_handleInputFocus}
+				onKeyDown={_handleInputKeyDown}
+				required={required}
+				value={autocompleteSearchValue}
+			/>
+
+			<ClayAutocomplete.DropDown
+				active={showDropDown}
+				onSetActive={setShowDropDown}
+			>
+				<ClayDropDown.ItemList>
+					{_renderAutocompleteDropdownItems()}
+				</ClayDropDown.ItemList>
+			</ClayAutocomplete.DropDown>
+		</ClayAutocomplete>
 	);
 }
 

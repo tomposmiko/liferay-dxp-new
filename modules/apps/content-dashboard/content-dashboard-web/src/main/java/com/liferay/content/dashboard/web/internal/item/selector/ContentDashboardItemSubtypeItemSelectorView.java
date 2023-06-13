@@ -21,7 +21,7 @@ import com.liferay.content.dashboard.item.ContentDashboardItemFactory;
 import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtype;
 import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtypeFactory;
 import com.liferay.content.dashboard.web.internal.display.context.ContentDashboardItemSubtypeItemSelectorViewDisplayContext;
-import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactoryTracker;
+import com.liferay.content.dashboard.web.internal.item.ContentDashboardItemFactoryRegistry;
 import com.liferay.content.dashboard.web.internal.item.selector.criteria.content.dashboard.type.criterion.ContentDashboardItemSubtypeItemSelectorCriterion;
 import com.liferay.content.dashboard.web.internal.util.ContentDashboardGroupUtil;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
@@ -29,7 +29,7 @@ import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.info.item.InfoItemClassDetails;
 import com.liferay.info.item.InfoItemFormVariation;
 import com.liferay.info.item.InfoItemReference;
-import com.liferay.info.item.InfoItemServiceTracker;
+import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.info.item.provider.InfoItemFormVariationsProvider;
 import com.liferay.info.localized.InfoLocalizedValue;
 import com.liferay.info.search.InfoSearchClassMapperTracker;
@@ -184,10 +184,10 @@ public class ContentDashboardItemSubtypeItemSelectorView
 			_jsonFactory.createJSONArray();
 
 		for (String className :
-				_contentDashboardItemFactoryTracker.getClassNames()) {
+				_contentDashboardItemFactoryRegistry.getClassNames()) {
 
 			ContentDashboardItemFactory<?> contentDashboardItemFactory =
-				_contentDashboardItemFactoryTracker.
+				_contentDashboardItemFactoryRegistry.
 					getContentDashboardItemFactory(className);
 
 			if (contentDashboardItemFactory == null) {
@@ -272,7 +272,7 @@ public class ContentDashboardItemSubtypeItemSelectorView
 			className);
 
 		InfoItemFormVariationsProvider<?> infoItemFormVariationsProvider =
-			_infoItemServiceTracker.getFirstInfoItemService(
+			_infoItemServiceRegistry.getFirstInfoItemService(
 				InfoItemFormVariationsProvider.class,
 				infoItemClassDetails.getClassName());
 
@@ -411,8 +411,8 @@ public class ContentDashboardItemSubtypeItemSelectorView
 	private CompanyLocalService _companyLocalService;
 
 	@Reference
-	private ContentDashboardItemFactoryTracker
-		_contentDashboardItemFactoryTracker;
+	private ContentDashboardItemFactoryRegistry
+		_contentDashboardItemFactoryRegistry;
 
 	@Reference
 	private DLFileEntryTypeLocalService _dlFileEntryTypeLocalService;
@@ -421,7 +421,7 @@ public class ContentDashboardItemSubtypeItemSelectorView
 	private GroupLocalService _groupLocalService;
 
 	@Reference
-	private InfoItemServiceTracker _infoItemServiceTracker;
+	private InfoItemServiceRegistry _infoItemServiceRegistry;
 
 	@Reference
 	private InfoSearchClassMapperTracker _infoSearchClassMapperTracker;

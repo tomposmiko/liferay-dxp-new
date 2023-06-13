@@ -20,12 +20,12 @@ import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProviderRegistry;
 import com.liferay.object.rest.dto.v1_0.ObjectEntry;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManager;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerTracker;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.service.ObjectRelationshipService;
 import com.liferay.object.system.SystemObjectDefinitionMetadata;
-import com.liferay.object.system.SystemObjectDefinitionMetadataTracker;
+import com.liferay.object.system.SystemObjectDefinitionMetadataRegistry;
 import com.liferay.portal.kernel.security.auth.GuestOrUserUtil;
 import com.liferay.portal.kernel.service.PersistedModelLocalService;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
@@ -122,7 +122,7 @@ public class RelatedObjectEntryResourceImpl
 			systemObjectDefinition, objectRelationship);
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				systemObjectDefinition.getStorageType());
 
 		if (relatedObjectDefinition.isSystem()) {
@@ -256,7 +256,7 @@ public class RelatedObjectEntryResourceImpl
 		throws Exception {
 
 		ObjectEntryManager objectEntryManager =
-			_objectEntryManagerTracker.getObjectEntryManager(
+			_objectEntryManagerRegistry.getObjectEntryManager(
 				systemObjectDefinition.getStorageType());
 
 		ObjectDefinition relatedObjectDefinition = _getRelatedObjectDefinition(
@@ -298,7 +298,7 @@ public class RelatedObjectEntryResourceImpl
 				_objectDefinitionLocalService.getSystemObjectDefinitions()) {
 
 			SystemObjectDefinitionMetadata systemObjectDefinitionMetadata =
-				_systemObjectDefinitionMetadataTracker.
+				_systemObjectDefinitionMetadataRegistry.
 					getSystemObjectDefinitionMetadata(
 						systemObjectDefinition.getName());
 
@@ -322,7 +322,7 @@ public class RelatedObjectEntryResourceImpl
 	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Reference
-	private ObjectEntryManagerTracker _objectEntryManagerTracker;
+	private ObjectEntryManagerRegistry _objectEntryManagerRegistry;
 
 	@Reference
 	private ObjectRelatedModelsProviderRegistry
@@ -339,8 +339,8 @@ public class RelatedObjectEntryResourceImpl
 		_persistedModelLocalServiceRegistry;
 
 	@Reference
-	private SystemObjectDefinitionMetadataTracker
-		_systemObjectDefinitionMetadataTracker;
+	private SystemObjectDefinitionMetadataRegistry
+		_systemObjectDefinitionMetadataRegistry;
 
 	@Context
 	private UriInfo _uriInfo;

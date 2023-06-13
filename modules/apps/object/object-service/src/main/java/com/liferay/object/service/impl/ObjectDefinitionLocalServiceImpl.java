@@ -48,7 +48,7 @@ import com.liferay.object.model.ObjectEntryTable;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.model.ObjectRelationship;
 import com.liferay.object.model.impl.ObjectDefinitionImpl;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerTracker;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
 import com.liferay.object.scope.ObjectScopeProviderRegistry;
 import com.liferay.object.service.ObjectActionLocalService;
 import com.liferay.object.service.ObjectDefinitionLocalServiceUtil;
@@ -103,13 +103,11 @@ import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.transaction.TransactionCommitCallbackUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalRunMode;
-import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TextFormatter;
 import com.liferay.portal.kernel.util.Validator;
@@ -579,7 +577,7 @@ public class ObjectDefinitionLocalServiceImpl
 				_assetVocabularyLocalService, _bundleContext,
 				_dynamicQueryBatchIndexingActionableFactory, _groupLocalService,
 				_listTypeEntryLocalService, _modelSearchRegistrarHelper, this,
-				_objectEntryLocalService, _objectEntryManagerTracker,
+				_objectEntryLocalService, _objectEntryManagerRegistry,
 				_objectEntryService, _objectFieldLocalService,
 				_objectLayoutLocalService, _objectRelationshipLocalService,
 				_objectScopeProviderRegistry, _objectViewLocalService,
@@ -931,20 +929,16 @@ public class ObjectDefinitionLocalServiceImpl
 				_language.get(LocaleUtil.getDefault(), "create-date")),
 			"createDate", false, false);
 
-		if (!objectDefinition.isSystem() ||
-			GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164801"))) {
-
-			_objectFieldLocalService.addSystemObjectField(
-				userId, objectDefinition.getObjectDefinitionId(),
-				ObjectFieldConstants.BUSINESS_TYPE_TEXT,
-				ObjectEntryTable.INSTANCE.externalReferenceCode.getName(),
-				dbTableName, ObjectFieldConstants.DB_TYPE_STRING, null, false,
-				false, null,
-				LocalizedMapUtil.getLocalizedMap(
-					_language.get(
-						LocaleUtil.getDefault(), "external-reference-code")),
-				"externalReferenceCode", false, false);
-		}
+		_objectFieldLocalService.addSystemObjectField(
+			userId, objectDefinition.getObjectDefinitionId(),
+			ObjectFieldConstants.BUSINESS_TYPE_TEXT,
+			ObjectEntryTable.INSTANCE.externalReferenceCode.getName(),
+			dbTableName, ObjectFieldConstants.DB_TYPE_STRING, null, false,
+			false, null,
+			LocalizedMapUtil.getLocalizedMap(
+				_language.get(
+					LocaleUtil.getDefault(), "external-reference-code")),
+			"externalReferenceCode", false, false);
 
 		String dbColumnName = ObjectEntryTable.INSTANCE.objectEntryId.getName();
 
@@ -1010,8 +1004,7 @@ public class ObjectDefinitionLocalServiceImpl
 			return className;
 		}
 
-		return "com.liferay.object.model.ObjectDefinition#" +
-			objectDefinitionId;
+		return ObjectDefinition.class.getName() + "#" + objectDefinitionId;
 	}
 
 	private String _getDBTableName(
@@ -1592,7 +1585,7 @@ public class ObjectDefinitionLocalServiceImpl
 	private ObjectEntryLocalService _objectEntryLocalService;
 
 	@Reference
-	private ObjectEntryManagerTracker _objectEntryManagerTracker;
+	private ObjectEntryManagerRegistry _objectEntryManagerRegistry;
 
 	@Reference
 	private ObjectEntryPersistence _objectEntryPersistence;

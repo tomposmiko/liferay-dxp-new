@@ -182,9 +182,9 @@ public class ManageLayoutProductNavigationControlMenuEntry
 		LayoutPageTemplateEntry layoutPageTemplateEntry =
 			_getLayoutPageTemplateEntry(layout);
 
-		if (layout.isTypeControlPanel() ||
+		if (layout.isEmbeddedPersonalApplication() ||
+			layout.isTypeControlPanel() ||
 			_isMasterLayout(layout, layoutPageTemplateEntry) ||
-			isEmbeddedPersonalApplicationLayout(layout) ||
 			!(themeDisplay.isShowLayoutTemplatesIcon() ||
 			  themeDisplay.isShowPageSettingsIcon())) {
 

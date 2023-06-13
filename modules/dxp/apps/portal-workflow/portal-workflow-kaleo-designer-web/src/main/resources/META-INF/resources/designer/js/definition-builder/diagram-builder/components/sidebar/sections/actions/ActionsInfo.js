@@ -26,7 +26,7 @@ const ActionsInfo = ({
 	sectionsLength,
 	setSections,
 }) => {
-	const {clientExtensions, selectedItem, setSelectedItem} = useContext(
+	const {functionActionExecutors, selectedItem, setSelectedItem} = useContext(
 		DiagramBuilderContext
 	);
 	const {actions} = selectedItem.data;
@@ -61,24 +61,13 @@ const ActionsInfo = ({
 		},
 	];
 
-	if (clientExtensions?.length) {
+	if (functionActionExecutors?.length) {
 		actionTypeOptions.push(
-			...clientExtensions.map((item) => {
-				const itemCopy = {...item};
-				itemCopy.type = 'clientExtension';
-				itemCopy.label = item.description;
-				delete itemCopy.description;
-				itemCopy.value = item.key;
-				delete itemCopy.key;
-
-				return Object.keys(itemCopy)
-					.sort()
-					.reduce((accumulator, key) => {
-						accumulator[key] = itemCopy[key];
-
-						return accumulator;
-					}, {});
-			})
+			...functionActionExecutors.map((item) => ({
+				label: item,
+				type: 'functionActionExecutor',
+				value: item,
+			}))
 		);
 	}
 
@@ -123,7 +112,7 @@ const ActionsInfo = ({
 		if (
 			item.name &&
 			(item.script ||
-				(selectedActionType?.type === 'clientExtension' &&
+				(selectedActionType?.type === 'functionActionExecutor' &&
 					item.script === '')) &&
 			item.executionType
 		) {
@@ -196,7 +185,7 @@ const ActionsInfo = ({
 					className="mr-3"
 					disabled={
 						actions?.name === '' ||
-						(!selectedActionType === 'clientExtension' &&
+						(!selectedActionType === 'functionActionExecutor' &&
 							script === '')
 					}
 					displayType="secondary"

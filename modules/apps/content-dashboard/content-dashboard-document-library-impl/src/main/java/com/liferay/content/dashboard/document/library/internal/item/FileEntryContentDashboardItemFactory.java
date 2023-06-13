@@ -18,16 +18,16 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.content.dashboard.item.ContentDashboardItem;
 import com.liferay.content.dashboard.item.ContentDashboardItemFactory;
-import com.liferay.content.dashboard.item.action.ContentDashboardItemActionProviderTracker;
-import com.liferay.content.dashboard.item.action.ContentDashboardItemVersionActionProviderTracker;
+import com.liferay.content.dashboard.item.action.ContentDashboardItemActionProviderRegistry;
+import com.liferay.content.dashboard.item.action.ContentDashboardItemVersionActionProviderRegistry;
 import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtypeFactory;
-import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtypeFactoryTracker;
+import com.liferay.content.dashboard.item.type.ContentDashboardItemSubtypeFactoryRegistry;
 import com.liferay.document.library.display.context.DLDisplayContextProvider;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.util.DLURLHelper;
-import com.liferay.info.item.InfoItemServiceTracker;
+import com.liferay.info.item.InfoItemServiceRegistry;
 import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -64,7 +64,7 @@ public class FileEntryContentDashboardItemFactory
 		}
 
 		InfoItemFieldValuesProvider<FileEntry> infoItemFieldValuesProvider =
-			infoItemServiceTracker.getFirstInfoItemService(
+			infoItemServiceRegistry.getFirstInfoItemService(
 				InfoItemFieldValuesProvider.class, FileEntry.class.getName());
 
 		Optional<ContentDashboardItemSubtypeFactory>
@@ -79,8 +79,8 @@ public class FileEntryContentDashboardItemFactory
 
 		return new FileEntryContentDashboardItem(
 			assetEntry.getCategories(), assetEntry.getTags(),
-			_contentDashboardItemActionProviderTracker,
-			_contentDashboardItemVersionActionProviderTracker,
+			_contentDashboardItemActionProviderRegistry,
+			_contentDashboardItemVersionActionProviderRegistry,
 			contentDashboardItemSubtypeFactory.create(
 				dlFileEntry.getFileEntryTypeId(), dlFileEntry.getFileEntryId()),
 			_dlDisplayContextProvider, _dlURLHelper, fileEntry,
@@ -92,28 +92,28 @@ public class FileEntryContentDashboardItemFactory
 	public Optional<ContentDashboardItemSubtypeFactory>
 		getContentDashboardItemSubtypeFactoryOptional() {
 
-		return _contentDashboardItemSubtypeFactoryTracker.
+		return _contentDashboardItemSubtypeFactoryRegistry.
 			getContentDashboardItemSubtypeFactoryOptional(
 				DLFileEntryType.class.getName());
 	}
 
 	@Reference
-	protected InfoItemServiceTracker infoItemServiceTracker;
+	protected InfoItemServiceRegistry infoItemServiceRegistry;
 
 	@Reference
 	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
-	private ContentDashboardItemActionProviderTracker
-		_contentDashboardItemActionProviderTracker;
+	private ContentDashboardItemActionProviderRegistry
+		_contentDashboardItemActionProviderRegistry;
 
 	@Reference
-	private ContentDashboardItemSubtypeFactoryTracker
-		_contentDashboardItemSubtypeFactoryTracker;
+	private ContentDashboardItemSubtypeFactoryRegistry
+		_contentDashboardItemSubtypeFactoryRegistry;
 
 	@Reference
-	private ContentDashboardItemVersionActionProviderTracker
-		_contentDashboardItemVersionActionProviderTracker;
+	private ContentDashboardItemVersionActionProviderRegistry
+		_contentDashboardItemVersionActionProviderRegistry;
 
 	@Reference
 	private DLAppLocalService _dlAppLocalService;

@@ -16,7 +16,7 @@ package com.liferay.object.rest.internal.util;
 
 import com.liferay.object.exception.NoSuchObjectEntryException;
 import com.liferay.object.field.business.type.ObjectFieldBusinessType;
-import com.liferay.object.field.business.type.ObjectFieldBusinessTypeTracker;
+import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.model.ObjectEntry;
 import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
@@ -24,8 +24,6 @@ import com.liferay.object.service.ObjectEntryLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.PropsUtil;
 
 import java.util.Map;
 
@@ -38,17 +36,13 @@ public class ObjectEntryValuesUtil {
 			ObjectDefinitionLocalService objectDefinitionLocalService,
 			ObjectEntryLocalService objectEntryLocalService,
 			ObjectField objectField,
-			ObjectFieldBusinessTypeTracker objectFieldBusinessTypeTracker,
+			ObjectFieldBusinessTypeRegistry objectFieldBusinessTypeRegistry,
 			long userId, Map<String, Object> values)
 		throws PortalException {
 
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-164801"))) {
-			return values.get(objectField.getName());
-		}
-
 		try {
 			ObjectFieldBusinessType objectFieldBusinessType =
-				objectFieldBusinessTypeTracker.getObjectFieldBusinessType(
+				objectFieldBusinessTypeRegistry.getObjectFieldBusinessType(
 					objectField.getBusinessType());
 
 			return objectFieldBusinessType.getValue(objectField, values);

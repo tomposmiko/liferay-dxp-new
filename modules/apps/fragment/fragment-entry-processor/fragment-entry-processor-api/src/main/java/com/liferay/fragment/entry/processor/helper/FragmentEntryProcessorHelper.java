@@ -16,16 +16,15 @@ package com.liferay.fragment.entry.processor.helper;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.fragment.processor.FragmentEntryProcessorContext;
 import com.liferay.info.item.InfoItemFieldValues;
 import com.liferay.info.item.InfoItemReference;
-import com.liferay.info.item.provider.InfoItemFieldValuesProvider;
 import com.liferay.info.type.WebImage;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONObject;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @author Eudaldo Alonso
@@ -34,6 +33,12 @@ import java.util.Optional;
 public interface FragmentEntryProcessorHelper {
 
 	public String getEditableValue(JSONObject jsonObject, Locale locale);
+
+	public Object getFieldValue(
+			JSONObject editableValueJSONObject,
+			Map<Long, InfoItemFieldValues> infoDisplaysFieldValues,
+			FragmentEntryProcessorContext fragmentEntryProcessorContext)
+		throws PortalException;
 
 	public long getFileEntryId(
 		InfoItemReference infoItemReference, String fieldName, Locale locale);
@@ -46,27 +51,10 @@ public interface FragmentEntryProcessorHelper {
 
 	public long getFileEntryId(WebImage webImage);
 
-	public Object getMappedCollectionValue(
-			Optional<InfoItemReference> infoItemReferenceOptional,
-			JSONObject jsonObject, Locale locale)
-		throws PortalException;
-
-	public Object getMappedInfoItemFieldValue(
-			JSONObject jsonObject,
-			Map<Long, InfoItemFieldValues> infoItemFieldValuesMap,
-			Locale locale, String mode, long previewClassPK,
-			String previewVersion)
-		throws PortalException;
-
-	public Object getMappedInfoItemFieldValue(
-		String fieldName,
-		InfoItemFieldValuesProvider infoItemFieldValuesProvider, Locale locale,
-		Object object);
-
-	public boolean isAssetDisplayPage(String mode);
-
 	public boolean isMapped(JSONObject jsonObject);
 
 	public boolean isMappedCollection(JSONObject jsonObject);
+
+	public boolean isMappedDisplayPage(JSONObject jsonObject);
 
 }
