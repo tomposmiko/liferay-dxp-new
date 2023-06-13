@@ -42,10 +42,11 @@ export default function Action({
 	objectAction: initialValues,
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionsRelationshipsURL,
 	readOnly,
 	requestParams: {method, url},
 	successMessage,
-	validateExpressionBuilderContentURL,
+	validateExpressionURL,
 }: IProps) {
 	const onSubmit = async (objectAction: ObjectAction) => {
 		const response = await fetch(url, {
@@ -115,10 +116,11 @@ export default function Action({
 						ffNotificationTemplates={ffNotificationTemplates}
 						objectActionExecutors={objectActionExecutors}
 						objectActionTriggers={objectActionTriggers}
-						setValues={setValues}
-						validateExpressionBuilderContentURL={
-							validateExpressionBuilderContentURL
+						objectDefinitionsRelationshipsURL={
+							objectDefinitionsRelationshipsURL
 						}
+						setValues={setValues}
+						validateExpressionURL={validateExpressionURL}
 						values={values}
 					/>
 				</ClayTabs.TabPane>
@@ -146,6 +148,12 @@ function useObjectActionForm({initialValues, onSubmit}: IUseObjectActionForm) {
 			invalidateRequired(values.parameters?.url)
 		) {
 			errors.url = REQUIRED_MSG;
+		}
+		else if (
+			values.objectActionExecutorKey === 'add-object-entry' &&
+			!values.parameters?.objectDefinitionId
+		) {
+			errors.objectDefinitionId = REQUIRED_MSG;
 		}
 
 		if (
@@ -177,14 +185,15 @@ interface IProps {
 	objectAction: Partial<ObjectAction>;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
+	objectDefinitionsRelationshipsURL: string;
 	readOnly?: boolean;
 	requestParams: {
-		method: HTTPMethods;
+		method: 'GET' | 'POST' | 'DELETE' | 'PUT';
 		url: string;
 	};
 	successMessage: string;
 	title: string;
-	validateExpressionBuilderContentURL: string;
+	validateExpressionURL: string;
 }
 
 interface IUseObjectActionForm {

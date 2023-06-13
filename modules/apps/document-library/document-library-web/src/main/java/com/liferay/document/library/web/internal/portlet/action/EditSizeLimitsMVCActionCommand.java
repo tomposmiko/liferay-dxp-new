@@ -17,9 +17,11 @@ package com.liferay.document.library.web.internal.portlet.action;
 import com.liferay.configuration.admin.constants.ConfigurationAdminPortletKeys;
 import com.liferay.document.library.configuration.DLSizeLimitConfigurationProvider;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
+import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListenerException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -68,28 +70,17 @@ public class EditSizeLimitsMVCActionCommand extends BaseMVCActionCommand {
 				"Invalid scope primary key 0 for " + scope + " scope");
 		}
 
-		long fileMaxSize = ParamUtil.getLong(actionRequest, "fileMaxSize");
-
-		if (scope.equals(
-				ExtendedObjectClassDefinition.Scope.COMPANY.getValue())) {
-
-			_dlSizeLimitConfigurationProvider.updateCompanySizeLimit(
-				scopePK, fileMaxSize, _getMimeTypeSizeLimits(actionRequest));
+		try {
+			_updateSizeLimit(actionRequest, scope, scopePK);
 		}
-		else if (scope.equals(
-					ExtendedObjectClassDefinition.Scope.GROUP.getValue())) {
+		catch (ConfigurationModelListenerException
+					configurationModelListenerException) {
 
-			_dlSizeLimitConfigurationProvider.updateGroupSizeLimit(
-				scopePK, fileMaxSize, _getMimeTypeSizeLimits(actionRequest));
-		}
-		else if (scope.equals(
-					ExtendedObjectClassDefinition.Scope.SYSTEM.getValue())) {
+			SessionErrors.add(
+				actionRequest, configurationModelListenerException.getClass());
 
-			_dlSizeLimitConfigurationProvider.updateSystemSizeLimit(
-				fileMaxSize, _getMimeTypeSizeLimits(actionRequest));
-		}
-		else {
-			throw new PortalException("Unsupported scope: " + scope);
+			actionResponse.sendRedirect(
+				ParamUtil.getString(actionRequest, "redirect"));
 		}
 	}
 
@@ -117,6 +108,35 @@ public class EditSizeLimitsMVCActionCommand extends BaseMVCActionCommand {
 		}
 
 		return mimeTypeSizeLimits;
+	}
+
+	private void _updateSizeLimit(
+			ActionRequest actionRequest, String scope, long scopePK)
+		throws Exception {
+
+		long fileMaxSize = ParamUtil.getLong(actionRequest, "fileMaxSize");
+
+		if (scope.equals(
+				ExtendedObjectClassDefinition.Scope.COMPANY.getValue())) {
+
+			_dlSizeLimitConfigurationProvider.updateCompanySizeLimit(
+				scopePK, fileMaxSize, _getMimeTypeSizeLimits(actionRequest));
+		}
+		else if (scope.equals(
+					ExtendedObjectClassDefinition.Scope.GROUP.getValue())) {
+
+			_dlSizeLimitConfigurationProvider.updateGroupSizeLimit(
+				scopePK, fileMaxSize, _getMimeTypeSizeLimits(actionRequest));
+		}
+		else if (scope.equals(
+					ExtendedObjectClassDefinition.Scope.SYSTEM.getValue())) {
+
+			_dlSizeLimitConfigurationProvider.updateSystemSizeLimit(
+				fileMaxSize, _getMimeTypeSizeLimits(actionRequest));
+		}
+		else {
+			throw new PortalException("Unsupported scope: " + scope);
+		}
 	}
 
 	@Reference

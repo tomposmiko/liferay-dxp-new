@@ -189,12 +189,32 @@ definition {
 	}
 
 	@description = "LPS-148112 - Verify if turn off the 'Show files' option on field settings"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanDisableShowFilesOptionOnFieldSettings {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-153419 CanDisableShowFilesOptionOnFieldSettings pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToFieldsTab();
+
+		ObjectAdmin.addObjectFieldViaUI(
+			enableShowFiles = "true",
+			fieldAttachment = "Upload Directly from the User's Computer",
+			fieldLabel = "Custom Attachment",
+			fieldType = "Attachment");
+
+		ObjectAdmin.goToFieldsDetails(label = "Custom Attachment");
+
+		Uncheck.uncheckNotVisible(
+			key_toggleSwitchLabel = "Show Files in Documents and Media",
+			locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
+
+		ObjectField.save();
 	}
 
 	@description = "LPS-148112 - Verify that admin can edit the Storage Folder path in Published objects"
@@ -412,21 +432,59 @@ definition {
 	}
 
 	@description = "LPS-148112 - Verify if when selecting the option on Request Files: Directly from User's Computer the toggle is OFF by default"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewOptionsDisableWhenSelectDirectlyFromUsersComputerOption {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-153413 CanViewOptionsDisableWhenSelectDirectlyFromUsersComputerOption pending implementation
+		Navigator.openURL();
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToFieldsTab();
+
+		LexiconEntry.gotoAdd();
+
+		ObjectField.selectType(fieldType = "Attachment");
+
+		ObjectField.selectOptionOnRequestFiles(option = "Upload Directly from the User's Computer");
+
+		Uncheck.uncheckNotVisible(
+			key_toggleSwitchLabel = "Show Files in Documents and Media",
+			locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
 	}
 
 	@description = "LPS-148112 - Verify if when selecting the option on Request Files: Directly from User's Computer there is a Toggle"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewOptionsWhenSelectDirectlyFromUsersComputerOption {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-153411 CanViewOptionsWhenSelectDirectlyFromUsersComputerOption pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToFieldsTab();
+
+		LexiconEntry.gotoAdd();
+
+		AssertElementNotPresent(
+			key_labelName = "Show Files in Documents and Media",
+			locator1 = "ObjectField#DEFAULT_TOGGLE_SWITCH");
+
+		ObjectField.selectType(fieldType = "Attachment");
+
+		ObjectField.selectOptionOnRequestFiles(option = "Upload Directly from the User's Computer");
+
+		AssertElementPresent(
+			key_labelName = "Show Files in Documents and Media",
+			locator1 = "ObjectField#DEFAULT_TOGGLE_SWITCH");
 	}
 
 	@description = "LPS-146889 - Verify that 'Set the Maximum Number of Characters' toggle is available for Text and Long Text fields"
@@ -509,21 +567,57 @@ definition {
 	}
 
 	@description = "LPS-148112 - Verify if after create a attachment field with option Request Files: Directly from User's Computer selected and when the 'Show files' is enabled there is a new configuration field called Storage Folder"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewStorageFolderWhenShowFilesIsEnable {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-153415 CanViewStorageFolderWhenShowFilesIsEnable pending implementation
+		Navigator.openURL();
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToFieldsTab();
+
+		ObjectAdmin.addObjectFieldViaUI(
+			enableShowFiles = "true",
+			fieldAttachment = "Upload Directly from the User's Computer",
+			fieldLabel = "Custom Attachment",
+			fieldType = "Attachment");
+
+		ObjectAdmin.goToFieldsDetails(label = "Custom Attachment");
+
+		AssertElementPresent(locator1 = "ObjectField#LABEL_STORAGE_FOLDER");
 	}
 
 	@description = "LPS-148112 - Verify if when selecting the option on Request Files: Directly from User's Computer there is a tooltip on the Toggle"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test CanViewTootipWhenSelectDirectlyFromUsersComputerOption {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-153412 CanViewTootipWhenSelectDirectlyFromUsersComputerOption pending implementation
+		Navigator.openURL();
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToFieldsTab();
+
+		LexiconEntry.gotoAdd();
+
+		ObjectField.selectType(fieldType = "Attachment");
+
+		ObjectField.selectOptionOnRequestFiles(option = "Upload Directly from the User's Computer");
+
+		AssertElementPresent(
+			key_text = "question-circle-full",
+			locator1 = "Icon#ANY");
 	}
 
 	@description = "LPS-144902 - Verify there is a description of each Field Type"
@@ -585,8 +679,8 @@ definition {
 
 		ObjectAutoGenerated.clickSelectFile();
 
-		ObjectField.assertDocumentsAndMediaHomeFolder(
-			infoText = "There are no documents or media files in this folder.",
+		ObjectField.assertDocumentsAndMediaHomeFolderBySite(
+			imageName = "tree.png",
 			viewHomeFolder = "${siteName}");
 	}
 
@@ -621,7 +715,7 @@ definition {
 
 		ObjectAutoGenerated.clickSelectFile();
 
-		ObjectField.assertDocumentsAndMediaHomeFolder(
+		ObjectField.assertDocumentsAndMediaHomeFolderByCompany(
 			infoText = "There are no documents or media files in this folder.",
 			viewHomeFolder = "Global");
 	}
@@ -716,30 +810,95 @@ definition {
 	}
 
 	@description = "LPS-148112 - Verify if field called Storage Folder have a default value"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test StorageFolderFieldHaveDefaultValue {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-153417 StorageFolderFieldHaveDefaultValue pending implementation
+		Navigator.openURL();
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToFieldsTab();
+
+		ObjectAdmin.addObjectFieldViaUI(
+			enableShowFiles = "true",
+			fieldAttachment = "Upload Directly from the User's Computer",
+			fieldLabel = "Custom Attachment",
+			fieldType = "Attachment");
+
+		ObjectAdmin.goToFieldsDetails(label = "Custom Attachment");
+
+		AssertElementPresent(
+			locator1 = "ObjectField#STORAGE_FOLDER_INPUT",
+			value1 = "/CustomObject");
 	}
 
 	@description = "LPS-148112 - Verify if field called Storage Folder have help text"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test StorageFolderFieldHaveHelpText {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-153418 StorageFolderFieldHaveHelpText pending implementation
+		ObjectAdmin.openObjectAdmin();
 
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToFieldsTab();
+
+		ObjectAdmin.addObjectFieldViaUI(
+			enableShowFiles = "true",
+			fieldAttachment = "Upload Directly from the User's Computer",
+			fieldLabel = "Custom Attachment",
+			fieldType = "Attachment");
+
+		ObjectAdmin.goToFieldsDetails(label = "Custom Attachment");
+
+		var helpText = "Input the path of the chosen folder in Documents and Media. An example of a valid path is: &quot;/myDocumentsAndMediaFolder&quot;.";
+
+		AssertElementPresent(
+			key_helpText = "${helpText}",
+			locator1 = "ObjectField#HELP_TEXT",
+			value1 = "${key_helpText}");
 	}
 
 	@description = "LPS-148112 - Verify if field called Storage Folder is required"
-	@ignore = "Test Stub"
 	@priority = "4"
 	test StorageFolderFieldIsRequired {
+		ObjectAdmin.addObjectViaAPI(
+			labelName = "Custom Object",
+			objectName = "CustomObject",
+			pluralLabelName = "Custom Objects");
 
-		// TODO LPS-153416 StorageFolderFieldIsRequired pending implementation
+		Navigator.openURL();
 
+		ObjectAdmin.openObjectAdmin();
+
+		ObjectPortlet.selectCustomObject(label = "Custom Object");
+
+		ObjectAdmin.goToFieldsTab();
+
+		ObjectAdmin.addObjectFieldViaUI(
+			enableShowFiles = "true",
+			fieldAttachment = "Upload Directly from the User's Computer",
+			fieldLabel = "Custom Attachment",
+			fieldType = "Attachment");
+
+		ObjectAdmin.goToFieldsDetails(label = "Custom Attachment");
+
+		ObjectField.typeStorageFolder(content = "");
+
+		Button.clickSave();
+
+		AssertElementPresent(
+			key_fieldName = "Storage Folder",
+			locator1 = "ObjectField#ERROR_REQUIRED_FIELD_SPECIFIC");
 	}
 
 }

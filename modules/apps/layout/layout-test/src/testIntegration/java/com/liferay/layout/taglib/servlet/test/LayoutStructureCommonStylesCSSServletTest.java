@@ -18,11 +18,9 @@ import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.petra.string.StringPool;
-import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -30,7 +28,6 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -39,7 +36,6 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
-import com.liferay.portal.util.PropsUtil;
 import com.liferay.segments.service.SegmentsExperienceLocalService;
 
 import javax.servlet.Servlet;
@@ -70,28 +66,17 @@ public class LayoutStructureCommonStylesCSSServletTest {
 
 	@Before
 	public void setUp() throws Exception {
-		_originalFeatureFlagLps132571 = GetterUtil.getBoolean(
-			PropsUtil.get("feature.flag.LPS-132571"));
-
-		PropsUtil.set("feature.flag.LPS-132571", "true");
-
 		_group = GroupTestUtil.addGroup();
 
 		_layout = LayoutTestUtil.addTypeContentLayout(_group);
 
-		ServiceContext serviceContext =
+		ServiceContextThreadLocal.pushServiceContext(
 			ServiceContextTestUtil.getServiceContext(
-				TestPropsValues.getGroupId(), TestPropsValues.getUserId());
-
-		ServiceContextThreadLocal.pushServiceContext(serviceContext);
+				TestPropsValues.getGroupId(), TestPropsValues.getUserId()));
 	}
 
 	@After
 	public void tearDown() {
-		PropsUtil.set(
-			"feature.flag.LPS-132571",
-			String.valueOf(_originalFeatureFlagLps132571));
-
 		ServiceContextThreadLocal.popServiceContext();
 	}
 
@@ -186,11 +171,8 @@ public class LayoutStructureCommonStylesCSSServletTest {
 	private ThemeDisplay _getThemeDisplay() throws Exception {
 		ThemeDisplay themeDisplay = new ThemeDisplay();
 
-		Company company = _companyLocalService.getCompany(
-			TestPropsValues.getCompanyId());
-
-		themeDisplay.setCompany(company);
-
+		themeDisplay.setCompany(
+			_companyLocalService.getCompany(TestPropsValues.getCompanyId()));
 		themeDisplay.setLanguageId(_group.getDefaultLanguageId());
 		themeDisplay.setLayout(_layout);
 		themeDisplay.setLocale(
@@ -226,8 +208,6 @@ public class LayoutStructureCommonStylesCSSServletTest {
 	@Inject
 	private LayoutPageTemplateStructureLocalService
 		_layoutPageTemplateStructureLocalService;
-
-	private boolean _originalFeatureFlagLps132571;
 
 	@Inject
 	private Portal _portal;

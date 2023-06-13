@@ -300,9 +300,12 @@ public class VirtualHostLocalServiceUtil {
 		return getService().getVirtualHosts(start, end);
 	}
 
+	public static List<VirtualHost> getVirtualHosts(long companyId) {
+		return getService().getVirtualHosts(companyId);
+	}
+
 	public static List<VirtualHost> getVirtualHosts(
-			long companyId, long layoutSetId)
-		throws PortalException {
+		long companyId, long layoutSetId) {
 
 		return getService().getVirtualHosts(companyId, layoutSetId);
 	}

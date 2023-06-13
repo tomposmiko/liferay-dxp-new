@@ -37,6 +37,7 @@ import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -50,7 +51,7 @@ public class OpenIdConnectUserInfoProcessorImpl
 
 	@Override
 	public long processUserInfo(
-			UserInfo userInfo, long companyId, String mainPath,
+			UserInfo userInfo, long companyId, String issuer, String mainPath,
 			String portalURL)
 		throws PortalException {
 
@@ -99,7 +100,7 @@ public class OpenIdConnectUserInfoProcessorImpl
 		String jobTitle = StringPool.BLANK;
 		long[] groupIds = null;
 		long[] organizationIds = null;
-		long[] roleIds = _getRoleIds(companyId);
+		long[] roleIds = _getRoleIds(companyId, issuer);
 		long[] userGroupIds = null;
 		boolean sendEmail = false;
 
@@ -137,7 +138,16 @@ public class OpenIdConnectUserInfoProcessorImpl
 		}
 	}
 
-	private long[] _getRoleIds(long companyId) {
+	private long[] _getRoleIds(long companyId, String issuer) {
+		if (Validator.isNull(issuer) ||
+			Objects.equals(
+				issuer,
+				_props.get(
+					"open.id.connect.user.info.processor.impl.issuer"))) {
+
+			return null;
+		}
+
 		String roleName = _props.get(
 			"open.id.connect.user.info.processor.impl.regular.role");
 
@@ -145,19 +155,18 @@ public class OpenIdConnectUserInfoProcessorImpl
 			return null;
 		}
 
-		try {
-			Role role = _roleLocalService.getRole(companyId, roleName);
+		Role role = _roleLocalService.fetchRole(companyId, roleName);
 
-			if (role.getType() == RoleConstants.TYPE_REGULAR) {
-				return new long[] {role.getRoleId()};
-			}
-
-			if (_log.isInfoEnabled()) {
-				_log.info("Role " + roleName + " is not a regular role");
-			}
+		if (role == null) {
+			return null;
 		}
-		catch (PortalException portalException) {
-			_log.error("Unable to get role " + roleName, portalException);
+
+		if (role.getType() == RoleConstants.TYPE_REGULAR) {
+			return new long[] {role.getRoleId()};
+		}
+
+		if (_log.isInfoEnabled()) {
+			_log.info("Role " + roleName + " is not a regular role");
 		}
 
 		return null;

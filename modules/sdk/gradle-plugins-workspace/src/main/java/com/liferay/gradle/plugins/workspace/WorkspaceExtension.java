@@ -19,13 +19,13 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
-import com.liferay.gradle.plugins.workspace.configurators.DesignPacksProjectConfigurator;
-import com.liferay.gradle.plugins.workspace.configurators.ExtProjectConfigurator;
-import com.liferay.gradle.plugins.workspace.configurators.ModulesProjectConfigurator;
-import com.liferay.gradle.plugins.workspace.configurators.PluginsProjectConfigurator;
-import com.liferay.gradle.plugins.workspace.configurators.RootProjectConfigurator;
-import com.liferay.gradle.plugins.workspace.configurators.ThemesProjectConfigurator;
-import com.liferay.gradle.plugins.workspace.configurators.WarsProjectConfigurator;
+import com.liferay.gradle.plugins.workspace.configurator.ClientExtensionProjectConfigurator;
+import com.liferay.gradle.plugins.workspace.configurator.ExtProjectConfigurator;
+import com.liferay.gradle.plugins.workspace.configurator.ModulesProjectConfigurator;
+import com.liferay.gradle.plugins.workspace.configurator.PluginsProjectConfigurator;
+import com.liferay.gradle.plugins.workspace.configurator.RootProjectConfigurator;
+import com.liferay.gradle.plugins.workspace.configurator.ThemesProjectConfigurator;
+import com.liferay.gradle.plugins.workspace.configurator.WarsProjectConfigurator;
 import com.liferay.gradle.plugins.workspace.internal.util.GradleUtil;
 import com.liferay.gradle.util.Validator;
 import com.liferay.portal.tools.bundle.support.commands.DownloadCommand;
@@ -63,6 +63,7 @@ import org.gradle.api.logging.Logger;
  * @author David Truong
  * @author Andrea Di Giorgi
  * @author Simon Jiang
+ * @author Gregory Amerson
  */
 public class WorkspaceExtension {
 
@@ -72,7 +73,8 @@ public class WorkspaceExtension {
 
 		_product = _getProperty(settings, "product", (String)null);
 
-		_projectConfigurators.add(new DesignPacksProjectConfigurator(settings));
+		_projectConfigurators.add(
+			new ClientExtensionProjectConfigurator(settings));
 		_projectConfigurators.add(new ExtProjectConfigurator(settings));
 		_projectConfigurators.add(new ModulesProjectConfigurator(settings));
 		_projectConfigurators.add(new PluginsProjectConfigurator(settings));

@@ -31,7 +31,6 @@ import selectFragmentEntryLink from '../../../../../../app/selectors/selectFragm
 import selectLanguageId from '../../../../../../app/selectors/selectLanguageId';
 import selectSegmentsExperienceId from '../../../../../../app/selectors/selectSegmentsExperienceId';
 import FormService from '../../../../../../app/services/FormService';
-import InfoItemService from '../../../../../../app/services/InfoItemService';
 import updateEditableValues from '../../../../../../app/thunks/updateEditableValues';
 import {CACHE_KEYS} from '../../../../../../app/utils/cache';
 import {isFormRequiredField} from '../../../../../../app/utils/isFormRequiredField';
@@ -91,24 +90,18 @@ function getInputCommonConfiguration(configurationValues, formFields) {
 			type: 'text',
 		},
 		{
-			defaultValue: true,
+			defaultValue: false,
 			label: Liferay.Language.get('show-help-text'),
 			name: SHOW_HELP_TEXT_CONFIGURATION_KEY,
 			type: 'checkbox',
 			typeOptions: {displayType: 'toggle'},
 		},
 		{
-			defaultValue: '',
+			defaultValue: Liferay.Language.get('add-your-help-text-here'),
 			label: Liferay.Language.get('help-text'),
 			localizable: true,
 			name: HELP_TEXT_CONFIGURATION_KEY,
 			type: 'text',
-			typeOptions: {
-				component: 'textarea',
-				placeholder: Liferay.Language.get(
-					'guide-your-users-to-fill-in-the-field-by-adding-help-text-here'
-				),
-			},
 		}
 	);
 
@@ -325,14 +318,22 @@ export function FormInputGeneralPanel({item}) {
 					)}
 
 					{configurationValues[FIELD_ID_CONFIGURATION_KEY] && (
-						<FieldSet
-							fields={configFields}
-							item={item}
-							label=""
-							languageId={languageId}
-							onValueSelect={handleValueSelect}
-							values={configurationValues}
-						/>
+						<>
+							<span className="sr-only">
+								{Liferay.Language.get(
+									'input-fragment-configuration'
+								)}
+							</span>
+
+							<FieldSet
+								fields={configFields}
+								item={item}
+								label=""
+								languageId={languageId}
+								onValueSelect={handleValueSelect}
+								values={configurationValues}
+							/>
+						</>
 					)}
 				</Collapse>
 			</div>
@@ -345,15 +346,14 @@ export function FormInputGeneralPanel({item}) {
 function FormInputMappingOptions({configurationValues, form, onValueSelect}) {
 	const {classNameId, classTypeId, fields} = form;
 
-	const itemTypes = useCache({
-		fetcher: () =>
-			InfoItemService.getAvailableEditPageInfoItemFormProviders(),
-		key: [CACHE_KEYS.itemTypes],
+	const formTypes = useCache({
+		fetcher: () => FormService.getAvailableEditPageInfoItemFormProviders(),
+		key: [CACHE_KEYS.formTypes],
 	});
 
 	const {subtype, type} = useMemo(
-		() => getTypeLabels(itemTypes, classNameId, classTypeId),
-		[itemTypes, classNameId, classTypeId]
+		() => getTypeLabels(formTypes, classNameId, classTypeId),
+		[formTypes, classNameId, classTypeId]
 	);
 
 	if (!classNameId || !classTypeId) {

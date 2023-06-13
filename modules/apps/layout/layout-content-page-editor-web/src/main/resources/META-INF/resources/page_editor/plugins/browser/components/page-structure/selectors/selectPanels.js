@@ -20,9 +20,12 @@ import {FRAGMENT_ENTRY_TYPES} from '../../../../../app/config/constants/fragment
 import {ITEM_TYPES} from '../../../../../app/config/constants/itemTypes';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../../../../app/config/constants/layoutDataItemTypes';
 import {VIEWPORT_SIZES} from '../../../../../app/config/constants/viewportSizes';
+import {config} from '../../../../../app/config/index';
 import selectCanUpdateEditables from '../../../../../app/selectors/selectCanUpdateEditables';
 import selectCanUpdateItemAdvancedConfiguration from '../../../../../app/selectors/selectCanUpdateItemAdvancedConfiguration';
 import selectCanUpdateItemConfiguration from '../../../../../app/selectors/selectCanUpdateItemConfiguration';
+import getFragmentItem from '../../../../../app/utils/getFragmentItem';
+import hasSubmitChild from '../../../../../app/utils/hasSubmitChild';
 import {CollectionAppliedFiltersGeneralPanel} from '../components/item-configuration-panels/CollectionAppliedFiltersGeneralPanel';
 import {CollectionFilterGeneralPanel} from '../components/item-configuration-panels/CollectionFilterGeneralPanel';
 import ContainerAdvancedPanel from '../components/item-configuration-panels/ContainerAdvancedPanel';
@@ -201,6 +204,8 @@ export function selectPanels(activeItemId, activeItemType, state) {
 			editableValueNamespace: EDITABLE_FRAGMENT_ENTRY_PROCESSOR,
 			fragmentEntryLinkId,
 			itemId: activeItemId,
+			parentId: getFragmentItem(state.layoutData, fragmentEntryLinkId)
+				.itemId,
 			type:
 				state.fragmentEntryLinks[fragmentEntryLinkId].editableTypes[
 					editableId
@@ -229,7 +234,9 @@ export function selectPanels(activeItemId, activeItemType, state) {
 					EDITABLE_TYPES.image,
 					EDITABLE_TYPES.link,
 				].includes(activeItem.type) &&
-				state.selectedViewportSize === VIEWPORT_SIZES.desktop,
+				state.selectedViewportSize === VIEWPORT_SIZES.desktop &&
+				(!config.featureFlagLps150277 ||
+					!hasSubmitChild(activeItem.parentId)),
 			[PANEL_IDS.imageSource]:
 				activeItem.type === EDITABLE_TYPES.image ||
 				activeItem.type === EDITABLE_TYPES.backgroundImage,
@@ -249,18 +256,14 @@ export function selectPanels(activeItemId, activeItemType, state) {
 	}
 	else if (activeItem.type === LAYOUT_DATA_ITEM_TYPES.container) {
 		panelsIds = {
-			[PANEL_IDS.containerAdvanced]:
-				state.selectedViewportSize === VIEWPORT_SIZES.desktop &&
-				canUpdateItemAdvancedConfiguration,
+			[PANEL_IDS.containerAdvanced]: canUpdateItemAdvancedConfiguration,
 			[PANEL_IDS.containerGeneral]: true,
 			[PANEL_IDS.containerStyles]: true,
 		};
 	}
 	else if (activeItem.type === LAYOUT_DATA_ITEM_TYPES.form) {
 		panelsIds = {
-			[PANEL_IDS.formAdvancedPanel]:
-				state.selectedViewportSize === VIEWPORT_SIZES.desktop &&
-				canUpdateItemAdvancedConfiguration,
+			[PANEL_IDS.formAdvancedPanel]: canUpdateItemAdvancedConfiguration,
 			[PANEL_IDS.formGeneral]:
 				state.selectedViewportSize === VIEWPORT_SIZES.desktop,
 			[PANEL_IDS.containerStyles]: haveAtLeastLimitedPermission,
@@ -272,9 +275,7 @@ export function selectPanels(activeItemId, activeItemType, state) {
 		];
 
 		panelsIds = {
-			[PANEL_IDS.fragmentAdvanced]:
-				state.selectedViewportSize === VIEWPORT_SIZES.desktop &&
-				canUpdateItemAdvancedConfiguration,
+			[PANEL_IDS.fragmentAdvanced]: canUpdateItemAdvancedConfiguration,
 			[PANEL_IDS.fragmentStyles]: haveAtLeastLimitedPermission,
 			[PANEL_IDS.fragmentGeneral]:
 				fragmentEntryType !== FRAGMENT_ENTRY_TYPES.input &&
@@ -295,9 +296,7 @@ export function selectPanels(activeItemId, activeItemType, state) {
 		panelsIds = {
 			[PANEL_IDS.rowStyles]: true,
 			[PANEL_IDS.rowGeneral]: true,
-			[PANEL_IDS.rowAdvanced]:
-				state.selectedViewportSize === VIEWPORT_SIZES.desktop &&
-				canUpdateItemAdvancedConfiguration,
+			[PANEL_IDS.rowAdvanced]: canUpdateItemAdvancedConfiguration,
 		};
 	}
 

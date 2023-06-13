@@ -208,7 +208,7 @@ definition {
 
 			PageEditor.viewFragmentStyle(
 				alignment = "center",
-				fragmentName = "button");
+				fragmentName = "Button");
 		}
 
 		task ("Undo changes") {
@@ -221,7 +221,7 @@ definition {
 				index = "1",
 				locator1 = "Fragment#FRAGMENT_BODY",
 				locator2 = "text-align",
-				value1 = "left");
+				value1 = "start");
 
 			Click(
 				key_text = "undo",

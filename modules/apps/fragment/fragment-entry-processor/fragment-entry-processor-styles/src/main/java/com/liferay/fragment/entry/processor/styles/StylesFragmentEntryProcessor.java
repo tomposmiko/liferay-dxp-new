@@ -18,6 +18,7 @@ import com.liferay.fragment.exception.FragmentEntryContentException;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessor;
 import com.liferay.fragment.processor.FragmentEntryProcessorContext;
+import com.liferay.layout.constants.LayoutWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.layout.util.structure.LayoutStructure;
@@ -29,10 +30,10 @@ import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.PropsUtil;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -53,20 +54,12 @@ public class StylesFragmentEntryProcessor implements FragmentEntryProcessor {
 
 	@Override
 	public JSONArray getDataAttributesJSONArray() {
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-132571"))) {
-			return null;
-		}
-
 		return JSONUtil.put("lfr-styles");
 	}
 
 	@Override
 	public JSONObject getDefaultEditableValuesJSONObject(
 		String html, String configuration) {
-
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-132571"))) {
-			return null;
-		}
 
 		Document document = _getDocument(html);
 
@@ -84,10 +77,6 @@ public class StylesFragmentEntryProcessor implements FragmentEntryProcessor {
 		FragmentEntryLink fragmentEntryLink, String html,
 		FragmentEntryProcessorContext fragmentEntryProcessorContext) {
 
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-132571"))) {
-			return html;
-		}
-
 		Document document = _getDocument(html);
 
 		Elements elements = document.select("[data-lfr-styles]");
@@ -97,7 +86,8 @@ public class StylesFragmentEntryProcessor implements FragmentEntryProcessor {
 		}
 
 		LayoutStructureItem layoutStructureItem = _getLayoutStructureItem(
-			fragmentEntryLink);
+			fragmentEntryLink,
+			fragmentEntryProcessorContext.getHttpServletRequest());
 
 		if (layoutStructureItem == null) {
 			return html;
@@ -128,10 +118,6 @@ public class StylesFragmentEntryProcessor implements FragmentEntryProcessor {
 	public void validateFragmentEntryHTML(String html, String configuration)
 		throws PortalException {
 
-		if (!GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-132571"))) {
-			return;
-		}
-
 		Document document = _getDocument(html);
 
 		Elements elements = document.select("[data-lfr-styles]");
@@ -158,25 +144,32 @@ public class StylesFragmentEntryProcessor implements FragmentEntryProcessor {
 	}
 
 	private LayoutStructureItem _getLayoutStructureItem(
-		FragmentEntryLink fragmentEntryLink) {
+		FragmentEntryLink fragmentEntryLink,
+		HttpServletRequest httpServletRequest) {
 
-		try {
-			LayoutPageTemplateStructure layoutPageTemplateStructure =
-				_layoutPageTemplateStructureLocalService.
-					fetchLayoutPageTemplateStructure(
-						fragmentEntryLink.getGroupId(),
-						fragmentEntryLink.getPlid(), true);
+		LayoutStructure layoutStructure =
+			(LayoutStructure)httpServletRequest.getAttribute(
+				LayoutWebKeys.LAYOUT_STRUCTURE);
 
-			LayoutStructure layoutStructure = LayoutStructure.of(
-				layoutPageTemplateStructure.getData(
-					fragmentEntryLink.getSegmentsExperienceId()));
+		if (layoutStructure == null) {
+			try {
+				LayoutPageTemplateStructure layoutPageTemplateStructure =
+					_layoutPageTemplateStructureLocalService.
+						fetchLayoutPageTemplateStructure(
+							fragmentEntryLink.getGroupId(),
+							fragmentEntryLink.getPlid(), true);
 
-			return layoutStructure.getLayoutStructureItemByFragmentEntryLinkId(
-				fragmentEntryLink.getFragmentEntryLinkId());
+				layoutStructure = LayoutStructure.of(
+					layoutPageTemplateStructure.getData(
+						fragmentEntryLink.getSegmentsExperienceId()));
+			}
+			catch (Exception exception) {
+				return null;
+			}
 		}
-		catch (Exception exception) {
-			return null;
-		}
+
+		return layoutStructure.getLayoutStructureItemByFragmentEntryLinkId(
+			fragmentEntryLink.getFragmentEntryLinkId());
 	}
 
 	@Reference

@@ -21,8 +21,9 @@ export default function ActionBuilder({
 	ffNotificationTemplates,
 	objectActionExecutors,
 	objectActionTriggers,
+	objectDefinitionsRelationshipsURL,
 	setValues,
-	validateExpressionBuilderContentURL,
+	validateExpressionURL,
 	values,
 }: IProps): JSX.Element;
 interface IProps {
@@ -30,8 +31,9 @@ interface IProps {
 	ffNotificationTemplates: boolean;
 	objectActionExecutors: CustomItem[];
 	objectActionTriggers: CustomItem[];
+	objectDefinitionsRelationshipsURL: string;
 	setValues: (values: Partial<ObjectAction>) => void;
-	validateExpressionBuilderContentURL: string;
+	validateExpressionURL: string;
 	values: Partial<ObjectAction>;
 }
 export {};

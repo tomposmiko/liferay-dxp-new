@@ -17,6 +17,23 @@ definition {
 			JSONGroup.addGroup(groupName = "Test Site Name");
 		}
 
+		task ("Add a company Object with a Boolean field") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Purchase Order",
+				objectName = "PurchaseOrder",
+				pluralLabelName = "Purchase Orders");
+
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldBusinessType = "Boolean",
+				fieldLabelName = "I accept the terms of use and Privacy Policy",
+				fieldName = "iAcceptTheTermsOfUseAndPrivacyPolicy",
+				fieldType = "Boolean",
+				isRequired = "false",
+				objectName = "PurchaseOrder");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "PurchaseOrder");
+		}
+
 		task ("Enable Inputs Fragment collection in Gogo Shell") {
 			GogoShell.openGogoShellAdmin();
 
@@ -42,6 +59,8 @@ definition {
 			}
 
 			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
+
+			ObjectAdmin.deleteObjectViaAPI(objectName = "PurchaseOrder");
 		}
 	}
 
@@ -51,20 +70,6 @@ definition {
 		property test.name.skip.portal.instance = "Checkbox#ConfigureCheckbox";
 
 		task ("Given a page creator has a Form Container mapped to an entity with boolean field") {
-			task ("Add a web content structure with a Boolean field") {
-				WebContentNavigator.openWebContentAdmin(siteURLKey = "test-site-name");
-
-				NavItem.gotoStructures();
-
-				WebContentStructures.addCP(structureName = "WC Structure Name");
-
-				DataEngine.addField(
-					fieldFieldLabel = "Boolean",
-					fieldName = "Boolean");
-
-				WebContentStructures.saveCP();
-			}
-
 			task ("Add a Form Container framgment to content page") {
 				JSONLayout.addPublicLayout(
 					groupName = "Test Site Name",
@@ -80,11 +85,10 @@ definition {
 					fragmentName = "Form Container");
 			}
 
-			task ("Map the Form Container to new structure") {
+			task ("Map the Form Container to new Object") {
 				PageEditor.editFormContainer(
-					contentType = "Web Content Article",
-					panel = "General",
-					subtype = "WC Structure Name");
+					contentType = "Purchase Order",
+					panel = "General");
 			}
 		}
 
@@ -97,14 +101,13 @@ definition {
 		task ("Then the page creator could configure the Checkbox fragment") {
 			task ("Rename the label") {
 				PageEditor.editInput(
-					field = "Boolean",
+					field = "I accept the terms of use and Privacy Policy",
 					fragmentName = "Checkbox",
 					label = "Are you a fun of Stephen Curry?");
 
-				AssertVisible(
-					fieldLabel = "Are you a fun of Stephen Curry?",
-					index = "1",
-					locator1 = "Fragment#INPUT_LABEL",
+				PageEditor.viewInputStyle(
+					label = "Are you a fun of Stephen Curry?",
+					showLabel = "true",
 					type = "checkbox");
 			}
 
@@ -113,52 +116,36 @@ definition {
 					fragmentName = "Checkbox",
 					hideLabel = "true");
 
-				AssertElementPresent(
-					fieldLabel = "Are you a fun of Stephen Curry?",
-					index = "1",
-					locator1 = "Fragment#INPUT_LABEL_INVISIBLE",
+				PageEditor.viewInputStyle(
+					label = "Are you a fun of Stephen Curry?",
+					showLabel = "false",
 					type = "checkbox");
 			}
 
-			task ("View the placeholder of Help Text field") {
-				AssertAttributeValue(
-					attribute1 = "placeholder",
-					key_label = "Help Text",
-					locator1 = "TextArea#ANY_LABELED",
-					value1 = "Guide your users to fill in the field by adding help text here.");
-			}
-
-			task ("Change the Help Text to a space") {
-				PageEditor.editInput(
-					fragmentName = "Checkbox",
-					helpText = " ");
-
-				AssertElementNotPresent(
-					index = "1",
-					locator1 = "Fragment#INPUT_HELP_TEXT",
+			task ("View the Help Text is disabled by default") {
+				PageEditor.viewInputStyle(
+					showHelpText = "false",
 					type = "checkbox");
 			}
 
-			task ("Change the Help Text to a sentence") {
+			task ("Show the Help Text") {
 				PageEditor.editInput(
 					fragmentName = "Checkbox",
-					helpText = "This is a Help Text.");
+					hideHelpText = "false");
 
-				AssertTextEquals(
-					index = "1",
-					locator1 = "Fragment#INPUT_HELP_TEXT",
-					type = "checkbox",
-					value1 = "This is a Help Text.");
+				PageEditor.viewInputStyle(
+					helpText = "Add your help text here.",
+					showHelpText = "true",
+					type = "checkbox");
 			}
 
-			task ("Hide the Help Text") {
+			task ("Clear the Help Text") {
 				PageEditor.editInput(
 					fragmentName = "Checkbox",
-					hideHelpText = "true");
+					helpText = "");
 
-				AssertElementNotPresent(
-					index = "1",
-					locator1 = "Fragment#INPUT_HELP_TEXT",
+				PageEditor.viewInputStyle(
+					showHelpText = "false",
 					type = "checkbox");
 			}
 		}

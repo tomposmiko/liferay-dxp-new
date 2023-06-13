@@ -92,6 +92,14 @@ public interface ObjectFieldLocalService
 	public ObjectField addObjectField(ObjectField objectField);
 
 	@Indexable(type = IndexableType.REINDEX)
+	public ObjectField addOrUpdateSystemObjectField(
+			long userId, long objectDefinitionId, String businessType,
+			String dbColumnName, String dbTableName, String dbType,
+			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
+			Map<Locale, String> labelMap, String name, boolean required)
+		throws PortalException;
+
+	@Indexable(type = IndexableType.REINDEX)
 	public ObjectField addSystemObjectField(
 			long userId, long objectDefinitionId, String businessType,
 			String dbColumnName, String dbTableName, String dbType,
@@ -351,10 +359,21 @@ public interface ObjectFieldLocalService
 
 	@Indexable(type = IndexableType.REINDEX)
 	public ObjectField updateCustomObjectField(
-			long objectFieldId, long listTypeDefinitionId, String businessType,
+			long objectFieldId, String externalReferenceCode,
+			long listTypeDefinitionId, String businessType, String dbType,
+			boolean indexed, boolean indexedAsKeyword, String indexedLanguageId,
+			Map<Locale, String> labelMap, String name, boolean required,
+			List<ObjectFieldSetting> objectFieldSettings)
+		throws PortalException;
+
+	public ObjectField updateObjectField(
+			long userId, long objectDefinitionId, long objectFieldId,
+			String externalReferenceCode, long listTypeDefinitionId,
+			String businessType, String dbColumnName, String dbTableName,
 			String dbType, boolean indexed, boolean indexedAsKeyword,
 			String indexedLanguageId, Map<Locale, String> labelMap, String name,
-			boolean required, List<ObjectFieldSetting> objectFieldSettings)
+			boolean required, boolean system,
+			List<ObjectFieldSetting> objectFieldSettings)
 		throws PortalException;
 
 	/**

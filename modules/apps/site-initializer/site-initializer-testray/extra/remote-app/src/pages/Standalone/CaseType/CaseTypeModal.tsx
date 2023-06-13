@@ -25,13 +25,16 @@ const CaseTypeModal = () => {
 		<>
 			<ListView
 				forceRefetch={formModal.forceRefetch}
-				managementToolbarProps={{addButton: formModal.modal.open}}
+				managementToolbarProps={{
+					addButton: () => formModal.modal.open(),
+				}}
 				query={getCaseTypes}
 				tableProps={{
 					actions,
 					columns: [
 						{
 							key: 'name',
+							sorteable: true,
 							value: i18n.translate('name'),
 						},
 					],

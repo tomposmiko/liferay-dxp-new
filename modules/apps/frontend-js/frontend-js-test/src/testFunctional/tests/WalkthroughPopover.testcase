@@ -109,6 +109,26 @@ definition {
 		}
 	}
 
+	@description = "LPS-154644. Assert popover mode can display step number."
+	@priority = "4"
+	test CanDisplayStepNumber {
+		task ("And given click hotspot element") {
+			Click(locator1 = "Walkthrough#HOTSPOT");
+		}
+
+		task ("When click through all primary step buttons") {
+			for (var number : list "2,3,4,5") {
+				Click(locator1 = "Button#OK");
+
+				task ("Then step number is displayed consecutively") {
+					AssertElementPresent(
+						key_title = "Step ${number} of 5: Title ${number}",
+						locator1 = "Walkthrough#POPOVER_TITLE");
+				}
+			}
+		}
+	}
+
 	@description = "LPS-154642. Assert popover mode contains a title."
 	@priority = "5"
 	test CanDisplayTitle {
@@ -137,6 +157,88 @@ definition {
 				attribute1 = "fill",
 				locator1 = "Walkthrough#POPOVER_OVERLAY",
 				value1 = "#393a4a");
+		}
+	}
+
+	@description = "LPS-154640. Assert popover mode can have a shadow around element."
+	@priority = "2"
+	test CanHaveAShadowAroundElement {
+		task ("When click hotspot element until Step 4") {
+			Click(locator1 = "Walkthrough#HOTSPOT");
+
+			Click(locator1 = "Button#OK");
+
+			Click(locator1 = "Button#OK");
+
+			Click(locator1 = "Button#OK");
+		}
+
+		task ("Then element is outlined with a shadow") {
+			AssertCssValue(
+				id = "step4",
+				locator1 = "Walkthrough#ALERT",
+				locator2 = "box-shadow",
+				value1 = "rgba(11, 95, 255, 0.16) 0px 8px 16px 0px");
+		}
+	}
+
+	@description = "LPS-154649. Assert hotspot can transition back to previous step if next element doesn't exist on the page."
+	@priority = "3"
+	test CanReturnToPreviousStepIfElementDoesNotExist {
+		task ("Given JSON file includes an element that does not exist on the page/sample portlet") {
+			Navigator.gotoNavTab(navTab = "Test Walkable");
+		}
+
+		task ("When popover mode transistions to the step that has no element") {
+			Walkthrough.enablePopoverMode();
+
+			Click(locator1 = "Button#OK");
+		}
+
+		task ("Then hotspot returns to last element") {
+			WalkthroughPopover.viewCoordinatePositionMatchesElementStep(
+				hotspotElementClass = "lfr-walkthrough-hotspot-inner",
+				stepElementId = "teststep1");
+		}
+	}
+
+	@description = "LPS-154648. Assert final step can transition to hotspot mode."
+	@priority = "5"
+	test FinalStepCanTransitionToHotSpotMode {
+		task ("And Given popover mode") {
+			Walkthrough.enablePopoverMode();
+		}
+
+		task ("When on 1st step popover") {
+			VerifyElementPresent(
+				key_title = "Step 1 of 5: Title 1",
+				locator1 = "Walkthrough#POPOVER_TITLE");
+		}
+
+		task ("And When click on all next steps") {
+			Walkthrough.goToSpecificStep(key_step = "5");
+		}
+
+		task ("Then last step contains close button") {
+			AssertElementPresent(locator1 = "Button#CLOSE");
+		}
+
+		task ("When click on close button") {
+			Click(locator1 = "Button#CLOSE");
+		}
+
+		task ("Then transitions to hotspot mode") {
+			AssertElementPresent(locator1 = "Walkthrough#HOTSPOT");
+		}
+
+		task ("And Then hotspot is on final element") {
+			WalkthroughPopover.viewCoordinatePositionMatchesElementStep(
+				hotspotElementClass = "lfr-walkthrough-hotspot-inner",
+				stepElementId = "step5");
+		}
+
+		task ("And Then popover is not present") {
+			AssertElementNotPresent(locator1 = "Walkthrough#POPOVER");
 		}
 	}
 

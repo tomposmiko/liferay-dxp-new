@@ -405,13 +405,13 @@ definition {
 		task ("View the background image of Container") {
 			PageEditor.viewFragment(fragmentName = "Container");
 
-			ContentPages.viewFragmentBackgroundImage(image = "Document_1.jpg");
+			ContentPages.viewFragmentBackgroundImage(image = "Document_1\.jpg");
 		}
 
 		task ("View the styles of Heading") {
 			PageEditor.viewFragmentStyle(
 				alignment = "center",
-				fragmentName = "heading",
+				fragmentName = "Heading",
 				headingLevel = "H2",
 				textColor = "danger");
 		}

@@ -21921,15 +21921,14 @@ public class BlogsEntryPersistenceImpl
 		BlogsEntryModelImpl blogsEntryModelImpl =
 			(BlogsEntryModelImpl)blogsEntry;
 
-		if (Validator.isNull(blogsEntry.getExternalReferenceCode())) {
-			blogsEntry.setExternalReferenceCode(
-				String.valueOf(blogsEntry.getPrimaryKey()));
-		}
-
 		if (Validator.isNull(blogsEntry.getUuid())) {
 			String uuid = _portalUUID.generate();
 
 			blogsEntry.setUuid(uuid);
+		}
+
+		if (Validator.isNull(blogsEntry.getExternalReferenceCode())) {
+			blogsEntry.setExternalReferenceCode(blogsEntry.getUuid());
 		}
 
 		ServiceContext serviceContext =
@@ -22088,7 +22087,9 @@ public class BlogsEntryPersistenceImpl
 	 */
 	@Override
 	public BlogsEntry fetchByPrimaryKey(Serializable primaryKey) {
-		if (ctPersistenceHelper.isProductionMode(BlogsEntry.class)) {
+		if (ctPersistenceHelper.isProductionMode(
+				BlogsEntry.class, primaryKey)) {
+
 			return super.fetchByPrimaryKey(primaryKey);
 		}
 

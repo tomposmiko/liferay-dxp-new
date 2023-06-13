@@ -27,8 +27,9 @@ import com.liferay.object.internal.upgrade.v3_0_0.ObjectFieldSettingUpgradeProce
 import com.liferay.object.internal.upgrade.v3_2_0.ObjectValidationRuleUpgradeProcess;
 import com.liferay.object.internal.upgrade.v3_3_0.util.ObjectViewFilterColumnTable;
 import com.liferay.object.internal.upgrade.v3_4_0.ObjectActionUpgradeProcess;
-import com.liferay.object.internal.upgrade.v3_8_0.ObjectEntryExternalReferenceCodeUpgradeProcess;
 import com.liferay.object.internal.upgrade.v3_9_0.ObjectLayoutBoxUpgradeProcess;
+import com.liferay.portal.kernel.upgrade.BaseExternalReferenceCodeUpgradeProcess;
+import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
 import org.osgi.service.component.annotations.Component;
@@ -93,9 +94,7 @@ public class ObjectServiceUpgrade implements UpgradeStepRegistrator {
 			new com.liferay.object.internal.upgrade.v3_7_0.
 				ObjectActionUpgradeProcess());
 
-		registry.register(
-			"3.7.0", "3.8.0",
-			new ObjectEntryExternalReferenceCodeUpgradeProcess());
+		registry.register("3.7.0", "3.8.0", new DummyUpgradeStep());
 
 		registry.register(
 			"3.8.0", "3.9.0", new ObjectLayoutBoxUpgradeProcess(),
@@ -116,6 +115,20 @@ public class ObjectServiceUpgrade implements UpgradeStepRegistrator {
 			"3.11.0", "3.12.0",
 			new com.liferay.object.internal.upgrade.v3_13_0.
 				ObjectDefinitionUpgradeProcess());
+
+		registry.register(
+			"3.12.0", "3.13.0",
+			new BaseExternalReferenceCodeUpgradeProcess() {
+
+				@Override
+				protected String[][] getTableAndPrimaryKeyColumnNames() {
+					return new String[][] {
+						{"ObjectEntry", "objectEntryId"},
+						{"ObjectField", "objectFieldId"}
+					};
+				}
+
+			});
 	}
 
 }

@@ -334,15 +334,9 @@ public class LayoutSetImpl extends LayoutSetBaseImpl {
 			return new TreeMap<>(_virtualHostnames);
 		}
 
-		List<VirtualHost> virtualHosts = null;
-
-		try {
-			virtualHosts = VirtualHostLocalServiceUtil.getVirtualHosts(
+		List<VirtualHost> virtualHosts =
+			VirtualHostLocalServiceUtil.getVirtualHosts(
 				getCompanyId(), getLayoutSetId());
-		}
-		catch (PortalException portalException) {
-			_log.error(portalException);
-		}
 
 		if (ListUtil.isEmpty(virtualHosts)) {
 			_virtualHostnames = new TreeMap<>();
