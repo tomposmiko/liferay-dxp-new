@@ -54,6 +54,7 @@ import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
@@ -366,15 +367,25 @@ public class AccountEntryLocalServiceTest {
 
 	@Test
 	public void testAddAccountEntryWithWorkflowEnabled() throws Exception {
-		_enableWorkflow();
+		String name = PrincipalThreadLocal.getName();
 
-		User user = UserTestUtil.addUser();
+		try {
+			_workflowDefinitionLinkLocalService.addWorkflowDefinitionLink(
+				TestPropsValues.getUserId(), TestPropsValues.getCompanyId(),
+				GroupConstants.DEFAULT_LIVE_GROUP_ID,
+				AccountEntry.class.getName(), 0, 0, "Single Approver", 1);
 
-		AccountEntry accountEntry = AccountEntryTestUtil.addAccountEntry(
-			AccountEntryArgs.withOwner(user));
+			User user = UserTestUtil.addUser();
 
-		_assertStatus(accountEntry, WorkflowConstants.STATUS_PENDING, user);
-		Assert.assertTrue(_hasWorkflowInstance(accountEntry));
+			AccountEntry accountEntry = AccountEntryTestUtil.addAccountEntry(
+				AccountEntryArgs.withOwner(user));
+
+			_assertStatus(accountEntry, WorkflowConstants.STATUS_PENDING, user);
+			Assert.assertTrue(_hasWorkflowInstance(accountEntry));
+		}
+		finally {
+			PrincipalThreadLocal.setName(name);
+		}
 	}
 
 	@Test
@@ -1220,13 +1231,6 @@ public class AccountEntryLocalServiceTest {
 			accountEntryId);
 
 		Assert.assertEquals(expectedStatus, accountEntry.getStatus());
-	}
-
-	private void _enableWorkflow() throws Exception {
-		_workflowDefinitionLinkLocalService.addWorkflowDefinitionLink(
-			TestPropsValues.getUserId(), TestPropsValues.getCompanyId(),
-			GroupConstants.DEFAULT_LIVE_GROUP_ID, AccountEntry.class.getName(),
-			0, 0, "Single Approver", 1);
 	}
 
 	private long[] _getAccountUserIds(AccountEntry accountEntry) {

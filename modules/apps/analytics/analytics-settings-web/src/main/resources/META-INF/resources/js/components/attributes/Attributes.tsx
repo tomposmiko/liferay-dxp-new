@@ -20,15 +20,18 @@ import React, {useEffect, useMemo, useState} from 'react';
 
 import {
 	fetchAccountsFields,
+	fetchOrdersFields,
 	fetchPeopleFields,
 	fetchProductsFields,
 	fetchSelectedFields,
 	updateAccountsFields,
+	updateOrdersFields,
 	updatePeopleFields,
 	updateProductsFields,
 } from '../../utils/api';
 import Loading from '../Loading';
-import Modal from './Modal';
+import {TFormattedItems} from '../table/types';
+import Modal, {TRawItem} from './Modal';
 
 enum EFields {
 	Account = 'account',
@@ -74,22 +77,34 @@ const Attributes: React.FC = () => {
 		setSelectedFields(selectedFields);
 	};
 
-	const handleCloseModal = (
-		key: EFields,
-		closeFn: (value: boolean) => void
-	) => {
-		closeFn(false);
+	const handleSubmit = async ({
+		closeFn,
+		items,
+		key,
+		updateFn,
+	}: {
+		closeFn: (value: boolean) => void;
+		items: TFormattedItems;
+		key: EFields;
+		updateFn: (items: TRawItem[]) => Promise<any>;
+	}) => {
+		const fields: TRawItem[] = getFields(items);
+		const {ok} = await updateFn(fields);
 
-		setSelectedFields({
-			...selectedFields,
-			[key]: <Loading inline />,
-		});
+		if (ok) {
+			closeFn(false);
 
-		setTimeout(syncData, 1000);
+			setSelectedFields({
+				...selectedFields,
+				[key]: <Loading inline />,
+			});
 
-		Liferay.Util.openToast({
-			message: Liferay.Language.get('attributes-have-been-saved'),
-		});
+			setTimeout(syncData, 1000);
+
+			Liferay.Util.openToast({
+				message: Liferay.Language.get('attributes-have-been-saved'),
+			});
+		}
 	};
 
 	useEffect(() => {
@@ -172,15 +187,16 @@ const Attributes: React.FC = () => {
 				<Modal
 					observer={observerAccountsAttributes}
 					onCancel={() => onOpenChangeAccountsAttributes(false)}
-					onSubmit={() =>
-						handleCloseModal(
-							EFields.Account,
-							onOpenChangeAccountsAttributes
-						)
+					onSubmit={(items) =>
+						handleSubmit({
+							closeFn: onOpenChangeAccountsAttributes,
+							items,
+							key: EFields.Account,
+							updateFn: updateAccountsFields,
+						})
 					}
 					requestFn={fetchAccountsFields}
 					title={Liferay.Language.get('sync-account-attributes')}
-					updateFn={updateAccountsFields}
 				/>
 			)}
 
@@ -188,15 +204,16 @@ const Attributes: React.FC = () => {
 				<Modal
 					observer={observerOrderAttributes}
 					onCancel={() => onOpenChangeOrderAttributes(false)}
-					onSubmit={() =>
-						handleCloseModal(
-							EFields.Order,
-							onOpenChangeOrderAttributes
-						)
+					onSubmit={(items) =>
+						handleSubmit({
+							closeFn: onOpenChangeOrderAttributes,
+							items,
+							key: EFields.Order,
+							updateFn: updateOrdersFields,
+						})
 					}
-					requestFn={() => Promise.resolve()}
+					requestFn={fetchOrdersFields}
 					title={Liferay.Language.get('sync-order-attributes')}
-					updateFn={() => Promise.resolve()}
 				/>
 			)}
 
@@ -204,15 +221,16 @@ const Attributes: React.FC = () => {
 				<Modal
 					observer={observerPeopleAttributes}
 					onCancel={() => onOpenChangePeopleAttributes(false)}
-					onSubmit={() =>
-						handleCloseModal(
-							EFields.People,
-							onOpenChangePeopleAttributes
-						)
+					onSubmit={(items) =>
+						handleSubmit({
+							closeFn: onOpenChangePeopleAttributes,
+							items,
+							key: EFields.People,
+							updateFn: updatePeopleFields,
+						})
 					}
 					requestFn={fetchPeopleFields}
 					title={Liferay.Language.get('sync-people-attributes')}
-					updateFn={updatePeopleFields}
 				/>
 			)}
 
@@ -220,19 +238,44 @@ const Attributes: React.FC = () => {
 				<Modal
 					observer={observerProductsAttributes}
 					onCancel={() => onOpenChangeProductsAttributes(false)}
-					onSubmit={() =>
-						handleCloseModal(
-							EFields.Product,
-							onOpenChangeProductsAttributes
-						)
+					onSubmit={(items) =>
+						handleSubmit({
+							closeFn: onOpenChangeProductsAttributes,
+							items,
+							key: EFields.Product,
+							updateFn: updateProductsFields,
+						})
 					}
 					requestFn={fetchProductsFields}
 					title={Liferay.Language.get('sync-product-attributes')}
-					updateFn={updateProductsFields}
 				/>
 			)}
 		</>
 	);
 };
+
+function getFields(items: TFormattedItems): TRawItem[] {
+	return Object.values(items).map(
+		({
+			checked,
+			columns: [
+				{value: name},
+				{value: type},
+				{value: example},
+				{value: source},
+			],
+			disabled,
+		}) => {
+			return {
+				example: example as string,
+				name: name as string,
+				required: !!disabled,
+				selected: !!checked,
+				source: source as string,
+				type: type as string,
+			};
+		}
+	);
+}
 
 export default Attributes;

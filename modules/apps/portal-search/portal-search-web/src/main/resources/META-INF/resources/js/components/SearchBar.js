@@ -20,7 +20,7 @@ import ClayIcon from '@clayui/icon';
 import ClayLoadingIndicator from '@clayui/loading-indicator';
 import getCN from 'classnames';
 import {addParams, fetch, navigate} from 'frontend-js-web';
-import React, {useRef, useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 
 import useDebounceCallback from '../hooks/useDebounceCallback';
 
@@ -55,6 +55,26 @@ export default function SearchBar({
 
 	const alignElementRef = useRef();
 	const dropdownRef = useRef();
+
+	/**
+	 * Returns the lowest suggestions display threshold available.
+	 * If no blueprint suggestions contributor sets its own threshold,
+	 * this value will default to the global one.
+	 */
+
+	const _getLowestSuggestionsDisplayThreshold = useCallback(() => {
+		const characterThresholdArray = JSON.parse(
+			suggestionsContributorConfiguration
+		)
+			.filter((config) => config.attributes?.characterThreshold)
+			.map((config) =>
+				parseInt(config.attributes.characterThreshold, 10)
+			);
+
+		return characterThresholdArray.length
+			? Math.min(...characterThresholdArray)
+			: parseInt(suggestionsDisplayThreshold, 10);
+	}, [suggestionsContributorConfiguration, suggestionsDisplayThreshold]);
 
 	const _fetchSuggestions = (searchValue, scopeValue) => {
 		fetch(
@@ -108,6 +128,19 @@ export default function SearchBar({
 		setScope(event.target.value);
 	};
 
+	const _handleFocus = () => {
+		if (
+			_getLowestSuggestionsDisplayThreshold() === 0 &&
+			inputValue === ''
+		) {
+			setLoading(true);
+
+			_fetchSuggestions(inputValue, scope);
+
+			setActive(true);
+		}
+	};
+
 	const _handleSubmit = (event) => {
 		event.preventDefault();
 		event.stopPropagation();
@@ -124,7 +157,7 @@ export default function SearchBar({
 
 		setInputValue(value);
 
-		if (value.trim().length > parseInt(suggestionsDisplayThreshold, 10)) {
+		if (value.trim().length >= _getLowestSuggestionsDisplayThreshold()) {
 
 			// Immediately show loading spinner unless the value hasn't changed.
 			// If the value hasn't changed, no new request will be made and the
@@ -158,6 +191,7 @@ export default function SearchBar({
 					data-qa-id="searchInput"
 					name={keywordsParameterName}
 					onChange={_handleValueChange}
+					onFocus={_handleFocus}
 					onKeyDown={_handleKeyDown}
 					placeholder={Liferay.Language.get('search-...')}
 					title={Liferay.Language.get('search')}
@@ -195,6 +229,7 @@ export default function SearchBar({
 							data-qa-id="searchInput"
 							name={keywordsParameterName}
 							onChange={_handleValueChange}
+							onFocus={_handleFocus}
 							onKeyDown={_handleKeyDown}
 							placeholder={Liferay.Language.get('search-...')}
 							type="text"

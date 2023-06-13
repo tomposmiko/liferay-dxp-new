@@ -1,6 +1,7 @@
 @component-name = "portal-security"
 definition {
 
+	property ci.retries.disabled = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "OAuth 2";
@@ -1634,7 +1635,7 @@ definition {
 				fieldId = "JsonWebKey",
 				text = "${jwk}");
 
-			PortletEntry.save();
+			SystemSettings.saveConfiguration();
 		}
 
 		task ("When: Visit URI where can obtain a JWKS") {

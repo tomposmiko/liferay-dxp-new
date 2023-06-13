@@ -21,17 +21,19 @@ interface ErrorDetails extends Error {
 	detail?: string;
 }
 
-interface NotificationTemplate {
+export interface NotificationTemplate {
 	attachmentObjectFieldIds: string[] | number[];
 	bcc: string;
 	body: LocalizedValue<string>;
 	cc: string;
 	description: string;
 	editorType: 'freemarker' | 'richText';
+	externalReferenceCode: string;
 	from: string;
 	fromName: LocalizedValue<string>;
 	id: number;
 	name: string;
+	objectDefinitionExternalReferenceCode: string;
 	objectDefinitionId: number | null;
 	recipientType: RecipientType;
 	recipients: Recipients[];
@@ -59,6 +61,8 @@ interface ObjectRelationship {
 	id: number;
 	label: LocalizedValue<string>;
 	name: string;
+	objectDefinitionExternalReferenceCode1: string;
+	objectDefinitionExternalReferenceCode2: string;
 	objectDefinitionId1: number;
 	objectDefinitionId2: number;
 	readonly objectDefinitionName2: string;
@@ -68,6 +72,7 @@ interface ObjectRelationship {
 	type: ObjectRelationshipType;
 }
 interface PickListItem {
+	externalReferenceCode: string;
 	id: number;
 	key: string;
 	name: string;
@@ -196,15 +201,31 @@ export async function getObjectField(objectFieldId: number) {
 	);
 }
 
-export async function getObjectFields(objectDefinitionId: number) {
+export async function getObjectFieldsById(objectDefinitionId: number) {
 	return await getList<ObjectField>(
 		`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-fields?pageSize=-1`
 	);
 }
 
-export async function getObjectRelationships(objectDefinitionId: number) {
+export async function getObjectFieldsByExternalReferenceCode(
+	externalReferenceCode: string
+) {
+	return await getList<ObjectField>(
+		`/o/object-admin/v1.0/object-definitions/by-external-reference-code/${externalReferenceCode}/object-fields?pageSize=-1`
+	);
+}
+
+export async function getObjectRelationshipsById(objectDefinitionId: number) {
 	return await getList<ObjectRelationship>(
 		`/o/object-admin/v1.0/object-definitions/${objectDefinitionId}/object-relationships`
+	);
+}
+
+export async function getObjectRelationshipsByExternalReferenceCode(
+	externalReferenceCode: string
+) {
+	return await getList<ObjectRelationship>(
+		`/o/object-admin/v1.0/object-definitions/by-external-reference-code/${externalReferenceCode}/object-relationships`
 	);
 }
 
@@ -322,12 +343,13 @@ export async function deletePickListItem(id: number) {
 }
 
 export async function updatePickListItem({
+	externalReferenceCode,
 	id,
 	name_i18n,
 }: Partial<PickListItem>) {
 	return await save(
 		`/o/headless-admin-list-type/v1.0/list-type-entries/${id}`,
-		{name_i18n},
+		{externalReferenceCode, name_i18n},
 		'PUT'
 	);
 }

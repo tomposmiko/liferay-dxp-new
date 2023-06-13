@@ -15,6 +15,7 @@
 import {Text} from '@clayui/core';
 import React from 'react';
 
+import {TEmptyState} from '../table/StateRenderer';
 import Table from '../table/Table';
 import {TColumn, TTableRequestParams} from '../table/types';
 import {getIds} from '../table/utils';
@@ -31,11 +32,10 @@ export type TRawItem = {
 interface ITabProps {
 	columns: Array<keyof TRawItem>;
 	description?: string;
-	emptyStateTitle: string;
+	emptyState: TEmptyState;
 	enableCheckboxs?: boolean;
 	header: TColumn[];
 	initialIds: number[];
-	noResultsTitle: string;
 	onItemsChange: (ids: number[]) => void;
 	property: TProperty;
 	requestFn: (params: TTableRequestParams) => Promise<any>;
@@ -44,11 +44,10 @@ interface ITabProps {
 const Tab: React.FC<ITabProps> = ({
 	columns,
 	description,
-	emptyStateTitle,
+	emptyState,
 	enableCheckboxs = true,
 	header,
 	initialIds,
-	noResultsTitle,
 	onItemsChange,
 	property,
 	requestFn,
@@ -63,22 +62,26 @@ const Tab: React.FC<ITabProps> = ({
 		<Table<TRawItem>
 			columns={header}
 			disabled={!enableCheckboxs}
-			emptyStateTitle={emptyStateTitle}
-			mapperItems={(items: TRawItem[]) => {
+			emptyState={emptyState}
+			mapperItems={(items) => {
 				return items.map((item) => ({
 					checked: !!(
 						item.channelName && item.channelName === property.name
 					),
-					columns: columns.map((column) => ({
-						label: item?.[column] ?? '',
-					})),
+					columns: columns.map((column) => {
+						const value = item?.[column] ?? '';
+
+						return {
+							id: column,
+							value,
+						};
+					}),
 					disabled: !!(
 						item.channelName && item.channelName !== property.name
 					),
 					id: item.id,
 				}));
 			}}
-			noResultsTitle={noResultsTitle}
 			onItemsChange={(items) => onItemsChange(getIds(items, initialIds))}
 			requestFn={requestFn}
 		/>

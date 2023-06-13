@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -108,21 +107,21 @@ public class WorkflowDefinitionsDataProviderTest {
 
 		Assert.assertTrue(ddmDataProviderResponse.hasOutput("Default-Output"));
 
-		Optional<List<KeyValuePair>> optional =
-			ddmDataProviderResponse.getOutputOptional(
-				"Default-Output", List.class);
+		List<KeyValuePair> keyValuePairs = ddmDataProviderResponse.getOutput(
+			"Default-Output", List.class);
 
-		Assert.assertTrue(optional.isPresent());
+		Assert.assertNotNull(keyValuePairs);
 
-		List<KeyValuePair> keyValuePairs = new ArrayList<KeyValuePair>() {
-			{
-				add(new KeyValuePair("no-workflow", "No Workflow"));
-				add(new KeyValuePair("definition1", "Definition 1"));
-				add(new KeyValuePair("definition2", "Definition 2"));
-			}
-		};
+		List<KeyValuePair> expectedKeyValuePairs =
+			new ArrayList<KeyValuePair>() {
+				{
+					add(new KeyValuePair("no-workflow", "No Workflow"));
+					add(new KeyValuePair("definition1", "Definition 1"));
+					add(new KeyValuePair("definition2", "Definition 2"));
+				}
+			};
 
-		Assert.assertEquals(keyValuePairs, optional.get());
+		Assert.assertEquals(expectedKeyValuePairs, keyValuePairs);
 	}
 
 	@Test
@@ -139,19 +138,19 @@ public class WorkflowDefinitionsDataProviderTest {
 
 		Assert.assertTrue(ddmDataProviderResponse.hasOutput("Default-Output"));
 
-		Optional<List<KeyValuePair>> optional =
-			ddmDataProviderResponse.getOutputOptional(
-				"Default-Output", List.class);
+		List<KeyValuePair> keyValuePairs = ddmDataProviderResponse.getOutput(
+			"Default-Output", List.class);
 
-		Assert.assertTrue(optional.isPresent());
+		Assert.assertNotNull(keyValuePairs);
 
-		List<KeyValuePair> keyValuePairs = new ArrayList<KeyValuePair>() {
-			{
-				add(new KeyValuePair("no-workflow", "No Workflow"));
-			}
-		};
+		List<KeyValuePair> expectedKeyValuePairs =
+			new ArrayList<KeyValuePair>() {
+				{
+					add(new KeyValuePair("no-workflow", "No Workflow"));
+				}
+			};
 
-		Assert.assertEquals(keyValuePairs, optional.get());
+		Assert.assertEquals(expectedKeyValuePairs, keyValuePairs);
 	}
 
 	@Test(expected = DDMDataProviderException.class)

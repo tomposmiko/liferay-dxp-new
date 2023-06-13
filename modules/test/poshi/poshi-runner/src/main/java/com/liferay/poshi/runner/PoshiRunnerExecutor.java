@@ -158,6 +158,20 @@ public class PoshiRunnerExecutor {
 		return conditionalValue;
 	}
 
+	public void evaluateLoopElement(Element element) {
+		if (_inLoop) {
+			String elementName = element.getName();
+
+			if (elementName.equals("break")) {
+				_hasBreak = true;
+			}
+
+			if (elementName.equals("continue")) {
+				_hasContinue = true;
+			}
+		}
+	}
+
 	public boolean isOcularFunction(Element functionCommandElement) {
 		List<Element> executeElements = functionCommandElement.elements(
 			"execute");
@@ -180,10 +194,25 @@ public class PoshiRunnerExecutor {
 		List<Element> childElements = element.elements();
 
 		for (Element childElement : childElements) {
+			if (_inLoop) {
+				if (_hasBreak) {
+					return;
+				}
+
+				if (_hasContinue) {
+					continue;
+				}
+			}
+
 			String childElementName = childElement.getName();
 
-			if (childElementName.equals("echo") ||
-				childElementName.equals("description")) {
+			if (childElementName.equals("break") ||
+				childElementName.equals("continue")) {
+
+				evaluateLoopElement(childElement);
+			}
+			else if (childElementName.equals("echo") ||
+					 childElementName.equals("description")) {
 
 				runEchoElement(childElement);
 			}
@@ -390,6 +419,8 @@ public class PoshiRunnerExecutor {
 	public void runForElement(Element element) throws Exception {
 		PoshiStackTraceUtil.setCurrentElement(element);
 
+		_inLoop = true;
+
 		String paramName = PoshiVariablesUtil.getReplacedCommandVarsString(
 			element.attributeValue("param"));
 
@@ -403,6 +434,18 @@ public class PoshiRunnerExecutor {
 				PoshiVariablesUtil.putIntoCommandMap(paramName, paramValue);
 
 				parseElement(element);
+
+				if (_hasContinue) {
+					_hasContinue = false;
+
+					continue;
+				}
+
+				if (_hasBreak) {
+					_hasBreak = false;
+
+					break;
+				}
 			}
 		}
 		else if (element.attributeValue("table") != null) {
@@ -419,6 +462,8 @@ public class PoshiRunnerExecutor {
 				parseElement(element);
 			}
 		}
+
+		_inLoop = false;
 
 		_poshiLogger.updateStatus(element, "pass");
 	}
@@ -1024,6 +1069,8 @@ public class PoshiRunnerExecutor {
 	public void runWhileElement(Element element) throws Exception {
 		PoshiStackTraceUtil.setCurrentElement(element);
 
+		_inLoop = true;
+
 		int maxIterations = 15;
 
 		if (element.attributeValue("max-iterations") != null) {
@@ -1040,8 +1087,12 @@ public class PoshiRunnerExecutor {
 		boolean conditionRun = false;
 
 		for (int i = 0; i < maxIterations; i++) {
-			if (!evaluateConditionalElement(conditionElement)) {
+			if (!evaluateConditionalElement(conditionElement) || _hasBreak) {
 				break;
+			}
+
+			if (_hasContinue) {
+				continue;
 			}
 
 			conditionRun = true;
@@ -1052,6 +1103,8 @@ public class PoshiRunnerExecutor {
 
 			_poshiLogger.updateStatus(thenElement, "pass");
 		}
+
+		_inLoop = false;
 
 		if (conditionRun) {
 			_poshiLogger.updateStatus(element, "pass");
@@ -1326,6 +1379,9 @@ public class PoshiRunnerExecutor {
 
 	private Element _functionExecuteElement;
 	private String _functionWarningMessage;
+	private boolean _hasBreak;
+	private boolean _hasContinue;
+	private boolean _inLoop;
 	private Object _macroReturnValue;
 	private final PoshiLogger _poshiLogger;
 	private Object _returnObject;

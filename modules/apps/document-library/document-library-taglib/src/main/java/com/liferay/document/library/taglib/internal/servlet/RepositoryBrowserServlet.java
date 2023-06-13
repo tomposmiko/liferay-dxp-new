@@ -14,6 +14,8 @@
 
 package com.liferay.document.library.taglib.internal.servlet;
 
+import com.liferay.document.library.kernel.exception.DuplicateFileEntryException;
+import com.liferay.document.library.kernel.exception.DuplicateFolderNameException;
 import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.petra.string.StringPool;
@@ -31,9 +33,11 @@ import com.liferay.portal.kernel.security.permission.PermissionCheckerFactory;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
+import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadServletRequest;
 import com.liferay.portal.kernel.util.ContentTypes;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
@@ -154,6 +158,13 @@ public class RepositoryBrowserServlet extends HttpServlet {
 
 			_sendResponse(httpServletResponse, HttpServletResponse.SC_OK);
 		}
+		catch (DuplicateFileEntryException | DuplicateFolderNameException
+					exception) {
+
+			SessionErrors.add(httpServletRequest, exception.getClass());
+
+			_sendResponse(httpServletResponse, HttpServletResponse.SC_CONFLICT);
+		}
 		catch (PortalException portalException) {
 			throw new ServletException(portalException);
 		}
@@ -185,11 +196,15 @@ public class RepositoryBrowserServlet extends HttpServlet {
 				long parentFolderId = ParamUtil.getLong(
 					httpServletRequest, "parentFolderId");
 
+				String sourceFileName = uploadServletRequest.getFileName(
+					"file");
+
+				String title = FileUtil.stripExtension(sourceFileName);
+
 				_dlAppService.addFileEntry(
-					null, repositoryId, parentFolderId, file.getName(),
-					uploadServletRequest.getContentType("file"),
-					uploadServletRequest.getFileName("file"), null, null, null,
-					file, null, null,
+					null, repositoryId, parentFolderId, sourceFileName,
+					uploadServletRequest.getContentType("file"), title, null,
+					null, null, file, null, null,
 					ServiceContextFactory.getInstance(
 						FileEntry.class.getName(), httpServletRequest));
 
@@ -222,6 +237,13 @@ public class RepositoryBrowserServlet extends HttpServlet {
 				"your-request-completed-successfully");
 
 			_sendResponse(httpServletResponse, HttpServletResponse.SC_OK);
+		}
+		catch (DuplicateFileEntryException | DuplicateFolderNameException
+					exception) {
+
+			SessionErrors.add(httpServletRequest, exception.getClass());
+
+			_sendResponse(httpServletResponse, HttpServletResponse.SC_CONFLICT);
 		}
 		catch (PortalException portalException) {
 			throw new ServletException(portalException);

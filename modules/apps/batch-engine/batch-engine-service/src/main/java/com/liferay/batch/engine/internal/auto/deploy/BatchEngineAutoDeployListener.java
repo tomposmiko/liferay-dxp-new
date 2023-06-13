@@ -34,7 +34,6 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Company;
-import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -166,7 +165,22 @@ public class BatchEngineAutoDeployListener implements AutoDeployListener {
 		for (BatchEngineZipUnit batchEngineZipUnit :
 				_getBatchEngineZipUnits(zipFile)) {
 
-			_processBatchEngineZipUnit(batchEngineZipUnit);
+			try {
+				_processBatchEngineZipUnit(batchEngineZipUnit);
+
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						"Successfully enqueued batch file " +
+							batchEngineZipUnit);
+				}
+			}
+			catch (Exception exception) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						"Ignoring invalid batch file " + batchEngineZipUnit,
+						exception);
+				}
+			}
 		}
 	}
 
@@ -201,11 +215,10 @@ public class BatchEngineAutoDeployListener implements AutoDeployListener {
 			}
 
 			try {
-				User user = _userLocalService.getUserByScreenName(
-					batchEngineConfiguration.companyId,
-					PropsUtil.get(PropsKeys.DEFAULT_ADMIN_SCREEN_NAME));
-
-				batchEngineConfiguration.userId = user.getUserId();
+				batchEngineConfiguration.userId =
+					_userLocalService.getUserIdByScreenName(
+						batchEngineConfiguration.companyId,
+						PropsUtil.get(PropsKeys.DEFAULT_ADMIN_SCREEN_NAME));
 			}
 			catch (PortalException portalException) {
 				_log.error("Unable to get default user ID", portalException);
@@ -291,9 +304,8 @@ public class BatchEngineAutoDeployListener implements AutoDeployListener {
 		String contentType = null;
 
 		if (batchEngineZipUnit.isValid()) {
-			batchEngineImportConfiguration =
-				batchEngineZipUnit.getBatchEngineConfiguration(
-					BatchEngineImportConfiguration.class);
+			batchEngineImportConfiguration = _getBatchEngineImportConfiguration(
+				batchEngineZipUnit);
 
 			UnsyncByteArrayOutputStream compressedUnsyncByteArrayOutputStream =
 				new UnsyncByteArrayOutputStream();

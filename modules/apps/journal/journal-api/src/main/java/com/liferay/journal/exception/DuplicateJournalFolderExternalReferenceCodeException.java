@@ -14,13 +14,13 @@
 
 package com.liferay.journal.exception;
 
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.DuplicateExternalReferenceCodeException;
 
 /**
  * @author Brian Wing Shun Chan
  */
 public class DuplicateJournalFolderExternalReferenceCodeException
-	extends SystemException {
+	extends DuplicateExternalReferenceCodeException {
 
 	public DuplicateJournalFolderExternalReferenceCodeException() {
 	}

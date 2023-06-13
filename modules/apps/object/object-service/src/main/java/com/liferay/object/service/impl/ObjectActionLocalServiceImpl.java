@@ -96,24 +96,20 @@ public class ObjectActionLocalServiceImpl
 		_validateObjectActionExecutorKey(objectActionExecutorKey);
 		_validateObjectActionTriggerKey(
 			conditionExpression, objectActionTriggerKey);
-		_validateParametersUnicodeProperties(
-			conditionExpression, objectActionExecutorKey,
-			objectActionTriggerKey, parametersUnicodeProperties);
 
-		ObjectDefinition objectDefinition =
-			_objectDefinitionPersistence.findByPrimaryKey(objectDefinitionId);
+		User user = _userLocalService.getUser(userId);
+
+		_validateParametersUnicodeProperties(
+			user.getCompanyId(), conditionExpression, objectActionExecutorKey,
+			objectActionTriggerKey, parametersUnicodeProperties);
 
 		ObjectAction objectAction = objectActionPersistence.create(
 			counterLocalService.increment());
 
-		User user = _userLocalService.getUser(userId);
-
 		objectAction.setCompanyId(user.getCompanyId());
 		objectAction.setUserId(user.getUserId());
 		objectAction.setUserName(user.getFullName());
-
-		objectAction.setObjectDefinitionId(
-			objectDefinition.getObjectDefinitionId());
+		objectAction.setObjectDefinitionId(objectDefinitionId);
 		objectAction.setActive(active);
 		objectAction.setConditionExpression(conditionExpression);
 		objectAction.setDescription(description);
@@ -195,12 +191,14 @@ public class ObjectActionLocalServiceImpl
 		_validateErrorMessage(errorMessageMap, objectActionTriggerKey);
 		_validateLabel(labelMap);
 		_validateObjectActionExecutorKey(objectActionExecutorKey);
-		_validateParametersUnicodeProperties(
-			conditionExpression, objectActionExecutorKey,
-			objectActionTriggerKey, parametersUnicodeProperties);
 
 		ObjectAction objectAction = objectActionPersistence.findByPrimaryKey(
 			objectActionId);
+
+		_validateParametersUnicodeProperties(
+			objectAction.getCompanyId(), conditionExpression,
+			objectActionExecutorKey, objectActionTriggerKey,
+			parametersUnicodeProperties);
 
 		objectAction.setActive(active);
 		objectAction.setConditionExpression(conditionExpression);
@@ -359,8 +357,8 @@ public class ObjectActionLocalServiceImpl
 	}
 
 	private void _validateParametersUnicodeProperties(
-			String conditionExpression, String objectActionExecutorKey,
-			String objectActionTriggerKey,
+			long companyId, String conditionExpression,
+			String objectActionExecutorKey, String objectActionTriggerKey,
 			UnicodeProperties parametersUnicodeProperties)
 		throws PortalException {
 
@@ -410,6 +408,25 @@ public class ObjectActionLocalServiceImpl
 			ObjectDefinition objectDefinition =
 				_objectDefinitionPersistence.fetchByPrimaryKey(
 					objectDefinitionId);
+
+			String objectDefinitionExternalReferenceCode = GetterUtil.getString(
+				parametersUnicodeProperties.remove(
+					"objectDefinitionExternalReferenceCode"));
+
+			if (Validator.isNotNull(objectDefinitionExternalReferenceCode)) {
+				ObjectDefinition existingObjectDefinition =
+					_objectDefinitionPersistence.fetchByERC_C(
+						objectDefinitionExternalReferenceCode, companyId);
+
+				if (existingObjectDefinition != null) {
+					objectDefinition = existingObjectDefinition;
+
+					parametersUnicodeProperties.put(
+						"objectDefinitionId",
+						String.valueOf(
+							objectDefinition.getObjectDefinitionId()));
+				}
+			}
 
 			if ((objectDefinition == null) || !objectDefinition.isActive() ||
 				!objectDefinition.isApproved() || objectDefinition.isSystem()) {

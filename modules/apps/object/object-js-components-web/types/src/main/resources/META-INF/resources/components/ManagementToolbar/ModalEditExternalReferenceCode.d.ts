@@ -15,22 +15,25 @@
 /// <reference types="react" />
 
 import {Observer} from '@clayui/modal/lib/types';
-interface IProps {
+import {Entity} from './index';
+interface ModalEditExternalReferenceCodeProps {
 	externalReferenceCode: string;
-	getEntity: Function;
 	helpMessage: string;
 	observer: Observer;
 	onClose: () => void;
+	onExternalReferenceCodeChange?: (value: string) => void;
+	onGetEntity: () => Promise<Entity>;
 	saveURL: string;
 	setExternalReferenceCode: (value: string) => void;
 }
 export declare function ModalEditExternalReferenceCode({
 	externalReferenceCode,
-	getEntity,
 	helpMessage,
 	observer,
 	onClose,
+	onExternalReferenceCodeChange,
+	onGetEntity,
 	saveURL,
 	setExternalReferenceCode,
-}: IProps): JSX.Element;
+}: ModalEditExternalReferenceCodeProps): JSX.Element;
 export {};

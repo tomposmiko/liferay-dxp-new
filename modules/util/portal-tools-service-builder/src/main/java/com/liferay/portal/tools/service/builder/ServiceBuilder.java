@@ -2601,7 +2601,9 @@ public class ServiceBuilder {
 			}
 
 			if (entity.hasEntityColumns()) {
-				if (entity.hasExternalReferenceCode()) {
+				if (entity.hasExternalReferenceCode() ||
+					entity.hasEntityColumn("externalReferenceCode")) {
+
 					exceptions.add(
 						getDuplicateEntityExternalReferenceCodeException(
 							entity));
@@ -2676,7 +2678,10 @@ public class ServiceBuilder {
 					exception.endsWith("ExternalReferenceCode")) {
 
 					content = StringUtil.replace(
-						content, "PortalException", "SystemException");
+						content, "PortalException",
+						isVersionGTE_7_4_0() ?
+							"DuplicateExternalReferenceCodeException" :
+								"SystemException");
 				}
 				else if (exception.startsWith("NoSuch")) {
 					content = StringUtil.replace(
@@ -2694,12 +2699,29 @@ public class ServiceBuilder {
 
 				String content = _read(exceptionFile);
 
-				if (!content.contains("SystemException")) {
-					content = StringUtil.replace(
-						content, "PortalException", "SystemException");
+				if (isVersionGTE_7_4_0()) {
+					if (!content.contains(
+							"DuplicateExternalReferenceCodeException")) {
 
-					ToolsUtil.writeFileRaw(
-						exceptionFile, content, _modifiedFileNames);
+						content = StringUtil.replace(
+							content, "PortalException",
+							"DuplicateExternalReferenceCodeException");
+						content = StringUtil.replace(
+							content, "SystemException",
+							"DuplicateExternalReferenceCodeException");
+
+						ToolsUtil.writeFileRaw(
+							exceptionFile, content, _modifiedFileNames);
+					}
+				}
+				else {
+					if (!content.contains("SystemException")) {
+						content = StringUtil.replace(
+							content, "PortalException", "SystemException");
+
+						ToolsUtil.writeFileRaw(
+							exceptionFile, content, _modifiedFileNames);
+					}
 				}
 			}
 			else if (exception.startsWith("NoSuch")) {

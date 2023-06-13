@@ -14,13 +14,13 @@
 
 package com.liferay.dispatch.exception;
 
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.DuplicateExternalReferenceCodeException;
 
 /**
  * @author Matija Petanjek
  */
 public class DuplicateDispatchTriggerExternalReferenceCodeException
-	extends SystemException {
+	extends DuplicateExternalReferenceCodeException {
 
 	public DuplicateDispatchTriggerExternalReferenceCodeException() {
 	}

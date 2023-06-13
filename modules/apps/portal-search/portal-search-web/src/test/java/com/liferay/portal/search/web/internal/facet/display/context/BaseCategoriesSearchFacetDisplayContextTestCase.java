@@ -18,6 +18,7 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
@@ -37,6 +38,7 @@ import com.liferay.portal.search.configuration.CategoryFacetFieldConfiguration;
 import com.liferay.portal.search.web.internal.facet.display.context.builder.AssetCategoriesSearchFacetDisplayContextBuilder;
 import com.liferay.portal.search.web.internal.facet.display.context.builder.AssetCategoryPermissionChecker;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -247,6 +249,102 @@ public abstract class BaseCategoriesSearchFacetDisplayContextTestCase {
 	}
 
 	@Test
+	public void testOrderByTermFrequencyAscending() throws Exception {
+		long[] assetCategoryIds = {3L, 4L, 2L, 1L};
+
+		List<TermCollector> termCollectors = _getTermCollectors(
+			assetCategoryIds, new int[] {6, 5, 5, 4});
+
+		_setUpMultipleAssetCategory(assetCategoryIds);
+
+		_setUpMultipleTermCollectors(termCollectors);
+
+		AssetCategoriesSearchFacetDisplayContext
+			assetCategoriesSearchFacetDisplayContext = createDisplayContext(
+				StringPool.BLANK, "count:asc");
+
+		String nameFrequencyString = _buildNameFrequencyString(
+			assetCategoriesSearchFacetDisplayContext.
+				getBucketDisplayContexts());
+
+		Assert.assertEquals(
+			"categoryId1:4|categoryId2:5|categoryId4:5|categoryId3:6",
+			nameFrequencyString);
+	}
+
+	@Test
+	public void testOrderByTermFrequencyDescending() throws Exception {
+		long[] assetCategoryIds = {3L, 4L, 2L, 1L};
+
+		List<TermCollector> termCollectors = _getTermCollectors(
+			assetCategoryIds, new int[] {6, 5, 5, 4});
+
+		_setUpMultipleAssetCategory(assetCategoryIds);
+
+		_setUpMultipleTermCollectors(termCollectors);
+
+		AssetCategoriesSearchFacetDisplayContext
+			assetCategoriesSearchFacetDisplayContext = createDisplayContext(
+				StringPool.BLANK, "count:desc");
+
+		String nameFrequencyString = _buildNameFrequencyString(
+			assetCategoriesSearchFacetDisplayContext.
+				getBucketDisplayContexts());
+
+		Assert.assertEquals(
+			"categoryId3:6|categoryId2:5|categoryId4:5|categoryId1:4",
+			nameFrequencyString);
+	}
+
+	@Test
+	public void testOrderByTermValueAscending() throws Exception {
+		long[] assetCategoryIds = {2L, 1L, 2L, 3L};
+
+		List<TermCollector> termCollectors = _getTermCollectors(
+			assetCategoryIds);
+
+		_setUpMultipleAssetCategory(assetCategoryIds);
+
+		_setUpMultipleTermCollectors(termCollectors);
+
+		AssetCategoriesSearchFacetDisplayContext
+			assetCategoriesSearchFacetDisplayContext = createDisplayContext(
+				StringPool.BLANK, "key:asc");
+
+		String nameFrequencyString = _buildNameFrequencyString(
+			assetCategoriesSearchFacetDisplayContext.
+				getBucketDisplayContexts());
+
+		Assert.assertEquals(
+			"categoryId1:2|categoryId2:3|categoryId2:1|categoryId3:4",
+			nameFrequencyString);
+	}
+
+	@Test
+	public void testOrderByTermValueDescending() throws Exception {
+		long[] assetCategoryIds = {2L, 1L, 2L, 3L};
+
+		List<TermCollector> termCollectors = _getTermCollectors(
+			assetCategoryIds);
+
+		_setUpMultipleAssetCategory(assetCategoryIds);
+
+		_setUpMultipleTermCollectors(termCollectors);
+
+		AssetCategoriesSearchFacetDisplayContext
+			assetCategoriesSearchFacetDisplayContext = createDisplayContext(
+				StringPool.BLANK, "key:desc");
+
+		String nameFrequencyString = _buildNameFrequencyString(
+			assetCategoriesSearchFacetDisplayContext.
+				getBucketDisplayContexts());
+
+		Assert.assertEquals(
+			"categoryId3:4|categoryId2:3|categoryId2:1|categoryId1:2",
+			nameFrequencyString);
+	}
+
+	@Test
 	public void testUnauthorized() throws Exception {
 		long assetCategoryId = RandomTestUtil.randomLong();
 
@@ -307,6 +405,12 @@ public abstract class BaseCategoriesSearchFacetDisplayContextTestCase {
 	protected AssetCategoriesSearchFacetDisplayContext createDisplayContext(
 		String parameterValue) {
 
+		return createDisplayContext(parameterValue, "count:desc");
+	}
+
+	protected AssetCategoriesSearchFacetDisplayContext createDisplayContext(
+		String parameterValue, String order) {
+
 		RenderRequest renderRequest = Mockito.mock(RenderRequest.class);
 
 		AssetCategoriesSearchFacetDisplayContextBuilder
@@ -330,6 +434,7 @@ public abstract class BaseCategoriesSearchFacetDisplayContextTestCase {
 		assetCategoriesSearchFacetDisplayContextBuilder.setLocale(
 			LocaleUtil.getDefault());
 		assetCategoriesSearchFacetDisplayContextBuilder.setMaxTerms(0);
+		assetCategoriesSearchFacetDisplayContextBuilder.setOrder(order);
 		assetCategoriesSearchFacetDisplayContextBuilder.setParameterName(
 			_facet.getFieldId());
 		assetCategoriesSearchFacetDisplayContextBuilder.setParameterValue(
@@ -462,6 +567,27 @@ public abstract class BaseCategoriesSearchFacetDisplayContextTestCase {
 		).getTermCollectors();
 	}
 
+	private String _buildNameFrequencyString(
+			List<BucketDisplayContext> bucketDisplayContexts)
+		throws Exception {
+
+		StringBundler sb = new StringBundler(bucketDisplayContexts.size() * 4);
+
+		for (BucketDisplayContext bucketDisplayContext :
+				bucketDisplayContexts) {
+
+			sb.append("categoryId");
+			sb.append(bucketDisplayContext.getFilterValue());
+			sb.append(StringPool.COLON);
+			sb.append(bucketDisplayContext.getFrequency());
+			sb.append(StringPool.PIPE);
+		}
+
+		sb.setIndex(sb.index() - 1);
+
+		return sb.toString();
+	}
+
 	private AssetCategory _createAssetCategory(
 		long assetCategoryId, long groupId) {
 
@@ -527,6 +653,29 @@ public abstract class BaseCategoriesSearchFacetDisplayContextTestCase {
 		return portal;
 	}
 
+	private List<TermCollector> _getTermCollectors(long... assetCategoryIds) {
+		int[] frequencies = new int[assetCategoryIds.length];
+
+		for (int i = 0; i < assetCategoryIds.length; i++) {
+			frequencies[i] = i + 1;
+		}
+
+		return _getTermCollectors(assetCategoryIds, frequencies);
+	}
+
+	private List<TermCollector> _getTermCollectors(
+		long[] assetCategoryIds, int[] frequencies) {
+
+		List<TermCollector> termCollectors = new ArrayList<>();
+
+		for (int i = 0; i < assetCategoryIds.length; i++) {
+			termCollectors.add(
+				createTermCollector(assetCategoryIds[i], frequencies[i]));
+		}
+
+		return termCollectors;
+	}
+
 	private boolean _isLegacyField() {
 		String fieldName = getFacetFieldName();
 
@@ -556,6 +705,31 @@ public abstract class BaseCategoriesSearchFacetDisplayContextTestCase {
 		).hasPermission(
 			assetCategory
 		);
+	}
+
+	private void _setUpMultipleAssetCategory(long[] assetCategoryId) {
+		for (int i = 0; i < assetCategoryId.length; i++) {
+			AssetCategory assetCategory = _createAssetCategory(
+				assetCategoryId[i], i);
+
+			Mockito.doReturn(
+				true
+			).when(
+				_assetCategoryPermissionChecker
+			).hasPermission(
+				assetCategory
+			);
+		}
+	}
+
+	private void _setUpMultipleTermCollectors(
+		List<TermCollector> termCollectors) {
+
+		Mockito.doReturn(
+			termCollectors
+		).when(
+			_facetCollector
+		).getTermCollectors();
 	}
 
 	private final AssetCategoryLocalService _assetCategoryLocalService =

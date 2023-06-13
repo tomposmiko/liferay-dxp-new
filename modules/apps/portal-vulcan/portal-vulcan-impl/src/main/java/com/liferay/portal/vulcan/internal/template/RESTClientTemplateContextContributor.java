@@ -20,12 +20,13 @@ import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.servlet.PipingServletResponse;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.template.TemplateContextContributor;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.vulcan.internal.template.servlet.RESTClientHttpRequest;
 import com.liferay.portal.vulcan.internal.template.servlet.RESTClientHttpResponse;
 
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -50,22 +51,13 @@ public class RESTClientTemplateContextContributor
 		Map<String, Object> contextObjects,
 		HttpServletRequest httpServletRequest) {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)contextObjects.get(
-			"themeDisplay");
-
-		contextObjects.put(
-			"restClient",
-			new RESTClient(httpServletRequest, themeDisplay.getResponse()));
+		contextObjects.put("restClient", new RESTClient(httpServletRequest));
 	}
 
 	public class RESTClient {
 
-		public RESTClient(
-			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse) {
-
+		public RESTClient(HttpServletRequest httpServletRequest) {
 			_httpServletRequest = httpServletRequest;
-			_httpServletResponse = httpServletResponse;
 		}
 
 		public Object get(String path) throws Exception {
@@ -76,17 +68,26 @@ public class RESTClientTemplateContextContributor
 			RequestDispatcher requestDispatcher =
 				servletContext.getRequestDispatcher(Portal.PATH_MODULE + path);
 
+			HttpServletResponse httpServletResponse = new PipingServletResponse(
+				new RESTClientHttpResponse(), unsyncStringWriter);
+
 			requestDispatcher.forward(
 				new RESTClientHttpRequest(_httpServletRequest),
-				new RESTClientHttpResponse(
-					new PipingServletResponse(
-						_httpServletResponse, unsyncStringWriter)));
+				httpServletResponse);
 
-			return _jsonFactory.looseDeserialize(unsyncStringWriter.toString());
+			String responseString = unsyncStringWriter.toString();
+
+			if (Objects.equals(
+					httpServletResponse.getContentType(),
+					ContentTypes.APPLICATION_JSON)) {
+
+				return _jsonFactory.looseDeserialize(responseString);
+			}
+
+			return responseString;
 		}
 
 		private final HttpServletRequest _httpServletRequest;
-		private final HttpServletResponse _httpServletResponse;
 
 	}
 

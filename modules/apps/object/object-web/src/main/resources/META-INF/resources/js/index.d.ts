@@ -43,7 +43,7 @@ interface ObjectAction {
 	objectActionTriggerKey: string;
 	objectDefinitionId?: number;
 	objectDefinitionsRelationshipsURL: string;
-	parameters?: ObjectActionParameters;
+	parameters: ObjectActionParameters;
 	script?: string;
 }
 
@@ -113,6 +113,7 @@ interface ObjectDefinition {
 	dateCreated: string;
 	dateModified: string;
 	enableCategorization: boolean;
+	externalReferenceCode: string;
 	id: number;
 	label: LocalizedValue<string>;
 	name: string;
@@ -251,16 +252,19 @@ interface ObjectRelationship {
 	id: number;
 	label: LocalizedValue<string>;
 	name: string;
+	objectDefinitionExternalReferenceCode1: string;
+	objectDefinitionExternalReferenceCode2: string;
 	objectDefinitionId1: number;
 	objectDefinitionId2: number;
 	readonly objectDefinitionName2: string;
 	objectRelationshipId: number;
-	parameterObjectFieldId?: number;
+	parameterObjectFieldName?: string;
 	reverse: boolean;
 	type: ObjectRelationshipType;
 }
 
 interface ObjectDefinitionsRelationship {
+	externalReferenceCode: string;
 	id: number;
 	label: string;
 	related?: boolean;
@@ -284,6 +288,7 @@ interface PickList {
 }
 
 interface PickListItem {
+	externalReferenceCode: string;
 	id: number;
 	key: string;
 	name: string;
@@ -312,6 +317,11 @@ interface PredefinedValue {
 interface LabelValueObject {
 	label: string;
 	value: string;
+}
+
+interface LabelNameObject {
+	label: string;
+	name: string;
 }
 
 interface NameValueObject {

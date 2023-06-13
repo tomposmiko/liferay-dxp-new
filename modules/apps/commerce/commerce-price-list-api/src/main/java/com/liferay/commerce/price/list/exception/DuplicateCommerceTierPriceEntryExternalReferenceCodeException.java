@@ -14,13 +14,13 @@
 
 package com.liferay.commerce.price.list.exception;
 
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.DuplicateExternalReferenceCodeException;
 
 /**
  * @author Alessio Antonio Rendina
  */
 public class DuplicateCommerceTierPriceEntryExternalReferenceCodeException
-	extends SystemException {
+	extends DuplicateExternalReferenceCodeException {
 
 	public DuplicateCommerceTierPriceEntryExternalReferenceCodeException() {
 	}

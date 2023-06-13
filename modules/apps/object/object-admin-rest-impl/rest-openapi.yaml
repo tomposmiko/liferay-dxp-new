@@ -455,6 +455,8 @@ components:
                     additionalProperties:
                         type: string
                     type: object
+                objectDefinitionExternalReferenceCode:
+                    type: string
                 objectDefinitionId:
                     format: int64
                     type: integer
@@ -528,7 +530,7 @@ components:
 info:
     description:
         "A Java client JAR is available for use with the group ID 'com.liferay', artifact ID
-        'com.liferay.object.admin.rest.client', and version '1.0.43'."
+        'com.liferay.object.admin.rest.client', and version '1.0.44'."
     license:
         name: "Apache 2.0"
         url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -738,12 +740,73 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/ObjectDefinition"
             tags: ["ObjectDefinition"]
-    "/object-definitions/by-external-reference-code/{objectDefinitionExternalReferenceCode}/object-fields":
+    "/object-definitions/by-external-reference-code/{externalReferenceCode}/object-actions":
         get:
-            operationId: getObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectFieldsPage
+            operationId: getObjectDefinitionByExternalReferenceCodeObjectActionsPage
             parameters:
                 - in: path
-                  name: objectDefinitionExternalReferenceCode
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectAction"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectAction"
+                                type: array
+            tags: ["ObjectAction"]
+        post:
+            operationId: postObjectDefinitionByExternalReferenceCodeObjectAction
+            parameters:
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ObjectAction"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ObjectAction"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ObjectAction"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ObjectAction"
+            tags: ["ObjectAction"]
+    "/object-definitions/by-external-reference-code/{externalReferenceCode}/object-fields":
+        get:
+            operationId: getObjectDefinitionByExternalReferenceCodeObjectFieldsPage
+            parameters:
+                - in: path
+                  name: externalReferenceCode
                   required: true
                   schema:
                       type: string
@@ -782,10 +845,10 @@ paths:
                                 type: array
             tags: ["ObjectField"]
         post:
-            operationId: postObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectField
+            operationId: postObjectDefinitionByExternalReferenceCodeObjectField
             parameters:
                 - in: path
-                  name: objectDefinitionExternalReferenceCode
+                  name: externalReferenceCode
                   required: true
                   schema:
                       type: string
@@ -807,12 +870,77 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/ObjectField"
             tags: ["ObjectField"]
-    "/object-definitions/by-external-reference-code/{objectDefinitionExternalReferenceCode}/object-relationships":
+    "/object-definitions/by-external-reference-code/{externalReferenceCode}/object-layouts":
         get:
-            operationId: getObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectRelationshipsPage
+            operationId: getObjectDefinitionByExternalReferenceCodeObjectLayoutsPage
             parameters:
                 - in: path
-                  name: objectDefinitionExternalReferenceCode
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: header
+                  name: Accept-Language
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectLayout"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectLayout"
+                                type: array
+            tags: ["ObjectLayout"]
+        post:
+            operationId: postObjectDefinitionByExternalReferenceCodeObjectLayout
+            parameters:
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ObjectLayout"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ObjectLayout"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ObjectLayout"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ObjectLayout"
+            tags: ["ObjectLayout"]
+    "/object-definitions/by-external-reference-code/{externalReferenceCode}/object-relationships":
+        get:
+            operationId: getObjectDefinitionByExternalReferenceCodeObjectRelationshipsPage
+            parameters:
+                - in: path
+                  name: externalReferenceCode
                   required: true
                   schema:
                       type: string
@@ -847,10 +975,10 @@ paths:
                                 type: array
             tags: ["ObjectRelationship"]
         post:
-            operationId: postObjectDefinitionByExternalReferenceCodeObjectDefinitionExternalReferenceCodeObjectRelationship
+            operationId: postObjectDefinitionByExternalReferenceCodeObjectRelationship
             parameters:
                 - in: path
-                  name: objectDefinitionExternalReferenceCode
+                  name: externalReferenceCode
                   required: true
                   schema:
                       type: string
@@ -872,6 +1000,71 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/ObjectRelationship"
             tags: ["ObjectRelationship"]
+    "/object-definitions/by-external-reference-code/{externalReferenceCode}/object-views":
+        get:
+            operationId: getObjectDefinitionByExternalReferenceCodeObjectViewsPage
+            parameters:
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+                - in: query
+                  name: page
+                  schema:
+                      type: integer
+                - in: query
+                  name: pageSize
+                  schema:
+                      type: integer
+                - in: query
+                  name: search
+                  schema:
+                      type: string
+                - in: header
+                  name: Accept-Language
+                  schema:
+                      type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectView"
+                                type: array
+                        application/xml:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ObjectView"
+                                type: array
+            tags: ["ObjectView"]
+        post:
+            operationId: postObjectDefinitionByExternalReferenceCodeObjectView
+            parameters:
+                - in: path
+                  name: externalReferenceCode
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ObjectView"
+                    application/xml:
+                        schema:
+                            $ref: "#/components/schemas/ObjectView"
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ObjectView"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/ObjectView"
+            tags: ["ObjectView"]
     "/object-definitions/{objectDefinitionId}":
         delete:
             operationId: deleteObjectDefinition

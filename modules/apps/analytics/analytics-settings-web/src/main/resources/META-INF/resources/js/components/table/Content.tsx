@@ -20,34 +20,45 @@ import React from 'react';
 
 import {OrderBy} from '../../utils/filter';
 import {Events, useData, useDispatch} from './Context';
-import {TColumn} from './types';
-
+import {EColumnAlign, TColumn} from './types';
 interface IContentProps {
 	columns: TColumn[];
 	disabled: boolean;
+	showCheckbox: boolean;
 }
 
-const Content: React.FC<IContentProps> = ({columns, disabled}) => {
+const Content: React.FC<IContentProps> = ({
+	columns: headerColumns,
+	disabled,
+	showCheckbox,
+}) => {
 	const {filter, formattedItems, rows} = useData();
 	const dispatch = useDispatch();
 
 	return (
-		<ClayTable hover={!disabled}>
+		<ClayTable className="compose-table" hover={!disabled}>
 			<ClayTable.Head>
 				<ClayTable.Row>
-					<ClayTable.Cell></ClayTable.Cell>
+					{showCheckbox && <ClayTable.Cell />}
 
-					{columns.map(
-						({expanded = false, label, show = true, value}) =>
+					{headerColumns.map(
+						({
+							align = EColumnAlign.Left,
+							expanded = false,
+							id,
+							label,
+							show = true,
+						}) =>
 							show && (
 								<ClayTable.Cell
+									columnTextAlignment={align}
 									expanded={expanded}
 									headingCell
-									key={label}
+									key={id}
 								>
 									<span>{label}</span>
 
-									{filter.value === value && (
+									{filter.value === id && (
 										<span>
 											<ClayIcon
 												symbol={
@@ -67,10 +78,9 @@ const Content: React.FC<IContentProps> = ({columns, disabled}) => {
 			<ClayTable.Body>
 				{rows.map((rowId) => {
 					const {
-						checked,
+						checked = false,
 						columns,
 						disabled: disabledItem = false,
-						id,
 					} = formattedItems[rowId];
 
 					return (
@@ -79,32 +89,49 @@ const Content: React.FC<IContentProps> = ({columns, disabled}) => {
 								'table-active': checked,
 								'text-muted': disabled,
 							})}
-							key={id}
+							data-testid={columns[0].value}
+							key={rowId}
 						>
-							<ClayTable.Cell>
-								<ClayCheckbox
-									checked={checked}
-									disabled={disabled || disabledItem}
-									id={id}
-									onChange={() => {
-										if (!disabled && !disabledItem) {
-											dispatch({
-												payload: id,
-												type: Events.ChangeItems,
-											});
-										}
-									}}
-								/>
-							</ClayTable.Cell>
+							{showCheckbox && (
+								<ClayTable.Cell>
+									<ClayCheckbox
+										checked={checked}
+										disabled={disabled || disabledItem}
+										id={rowId}
+										onChange={() => {
+											if (!disabled && !disabledItem) {
+												dispatch({
+													payload: rowId,
+													type: Events.ChangeItems,
+												});
+											}
+										}}
+									/>
+								</ClayTable.Cell>
+							)}
 
-							{columns.map(
-								({label, show = true}, index) =>
+							{columns.map(({cellRenderer, id, value}, index) => {
+								const {
+									align = EColumnAlign.Left,
+									show = true,
+								} = headerColumns[index];
+
+								return (
 									show && (
-										<ClayTable.Cell key={index}>
-											{label}
+										<ClayTable.Cell
+											columnTextAlignment={align}
+											key={id}
+											role={rowId}
+										>
+											{cellRenderer
+												? cellRenderer(
+														formattedItems[rowId]
+												  )
+												: value}
 										</ClayTable.Cell>
 									)
-							)}
+								);
+							})}
 						</ClayTable.Row>
 					);
 				})}

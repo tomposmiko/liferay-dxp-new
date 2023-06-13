@@ -26,8 +26,6 @@ definition {
 	@description = "LPS-135394 - Verify it is possible to add a column for the View"
 	@priority = "5"
 	test CanAddColumn {
-		property portal.acceptance = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 147765",
 			objectName = "CustomObject147765",
@@ -162,8 +160,6 @@ definition {
 	@description = "LPS-135394 - Verify it is possible to cancel the addition of a column for the View"
 	@priority = "4"
 	test CanCancelColumnAddition {
-		property portal.upstream = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 147766",
 			objectName = "CustomObject147766",
@@ -186,6 +182,8 @@ definition {
 		Button.clickCancel();
 
 		AssertElementNotPresent(locator1 = "Portlet#MODAL_TITLE");
+
+		SelectFrame(locator1 = "IFrame#IFRAME");
 
 		ObjectCustomViews.assertEmptyStateTextOnViewBuilder(text = "No columns added yet.");
 	}
@@ -412,8 +410,6 @@ definition {
 	@description = "LPS-135394 - Verify it is possible to delete a column for the View by unselecting it"
 	@priority = "5"
 	test CanDeleteColumnByUnselect {
-		property portal.acceptance = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 147768",
 			objectName = "CustomObject147768",
@@ -445,8 +441,6 @@ definition {
 	@description = "LPS-135394 - Verify it is possible to delete a column for the View through the delete button"
 	@priority = "5"
 	test CanDeleteColumnThroughDeleteButton {
-		property portal.acceptance = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 147767",
 			objectName = "CustomObject147767",
@@ -624,8 +618,6 @@ definition {
 	@description = "LPS-144472 - Verify it is possible the user to delete the pre-order column"
 	@priority = "4"
 	test CanDeletePreOrderColumn {
-		property portal.upstream = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 152057",
 			objectName = "CustomObject152057",
@@ -733,8 +725,6 @@ definition {
 	@description = "LPS-135394 - Verify it is possible to drag the columns"
 	@priority = "5"
 	test CanDragColumns {
-		property portal.acceptance = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 147769",
 			objectName = "CustomObject147769",
@@ -1959,8 +1949,6 @@ definition {
 	@description = "LPS-144902 - Verify if the entries from an object in a table view defined as default are presented correctly"
 	@priority = "5"
 	test CanViewEntries {
-		property portal.acceptance = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 147770",
 			objectName = "CustomObject147770",
@@ -2071,8 +2059,6 @@ definition {
 	@description = "LPS-143190 - Verify that the metadata values are correctly displayed on a Custom View"
 	@priority = "5"
 	test CanViewMetadataValues {
-		property portal.acceptance = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 149239",
 			objectName = "CustomObject149239",
@@ -2177,8 +2163,6 @@ definition {
 	@description = "LPS-144902 - Verify if the Columns on the custom view are presented following the predefined order during visualization"
 	@priority = "5"
 	test ColumnsAreOrdered {
-		property portal.acceptance = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 147772",
 			objectName = "CustomObject147772",
@@ -2411,8 +2395,6 @@ definition {
 	@description = "LPS-135394 - Verify the empty state for the View Builder tab"
 	@priority = "3"
 	test EmptyStateViewBuilder {
-		property portal.upstream = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 147760",
 			objectName = "CustomObject147760",
@@ -2455,8 +2437,6 @@ definition {
 	@description = "LPS-135394 - Verify the Author, Create Date, Modified Date, Status, ID columns (Metadata columns) are displayed to be selected"
 	@priority = "5"
 	test MetadataColumnsDisplayed {
-		property portal.acceptance = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 147764",
 			objectName = "CustomObject147764",

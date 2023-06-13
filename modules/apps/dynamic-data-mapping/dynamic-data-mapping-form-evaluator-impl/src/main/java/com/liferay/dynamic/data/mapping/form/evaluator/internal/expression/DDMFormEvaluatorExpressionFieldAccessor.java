@@ -29,12 +29,13 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * @author Rafael Praxedes
@@ -244,21 +245,23 @@ public class DDMFormEvaluatorExpressionFieldAccessor
 	}
 
 	private Object _getFieldValues(String fieldName) {
+		List<Object> list = new ArrayList<>();
+
 		Set<DDMFormEvaluatorFieldContextKey> ddmFormFieldContextKeys =
 			_ddmFormEvaluatorFormValuesHelper.getDDMFormFieldContextKeys(
 				fieldName);
 
-		Stream<DDMFormEvaluatorFieldContextKey> stream =
-			ddmFormFieldContextKeys.stream();
+		for (DDMFormEvaluatorFieldContextKey ddmFormEvaluatorFieldContextKey :
+				ddmFormFieldContextKeys) {
+
+			list.add(getFieldValue(ddmFormEvaluatorFieldContextKey));
+		}
 
 		DDMFormFieldValueAccessor<?> ddmFormFieldValueAccessor =
 			_getDDMFormFieldValueAccessor(fieldName);
 
-		Object[] values = stream.map(
-			this::getFieldValue
-		).toArray(
-			ddmFormFieldValueAccessor.getArrayGeneratorIntFunction()
-		);
+		Object[] values = list.toArray(
+			ddmFormFieldValueAccessor.getArrayGenericType());
 
 		if (ArrayUtil.isNotEmpty(values) && (values.length == 1)) {
 			return values[0];

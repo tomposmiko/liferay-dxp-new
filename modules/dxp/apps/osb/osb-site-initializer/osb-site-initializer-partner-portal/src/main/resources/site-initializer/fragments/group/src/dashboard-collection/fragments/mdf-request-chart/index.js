@@ -10,188 +10,104 @@
  */
 
 import ClayButton from '@clayui/button';
-import classNames from 'classnames';
-import React from 'react';
+import ClayLoadingIndicator from '@clayui/loading-indicator';
+import React, {useEffect, useState} from 'react';
 
 import Container from '../../common/components/container';
-import {mdf} from '../../common/mock/mock';
-import {naNToZero} from '../../common/utils';
+import DonutChart from '../../common/components/donut-chart';
+import getChartColumns from '../../common/utils/getChartColumns';
 
-const MDFbarProgress = ({
-	items,
-	MdfbarClassNames = {
-		approved: 'approved',
-		pending: 'pending',
-	},
-}) => {
-	const total = items.reduce(
-		(prevValue, currentValue) => prevValue + currentValue[1].qtd,
-		0
-	);
-
-	return (
-		<>
-			<div className="progress-bar-border">
-				<div className="mdf-progress-bar">
-					{items.map((item, index) => {
-						const [label, value] = item;
-
-						const percent = naNToZero((value.qtd / total) * 100);
-
-						return (
-							<div
-								className={classNames(
-									'progress-bar-item',
-									MdfbarClassNames[label],
-									{
-										approvedItem: index === 0,
-									}
-								)}
-								key={index}
-								style={{width: `${percent}%`}}
-								title={`${value.qtd} ${label}`}
-							/>
-						);
-					})}
-				</div>
-			</div>
-
-			<div className="d-flex mdf-progress-bar">
-				{items.map((item, index) => {
-					const [label, value] = item;
-					const percent = naNToZero((value.qtd / total) * 100);
-
-					return (
-						<div
-							className="d-flex flex-row"
-							key={index}
-							style={{width: `${percent}%`}}
-						>
-							<div className="align-items-center">
-								<div className="d-flex flex-column">
-									<span
-										className="font-family-sans-serif mx-1"
-										title={value.qtd}
-									>
-										{value.qtd} {label}
-									</span>
-
-									<span className="font-family-sans-serif mx-1">
-										{value.total}
-									</span>
-								</div>
-							</div>
-						</div>
-					);
-				})}
-			</div>
-		</>
-	);
-};
-
-const LegendMDF = () => {
-	const label = {
-		aproved: 'Approved',
-		requested: 'Requested',
-	};
-
-	return (
-		<>
-			<div className="d-flex mdf-progress-bar">
-				<div className="d-flex flex-row">
-					<div className="align-items-center d-flex">
-						<div className="approved legend-bar-item" />
-					</div>
-
-					<span className="legend-item-label ml-1 mr-2 mt-1 text-neutral-6">
-						{label.aproved}
-					</span>
-				</div>
-
-				<div className="d-flex flex-row">
-					<div className="align-items-center d-flex">
-						<div className="legend-bar-item requested" />
-					</div>
-
-					<span className="legend-item-label ml-1 mr-2 mt-1 text-neutral-6">
-						{label.requested}
-					</span>
-				</div>
-			</div>
-		</>
-	);
+const colors = {
+	'Approved': '#003EB3',
+	'Claim Approved': '#377CFF',
+	'Claimed': '#0053F0',
+	'Expired': '#BBD2FF',
+	'Expiring Soon': '#8FB5FF',
+	'Requested': '#00256C',
 };
 
 export default function () {
-	const sortedItems = Object.entries(mdf.ProgressMdf);
+	const [columnsMDFChart, setColumnsMDFChart] = useState([]);
+	const [titleChart, setTitleChart] = useState('');
+	const [loading, setLoading] = useState(false);
 
-	const sortedItemsClain = Object.entries(mdf.ProgressClain);
+	const siteURL = Liferay.ThemeDisplay.getLayoutRelativeURL()
+		.split('/')
+		.slice(0, 3)
+		.join('/');
 
-	const totalRequest =
-		mdf.ProgressMdf.approved.qtd + mdf.ProgressMdf.pending.qtd;
+	const getMDFRequests = async () => {
+		setLoading(true);
+		// eslint-disable-next-line @liferay/portal/no-global-fetch
+		const response = await fetch(
+			`/o/c/mdfrequests?nestedFields=accountEntry,mdfRequestToActivities,activityToBudgets,mdfRequestToMdfClaims&nestedFieldsDepth=2&pageSize=9999`,
+			{
+				headers: {
+					'accept': 'application/json',
+					'x-csrf-token': Liferay.authToken,
+				},
+			}
+		);
 
-	const totalClain =
-		mdf.ProgressClain.approved.qtd + mdf.ProgressClain.pending.qtd;
+		if (response.ok) {
+			const mdfRequests = await response.json();
+
+			getChartColumns(mdfRequests, setColumnsMDFChart, setTitleChart);
+			setLoading(false);
+
+			return;
+		}
+
+		Liferay.Util.openToast({
+			message: 'An unexpected error occured.',
+			type: 'danger',
+		});
+	};
+
+	useEffect(() => {
+		getMDFRequests();
+	}, []);
+
+	const chartData = {
+		colors,
+		columns: columnsMDFChart,
+		type: 'donut',
+	};
 
 	return (
 		<Container
-			className="mdf-chart-card-height"
+			className="mdf-request-chart-card-height"
 			footer={
 				<>
-					<ClayButton className="mr-4 mt-2" displayType="primary">
+					<ClayButton
+						className="mr-4 mt-2"
+						displayType="primary"
+						onClick={() =>
+							Liferay.Util.navigate(
+								`${siteURL}/marketing/mdf-requests/new`
+							)
+						}
+					>
 						New MDF Request
 					</ClayButton>
 					<ClayButton
 						className="border-brand-primary-darken-1 mt-2 text-brand-primary-darken-1"
 						displayType="secondary"
+						onClick={() =>
+							Liferay.Util.navigate(
+								`${siteURL}/marketing/mdf-requests`
+							)
+						}
 					>
 						View all
 					</ClayButton>
 				</>
 			}
-			title="MDF Requests"
+			title="Market Development Funds"
 		>
-			<div className="d-flex flex-column flex-content-between h-100">
-				<div className="d-flex flex-column h-100 mb-5">
-					<div className="d-flex flex-row justify-content-between">
-						<div className="font-weight-bold h5">Request Funds</div>
+			{loading && <ClayLoadingIndicator className="mt-10" size="md" />}
 
-						<div>
-							<span className="font-weight-bold text-neutral-9">
-								{totalRequest} &nbsp;
-							</span>
-							total requests &nbsp; | &nbsp;
-							<span className="font-weight-bold text-neutral-9">
-								USD $92.993,29
-							</span>
-						</div>
-					</div>
-
-					<MDFbarProgress items={sortedItems} />
-				</div>
-
-				<div className="d-flex flex-column h-100 mb-3">
-					<div className="d-flex flex-row justify-content-between">
-						<div className="font-weight-bold h5">Clain Funds</div>
-
-						<div>
-							<span className="font-weight-bold text-neutral-9">
-								{totalClain} &nbsp;
-							</span>
-							total &nbsp;| &nbsp;
-							<span className="font-weight-bold text-neutral-9">
-								USD $12.000,50
-							</span>
-						</div>
-					</div>
-
-					<MDFbarProgress items={sortedItemsClain} />
-				</div>
-
-				<div className="d-flex flex-column h-100 mt-5">
-					<LegendMDF />
-				</div>
-			</div>
+			<DonutChart chartData={chartData} titleChart={titleChart} />
 		</Container>
 	);
 }

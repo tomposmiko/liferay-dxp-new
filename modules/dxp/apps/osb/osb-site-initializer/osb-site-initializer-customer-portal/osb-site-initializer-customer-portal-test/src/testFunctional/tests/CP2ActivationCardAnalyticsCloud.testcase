@@ -57,7 +57,7 @@ definition {
 		}
 
 		task ("Given I go to the test account") {
-			ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
+			CP2Utils.goToCustomerPortalSiteWithRefresh();
 
 			CustomerPortal.search(searchItem = "${testAccount}");
 
@@ -85,7 +85,7 @@ definition {
 		}
 
 		task ("Go to CP2.0 and join a project") {
-			ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
+			CP2Utils.goToCustomerPortalSiteWithRefresh();
 
 			CustomerPortal.enterOnProject(
 				status = "Expired",
@@ -128,7 +128,7 @@ definition {
 		}
 
 		task ("Go to CP2.0 and join a project") {
-			ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
+			CP2Utils.goToCustomerPortalSiteWithRefresh();
 
 			CustomerPortal.enterOnProject(
 				status = "Expired",
@@ -171,7 +171,7 @@ definition {
 	@priority = "5"
 	test DetailsFromNotActivatedCard {
 		task ("Go to CP2.0 and join a project") {
-			ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
+			CP2Utils.goToCustomerPortalSiteWithRefresh();
 
 			CustomerPortal.enterOnProject(
 				status = "Expired",
@@ -208,7 +208,7 @@ definition {
 		}
 
 		task ("Go to CP2.0 and join a project") {
-			ApplicationsMenu.gotoSite(key_site = "Customer Portal Site");
+			CP2Utils.goToCustomerPortalSiteWithRefresh();
 
 			CustomerPortal.enterOnProject(
 				status = "Expired",

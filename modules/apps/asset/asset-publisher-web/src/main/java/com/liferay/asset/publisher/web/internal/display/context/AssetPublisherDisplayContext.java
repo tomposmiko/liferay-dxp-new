@@ -15,7 +15,6 @@
 package com.liferay.asset.publisher.web.internal.display.context;
 
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
-import com.liferay.asset.kernel.action.AssetEntryAction;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
@@ -33,6 +32,7 @@ import com.liferay.asset.kernel.service.persistence.AssetEntryQuery;
 import com.liferay.asset.list.asset.entry.provider.AssetListAssetEntryProvider;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryServiceUtil;
+import com.liferay.asset.publisher.action.AssetEntryAction;
 import com.liferay.asset.publisher.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.constants.AssetPublisherWebKeys;
 import com.liferay.asset.publisher.util.AssetEntryResult;
@@ -878,12 +878,15 @@ public class AssetPublisherDisplayContext {
 				continue;
 			}
 
-			long curGroupId = group.getGroupId();
+			Group curGroup;
 
 			if (group.isStagingGroup() &&
 				!group.isStagedPortlet(assetRendererFactory.getPortletId())) {
 
-				curGroupId = group.getLiveGroupId();
+				curGroup = group.getLiveGroup();
+			}
+			else {
+				curGroup = group;
 			}
 
 			if (!assetRendererFactory.isSupportsClassTypes()) {
@@ -892,7 +895,7 @@ public class AssetPublisherDisplayContext {
 						dropdownItem.putData(
 							"href",
 							_getAssetEntryItemSelectorPortletURL(
-								assetRendererFactory,
+								assetRendererFactory, curGroup,
 								_DEFAULT_SUBTYPE_SELECTION_ID));
 						dropdownItem.putData(
 							"title",
@@ -914,7 +917,8 @@ public class AssetPublisherDisplayContext {
 
 			List<ClassType> assetAvailableClassTypes =
 				classTypeReader.getAvailableClassTypes(
-					PortalUtil.getCurrentAndAncestorSiteGroupIds(curGroupId),
+					PortalUtil.getCurrentAndAncestorSiteGroupIds(
+						curGroup.getGroupId()),
 					_themeDisplay.getLocale());
 
 			for (ClassType classType : assetAvailableClassTypes) {
@@ -923,7 +927,7 @@ public class AssetPublisherDisplayContext {
 						dropdownItem.putData(
 							"href",
 							_getAssetEntryItemSelectorPortletURL(
-								assetRendererFactory,
+								assetRendererFactory, curGroup,
 								classType.getClassTypeId()));
 						dropdownItem.putData(
 							"title",
@@ -2236,7 +2240,8 @@ public class AssetPublisherDisplayContext {
 	}
 
 	private String _getAssetEntryItemSelectorPortletURL(
-		AssetRendererFactory<?> assetRendererFactory, long subtypeSelectionId) {
+		AssetRendererFactory<?> assetRendererFactory, Group scopeGroup,
+		long subtypeSelectionId) {
 
 		AssetEntryItemSelectorCriterion assetEntryItemSelectorCriterion =
 			new AssetEntryItemSelectorCriterion();
@@ -2255,6 +2260,7 @@ public class AssetPublisherDisplayContext {
 		return String.valueOf(
 			_itemSelector.getItemSelectorURL(
 				RequestBackedPortletURLFactoryUtil.create(_portletRequest),
+				scopeGroup, _themeDisplay.getScopeGroupId(),
 				_portletResponse.getNamespace() + "selectAsset",
 				assetEntryItemSelectorCriterion));
 	}

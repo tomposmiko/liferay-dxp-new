@@ -14,13 +14,13 @@
 
 package com.liferay.list.type.exception;
 
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.DuplicateExternalReferenceCodeException;
 
 /**
  * @author Gabriel Albuquerque
  */
 public class DuplicateListTypeDefinitionExternalReferenceCodeException
-	extends SystemException {
+	extends DuplicateExternalReferenceCodeException {
 
 	public DuplicateListTypeDefinitionExternalReferenceCodeException() {
 	}

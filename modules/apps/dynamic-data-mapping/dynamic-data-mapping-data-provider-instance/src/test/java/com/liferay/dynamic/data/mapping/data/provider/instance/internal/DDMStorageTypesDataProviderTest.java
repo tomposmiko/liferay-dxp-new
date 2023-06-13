@@ -22,10 +22,8 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Stream;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -89,17 +87,15 @@ public class DDMStorageTypesDataProviderTest {
 			expectedSet
 		);
 
-		List<KeyValuePair> keyValuePairs = new ArrayList<>();
+		List<KeyValuePair> expectedKeyValuePairs = new ArrayList<>();
 
-		Stream<String> stream = expectedSet.stream();
+		for (String type : expectedSet) {
+			if (type.equals("json")) {
+				continue;
+			}
 
-		stream.filter(
-			type -> !type.equals("json")
-		).map(
-			type -> new KeyValuePair(type, type)
-		).forEach(
-			keyValuePairs::add
-		);
+			expectedKeyValuePairs.add(new KeyValuePair(type, type));
+		}
 
 		DDMDataProviderRequest.Builder builder =
 			DDMDataProviderRequest.Builder.newBuilder();
@@ -109,13 +105,11 @@ public class DDMStorageTypesDataProviderTest {
 
 		Assert.assertTrue(ddmDataProviderResponse.hasOutput("Default-Output"));
 
-		Optional<List<KeyValuePair>> optional =
-			ddmDataProviderResponse.getOutputOptional(
-				"Default-Output", List.class);
+		List<KeyValuePair> keyValuePairs = ddmDataProviderResponse.getOutput(
+			"Default-Output", List.class);
 
-		Assert.assertTrue(optional.isPresent());
-
-		Assert.assertEquals(keyValuePairs, optional.get());
+		Assert.assertNotNull(keyValuePairs);
+		Assert.assertEquals(expectedKeyValuePairs, keyValuePairs);
 	}
 
 	private static final DDMStorageAdapterRegistry _ddmStorageAdapterRegistry =

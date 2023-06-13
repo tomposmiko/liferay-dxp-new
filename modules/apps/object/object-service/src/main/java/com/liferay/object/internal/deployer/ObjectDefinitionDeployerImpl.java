@@ -19,7 +19,6 @@ import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.info.collection.provider.InfoCollectionProvider;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
-import com.liferay.notification.constants.NotificationTermEvaluatorConstants;
 import com.liferay.notification.handler.NotificationHandler;
 import com.liferay.notification.term.evaluator.NotificationTermEvaluator;
 import com.liferay.object.deployer.ObjectDefinitionDeployer;
@@ -29,7 +28,9 @@ import com.liferay.object.internal.notification.handler.ObjectDefinitionNotifica
 import com.liferay.object.internal.notification.term.contributor.ObjectDefinitionNotificationTermEvaluator;
 import com.liferay.object.internal.persistence.ObjectDefinitionTableArgumentsResolver;
 import com.liferay.object.internal.related.models.ObjectEntry1to1ObjectRelatedModelsProviderImpl;
+import com.liferay.object.internal.related.models.ObjectEntry1toMObjectRelatedModelsPredicateProviderImpl;
 import com.liferay.object.internal.related.models.ObjectEntry1toMObjectRelatedModelsProviderImpl;
+import com.liferay.object.internal.related.models.ObjectEntryMtoMObjectRelatedModelsPredicateProviderImpl;
 import com.liferay.object.internal.related.models.ObjectEntryMtoMObjectRelatedModelsProviderImpl;
 import com.liferay.object.internal.rest.context.path.RESTContextPathResolverImpl;
 import com.liferay.object.internal.search.spi.model.index.contributor.ObjectEntryModelDocumentContributor;
@@ -41,6 +42,7 @@ import com.liferay.object.internal.security.permission.resource.ObjectEntryModel
 import com.liferay.object.internal.security.permission.resource.ObjectEntryPortletResourcePermissionLogic;
 import com.liferay.object.internal.workflow.ObjectEntryWorkflowHandler;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.related.models.ObjectRelatedModelsPredicateProvider;
 import com.liferay.object.related.models.ObjectRelatedModelsProvider;
 import com.liferay.object.rest.context.path.RESTContextPathResolver;
 import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
@@ -241,11 +243,18 @@ public class ObjectDefinitionDeployerImpl implements ObjectDefinitionDeployer {
 					objectDefinition, _objectFieldLocalService,
 					_userLocalService),
 				HashMapDictionaryBuilder.<String, Object>put(
-					"notification.term.contributor.key",
-					NotificationTermEvaluatorConstants.BODY_AND_SUBJECT
-				).put(
-					"notification.type.key", objectDefinition.getClassName()
+					"class.name", objectDefinition.getClassName()
 				).build()),
+			_bundleContext.registerService(
+				ObjectRelatedModelsPredicateProvider.class,
+				new ObjectEntry1toMObjectRelatedModelsPredicateProviderImpl(
+					objectDefinition, _objectFieldLocalService),
+				null),
+			_bundleContext.registerService(
+				ObjectRelatedModelsPredicateProvider.class,
+				new ObjectEntryMtoMObjectRelatedModelsPredicateProviderImpl(
+					objectDefinition, _objectFieldLocalService),
+				null),
 			_bundleContext.registerService(
 				ObjectRelatedModelsProvider.class,
 				new ObjectEntry1to1ObjectRelatedModelsProviderImpl(

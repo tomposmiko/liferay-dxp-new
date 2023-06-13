@@ -12,17 +12,19 @@
  * details.
  */
 
-interface NotificationTemplate {
+export interface NotificationTemplate {
 	attachmentObjectFieldIds: string[] | number[];
 	bcc: string;
 	body: LocalizedValue<string>;
 	cc: string;
 	description: string;
 	editorType: 'freemarker' | 'richText';
+	externalReferenceCode: string;
 	from: string;
 	fromName: LocalizedValue<string>;
 	id: number;
 	name: string;
+	objectDefinitionExternalReferenceCode: string;
 	objectDefinitionId: number | null;
 	recipientType: RecipientType;
 	recipients: Recipients[];
@@ -45,6 +47,8 @@ interface ObjectRelationship {
 	id: number;
 	label: LocalizedValue<string>;
 	name: string;
+	objectDefinitionExternalReferenceCode1: string;
+	objectDefinitionExternalReferenceCode2: string;
 	objectDefinitionId1: number;
 	objectDefinitionId2: number;
 	readonly objectDefinitionName2: string;
@@ -54,6 +58,7 @@ interface ObjectRelationship {
 	type: ObjectRelationshipType;
 }
 interface PickListItem {
+	externalReferenceCode: string;
 	id: number;
 	key: string;
 	name: string;
@@ -106,11 +111,17 @@ export declare function getObjectDefinitions(
 export declare function getObjectField(
 	objectFieldId: number
 ): Promise<ObjectField>;
-export declare function getObjectFields(
+export declare function getObjectFieldsById(
 	objectDefinitionId: number
 ): Promise<ObjectField[]>;
-export declare function getObjectRelationships(
+export declare function getObjectFieldsByExternalReferenceCode(
+	externalReferenceCode: string
+): Promise<ObjectField[]>;
+export declare function getObjectRelationshipsById(
 	objectDefinitionId: number
+): Promise<ObjectRelationship[]>;
+export declare function getObjectRelationshipsByExternalReferenceCode(
+	externalReferenceCode: string
 ): Promise<ObjectRelationship[]>;
 export declare function getPickList(pickListId: number): Promise<PickList>;
 export declare function getPickLists(): Promise<PickList[]>;
@@ -142,6 +153,7 @@ export declare function addPickListItem({
 }: Partial<PickListItem>): Promise<void>;
 export declare function deletePickListItem(id: number): Promise<void>;
 export declare function updatePickListItem({
+	externalReferenceCode,
 	id,
 	name_i18n,
 }: Partial<PickListItem>): Promise<void>;

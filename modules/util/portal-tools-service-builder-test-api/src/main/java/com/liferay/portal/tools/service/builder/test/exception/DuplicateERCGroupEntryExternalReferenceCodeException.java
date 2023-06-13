@@ -14,13 +14,13 @@
 
 package com.liferay.portal.tools.service.builder.test.exception;
 
-import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.exception.DuplicateExternalReferenceCodeException;
 
 /**
  * @author Brian Wing Shun Chan
  */
 public class DuplicateERCGroupEntryExternalReferenceCodeException
-	extends SystemException {
+	extends DuplicateExternalReferenceCodeException {
 
 	public DuplicateERCGroupEntryExternalReferenceCodeException() {
 	}

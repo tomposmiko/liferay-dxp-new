@@ -41,7 +41,6 @@ import java.io.InputStream;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -166,18 +165,18 @@ public class ImageBlogsUploadFileEntryHandler
 
 		Set<String> extensions = MimeTypesUtil.getExtensions(contentType);
 
-		boolean validContentType = Stream.of(
-			_blogsFileUploadsConfiguration.imageExtensions()
-		).anyMatch(
-			extension ->
-				extension.equals(StringPool.STAR) ||
-				extensions.contains(extension)
-		);
+		for (String extension :
+				_blogsFileUploadsConfiguration.imageExtensions()) {
 
-		if (!validContentType) {
-			throw new EntryImageNameException(
-				"Invalid image for file name " + fileName);
+			if (extension.equals(StringPool.STAR) ||
+				extensions.contains(extension)) {
+
+				return;
+			}
 		}
+
+		throw new EntryImageNameException(
+			"Invalid image for file name " + fileName);
 	}
 
 	private volatile BlogsFileUploadsConfiguration

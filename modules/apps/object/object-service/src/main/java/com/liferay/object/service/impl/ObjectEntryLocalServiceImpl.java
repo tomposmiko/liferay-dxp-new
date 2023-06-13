@@ -1389,10 +1389,10 @@ public class ObjectEntryLocalServiceImpl
 				_objectDefinitionPersistence.fetchByPrimaryKey(
 					objectRelationship.getObjectDefinitionId1());
 
-			String objectRelationshipERCFieldName =
+			String objectRelationshipERCObjectFieldName =
 				ObjectFieldSettingUtil.getValue(
 					ObjectFieldSettingConstants.
-						NAME_OBJECT_RELATIONSHIP_ERC_FIELD_NAME,
+						NAME_OBJECT_RELATIONSHIP_ERC_OBJECT_FIELD_NAME,
 					objectField);
 
 			if (objectDefinition.isSystem()) {
@@ -1403,7 +1403,7 @@ public class ObjectEntryLocalServiceImpl
 
 				try {
 					values.put(
-						objectRelationshipERCFieldName,
+						objectRelationshipERCObjectFieldName,
 						systemObjectDefinitionMetadata.getExternalReferenceCode(
 							primaryKey));
 				}
@@ -1424,7 +1424,7 @@ public class ObjectEntryLocalServiceImpl
 			}
 
 			values.put(
-				objectRelationshipERCFieldName,
+				objectRelationshipERCObjectFieldName,
 				objectEntry.getExternalReferenceCode());
 		}
 	}
@@ -1653,6 +1653,42 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
+	private Predicate _fillObjectFieldPredicate(
+		Column<?, Object> column, String dbType, String search) {
+
+		Predicate objectFieldPredicate = null;
+
+		if (StringUtil.equals(
+				dbType, ObjectFieldConstants.DB_TYPE_BIG_DECIMAL) ||
+			dbType.equals(ObjectFieldConstants.DB_TYPE_DOUBLE)) {
+
+			BigDecimal searchBigDecimal = BigDecimal.valueOf(
+				GetterUtil.getDouble(search));
+
+			if (searchBigDecimal.compareTo(BigDecimal.ZERO) != 0) {
+				objectFieldPredicate = column.eq(searchBigDecimal);
+			}
+		}
+		else if (StringUtil.equals(dbType, ObjectFieldConstants.DB_TYPE_CLOB) ||
+				 StringUtil.equals(
+					 dbType, ObjectFieldConstants.DB_TYPE_STRING)) {
+
+			objectFieldPredicate = column.like("%" + search + "%");
+		}
+		else if (StringUtil.equals(
+					dbType, ObjectFieldConstants.DB_TYPE_INTEGER) ||
+				 StringUtil.equals(dbType, ObjectFieldConstants.DB_TYPE_LONG)) {
+
+			long searchLong = GetterUtil.getLong(search);
+
+			if (searchLong != 0L) {
+				objectFieldPredicate = column.eq(searchLong);
+			}
+		}
+
+		return objectFieldPredicate;
+	}
+
 	private Predicate _fillPredicate(
 			long objectDefinitionId, Predicate predicate, String search)
 		throws PortalException {
@@ -1661,9 +1697,8 @@ public class ObjectEntryLocalServiceImpl
 			return predicate;
 		}
 
-		List<ObjectField> objectFields =
-			_objectFieldPersistence.findByODI_DBT_I(
-				objectDefinitionId, "String", true);
+		List<ObjectField> objectFields = _objectFieldPersistence.findByODI_I(
+			objectDefinitionId, true);
 
 		if (objectFields.isEmpty()) {
 			return predicate;
@@ -1682,13 +1717,14 @@ public class ObjectEntryLocalServiceImpl
 				continue;
 			}
 
-			Predicate likePredicate = column.like("%" + search + "%");
+			Predicate objectFieldPredicate = _fillObjectFieldPredicate(
+				(Column<?, Object>)column, objectField.getDBType(), search);
 
 			if (searchPredicate == null) {
-				searchPredicate = likePredicate;
+				searchPredicate = objectFieldPredicate;
 			}
 			else {
-				searchPredicate = searchPredicate.or(likePredicate);
+				searchPredicate = searchPredicate.or(objectFieldPredicate);
 			}
 		}
 

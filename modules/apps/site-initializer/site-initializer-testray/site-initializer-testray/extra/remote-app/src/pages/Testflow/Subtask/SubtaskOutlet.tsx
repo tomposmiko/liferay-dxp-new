@@ -69,9 +69,21 @@ const SubtaskOutlet = () => {
 			: null
 	);
 
+	const {data: testraySubtaskToSplit} = useFetch<APIResponse<TestraySubTask>>(
+		`${testraySubTaskImpl.resource}&filter=${searchUtil.eq(
+			'r_splitFromTestraySubtask_c_subtaskId',
+			subtaskId as string
+		)}&pageSize=100&fields=name`,
+		(response) => testraySubTaskImpl.transformDataFromList(response)
+	);
+
 	const subtaskIssues = data?.items || [];
 
 	const mergedSubtaskNames = (testraySubtaskToMerged?.items || [])
+		.map(({name}) => name)
+		.join(', ');
+
+	const splitSubtaskNames = (testraySubtaskToSplit?.items || [])
 		.map(({name}) => name)
 		.join(', ');
 
@@ -100,6 +112,7 @@ const SubtaskOutlet = () => {
 				mergedSubtaskNames,
 				mutateSubtask,
 				mutateSubtaskIssues,
+				splitSubtaskNames,
 				subtaskIssues,
 				testraySubtask,
 				testrayTask,

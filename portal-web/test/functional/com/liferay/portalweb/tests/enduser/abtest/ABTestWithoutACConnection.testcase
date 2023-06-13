@@ -29,12 +29,11 @@ definition {
 	tearDown {
 		var testPortalInstance = PropsUtil.get("test.portal.instance");
 
-		Navigator.openURL();
-
-		JSONGroup.deleteGroupByName(groupName = "Test Site Name");
-
 		if ("${testPortalInstance}" == "true") {
 			PortalInstances.tearDownCP();
+		}
+		else {
+			JSONGroup.deleteGroupByName(groupName = "Test Site Name");
 		}
 	}
 
@@ -51,8 +50,6 @@ definition {
 	test CheckABTestingClosedAfterLogout {
 		task ("Open Content Performance panel") {
 			ABTest.openABTestPanel();
-
-			WaitForElementPresent(locator1 = "ABTest#AB_TEST_SIDE_BAR");
 		}
 
 		task ("Logout and login") {
@@ -72,7 +69,9 @@ definition {
 		task ("Click on the A/B Test icon and click on 'Hide A/B Test Panel'") {
 			ABTest.openABTestPanel();
 
-			Click(locator1 = "ABTest#HIDE_AB_TEST_BUTTON");
+			Click(
+				key_textValue = "Do not show me this again",
+				locator1 = "Sidebar#LINK");
 		}
 
 		task ("Assert 'AB Test' icon is not present") {
@@ -86,7 +85,9 @@ definition {
 		task ("Click on the A/B Test icon and Assert hide AB Test icon is present") {
 			ABTest.openABTestPanel();
 
-			AssertVisible(locator1 = "ABTest#HIDE_AB_TEST_BUTTON");
+			AssertVisible(
+				key_textValue = "Do not show me this again",
+				locator1 = "Sidebar#LINK");
 		}
 	}
 

@@ -12,7 +12,7 @@
  * details.
  */
 
-import {useParams} from 'react-router-dom';
+import {useOutletContext, useParams} from 'react-router-dom';
 
 import Avatar from '../../../../components/Avatar';
 import AssignToMe from '../../../../components/Avatar/AssigneToMe';
@@ -29,13 +29,28 @@ import {
 	TestrayCaseResult,
 	testrayCaseResultImpl,
 } from '../../../../services/rest';
-import {searchUtil} from '../../../../util/search';
+import {SearchBuilder} from '../../../../util/search';
 import useBuildTestActions from './useBuildTestActions';
+
+type OutletContext = {
+	runId: number | undefined;
+};
 
 const Build = () => {
 	const {buildId} = useParams();
 	const {updateItemFromList} = useMutate();
 	const {actions, form} = useBuildTestActions();
+	const {runId} = useOutletContext<OutletContext>();
+
+	const caseResultFilter = new SearchBuilder();
+
+	const filter = runId
+		? caseResultFilter
+				.eq('buildId', buildId as string)
+				.and()
+				.eq('runId', runId)
+				.build()
+		: caseResultFilter.eq('buildId', buildId as string).build();
 
 	return (
 		<Container className="mt-4">
@@ -138,6 +153,7 @@ const Build = () => {
 						},
 						{
 							key: 'issues',
+							size: 'lg',
 							value: i18n.translate('issues'),
 						},
 						{
@@ -149,14 +165,20 @@ const Build = () => {
 							size: 'xl',
 							value: i18n.translate('errors'),
 						},
+						{
+							key: 'comment',
+							size: 'lg',
+							value: i18n.translate('comment'),
+						},
 					],
 					navigateTo: ({id}) => `case-result/${id}`,
+					rowWrap: true,
 				}}
 				transformData={(response) =>
 					testrayCaseResultImpl.transformDataFromList(response)
 				}
 				variables={{
-					filter: searchUtil.eq('buildId', buildId as string),
+					filter,
 				}}
 			/>
 		</Container>

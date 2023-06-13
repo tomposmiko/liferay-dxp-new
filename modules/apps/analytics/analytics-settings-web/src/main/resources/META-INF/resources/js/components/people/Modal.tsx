@@ -17,6 +17,7 @@ import ClayModal from '@clayui/modal';
 import React, {useState} from 'react';
 
 import {updateAttributesConfiguration} from '../../utils/api';
+import {TEmptyState} from '../table/StateRenderer';
 import Table from '../table/Table';
 import {TColumn, TFormattedItems, TTableRequestParams} from '../table/types';
 import {getIds} from '../table/utils';
@@ -40,9 +41,8 @@ export interface ICommonModalProps {
 
 interface IModalProps {
 	columns: TColumn[];
-	emptyStateTitle: string;
+	emptyState: TEmptyState;
 	name: EPeople;
-	noResultsTitle: string;
 	observer: any;
 	onCloseModal: () => void;
 	requestFn: (params: TTableRequestParams) => Promise<any>;
@@ -56,9 +56,8 @@ interface IModalProps {
 
 const Modal: React.FC<IModalProps> = ({
 	columns,
-	emptyStateTitle,
+	emptyState,
 	name,
-	noResultsTitle,
 	observer,
 	onCloseModal,
 	requestFn,
@@ -76,16 +75,20 @@ const Modal: React.FC<IModalProps> = ({
 			<ClayModal.Body>
 				<Table<TRawItem>
 					columns={columns}
-					emptyStateTitle={emptyStateTitle}
-					mapperItems={(items: TRawItem[]) => {
+					emptyState={emptyState}
+					mapperItems={(items) => {
 						return items.map(({id, name, selected}) => ({
 							checked: selected,
-							columns: [{label: name}],
+							columns: [
+								{
+									id: 'name',
+									value: name,
+								},
+							],
 							disabled: false,
 							id: String(id),
 						}));
 					}}
-					noResultsTitle={noResultsTitle}
 					onItemsChange={setItems}
 					requestFn={requestFn}
 				/>

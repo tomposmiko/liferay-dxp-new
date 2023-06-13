@@ -38,9 +38,8 @@ import java.io.UnsupportedEncodingException;
 
 import java.net.URLEncoder;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -122,16 +121,19 @@ public class UADApplicationExportController {
 	private List<String> _getApplicationUADEntityRegistryKeys(
 		String applicationKey) {
 
-		Stream<UADDisplay<?>> uadDisplayStream =
-			_uadRegistry.getApplicationUADDisplayStream(applicationKey);
+		List<String> typeClassNames = new ArrayList<>();
 
-		return uadDisplayStream.map(
-			UADDisplay::getTypeClass
-		).map(
-			Class::getName
-		).collect(
-			Collectors.toList()
-		);
+		for (UADDisplay<?> uadDisplay :
+				_uadRegistry.getApplicationUADDisplays(applicationKey)) {
+
+			Class<?> typeClass = uadDisplay.getTypeClass();
+
+			String entityName = typeClass.getName();
+
+			typeClassNames.add(entityName);
+		}
+
+		return typeClassNames;
 	}
 
 	private String _getEntryPath(

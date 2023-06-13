@@ -14,17 +14,31 @@
 
 /// <reference types="react" />
 
+import {TEmptyState} from './StateRenderer';
 import {TColumn, TFormattedItems, TItem, TTableRequestParams} from './types';
 interface ITableProps<TRawItem> {
+	addItemTitle?: string;
 	columns: TColumn[];
 	disabled?: boolean;
-	emptyStateTitle: string;
+	emptyState: TEmptyState;
 	mapperItems: (items: TRawItem[]) => TItem[];
-	noResultsTitle: string;
+	onAddItem?: () => void;
 	onItemsChange?: (items: TFormattedItems) => void;
 	requestFn: (params: TTableRequestParams) => Promise<any>;
+	showCheckbox?: boolean;
 }
-declare function TableWrapper<TRawItem>(
+export declare function Table<TRawItem>({
+	addItemTitle,
+	columns,
+	disabled,
+	emptyState,
+	mapperItems,
+	onAddItem,
+	onItemsChange,
+	requestFn,
+	showCheckbox,
+}: ITableProps<TRawItem>): JSX.Element;
+declare function ComposedTable<TRawItem>(
 	props: ITableProps<TRawItem>
 ): JSX.Element;
-export default TableWrapper;
+export default ComposedTable;

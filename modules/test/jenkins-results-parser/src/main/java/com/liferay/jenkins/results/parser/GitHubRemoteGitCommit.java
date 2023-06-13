@@ -14,6 +14,8 @@
 
 package com.liferay.jenkins.results.parser;
 
+import com.atlassian.jira.rest.client.api.domain.Issue;
+
 import java.io.IOException;
 
 import java.text.DateFormat;
@@ -23,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -38,6 +42,18 @@ public class GitHubRemoteGitCommit extends BaseGitCommit {
 		return JenkinsResultsParserUtil.combine(
 			"https://github.com/", _gitHubUsername, "/", getGitRepositoryName(),
 			"/commit/", getSHA());
+	}
+
+	public Issue getJIRAIssue() {
+		Matcher matcher = _messagePattern.matcher(getMessage());
+
+		if (matcher.find()) {
+			String issueKey = matcher.group("jiraIssueKey");
+
+			return JIRAUtil.getIssue(issueKey);
+		}
+
+		return null;
 	}
 
 	public List<String> getModifiedFilenames() {
@@ -198,6 +214,9 @@ public class GitHubRemoteGitCommit extends BaseGitCommit {
 	}
 
 	protected List<String> modifiedFilenames;
+
+	private static final Pattern _messagePattern = Pattern.compile(
+		"^(?<jiraIssueKey>[A-Z]+[-][\\d]+)\\s*(?<message>.*)");
 
 	private final String _gitHubUsername;
 

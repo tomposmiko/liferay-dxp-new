@@ -25,13 +25,20 @@
 		</sequential>
 	</macrodef>
 
-	<macrodef name="rebuild-upgrade-database">
+	<macrodef name="modify-script-exit-code">
 		<sequential>
-			<antcall target="rebuild-legacy-database">
-				<param name="portal.version" value="6.2.10.21" />
-				<param name="data.archive.type" value="data-archive-portal" />
-				<param name="skip.get.testcase.database.properties" value="true" />
-			</antcall>
+			<get-database-upgrade-client-paths />
+
+			<replace
+				file="${db.upgrade.client.home}/db_upgrade${file.suffix.bat}"
+				token="exit 1"
+				value="exit 0"
+			/>
+
+			<chmod
+				file="${db.upgrade.client.home}/db_upgrade${file.suffix.bat}"
+				perm="a+x"
+			/>
 		</sequential>
 	</macrodef>
 
@@ -51,6 +58,38 @@
 		</sequential>
 	</macrodef>
 
+	<macrodef name="wait-for-upgrade-start">
+		<sequential>
+			<get-database-upgrade-client-paths />
+
+			<waitfor maxwait="300" maxwaitunit="second" timeoutproperty="upgrade.startfailed">
+				<available file="${db.upgrade.client.log}" />
+			</waitfor>
+
+			<fail if="upgrade.startfailed" message="Upgrade has failed to start." />
+		</sequential>
+	</macrodef>
+
+	<target name="check-failed-upgrade-log">
+		<waitfor maxwait="600" maxwaitunit="second" timeoutproperty="upgrade.failed">
+			<resourcecontains
+				resource="${db.upgrade.client.log}"
+				substring="Checking to see if all upgrades have completed...${line.separator}Module upgrades have failed, have not started, or are still running."
+			/>
+		</waitfor>
+
+		<fail if="upgrade.failed" message="The upgrade process has timed out." />
+
+		<waitfor maxwait="300" maxwaitunit="second" timeoutproperty="gogoshell.timeout">
+			<resourcecontains
+				resource="${db.upgrade.client.log}"
+				substring="Type &quot;help&quot; to get available upgrade and verify commands"
+			/>
+		</waitfor>
+
+		<fail if="gogoshell.timeout" message="The Gogo shell connection did not connect as expected." />
+	</target>
+
 	<target name="check-upgrade-client-additional-settings">
 		<get-database-upgrade-client-paths />
 
@@ -59,9 +98,7 @@
 				db_upgrade${file.suffix.bat} -j "-Dfile.encoding=UTF8 -Duser.country=US -Duser.language=en -Duser.timezone=GMT -Xmx4096m"
 			</execute>
 			<sequential>
-				<waitfor maxwait="60000">
-					<available file="${db.upgrade.client.log}" />
-				</waitfor>
+				<wait-for-upgrade-start />
 
 				<sleep seconds="5" />
 
@@ -162,17 +199,15 @@
 				</if>
 
 				<echo>A Gogo shell opened successfully.</echo>
-
-				<stop-one-java-process process.name="jar" />
 			</sequential>
 		</parallel>
+
+		<stop-one-java-process process.name="jar" />
 
 		<clean-database-upgrade-client />
 	</target>
 
 	<target name="check-upgrade-client-gogoshell-command-output">
-		<rebuild-upgrade-database />
-
 		<get-database-upgrade-client-paths />
 
 		<run-expect
@@ -196,67 +231,20 @@
 	</target>
 
 	<target name="check-upgrade-client-gogoshell-failed-upgrade">
-		<rebuild-upgrade-database />
-
 		<get-database-upgrade-client-paths />
 
-		<parallel>
-			<java
-				dir="${db.upgrade.client.home}"
-				fork="true"
-				jar="${db.upgrade.client.jar}"
-				timeout="900000"
-			>
-			</java>
+		<sql classpath="${app.server.shielded-container-lib.portal.dir}/${jdbc.mysql.driver}" driver="${database.mysql.driver}" onerror="continue" output="output.txt" password="${database.mysql.password}" print="true" url="${database.mysql.url}" userid="${database.mysql.username}">
+			<![CDATA[
+				ALTER TABLE JournalArticle DROP type_;
+			]]>
+		</sql>
 
-			<sequential>
-				<waitfor maxwait="30" maxwaitunit="second" timeoutproperty="upgrade.startfailed">
-					<available file="${db.upgrade.client.log}" />
-				</waitfor>
-
-				<fail if="upgrade.startfailed" message="Upgrade has failed to start." />
-
-				<sql classpath="${app.server.shielded-container-lib.portal.dir}/${jdbc.mysql.driver}" driver="${database.mysql.driver}" onerror="continue" output="output.txt" password="${database.mysql.password}" print="true" url="${database.mysql.url}" userid="${database.mysql.username}">
-					<![CDATA[
-						ALTER TABLE JournalArticle DROP type_;
-					]]>
-				</sql>
-
-				<waitfor maxwait="900000" timeoutproperty="upgrade.notfailed">
-					<resourcecontains
-						resource="${db.upgrade.client.log}"
-						substring="Checking to see if all upgrades have completed..."
-					/>
-				</waitfor>
-
-				<if>
-					<isset property="upgrade.notfailed" />
-					<then>
-						<fail message="The upgrade process failure has timed out." />
-					</then>
-				</if>
-
-				<waitfor maxwait="300" maxwaitunit="second" timeoutproperty="gogoshell.timeout">
-					<resourcecontains
-						resource="${db.upgrade.client.log}"
-						substring="Type &quot;help&quot; to get available upgrade and verify commands"
-					/>
-				</waitfor>
-
-				<fail if="gogoshell.timeout" message="The Gogo shell connection did not connect as expected." />
-
-				<stop-one-java-process process.name="jar" />
-			</sequential>
-		</parallel>
-
-		<rebuild-upgrade-database />
-
-		<clean-database-upgrade-client />
+		<execute dir="${db.upgrade.client.home}">
+			db_upgrade${file.suffix.bat} run
+		</execute>
 	</target>
 
 	<target name="check-upgrade-client-gogoshell-help-output">
-		<rebuild-upgrade-database />
-
 		<get-database-upgrade-client-paths />
 
 		<run-expect
@@ -376,6 +364,8 @@
 	<target name="check-upgrade-client-second-process">
 		<get-database-upgrade-client-paths />
 
+		<modify-script-exit-code />
+
 		<parallel failonany="true">
 			<exec executable="/bin/bash" spawn="true">
 				<arg value="-c" />
@@ -383,11 +373,7 @@
 			</exec>
 
 			<sequential>
-				<waitfor maxwait="300" maxwaitunit="second" timeoutproperty="upgrade.startfailed">
-					<available file="${db.upgrade.client.log}" />
-				</waitfor>
-
-				<fail if="upgrade.startfailed" message="Upgrade has failed to start." />
+				<wait-for-upgrade-start />
 
 				<exec executable="/bin/bash">
 					<arg value="-c" />
@@ -426,18 +412,14 @@
 			</exec>
 
 			<sequential>
-				<waitfor maxwait="30" maxwaitunit="second" timeoutproperty="upgrade.startfailed">
-					<available file="${db.upgrade.client.log}" />
-				</waitfor>
-
-				<fail if="upgrade.startfailed" message="Upgrade has failed to start." />
+				<wait-for-upgrade-start />
 
 				<send-sighup-to-upgrade-process />
 
 				<waitfor maxwait="300" maxwaitunit="second" timeoutproperty="upgrade.failed">
 					<resourcecontains
 						resource="${db.upgrade.client.log}"
-						substring="Checking to see if all upgrades have completed..."
+						substring="Checking to see if all upgrades have completed...${line.separator}Looks good."
 					/>
 				</waitfor>
 
@@ -456,62 +438,14 @@
 	</target>
 
 	<target name="check-upgrade-client-upgrade-core-only">
-		<rebuild-upgrade-database />
-
 		<get-database-upgrade-client-paths />
 
 		<echo append="true" file="${db.upgrade.client.home}/portal-upgrade-ext.properties">
 upgrade.database.auto.run=false</echo>
 
-		<parallel failonany="true">
-			<java
-				dir="${db.upgrade.client.home}"
-				fork="true"
-				jar="${db.upgrade.client.jar}"
-				timeout="900000"
-			>
-			</java>
-
-			<sequential>
-				<waitfor maxwait="900000">
-					<resourcecontains
-						resource="${db.upgrade.client.log}"
-						substring="Checking to see if all upgrades have completed... your upgrades have failed, have not started, or are still running."
-					/>
-				</waitfor>
-
-				<sleep seconds="20" />
-
-				<sql classpath="${app.server.shielded-container-lib.portal.dir}/${jdbc.mysql.driver}" driver="${database.mysql.driver}" onerror="continue" output="output.txt" password="${database.mysql.password}" print="true" url="${database.mysql.url}" userid="${database.mysql.username}">
-					<![CDATA[
-						select schemaVersion from Release_ where servletContextName = 'com.liferay.journal.web';
-					]]>
-				</sql>
-
-				<loadfile
-					property="select.result"
-					srcFile="output.txt"
-				/>
-
-				<if>
-					<contains string="${select.result}" substring="0.0.1" />
-					<then>
-						<echo>The upgrade client only upgrades core.</echo>
-					</then>
-					<else>
-						<fail message="The upgrade client upgrades core and modules." />
-					</else>
-				</if>
-
-				<stop-one-java-process process.name="jar" />
-			</sequential>
-		</parallel>
-
-		<delete file="${db.upgrade.client.home}/portal-upgrade-ext.properties" />
-
-		<prepare-database-upgrade-configuration />
-
-		<clean-database-upgrade-client />
+		<execute dir="${db.upgrade.client.home}">
+			db_upgrade${file.suffix.bat} run
+		</execute>
 	</target>
 
 	<target name="check-upgrade-client-zip-content">

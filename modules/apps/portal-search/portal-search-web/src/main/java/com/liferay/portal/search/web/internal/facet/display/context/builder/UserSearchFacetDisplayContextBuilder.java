@@ -24,8 +24,8 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.search.web.internal.facet.display.context.BucketDisplayContext;
 import com.liferay.portal.search.web.internal.facet.display.context.UserSearchFacetDisplayContext;
-import com.liferay.portal.search.web.internal.facet.display.context.UserSearchFacetTermDisplayContext;
 import com.liferay.portal.search.web.internal.user.facet.configuration.UserFacetPortletInstanceConfiguration;
 
 import java.util.ArrayList;
@@ -67,6 +67,8 @@ public class UserSearchFacetDisplayContextBuilder {
 		UserSearchFacetDisplayContext userSearchFacetDisplayContext =
 			new UserSearchFacetDisplayContext();
 
+		userSearchFacetDisplayContext.setBucketDisplayContexts(
+			buildBucketDisplayContexts(termCollectors));
 		userSearchFacetDisplayContext.setDisplayStyleGroupId(
 			getDisplayStyleGroupId());
 		userSearchFacetDisplayContext.setNothingSelected(nothingSelected);
@@ -76,8 +78,6 @@ public class UserSearchFacetDisplayContextBuilder {
 		userSearchFacetDisplayContext.setParamValue(_getFirstParamValue());
 		userSearchFacetDisplayContext.setParamValues(_paramValues);
 		userSearchFacetDisplayContext.setRenderNothing(renderNothing);
-		userSearchFacetDisplayContext.setTermDisplayContexts(
-			buildTermDisplayContexts(termCollectors));
 		userSearchFacetDisplayContext.setUserFacetPortletInstanceConfiguration(
 			_userFacetPortletInstanceConfiguration);
 
@@ -124,34 +124,31 @@ public class UserSearchFacetDisplayContextBuilder {
 		_paramValues = paramValues;
 	}
 
-	protected UserSearchFacetTermDisplayContext buildTermDisplayContext(
+	protected BucketDisplayContext buildBucketDisplayContext(
 		TermCollector termCollector) {
+
+		BucketDisplayContext bucketDisplayContext = new BucketDisplayContext();
 
 		String term = GetterUtil.getString(termCollector.getTerm());
 
-		UserSearchFacetTermDisplayContext userSearchFacetTermDisplayContext =
-			new UserSearchFacetTermDisplayContext();
+		bucketDisplayContext.setBucketText(term);
 
-		userSearchFacetTermDisplayContext.setFrequency(
-			termCollector.getFrequency());
-		userSearchFacetTermDisplayContext.setFrequencyVisible(
-			_frequenciesVisible);
-		userSearchFacetTermDisplayContext.setSelected(isSelected(term));
-		userSearchFacetTermDisplayContext.setUserName(term);
+		bucketDisplayContext.setFrequency(termCollector.getFrequency());
+		bucketDisplayContext.setFrequencyVisible(_frequenciesVisible);
+		bucketDisplayContext.setSelected(isSelected(term));
 
-		return userSearchFacetTermDisplayContext;
+		return bucketDisplayContext;
 	}
 
-	protected List<UserSearchFacetTermDisplayContext> buildTermDisplayContexts(
+	protected List<BucketDisplayContext> buildBucketDisplayContexts(
 		List<TermCollector> termCollectors) {
 
 		if (termCollectors.isEmpty()) {
-			return getEmptyTermDisplayContexts();
+			return getEmptyBucketDisplayContexts();
 		}
 
-		List<UserSearchFacetTermDisplayContext>
-			userSearchFacetTermDisplayContexts = new ArrayList<>(
-				termCollectors.size());
+		List<BucketDisplayContext> bucketDisplayContexts = new ArrayList<>(
+			termCollectors.size());
 
 		for (int i = 0; i < termCollectors.size(); i++) {
 			TermCollector termCollector = termCollectors.get(i);
@@ -163,11 +160,10 @@ public class UserSearchFacetDisplayContextBuilder {
 				break;
 			}
 
-			userSearchFacetTermDisplayContexts.add(
-				buildTermDisplayContext(termCollector));
+			bucketDisplayContexts.add(buildBucketDisplayContext(termCollector));
 		}
 
-		return userSearchFacetTermDisplayContexts;
+		return bucketDisplayContexts;
 	}
 
 	protected long getDisplayStyleGroupId() {
@@ -181,23 +177,19 @@ public class UserSearchFacetDisplayContextBuilder {
 		return displayStyleGroupId;
 	}
 
-	protected List<UserSearchFacetTermDisplayContext>
-		getEmptyTermDisplayContexts() {
-
+	protected List<BucketDisplayContext> getEmptyBucketDisplayContexts() {
 		if (_paramValues.isEmpty()) {
 			return Collections.emptyList();
 		}
 
-		UserSearchFacetTermDisplayContext userSearchFacetTermDisplayContext =
-			new UserSearchFacetTermDisplayContext();
+		BucketDisplayContext bucketDisplayContext = new BucketDisplayContext();
 
-		userSearchFacetTermDisplayContext.setFrequency(0);
-		userSearchFacetTermDisplayContext.setFrequencyVisible(
-			_frequenciesVisible);
-		userSearchFacetTermDisplayContext.setSelected(true);
-		userSearchFacetTermDisplayContext.setUserName(_paramValues.get(0));
+		bucketDisplayContext.setBucketText(_paramValues.get(0));
+		bucketDisplayContext.setFrequency(0);
+		bucketDisplayContext.setFrequencyVisible(_frequenciesVisible);
+		bucketDisplayContext.setSelected(true);
 
-		return Collections.singletonList(userSearchFacetTermDisplayContext);
+		return Collections.singletonList(bucketDisplayContext);
 	}
 
 	protected List<TermCollector> getTermCollectors() {

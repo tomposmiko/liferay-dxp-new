@@ -63,10 +63,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.portlet.PortletException;
 import javax.portlet.PortletURL;
@@ -328,32 +325,31 @@ public class BlogEntriesDisplayContext {
 
 			searchContainer.setResultsAndTotal(
 				() -> {
+					List<BlogsEntry> blogsEntries = new ArrayList<>();
+
 					List<SearchResult> searchResults =
 						SearchResultUtil.getSearchResults(
 							hits, LocaleUtil.getDefault());
 
-					Stream<SearchResult> stream = searchResults.stream();
+					for (SearchResult searchResult : searchResults) {
+						BlogsEntry blogsEntry = _toBlogsEntry(searchResult);
 
-					return stream.map(
-						this::_toBlogsEntryOptional
-					).filter(
-						Optional::isPresent
-					).map(
-						Optional::get
-					).collect(
-						Collectors.toList()
-					);
+						if (blogsEntry == null) {
+							continue;
+						}
+
+						blogsEntries.add(blogsEntry);
+					}
+
+					return blogsEntries;
 				},
 				hits.getLength());
 		}
 	}
 
-	private Optional<BlogsEntry> _toBlogsEntryOptional(
-		SearchResult searchResult) {
-
+	private BlogsEntry _toBlogsEntry(SearchResult searchResult) {
 		try {
-			return Optional.of(
-				BlogsEntryServiceUtil.getEntry(searchResult.getClassPK()));
+			return BlogsEntryServiceUtil.getEntry(searchResult.getClassPK());
 		}
 		catch (Exception exception) {
 			if (_log.isWarnEnabled()) {
@@ -363,7 +359,7 @@ public class BlogEntriesDisplayContext {
 					exception);
 			}
 
-			return Optional.empty();
+			return null;
 		}
 	}
 

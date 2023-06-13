@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.template.TemplateConstants;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
+import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.Localization;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
@@ -51,7 +52,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Eudaldo Alonso
  */
 @Component(
-	immediate = true,
 	property = {
 		"javax.portlet.name=" + TemplatePortletKeys.TEMPLATE,
 		"mvc.command.name=/template/update_template_entry"
@@ -77,8 +77,9 @@ public class UpdateTemplateEntryMVCActionCommand
 			uploadPortletRequest, "name");
 		Map<Locale, String> descriptionMap = _localization.getLocalizationMap(
 			uploadPortletRequest, "description");
-		String script = ParamUtil.getString(
-			uploadPortletRequest, "scriptContent");
+		String script = new String(
+			Base64.decode(
+				ParamUtil.getString(uploadPortletRequest, "scriptContent")));
 		boolean cacheable = ParamUtil.getBoolean(
 			uploadPortletRequest, "cacheable");
 

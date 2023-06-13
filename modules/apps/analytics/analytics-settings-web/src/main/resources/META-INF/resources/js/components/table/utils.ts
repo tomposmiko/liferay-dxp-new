@@ -22,20 +22,12 @@ export function serializeTableRequestParams({
 	keywords,
 	pagination: {page, pageSize},
 }: TTableRequestParams): string {
-	let params: any = {
+	const params: Record<string, string | number> = {
+		keywords,
 		page,
 		pageSize,
 		sort: `${value}:${type}`,
 	};
-
-	if (keywords) {
-		params = {
-			keywords,
-			page: 1,
-			pageSize,
-			sort: `${value}:${type}`,
-		};
-	}
 
 	const arrs = Object.keys(params).map((key) => [key, String(params[key])]);
 	const path = new URLSearchParams(arrs);
@@ -51,15 +43,15 @@ export function getOrderBySymbol({type}: TFilter): string {
 	return type === OrderBy.Asc ? 'order-list-up' : 'order-list-down';
 }
 
-export function getResultsLanguage(rows: string[]) {
-	if (rows.length > 1) {
+export function getResultsLanguage(totalCount: number) {
+	if (totalCount > 1) {
 		return sub(
 			Liferay.Language.get('x-results-for').toLowerCase(),
-			rows.length
+			totalCount
 		);
 	}
 
-	return sub(Liferay.Language.get('x-result-for').toLowerCase(), rows.length);
+	return sub(Liferay.Language.get('x-result-for').toLowerCase(), totalCount);
 }
 
 export function getGlobalChecked(formattedItems: TFormattedItems): boolean {
@@ -78,54 +70,46 @@ export function updateFormattedItems(
 	formattedItems: TFormattedItems,
 	checked: boolean
 ): TFormattedItems {
-	return Object.values(formattedItems).reduce(
-		(accumulator: TFormattedItems, item) => {
-			if (item.disabled) {
-				return {
-					...accumulator,
-					[item.id]: item,
-				};
-			}
+	const updatedItems: TFormattedItems = {};
 
-			return {
-				...accumulator,
-				[item.id]: {
-					...item,
-					checked,
-				},
-			};
-		},
-		{}
-	);
-}
-
-export function getFormattedItems(items: TItem[]): TFormattedItems {
-	return items.reduce((accumulator: TFormattedItems, item) => {
-		return {
-			...accumulator,
-			[item.id]: item,
-		};
-	}, {});
-}
-
-export function getIds(items: TFormattedItems, initialIds: number[]): number[] {
-	const ids = [...initialIds];
-
-	Object.values(items).forEach((item) => {
-		if (ids.length) {
-			ids.forEach((id, index) => {
-				if (id === Number(item.id) && !item.checked) {
-					ids.splice(index, 1);
-				}
-				else if (id !== Number(item.id) && item.checked) {
-					ids.push(Number(item.id));
-				}
-			});
+	Object.entries(formattedItems).forEach(([id, item]) => {
+		if (item.disabled) {
+			updatedItems[id] = item;
 		}
-		else if (item.checked) {
-			ids.push(Number(item.id));
+		else {
+			updatedItems[id] = {
+				...item,
+				checked,
+			};
 		}
 	});
 
-	return [...new Set(ids)];
+	return updatedItems;
+}
+
+export function getFormattedItems(items: TItem[]): TFormattedItems {
+	const formattedItems: TFormattedItems = {};
+
+	for (let i = 0; i < items.length; i++) {
+		const item = items[i];
+
+		formattedItems[item.id] = item;
+	}
+
+	return formattedItems;
+}
+
+export function getIds(items: TFormattedItems, initialIds: number[]): number[] {
+	const ids = new Set(initialIds);
+
+	Object.values(items).forEach(({checked, id}) => {
+		if (checked) {
+			ids.add(Number(id));
+		}
+		else {
+			ids.delete(Number(id));
+		}
+	});
+
+	return [...ids];
 }

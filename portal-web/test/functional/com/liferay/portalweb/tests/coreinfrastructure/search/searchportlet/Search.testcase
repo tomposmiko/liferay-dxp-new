@@ -125,7 +125,7 @@ definition {
 	}
 
 	@priority = "3"
-	test AssertCategoryFacetLayouts {
+	test AssertCategoryFacetTermsWithDifferentDisplayTemplates {
 		JSONCategory.addVocabulary(
 			groupName = "Guest",
 			title = "Vocabulary");
@@ -218,6 +218,49 @@ definition {
 		AssertAlertNotPresent();
 	}
 
+	@priority = "3"
+	test AssertCustomFacetTermsWithDifferentDisplayTemplates {
+		for (var count : list "1,2,3") {
+			JSONDocument.addFileWithUploadedFile(
+				dmDocumentTitle = "dm title ${count}",
+				groupName = "Guest",
+				mimeType = "application/docx",
+				sourceFileName = "Document_${count}.docx");
+		}
+
+		SearchPortlets.searchEmbedded(searchTerm = "title");
+
+		SearchPortlets.addWidgets(searchPortletList = "Custom Facet");
+
+		SearchFacetPortlet.configureCustomFacet(
+			aggregationField = "title_sortable",
+			customHeading = "Title");
+
+		SearchFacetPortlet.updateFacetConfiguration(
+			displayTemplate = "Compact Layout",
+			portletName = "Custom Facet");
+
+		Refresh();
+
+		for (var Document : list "dm title 1,dm title 2,dm title 3") {
+			AssertElementPresent(
+				facetValueName = "${Document}",
+				locator1 = "Search#FACET_COMPACT_LAYOUT");
+		}
+
+		SearchFacetPortlet.updateFacetConfiguration(
+			displayTemplate = "Label Layout",
+			portletName = "Custom Facet");
+
+		Refresh();
+
+		for (var Document : list "dm title 1,dm title 2,dm title 3") {
+			AssertElementPresent(
+				facetValueName = "${Document}",
+				locator1 = "Search#FACET_LABEL_LAYOUT");
+		}
+	}
+
 	@description = "This is a use case for LPS-160922."
 	@priority = "4"
 	test AssertDefaultSearchResultsDisplayTemplate {
@@ -281,6 +324,55 @@ definition {
 		AssertSelectedLabel(
 			locator1 = "Select#DISPLAY_TEMPLATE",
 			value1 = "Search Results Test ADT");
+	}
+
+	@description = "This is a use case for LPS-170111. When configuring the Folder Facet, facet terms are present with different display templates"
+	@priority = "3"
+	test AssertFolderFacetTermsWithDifferentDisplayTemplates {
+		task ("Add the folders and populate them with files") {
+			for (var folder : list "Product,Engineering,Company") {
+				JSONFolder.addFolder(
+					dmFolderName = "${folder}",
+					groupName = "Guest");
+			}
+
+			for (var folder : list "Product,Engineering,Company") {
+				JSONDocument.addFile(
+					dmDocumentTitle = "DM Document Title 1",
+					folderName = "${folder}",
+					groupName = "Guest");
+			}
+		}
+
+		SearchPortlets.searchEmbedded(searchTerm = "test");
+
+		task ("Assert that the three folders are present in Compact Layout Template") {
+			SearchFacetPortlet.updateFacetConfiguration(
+				displayTemplate = "Compact Layout",
+				portletName = "Folder Facet");
+
+			Refresh();
+
+			for (var folders : list "Company,Engineering,Product") {
+				AssertElementPresent(
+					facetValueName = "${folders}",
+					locator1 = "Search#FACET_COMPACT_LAYOUT");
+			}
+		}
+
+		task ("Assert that the three folders are present in Label Layout Template") {
+			SearchFacetPortlet.updateFacetConfiguration(
+				displayTemplate = "Label Layout",
+				portletName = "Folder Facet");
+
+			Refresh();
+
+			for (var folders : list "Company,Engineering,Product") {
+				AssertElementPresent(
+					facetValueName = "${folders}",
+					locator1 = "Search#FACET_LABEL_LAYOUT");
+			}
+		}
 	}
 
 	@description = "This is a use case for LPS-92008."
@@ -350,6 +442,78 @@ definition {
 		SearchPortlets.searchEmbedded(searchTerm = "test");
 
 		AssertAlertNotPresent();
+	}
+
+	@priority = "3"
+	test AssertModifiedFacetTermsWithDifferentDisplayTemplates {
+		task ("Create the Web Contents") {
+			for (var count : list "1,2,3") {
+				JSONWebcontent.addWebContent(
+					content = "Content",
+					groupName = "Guest",
+					title = "Web Content ${count}");
+			}
+		}
+
+		SearchPortlets.searchEmbedded(searchTerm = "Web Content");
+
+		task ("Change Display Template to 'Radio Layout' and assert the Web Contents are present") {
+			SearchFacetPortlet.updateFacetConfiguration(
+				displayTemplate = "Radio Layout",
+				portletName = "Modified Facet");
+
+			Refresh();
+
+			for (var count : list "1,2,3") {
+				SearchResultPortlet.viewSearchResults(
+					searchAssetTitle = "Web Content ${count}",
+					searchAssetType = "Content");
+			}
+		}
+
+		task ("Click on 'Past Hour' radio and assert the Web Contents are present") {
+			Click(
+				locator1 = "Search#MODIFIED_FACET_SELECTION",
+				range = "Past Hour");
+
+			for (var count : list "1,2,3") {
+				SearchResultPortlet.viewSearchResults(
+					searchAssetTitle = "Web Content ${count}",
+					searchAssetType = "Content");
+			}
+		}
+
+		task ("Add and enable a new modified facet label and assert there are no web contents present") {
+			Portlet.gotoPortletOptions(
+				portletName = "Modified Facet",
+				portletOption = "Configuration");
+
+			SelectFrame(locator1 = "IFrame#CONFIGURATION");
+
+			Click(locator1 = "Button#ADD_ROW");
+
+			Type(
+				key_fieldLabel = "Label",
+				locator1 = "Search#MODIFIED_FACET_CONFIG_EMPTY_FIELD",
+				value1 = "Past 23 Hours");
+
+			Type(
+				key_fieldLabel = "Range",
+				locator1 = "Search#MODIFIED_FACET_CONFIG_EMPTY_FIELD",
+				value1 = "[past-24-hours TO past-hour]");
+
+			PortletEntry.save();
+
+			IFrame.closeFrame();
+
+			Refresh();
+
+			Click(
+				locator1 = "Search#MODIFIED_FACET_SELECTION",
+				range = "Past 23 Hours");
+
+			SearchResultPortlet.viewMultipleSearchResultsNotPresent(noResultsList = "Web Content 1/Web Content Article,Web Content 2/Web Content Article,Web Content 3/Web Content Article");
+		}
 	}
 
 	@priority = "4"
@@ -587,6 +751,46 @@ definition {
 		}
 	}
 
+	@priority = "3"
+	test AssertSiteFacetTermsWithDifferentDisplayTemplates {
+		for (var siteName : list "Community,Engineering,Product") {
+			JSONGroup.addGroup(groupName = "${siteName}");
+
+			JSONWebcontent.addWebContent(
+				content = "Web Content",
+				groupName = "${siteName}",
+				title = "Web Content");
+		}
+
+		SearchPortlets.configureEmbeddedSearchBar(searchScope = "Everything");
+
+		SearchPortlets.searchEmbedded(searchTerm = "Web Content");
+
+		SearchFacetPortlet.updateFacetConfiguration(
+			displayTemplate = "Compact Layout",
+			portletName = "Site Facet");
+
+		Refresh();
+
+		for (var siteName : list "Community,Engineering,Product") {
+			AssertElementPresent(
+				facetValueName = "${siteName}",
+				locator1 = "Search#FACET_COMPACT_LAYOUT");
+		}
+
+		SearchFacetPortlet.updateFacetConfiguration(
+			displayTemplate = "Label Layout",
+			portletName = "Site Facet");
+
+		Refresh();
+
+		for (var siteName : list "Community,Engineering,Product") {
+			AssertElementPresent(
+				facetValueName = "${siteName}",
+				locator1 = "Search#FACET_LABEL_LAYOUT");
+		}
+	}
+
 	@description = "This is a use case for LPS-152993."
 	@priority = "4"
 	test AssertSortWidgetNoXSS {
@@ -674,11 +878,11 @@ definition {
 	}
 
 	@priority = "3"
-	test AssertTagFacetDisplays {
-		for (var tagList : list "engineering,product,2021,2022") {
+	test AssertTagFacetTermsWithDifferentDisplayTemplates {
+		for (var tagName : list "engineering,product,2021,2022") {
 			JSONAssettag.addTag(
 				groupName = "Guest",
-				tagName = "${tagList}");
+				tagName = "${tagName}");
 		}
 
 		JSONWebcontent.addWebContent(
@@ -695,9 +899,9 @@ definition {
 
 		Refresh();
 
-		for (var categories : list "engineering,product,2021,2022") {
+		for (var tagName : list "engineering,product,2021,2022") {
 			AssertElementPresent(
-				facetValueName = "${categories}",
+				facetValueName = "${tagName}",
 				locator1 = "Search#FACET_CLOUD_LAYOUT");
 		}
 
@@ -707,9 +911,9 @@ definition {
 
 		Refresh();
 
-		for (var categories : list "engineering,product,2021,2022") {
+		for (var tagName : list "engineering,product,2021,2022") {
 			AssertElementPresent(
-				facetValueName = "${categories}",
+				facetValueName = "${tagName}",
 				locator1 = "Search#FACET_COMPACT_LAYOUT");
 		}
 
@@ -719,9 +923,94 @@ definition {
 
 		Refresh();
 
-		for (var categories : list "engineering,product,2021,2022") {
+		for (var tagName : list "engineering,product,2021,2022") {
 			AssertElementPresent(
-				facetValueName = "${categories}",
+				facetValueName = "${tagName}",
+				locator1 = "Search#FACET_LABEL_LAYOUT");
+		}
+	}
+
+	@priority = "3"
+	test AssertTypeFacetTermsWithDifferentDisplayTemplates {
+		JSONWebcontent.addWebContent(
+			content = "WC WebContent Content",
+			groupName = "Guest",
+			title = "WC WebContent Title 1");
+
+		JSONDocument.addFileWithUploadedFile(
+			dmDocumentTitle = "DM Title",
+			groupName = "Guest",
+			mimeType = "application/docx",
+			sourceFileName = "Document_1.docx");
+
+		JSONBlog.addEntry(
+			entryContent = "Blogs Entry Content",
+			entryTitle = "Blogs Entry Title");
+
+		SearchPortlets.searchEmbedded(searchTerm = "title");
+
+		SearchFacetPortlet.updateFacetConfiguration(
+			displayTemplate = "Compact Layout",
+			portletName = "Type Facet");
+
+		Refresh();
+
+		for (var Document : list "Web Content Article,Document,Blogs Entry") {
+			AssertElementPresent(
+				facetValueName = "${Document}",
+				locator1 = "Search#FACET_COMPACT_LAYOUT");
+		}
+
+		SearchFacetPortlet.updateFacetConfiguration(
+			displayTemplate = "Label Layout",
+			portletName = "Type Facet");
+
+		Refresh();
+
+		for (var Document : list "Web Content Article,Document,Blogs Entry") {
+			AssertElementPresent(
+				facetValueName = "${Document}",
+				locator1 = "Search#FACET_LABEL_LAYOUT");
+		}
+	}
+
+	@priority = "3"
+	test AssertUserFacetTermsWithDifferentDisplayTemplates {
+		for (var count : list "1,2,3") {
+			JSONUser.addUser(
+				userEmailAddress = "userea${count}@liferay.com",
+				userFirstName = "userfn${count}",
+				userLastName = "userln${count}",
+				userScreenName = "usersn${count}");
+
+			JSONUser.addUserToSite(
+				groupName = "Guest",
+				userEmailAddress = "userea${count}@liferay.com");
+		}
+
+		SearchPortlets.searchEmbedded(searchTerm = "user");
+
+		SearchFacetPortlet.updateFacetConfiguration(
+			displayTemplate = "Compact Layout",
+			portletName = "User Facet");
+
+		Refresh();
+
+		for (var users : list "userfn1 userln1,userfn2 userln2,userfn3 userln3") {
+			AssertElementPresent(
+				facetValueName = "${users}",
+				locator1 = "Search#FACET_COMPACT_LAYOUT");
+		}
+
+		SearchFacetPortlet.updateFacetConfiguration(
+			displayTemplate = "Label Layout",
+			portletName = "User Facet");
+
+		Refresh();
+
+		for (var users : list "userfn1 userln1,userfn2 userln2,userfn3 userln3") {
+			AssertElementPresent(
+				facetValueName = "${users}",
 				locator1 = "Search#FACET_LABEL_LAYOUT");
 		}
 	}
@@ -825,13 +1114,13 @@ definition {
 			key_searchAssetTitle = "WC",
 			locator1 = "SearchResults#ASSET_ENTRY_TABLE_TITLE_SPECIFIC_HIGHLIGHT",
 			locator2 = "background-color",
-			value1 = "rgba(255, 255, 204, 1)");
+			value1 = "rgba(252, 248, 227, 1)");
 
 		AssertCssValue(
 			key_searchAssetTitle = "Title",
 			locator1 = "SearchResults#ASSET_ENTRY_TABLE_TITLE_SPECIFIC_HIGHLIGHT",
 			locator2 = "background-color",
-			value1 = "rgba(255, 255, 204, 1)");
+			value1 = "rgba(252, 248, 227, 1)");
 
 		SearchResultPortlet.configureSearchResults(disableHighlighting = "true");
 
