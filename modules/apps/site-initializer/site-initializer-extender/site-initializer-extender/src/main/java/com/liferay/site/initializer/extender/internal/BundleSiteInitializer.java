@@ -23,6 +23,7 @@ import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
+import com.liferay.commerce.initializer.util.PortletSettingsImporter;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.document.library.kernel.service.DLAppLocalServiceUtil;
@@ -210,6 +211,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		ObjectDefinitionResource.Factory objectDefinitionResourceFactory,
 		ObjectRelationshipResource.Factory objectRelationshipResourceFactory,
 		ObjectEntryLocalService objectEntryLocalService, Portal portal,
+		PortletSettingsImporter portletSettingsImporter,
 		RemoteAppEntryLocalService remoteAppEntryLocalService,
 		ResourceActionLocalService resourceActionLocalService,
 		ResourcePermissionLocalService resourcePermissionLocalService,
@@ -263,6 +265,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_objectRelationshipResourceFactory = objectRelationshipResourceFactory;
 		_objectEntryLocalService = objectEntryLocalService;
 		_portal = portal;
+		_portletSettingsImporter = portletSettingsImporter;
 		_remoteAppEntryLocalService = remoteAppEntryLocalService;
 		_resourceActionLocalService = resourceActionLocalService;
 		_resourcePermissionLocalService = resourcePermissionLocalService;
@@ -375,6 +378,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 			_invoke(
 				() -> _addTaxonomyVocabularies(
 					serviceContext, siteNavigationMenuItemSettingsBuilder));
+
+			_invoke(() -> _addPortletSettings(serviceContext));
 			_invoke(() -> _updateLayoutSets(serviceContext));
 
 			_invoke(
@@ -1606,6 +1611,19 @@ public class BundleSiteInitializer implements SiteInitializer {
 			return objectDefinitionIdsStringUtilReplaceValues;
 		}
 
+		List<com.liferay.object.model.ObjectDefinition> objectDefinitions =
+			_objectDefinitionLocalService.getObjectDefinitions(
+				serviceContext.getCompanyId(), true,
+				WorkflowConstants.STATUS_APPROVED);
+
+		for (com.liferay.object.model.ObjectDefinition objectDefinition :
+				objectDefinitions) {
+
+			objectDefinitionIdsStringUtilReplaceValues.put(
+				"OBJECT_DEFINITION_ID:" + objectDefinition.getName(),
+				String.valueOf(objectDefinition.getObjectDefinitionId()));
+		}
+
 		for (String resourcePath : resourcePaths) {
 			if (resourcePath.endsWith(".object-entries.json")) {
 				continue;
@@ -1792,6 +1810,27 @@ public class BundleSiteInitializer implements SiteInitializer {
 		_addUserAccounts(serviceContext);
 
 		_addUserRoles(serviceContext);
+	}
+
+	private void _addPortletSettings(ServiceContext serviceContext)
+		throws Exception {
+
+		String resourcePath = "/site-initializer/portlet-settings.json";
+
+		String json = SiteInitializerUtil.read(resourcePath, _servletContext);
+
+		if (json == null) {
+			return;
+		}
+
+		Group group = _groupLocalService.getCompanyGroup(
+			serviceContext.getCompanyId());
+
+		_portletSettingsImporter.importPortletSettings(
+			JSONFactoryUtil.createJSONArray(json), _classLoader,
+			"/site-initializer/portlet-settings/",
+			serviceContext.getScopeGroupId(), group.getGroupId(),
+			serviceContext.getUserId());
 	}
 
 	private Map<String, String> _addRemoteAppEntries(
@@ -2654,12 +2693,13 @@ public class BundleSiteInitializer implements SiteInitializer {
 			JSONObject workflowDefinitionJSONObject =
 				JSONFactoryUtil.createJSONObject(
 					SiteInitializerUtil.read(
-						resourcePath + ".json", _servletContext));
+						resourcePath + "workflow-definition.json",
+						_servletContext));
 
 			workflowDefinitionJSONObject.put(
 				"content",
 				SiteInitializerUtil.read(
-					resourcePath + ".content.xml", _servletContext));
+					resourcePath + "workflow-definition.xml", _servletContext));
 
 			WorkflowDefinition workflowDefinition =
 				workflowDefinitionResource.postWorkflowDefinitionDeploy(
@@ -2667,7 +2707,8 @@ public class BundleSiteInitializer implements SiteInitializer {
 						workflowDefinitionJSONObject.toString()));
 
 			String propertiesJSON = SiteInitializerUtil.read(
-				resourcePath + ".properties.json", _servletContext);
+				resourcePath + "workflow-definition.properties.json",
+				_servletContext);
 
 			if (propertiesJSON == null) {
 				continue;
@@ -2716,10 +2757,25 @@ public class BundleSiteInitializer implements SiteInitializer {
 						className, "#", objectDefinition.getId());
 				}
 
+				long typePK = 0;
+
+				if ((_commerceSiteInitializer != null) &&
+					StringUtil.equals(
+						className,
+						_commerceSiteInitializer.getCommerceOrderClassName())) {
+
+					groupId =
+						_commerceSiteInitializer.getCommerceChannelGroupId(
+							groupId);
+
+					typePK = propertiesJSONObject.getLong("typePK");
+				}
+
 				_workflowDefinitionLinkLocalService.
 					updateWorkflowDefinitionLink(
 						serviceContext.getUserId(),
-						serviceContext.getCompanyId(), groupId, className, 0, 0,
+						serviceContext.getCompanyId(), groupId, className, 0,
+						typePK,
 						StringBundler.concat(
 							workflowDefinition.getName(), "@",
 							workflowDefinition.getVersion()));
@@ -3019,6 +3075,7 @@ public class BundleSiteInitializer implements SiteInitializer {
 	private final ObjectRelationshipResource.Factory
 		_objectRelationshipResourceFactory;
 	private final Portal _portal;
+	private final PortletSettingsImporter _portletSettingsImporter;
 	private final RemoteAppEntryLocalService _remoteAppEntryLocalService;
 	private final ResourceActionLocalService _resourceActionLocalService;
 	private final ResourcePermissionLocalService

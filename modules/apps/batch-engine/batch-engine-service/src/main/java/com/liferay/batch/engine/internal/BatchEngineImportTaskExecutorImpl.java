@@ -26,9 +26,11 @@ import com.liferay.batch.engine.internal.notification.BatchEngineNotificationSen
 import com.liferay.batch.engine.internal.reader.BatchEngineImportTaskItemReader;
 import com.liferay.batch.engine.internal.reader.BatchEngineImportTaskItemReaderFactory;
 import com.liferay.batch.engine.internal.reader.BatchEngineImportTaskItemReaderUtil;
+import com.liferay.batch.engine.internal.strategy.BatchEngineImportStrategyFactory;
 import com.liferay.batch.engine.internal.task.progress.BatchEngineTaskProgress;
 import com.liferay.batch.engine.internal.task.progress.BatchEngineTaskProgressFactory;
 import com.liferay.batch.engine.model.BatchEngineImportTask;
+import com.liferay.batch.engine.service.BatchEngineImportTaskErrorLocalService;
 import com.liferay.batch.engine.service.BatchEngineImportTaskLocalService;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
@@ -176,6 +178,8 @@ public class BatchEngineImportTaskExecutorImpl
 			_transactionConfig,
 			() -> {
 				batchEngineTaskItemDelegateExecutor.saveItems(
+					_batchEngineImportStrategyFactory.create(
+						batchEngineImportTask),
 					BatchEngineTaskOperation.valueOf(
 						batchEngineImportTask.getOperation()),
 					items);
@@ -281,6 +285,14 @@ public class BatchEngineImportTaskExecutorImpl
 	private static final TransactionConfig _transactionConfig =
 		TransactionConfig.Factory.create(
 			Propagation.REQUIRES_NEW, new Class<?>[] {Exception.class});
+
+	private final BatchEngineImportStrategyFactory
+		_batchEngineImportStrategyFactory =
+			new BatchEngineImportStrategyFactory();
+
+	@Reference
+	private BatchEngineImportTaskErrorLocalService
+		_batchEngineImportTaskErrorLocalService;
 
 	private BatchEngineImportTaskItemReaderFactory
 		_batchEngineImportTaskItemReaderFactory;

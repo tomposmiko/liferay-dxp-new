@@ -60,7 +60,6 @@ JSPLogFileNameCheck | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Validates the valu
 [JSPSendRedirectCheck](check/jsp_send_redirect_check.markdown#jspsendredirectcheck) | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Checks that there are no calls to `HttpServletResponse.sendRedirect` from `jsp` files. |
 JSPSessionKeysCheck | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Checks that messages send to `SessionsErrors` or `SessionMessages` follow naming conventions. |
 JSPTagAttributesCheck | .jsp, .jspf, .jspx, .tag, .tpl or .vm | Performs several checks on tag attributes. |
-[JavaAPISignatureCheck](check/java_api_signature_check.markdown#javaapisignaturecheck) | .java | Checks that types `HttpServletRequest`, `HttpServletResponse`, `ThemeDisplay`, and `ServiceContext` are not used in API method signatures. |
 JavaAbstractMethodCheck | .java | Finds incorrect `abstract` methods in `interface`. |
 JavaAnnotationsCheck | .java | Performs several checks on annotations. |
 [JavaAnonymousInnerClassCheck](check/java_anonymous_inner_class_check.markdown#javaanonymousinnerclasscheck) | .java | Performs several checks on anonymous classes. |
@@ -95,7 +94,6 @@ JavaModifiedServiceMethodCheck | .java | Finds missing empty lines before `remov
 JavaModuleIllegalImportsCheck | .java | Finds cases of incorrect use of certain classes in modules. |
 JavaModuleInternalImportsCheck | .java | Finds cases where a module imports an `internal` class from another class. |
 JavaModuleJavaxPortletInitParamTemplatePathCheck | .java | Validates the value of `javax.portlet.init-param.template-path`. |
-JavaModuleServiceProxyFactoryCheck | .java | Finds cases of `ServiceProxyFactory.newServiceTrackedInstance`. |
 JavaModuleServiceReferenceCheck | .java | Finds cases where `@BeanReference` annotation should be used instead of `@ServiceReference` annotation. |
 [JavaModuleTestCheck](check/java_module_test_check.markdown#javamoduletestcheck) | .java | Checks package names in tests. |
 [JavaOSGiReferenceCheck](check/java_osgi_reference_check.markdown#javaosgireferencecheck) | .java | Performs several checks on classes with `@Component` annotation. |

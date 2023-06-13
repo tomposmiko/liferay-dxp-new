@@ -33,14 +33,16 @@ export type TObjectField = {
 };
 
 export type TObjectViewColumn = {
+	fieldLabel: string;
 	isDefaultSort: boolean;
-	label: string;
+	label: TName;
 	objectFieldName: string;
 	priority?: number;
 };
 
 export type TObjectViewSortColumn = {
-	label: string;
+	fieldLabel: string;
+	label: TName;
 	objectFieldName: string;
 	priority?: number;
 	sortOrder?: string;
@@ -54,6 +56,7 @@ export type TObjectView = {
 };
 
 export type TState = {
+	isFFObjectViewColumnAliasEnabled: boolean;
 	isFFObjectViewSortColumnConfigurationEnabled: boolean;
 	isViewOnly: boolean;
 	objectFields: TObjectField[];

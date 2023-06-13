@@ -1624,6 +1624,15 @@ definition {
 			locator1 = "DocumentsAndMediaDocument#DOCUMENT_DETAILS_IMAGE_PREVIEW");
 	}
 
+	@description = "This test covers LPS-146237. It validates that a PDF can be previewed from the Recycle Bin."
+	@ignore = "Test Stub"
+	@priority = "3"
+	test CanPreviewPDFFromRecycleBin {
+
+		// TODO LPS-147937
+
+	}
+
 	@description = "This test covers LPS-104957. It ensures that the PNG file can be previewed."
 	@priority = "5"
 	@refactordone
@@ -2463,6 +2472,15 @@ definition {
 		BlogsNavigator.gotoEntryCP(entryTitle = "Blogs Entry Title");
 
 		BlogsEntry.viewInlineImage(uploadFileName = "static.gif");
+	}
+
+	@description = "This test covers LPS-144687. It validates that a temp zip is not created if NoSuchFileException occurs during a download."
+	@ignore = "Test Stub"
+	@priority = "4"
+	test NoZipFileIsCreatedIfDownloadResultsInError {
+
+		// TODO LPS-149394
+
 	}
 
 	@description = "This test covers LPS-101667. It makes sure that the file size can be displayed correctly in the different versions after editing the document file."

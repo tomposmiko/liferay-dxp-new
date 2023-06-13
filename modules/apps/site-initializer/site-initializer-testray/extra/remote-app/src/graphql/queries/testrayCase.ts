@@ -14,20 +14,25 @@
 
 import {gql} from '@apollo/client';
 
-import {testrayCaseFragment} from '../fragments';
+import {TestrayCaseType} from './testrayCaseType';
+import {TestrayComponent} from './testrayComponent';
 
 export type TestrayCase = {
 	caseNumber: number;
+	dateCreated: string;
+	dateModified: string;
 	description: string;
 	descriptionType: string;
 	estimatedDuration: number;
+	id: number;
 	name: string;
 	originationKey: string;
 	priority: number;
 	steps: string;
 	stepsType: string;
-	testrayCaseId: number;
 	testrayCaseResult: number;
+	testrayCaseType?: TestrayCaseType;
+	testrayComponent?: TestrayComponent;
 };
 
 export const getTestrayCases = gql`
@@ -53,7 +58,7 @@ export const getTestrayCases = gql`
 				priority
 				steps
 				stepsType
-				id: testrayCaseId
+				id
 				testrayCaseResult
 				testrayCaseType: r_caseCaseType_c_testrayCaseType {
 					name
@@ -74,12 +79,33 @@ export const getTestrayCases = gql`
 `;
 
 export const getTestrayCase = gql`
-	${testrayCaseFragment}
-
-	query getTestrayCase($testrayCaseId: Long!) {
-		c {
-			testrayCase(testrayCaseId: $testrayCaseId) {
-				...TestrayCaseFragment
+	query gettestrayCase($testrayCaseId: Long!) {
+		testrayCase(testrayCaseId: $testrayCaseId)
+			@rest(
+				type: "C_TestrayCase"
+				path: "testraycases/{args.testrayCaseId}?nestedFields=testrayComponent.testrayTeam,testrayCaseType"
+			) {
+			caseNumber
+			dateCreated
+			dateModified
+			description
+			descriptionType
+			estimatedDuration
+			name
+			originationKey
+			priority
+			steps
+			stepsType
+			id
+			testrayCaseResult
+			testrayCaseType: r_caseCaseType_c_testrayCaseType {
+				name
+			}
+			testrayComponent: r_casesComponents_c_testrayComponent {
+				name
+				testrayTeam: r_componentTeam_c_testrayTeam {
+					name
+				}
 			}
 		}
 	}

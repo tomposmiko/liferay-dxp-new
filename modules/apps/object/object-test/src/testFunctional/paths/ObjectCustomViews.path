@@ -90,6 +90,16 @@
 		<td>//input[contains(@class,'custom-control-input')]</td>
 		<td></td>
 	</tr>
+	<tr>
+		<td>VIEW_COLUMN_ENTRIES</td>
+		<td>//div[${key_position}]//button[contains(text(),'${key_columnName}')]</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>SELECT_PERMISSIONS_TO_REGULAR_ROLE</td>
+		<td>//input[@id='regular-role_ACTION_${key_permissionName}']</td>
+		<td></td>
+	</tr>
 </tbody>
 </table>
 </body>

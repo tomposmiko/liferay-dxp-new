@@ -47,6 +47,56 @@ definition {
 		}
 	}
 
+	@description = "LPS-147404. Assert the more actions button is displayed"
+	@priority = "5"
+	test MoreActionsButtonCanRender {
+		task ("Navigate to Management Toolbars tab") {
+			Navigator.gotoNavTab(navTab = "Management Toolbars");
+		}
+
+		task ("Assert the 'more actions' button is displayed") {
+			AssertElementPresent(locator1 = "ManagementBar#MORE_ACTIONS_ELLIPSIS");
+		}
+
+		task ("Assert all the actions are displayed as icon and text buttons") {
+			AssertElementPresent(
+				key_action = "Download",
+				key_icon = "download",
+				locator1 = "ManagementBar#ICON_AND_TEXT_ACTION_BUTTON");
+
+			AssertElementPresent(
+				key_action = "Delete",
+				key_icon = "trash",
+				locator1 = "ManagementBar#ICON_AND_TEXT_ACTION_BUTTON");
+		}
+	}
+
+	@description = "LPS-147832. Assert the more actions button can display quick actions"
+	@priority = "5"
+	test MoreActionsButtonRenderQuickActions {
+		task ("Navigate to Management Toolbars tab") {
+			Navigator.gotoNavTab(navTab = "Management Toolbars");
+		}
+
+		task ("Click on 'more actions' button") {
+			Click(locator1 = "ManagementBar#MORE_ACTIONS_ELLIPSIS");
+		}
+
+		task ("Assert quick actions are displayed") {
+			AssertElementPresent(
+				key_action = "Edit",
+				locator1 = "ManagementBar#QUICK_ACTION_DROPDOWN_ITEM");
+
+			AssertElementPresent(
+				key_action = "Download",
+				locator1 = "ManagementBar#QUICK_ACTION_DROPDOWN_ITEM");
+
+			AssertElementPresent(
+				key_action = "Delete",
+				locator1 = "ManagementBar#QUICK_ACTION_DROPDOWN_ITEM");
+		}
+	}
+
 	@description = "LPS-147864. Assert the New button is displayed as a text button"
 	@priority = "5"
 	test NewButtonRender {
@@ -73,6 +123,10 @@ definition {
 		}
 
 		task ("Assert the new button is displayed as an icon button") {
+			ScrollWebElementIntoView(locator1 = "ManagementBar#NEW_BUTTON_MOBILE");
+
+			Pause(locator1 = "3000");
+
 			AssertElementPresent(locator1 = "ManagementBar#NEW_BUTTON_MOBILE");
 
 			AssertTextNotEquals(
@@ -93,6 +147,10 @@ definition {
 		}
 
 		task ("Hover over the new button") {
+			ScrollWebElementIntoView(locator1 = "ManagementBar#NEW_BUTTON_MOBILE");
+
+			Pause(locator1 = "3000");
+
 			MouseOver(locator1 = "ManagementBar#NEW_BUTTON_MOBILE");
 		}
 

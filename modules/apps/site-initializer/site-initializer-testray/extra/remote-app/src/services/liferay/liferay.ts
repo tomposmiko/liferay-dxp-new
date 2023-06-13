@@ -13,6 +13,7 @@
  */
 
 interface IThemeDisplay {
+	getBCP47LanguageId(): () => string;
 	getCompanyGroupId: () => number;
 	getLanguageId: () => string;
 	getPathThemeImages: () => string;
@@ -39,6 +40,7 @@ declare global {
 
 export const Liferay = window.Liferay || {
 	ThemeDisplay: {
+		getBCP47LanguageId: () => 'en-US',
 		getCompanyGroupId: () => 0,
 		getLanguageId: () => 'en_US',
 		getPathThemeImages: () => '',
@@ -47,4 +49,10 @@ export const Liferay = window.Liferay || {
 		getUserName: () => 'Test Test',
 	},
 	authToken: '',
+};
+
+export const LIFERAY_URLS = {
+	manage_roles: `${window.origin}/group/guest/~/control_panel/manage?p_p_id=com_liferay_roles_admin_web_portlet_RolesAdminPortlet&p_p_lifecycle=0&p_p_state=maximized`,
+	manage_server: `${window.origin}/group/guest/~/control_panel/manage?p_p_id=com_liferay_server_admin_web_portlet_ServerAdminPortlet&p_p_lifecycle=0&p_p_state=maximized`,
+	manage_user_groups: `${window.origin}/group/guest/~/control_panel/manage?p_p_id=com_liferay_user_groups_admin_web_portlet_UserGroupsAdminPortlet&p_p_lifecycle=0&p_p_state=maximized`,
 };

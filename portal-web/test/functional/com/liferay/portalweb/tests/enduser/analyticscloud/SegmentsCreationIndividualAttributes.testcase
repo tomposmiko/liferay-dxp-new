@@ -416,8 +416,6 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8567 | Test Summary: Add segment using an individual property 'user group'"
 	@priority = "4"
 	test CanAddSegmentUsingIndividualPropertyUserGroup {
-		property portal.upstream = "quarantine";
-
 		task ("Add a new user group and assign to the user") {
 			JSONUserGroup.addUserGroup(
 				userGroupDescription = "UG UserGroup Description",
@@ -478,15 +476,8 @@ definition {
 	}
 
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8569 | Test Summary: Add segment with custom field for individuals"
-	@ignore = "true"
 	@priority = "4"
 	test CanAddSegmentWithCustomFieldsForIndividuals {
-		property portal.upstream = "quarantine";
-
-		// AC Refactor: DXP User never appears
-		// AC Refactor ticket: LRAC-9351
-		// AC Bug ticket: LRAC-9350
-
 		task ("Add a user custom field") {
 			ApplicationsMenu.gotoPortlet(
 				category = "Configuration",
@@ -515,6 +506,23 @@ definition {
 
 		task ("Sync the Contact Data") {
 			ACDXPSettings.syncNewUserData(fieldNameList = "user custom field");
+		}
+
+		task ("Redefine the value of the custom field") {
+			ApplicationsMenu.gotoPortlet(
+				category = "Users",
+				panel = "Control Panel",
+				portlet = "Users and Organizations");
+
+			User.gotoEditCP(userScreenName = "ac");
+
+			User.editUserInformation(
+				userCustomField = "VIP AC",
+				userCustomFieldLabel = "User Custom Field");
+		}
+
+		task ("Sync the Contact Data") {
+			ACDXPSettings.syncNewContactData();
 		}
 
 		task ("View the page as the new added user") {
@@ -550,10 +558,10 @@ definition {
 
 			ACSegments.selectOperator(operator = "contains");
 
-			ACSegments.editTextCriterion(textInput = "VIP");
+			ACSegments.editTextCriterion(textInput = "VIP AC");
 		}
 
-		task ("View the user showns on the Preview mode") {
+		task ("View the user shown on the Preview mode") {
 			ACSegments.previewSegmentMembership();
 
 			ACUtils.viewNameList(nameList = "ac ac");
@@ -563,8 +571,6 @@ definition {
 	@description = "Feature ID: Legacy | Automation ID: LRAC-8570 | Test Summary: Add segment with custom fields for organizations"
 	@priority = "4"
 	test CanAddSegmentWithCustomFieldsForOrganizations {
-		property portal.upstream = "quarantine";
-
 		task ("Add a new organization and assign to the user") {
 			JSONOrganization.addOrganization(organizationName = "Organization Name");
 

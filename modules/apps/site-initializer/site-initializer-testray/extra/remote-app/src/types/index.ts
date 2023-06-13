@@ -23,6 +23,11 @@ export type ActionMap<M extends {[index: string]: any}> = {
 		  };
 };
 
+export enum DescriptionType {
+	MARKDOWN = 'markdown',
+	PLAINTEXT = 'plaintext',
+}
+
 export enum SortOption {
 	ASC = 'asc',
 	DESC = 'desc',

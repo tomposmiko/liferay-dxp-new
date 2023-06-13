@@ -17,6 +17,7 @@
 import {TObjectViewSortColumn} from '../types';
 import './BuilderScreen.scss';
 interface IProps {
+	aliasColumnHeader: string;
 	emptyState: {
 		buttonText: string;
 		description: string;
@@ -24,17 +25,20 @@ interface IProps {
 	};
 	isDefaultSort?: boolean;
 	objectColumns: TObjectViewSortColumn[];
+	onEditing?: (boolean: boolean) => void;
 	onEditingObjectFieldName?: (objectFieldName: string) => void;
-	onEditingSort?: (boolean: boolean) => void;
+	onVisibleEditModal: (boolean: boolean) => void;
 	onVisibleModal: (boolean: boolean) => void;
 	title: string;
 }
 export declare function BuilderScreen({
+	aliasColumnHeader,
 	emptyState,
 	isDefaultSort,
 	objectColumns,
+	onEditing,
 	onEditingObjectFieldName,
-	onEditingSort,
+	onVisibleEditModal,
 	onVisibleModal,
 	title,
 }: IProps): JSX.Element;

@@ -87,7 +87,6 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -485,12 +484,6 @@ public class ObjectEntryLocalServiceImpl
 				)
 			),
 			selectExpressions);
-
-		if (ListUtil.isEmpty(rows)) {
-			throw new ObjectEntryValuesException(
-				"No values exist for object entry " +
-					objectEntry.getObjectEntryId());
-		}
 
 		return _getValues(rows.get(0), selectExpressions);
 	}
@@ -1126,9 +1119,8 @@ public class ObjectEntryLocalServiceImpl
 
 			if (value == null) {
 				if (objectField.isRequired()) {
-					throw new ObjectEntryValuesException(
-						"No value was provided for required object field \"" +
-							objectField.getName() + "\"");
+					throw new ObjectEntryValuesException.Required(
+						objectField.getName());
 				}
 
 				if (_log.isDebugEnabled()) {
@@ -1621,43 +1613,6 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
-	private void _validateListTypeEntriesValues(
-			Map<String, Serializable> values,
-			Map.Entry<String, Serializable> entry, ObjectField objectField)
-		throws ObjectEntryValuesException {
-
-		List<ListTypeEntry> listTypeEntries =
-			_listTypeEntryLocalService.getListTypeEntries(
-				objectField.getListTypeDefinitionId());
-
-		Stream<ListTypeEntry> stream = listTypeEntries.stream();
-
-		String value = _getValue(String.valueOf(values.get(entry.getKey())));
-
-		if ((!value.isEmpty() || objectField.isRequired()) &&
-			!stream.anyMatch(
-				listTypeEntry -> Objects.equals(
-					listTypeEntry.getKey(), value))) {
-
-			throw new ObjectEntryValuesException(
-				"Object field name \"" + entry.getKey() +
-					"\" is not mapped to a valid list type entry");
-		}
-	}
-
-	private void _validateObjectFieldStringTypeLength(
-			Map.Entry<String, Serializable> entry)
-		throws ObjectEntryValuesException {
-
-		String value = (String)entry.getValue();
-
-		if ((value != null) && (value.length() > 280)) {
-			throw new ObjectEntryValuesException(
-				"Object field \"" + entry.getKey() +
-					"\" value exceeds 280 characters.");
-		}
-	}
-
 	private void _validateOneToOneInsert(
 			String dbColumnName, long dbColumnValue,
 			DynamicObjectDefinitionTable dynamicObjectDefinitionTable)
@@ -1688,11 +1643,9 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		if (count > 0) {
-			throw new ObjectEntryValuesException(
-				StringBundler.concat(
-					"One to one constraint violation for ",
-					dynamicObjectDefinitionTable.getTableName(), ".",
-					dbColumnName, " with value ", dbColumnValue));
+			throw new ObjectEntryValuesException.OneToOneConstraintViolation(
+				dbColumnName, dbColumnValue,
+				dynamicObjectDefinitionTable.getTableName());
 		}
 	}
 
@@ -1729,11 +1682,9 @@ public class ObjectEntryLocalServiceImpl
 		}
 
 		if (count > 0) {
-			throw new ObjectEntryValuesException(
-				StringBundler.concat(
-					"One to one constraint violation for ",
-					dynamicObjectDefinitionTable.getTableName(), ".",
-					dbColumnName, " with value ", dbColumnValue));
+			throw new ObjectEntryValuesException.OneToOneConstraintViolation(
+				dbColumnName, dbColumnValue,
+				dynamicObjectDefinitionTable.getTableName());
 		}
 	}
 
@@ -1742,26 +1693,92 @@ public class ObjectEntryLocalServiceImpl
 		throws PortalException {
 
 		for (Map.Entry<String, Serializable> entry : values.entrySet()) {
-			ObjectField objectField = null;
+			_validateValues(entry, objectDefinitionId, values);
+		}
+	}
 
-			try {
-				objectField = _objectFieldLocalService.getObjectField(
-					objectDefinitionId, entry.getKey());
+	private void _validateValues(
+			Map.Entry<String, Serializable> entry, long objectDefinitionId,
+			Map<String, Serializable> values)
+		throws PortalException {
+
+		ObjectField objectField = null;
+
+		try {
+			objectField = _objectFieldLocalService.getObjectField(
+				objectDefinitionId, entry.getKey());
+		}
+		catch (NoSuchObjectFieldException noSuchObjectFieldException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(noSuchObjectFieldException);
 			}
-			catch (NoSuchObjectFieldException noSuchObjectFieldException) {
-				if (_log.isDebugEnabled()) {
-					_log.debug(noSuchObjectFieldException);
+
+			return;
+		}
+
+		String dbType = objectField.getDBType();
+
+		if (StringUtil.equals(dbType, "Integer")) {
+			Serializable entryValue = entry.getValue();
+
+			String entryValueString = entryValue.toString();
+
+			if (!entryValueString.isEmpty()) {
+				int value = GetterUtil.getInteger(entryValue);
+
+				if (!StringUtil.equals(
+						String.valueOf(value), entryValueString)) {
+
+					throw new ObjectEntryValuesException.ExceedsIntegerSize();
 				}
-
-				continue;
 			}
+		}
+		else if (StringUtil.equals(dbType, "Long")) {
+			Serializable entryValue = entry.getValue();
 
-			if (StringUtil.equals(objectField.getDBType(), "String")) {
-				_validateObjectFieldStringTypeLength(entry);
+			String entryValueString = entryValue.toString();
+
+			if (!entryValueString.isEmpty()) {
+				long value = GetterUtil.getLong(entryValue);
+
+				if (!StringUtil.equals(
+						String.valueOf(value), entryValue.toString())) {
+
+					throw new ObjectEntryValuesException.ExceedsLongSize();
+				}
+				else if (value > 9007199254740991L) {
+					throw new ObjectEntryValuesException.ExceedsLongMaxSize();
+				}
+				else if (value < -9007199254740991L) {
+					throw new ObjectEntryValuesException.ExceedsLongMinSize();
+				}
 			}
+		}
+		else if (StringUtil.equals(dbType, "String")) {
+			String value = (String)entry.getValue();
 
-			if (objectField.getListTypeDefinitionId() != 0) {
-				_validateListTypeEntriesValues(values, entry, objectField);
+			if ((value != null) && (value.length() > 280)) {
+				throw new ObjectEntryValuesException.Exceeds280Characters();
+			}
+		}
+
+		if (objectField.getListTypeDefinitionId() != 0) {
+			List<ListTypeEntry> listTypeEntries =
+				_listTypeEntryLocalService.getListTypeEntries(
+					objectField.getListTypeDefinitionId());
+
+			Stream<ListTypeEntry> stream = listTypeEntries.stream();
+
+			String value = _getValue(
+				String.valueOf(values.get(entry.getKey())));
+
+			if ((!value.isEmpty() || objectField.isRequired()) &&
+				!stream.anyMatch(
+					listTypeEntry -> Objects.equals(
+						listTypeEntry.getKey(), value))) {
+
+				throw new ObjectEntryValuesException.ListTypeEntry(
+					entry.getKey());
 			}
 		}
 	}

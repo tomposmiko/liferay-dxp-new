@@ -18,31 +18,45 @@ import {initialState} from '../../context/HeaderContext';
 import {getTestrayProjects} from '../../graphql/queries';
 import useHeader from '../../hooks/useHeader';
 import i18n from '../../i18n';
+import ProjectModal from './ProjectModal';
+import useProjectActions from './useProjectActions';
 
 const Home = () => {
+	const {actions, formModal} = useProjectActions();
+
 	useHeader({useHeading: initialState.heading});
 
 	return (
-		<Container title={i18n.translate('projects')}>
-			<ListView
-				query={getTestrayProjects}
-				tableProps={{
-					columns: [
-						{
-							clickable: true,
-							key: 'name',
-							value: i18n.translate('project'),
-						},
-						{
-							key: 'description',
-							value: i18n.translate('description'),
-						},
-					],
-					navigateTo: (project) => `/project/${project.id}/routines`,
-				}}
-				transformData={(data) => data?.c?.testrayProjects}
-			/>
-		</Container>
+		<>
+			<Container title={i18n.translate('projects')}>
+				<ListView
+					forceRefetch={formModal.forceRefetch}
+					managementToolbarProps={{
+						addButton: formModal.modal.open,
+					}}
+					query={getTestrayProjects}
+					tableProps={{
+						actions,
+						columns: [
+							{
+								clickable: true,
+								key: 'name',
+								value: i18n.translate('project'),
+							},
+							{
+								key: 'description',
+								value: i18n.translate('description'),
+							},
+						],
+						navigateTo: (project) =>
+							`/project/${project.id}/routines`,
+					}}
+					transformData={(data) => data?.c?.testrayProjects}
+				/>
+			</Container>
+
+			<ProjectModal modal={formModal.modal} />
+		</>
 	);
 };
 

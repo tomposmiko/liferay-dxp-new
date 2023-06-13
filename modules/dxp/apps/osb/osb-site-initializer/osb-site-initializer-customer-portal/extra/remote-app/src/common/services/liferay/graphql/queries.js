@@ -32,6 +32,27 @@ export const getDXPCloudPageInfo = gql`
 	}
 `;
 
+export const getAnalyticsCloudPageInfo = gql`
+	query getAnalyticsCloudPageInfo($accountSubscriptionsFilter: String) {
+		c {
+			accountSubscriptions(filter: $accountSubscriptionsFilter) {
+				items {
+					accountKey
+					hasDisasterDataCenterRegion
+					name
+				}
+			}
+			analyticsCloudDataCenterLocation {
+				items {
+					analyticsCloudDataCenterLocationId
+					name
+					value
+				}
+			}
+		}
+	}
+`;
+
 export const getAccountSubscriptionsTerms = gql`
 	query getAccountSubscriptionsTerms(
 		$filter: String
@@ -167,6 +188,18 @@ export const getDXPCloudEnvironment = gql`
 			dXPCloudEnvironments(filter: $filter, scopeKey: $scopeKey) {
 				items {
 					projectId
+				}
+			}
+		}
+	}
+`;
+
+export const getAnalyticsCloudWorkspace = gql`
+	query getAnalyticsCloudWorkspace($scopeKey: String, $filter: String) {
+		c {
+			analyticsCloudWorkspaces(filter: $filter, scopeKey: $scopeKey) {
+				items {
+					workspaceGroupId
 				}
 			}
 		}
@@ -364,6 +397,7 @@ export const getAccountUserAccountsByExternalReferenceCode = gql`
 					name
 					externalReferenceCode
 					roleBriefs {
+						id
 						name
 					}
 				}
@@ -411,5 +445,31 @@ export const updateAccountSubscriptionGroups = gql`
 				name
 			}
 		}
+	}
+`;
+
+export const deleteAccountUserRoles = gql`
+	mutation deleteAccountUserRoles(
+		$accountRoleId: Long!
+		$emailAddress: String!
+		$accountKey: String!
+	) {
+		deleteAccountByExternalReferenceCodeAccountRoleUserAccountByEmailAddress(
+			accountRoleId: $accountRoleId
+			emailAddress: $emailAddress
+			externalReferenceCode: $accountKey
+		)
+	}
+`;
+
+export const deleteAccountUserAccount = gql`
+	mutation deleteAccountUserAccountByExternalReferenceCodeByEmailAddress(
+		$emailAddress: String!
+		$accountKey: String!
+	) {
+		deleteAccountUserAccountByExternalReferenceCodeByEmailAddress(
+			emailAddress: $emailAddress
+			externalReferenceCode: $accountKey
+		)
 	}
 `;

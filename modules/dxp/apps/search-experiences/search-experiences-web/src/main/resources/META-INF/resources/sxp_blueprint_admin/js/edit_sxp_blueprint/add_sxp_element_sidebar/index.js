@@ -35,6 +35,7 @@ import {
 } from '../../utils/data';
 import {addParams, fetchData} from '../../utils/fetch';
 import {getLocalizedText} from '../../utils/language';
+import {setStorageAddSXPElementSidebar} from '../../utils/sessionStorage';
 
 const DEFAULT_CATEGORY = 'other';
 const DEFAULT_EXPANDED_LIST = ['match'];
@@ -276,15 +277,13 @@ function AddSXPElementSidebar({
 
 	const [querySXPElements, setQuerySXPElements] = useState(null);
 
-	// TODO check pagesize
-
 	useEffect(() => {
 		fetchData(
 			addParams('/o/search-experiences-rest/v1.0/sxp-elements', {
-				pageSize: 200,
-			}),
-			{method: 'GET'},
-			(responseContent) => {
+				pageSize: 200, // TODO check pagesize
+			})
+		)
+			.then((responseContent) => {
 				if (isMounted()) {
 					setQuerySXPElements(
 						responseContent.items.map(
@@ -306,23 +305,28 @@ function AddSXPElementSidebar({
 						)
 					);
 				}
-			},
-			() => {
+			})
+			.catch(() => {
 				if (isMounted()) {
 					setQuerySXPElements([]);
 				}
-			}
-		);
+			});
 	}, []); //eslint-disable-line
 
 	if (!querySXPElements) {
 		return null;
 	}
 
+	const _handleClose = () => {
+		setStorageAddSXPElementSidebar('closed');
+
+		onClose();
+	};
+
 	return (
 		<Sidebar
 			className="add-sxp-element-sidebar"
-			onClose={onClose}
+			onClose={_handleClose}
 			title={Liferay.Language.get('add-query-elements')}
 			visible={visible}
 		>

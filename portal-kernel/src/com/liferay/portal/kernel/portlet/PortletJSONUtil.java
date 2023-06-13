@@ -211,31 +211,21 @@ public class PortletJSONUtil {
 			}
 		}
 
-		String footerCssPaths = JSONFactoryUtil.serialize(
-			footerCssSet.toArray(new String[0]));
-
 		jsonObject.put(
-			"footerCssPaths", JSONFactoryUtil.createJSONArray(footerCssPaths));
-
-		String footerJavaScriptPaths = JSONFactoryUtil.serialize(
-			footerJavaScriptSet.toArray(new String[0]));
-
-		jsonObject.put(
+			"footerCssPaths", JSONFactoryUtil.createJSONArray(footerCssSet)
+		).put(
 			"footerJavaScriptPaths",
-			JSONFactoryUtil.createJSONArray(footerJavaScriptPaths));
-
-		String headerCssPaths = JSONFactoryUtil.serialize(
-			headerCssSet.toArray(new String[0]));
-
-		jsonObject.put(
-			"headerCssPaths", JSONFactoryUtil.createJSONArray(headerCssPaths));
-
-		String headerJavaScriptPaths = JSONFactoryUtil.serialize(
-			headerJavaScriptSet.toArray(new String[0]));
-
-		jsonObject.put(
+			JSONFactoryUtil.createJSONArray(footerJavaScriptSet)
+		).put(
+			"headerCssPaths", JSONFactoryUtil.createJSONArray(headerCssSet)
+		).put(
 			"headerJavaScriptPaths",
-			JSONFactoryUtil.createJSONArray(headerJavaScriptPaths));
+			JSONFactoryUtil.createJSONArray(headerJavaScriptSet)
+		).put(
+			"portletHTML", portletHTML
+		).put(
+			"refresh", !portlet.isAjaxable()
+		);
 
 		List<String> markupHeadElements =
 			(List<String>)httpServletRequest.getAttribute(
@@ -246,12 +236,6 @@ public class PortletJSONUtil {
 				"markupHeadElements",
 				StringUtil.merge(markupHeadElements, StringPool.BLANK));
 		}
-
-		jsonObject.put(
-			"portletHTML", portletHTML
-		).put(
-			"refresh", !portlet.isAjaxable()
-		);
 	}
 
 	public static void writeFooterPaths(

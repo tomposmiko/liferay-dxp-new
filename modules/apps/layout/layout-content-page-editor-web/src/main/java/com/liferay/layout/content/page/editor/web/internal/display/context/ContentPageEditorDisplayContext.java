@@ -134,6 +134,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.language.LanguageResources;
+import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.constants.SegmentsWebKeys;
@@ -287,6 +288,9 @@ public class ContentPageEditorDisplayContext {
 				"defaultLanguageId",
 				LocaleUtil.toLanguageId(themeDisplay.getSiteDefaultLocale())
 			).put(
+				"defaultSegmentsExperienceId",
+				SegmentsExperienceConstants.ID_DEFAULT
+			).put(
 				"defaultStyleBookEntryImagePreviewURL",
 				() -> {
 					StyleBookEntry defaultStyleBookEntry =
@@ -343,6 +347,9 @@ public class ContentPageEditorDisplayContext {
 				"editFragmentEntryLinkURL",
 				getFragmentEntryActionURL(
 					"/layout_content_page_editor/edit_fragment_entry_link")
+			).put(
+				"featureFlagLps119551",
+				GetterUtil.getBoolean(PropsUtil.get("feature.flag.LPS-119551"))
 			).put(
 				"fragmentAdvancedOptionsEnabled",
 				_ffLayoutContentPageEditorConfiguration.
@@ -667,6 +674,8 @@ public class ContentPageEditorDisplayContext {
 					ContentPageEditorActionKeys.UPDATE_LAYOUT_CONTENT,
 					_hasUpdateContentPermissions()
 				).build()
+			).put(
+				"segmentsExperienceId", getSegmentsExperienceId()
 			).build()
 		).build();
 	}

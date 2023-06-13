@@ -1,6 +1,7 @@
 @component-name = "portal-object"
 definition {
 
+	property portal.acceptance = "true";
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property testray.main.component.name = "Object";
@@ -26,15 +27,15 @@ definition {
 	@priority = "4"
 	test CanCreateClobField {
 		ObjectAdmin.addObjectViaAPI(
-			labelName = "Custom Object",
-			objectName = "CustomObject",
-			pluralLabelName = "Custom Objects");
+			labelName = "Custom Object 206",
+			objectName = "CustomObject206",
+			pluralLabelName = "Custom Objects 206");
 
 		Navigator.openURL();
 
 		ObjectAdmin.openObjectAdmin();
 
-		ObjectPortlet.selectCustomObject(label = "Custom Object");
+		ObjectPortlet.selectCustomObject(label = "Custom Object 206");
 
 		ObjectAdmin.goToFieldsTab();
 
@@ -47,6 +48,15 @@ definition {
 		ObjectAdmin.assertObjectField(
 			fieldLabel = "Custom Field",
 			fieldType = "LongText");
+	}
+
+	@description = "LPS-147944 - Verify it is possible to view more than 20 picklists for the picklist drop-down"
+	@ignore = "Test Stub"
+	@priority = "4"
+	test CanViewMoreThan20Picklists {
+
+		// TODO LPS-149248 CanViewMoreThan20Picklists pending implementation
+
 	}
 
 	@description = "LPS-144902 - Verify there is a description of each Field Type"
@@ -68,7 +78,7 @@ definition {
 
 		LexiconEntry.gotoAdd();
 
-		Click(locator1 = "ObjectAdmin#OBJECT_FIELDS_TYPE");
+		Click(locator1 = "ObjectField#TYPE_FIELD");
 
 		ObjectAdmin.viewDescriptionForEachFieldType();
 	}

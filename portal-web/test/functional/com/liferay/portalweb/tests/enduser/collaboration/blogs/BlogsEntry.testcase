@@ -1072,6 +1072,15 @@ definition {
 		}
 	}
 
+	@description = "This test covers LPS-49419. It validates that BBCode cannot be injected into a blog comment using Pingback."
+	@ignore = "Test Stub"
+	@priority = "4"
+	test CannotInjectBBCodeIntoCommentUsingPingback {
+
+		// TODO LPS-147822
+
+	}
+
 	@description = "This is a test for LPS-136788. It checks that a user cannot rate a post when it is disabled in the configuration."
 	@priority = "3"
 	test CannotRatePost {
@@ -1262,6 +1271,15 @@ definition {
 		BlogsEntry.viewEntryPG(
 			entryContent = "Liferay Portal provides an excellent platform for building web applications, websites, and portals, but it can additionally be used for a new category of web applications called social applications. The definition is simple: a social application is a web application that additionally leverages social identity, data, and features or services. In the left figure, the light blue squares represent a definition of a standard web application while the darker blue squares show the addition of social aspects.",
 			entryTitle = "Blogs Entry Title");
+	}
+
+	@description = "This is a test for LPS-90966. It checks that the caption link will keep persisting."
+	@ignore = "Test Stub"
+	@priority = "4"
+	test LinkToImageInCaptionPersistsAfterBeingAdded {
+
+		// TODO LPS-149365 LinkToImageInCaptionPersistsAfterBeingAdded pending implementation
+
 	}
 
 	@description = "This is a use case for LPS-69240. It checks that when blog entries are duplicated their custom URL's are unique."
