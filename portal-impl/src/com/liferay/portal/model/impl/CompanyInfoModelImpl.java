@@ -219,35 +219,41 @@ public class CompanyInfoModelImpl
 
 	private static final Map<String, Function<CompanyInfo, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CompanyInfo, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CompanyInfo, Object>> attributeGetterFunctions =
 			new LinkedHashMap<String, Function<CompanyInfo, Object>>();
-		Map<String, BiConsumer<CompanyInfo, ?>> attributeSetterBiConsumers =
-			new LinkedHashMap<String, BiConsumer<CompanyInfo, ?>>();
 
 		attributeGetterFunctions.put(
 			"mvccVersion", CompanyInfo::getMvccVersion);
-		attributeSetterBiConsumers.put(
-			"mvccVersion",
-			(BiConsumer<CompanyInfo, Long>)CompanyInfo::setMvccVersion);
 		attributeGetterFunctions.put(
 			"companyInfoId", CompanyInfo::getCompanyInfoId);
-		attributeSetterBiConsumers.put(
-			"companyInfoId",
-			(BiConsumer<CompanyInfo, Long>)CompanyInfo::setCompanyInfoId);
 		attributeGetterFunctions.put("companyId", CompanyInfo::getCompanyId);
-		attributeSetterBiConsumers.put(
-			"companyId",
-			(BiConsumer<CompanyInfo, Long>)CompanyInfo::setCompanyId);
 		attributeGetterFunctions.put("key", CompanyInfo::getKey);
-		attributeSetterBiConsumers.put(
-			"key", (BiConsumer<CompanyInfo, String>)CompanyInfo::setKey);
 
 		_attributeGetterFunctions = Collections.unmodifiableMap(
 			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CompanyInfo, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<CompanyInfo, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<CompanyInfo, ?>>();
+
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<CompanyInfo, Long>)CompanyInfo::setMvccVersion);
+		attributeSetterBiConsumers.put(
+			"companyInfoId",
+			(BiConsumer<CompanyInfo, Long>)CompanyInfo::setCompanyInfoId);
+		attributeSetterBiConsumers.put(
+			"companyId",
+			(BiConsumer<CompanyInfo, Long>)CompanyInfo::setCompanyId);
+		attributeSetterBiConsumers.put(
+			"key", (BiConsumer<CompanyInfo, String>)CompanyInfo::setKey);
+
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

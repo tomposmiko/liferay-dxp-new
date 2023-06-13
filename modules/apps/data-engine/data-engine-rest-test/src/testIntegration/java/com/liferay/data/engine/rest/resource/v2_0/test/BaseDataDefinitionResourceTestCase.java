@@ -271,12 +271,12 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		dataDefinitionResource.deleteDataDefinition(dataDefinition2.getId());
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetDataDefinitionByContentTypeContentTypePage_getExpectedActions(
 				String contentType)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -836,12 +836,12 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		dataDefinitionResource.deleteDataDefinition(dataDefinition2.getId());
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetSiteDataDefinitionByContentTypeContentTypePage_getExpectedActions(
 				Long siteId, String contentType)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -1447,7 +1447,8 @@ public abstract class BaseDataDefinitionResourceTestCase {
 	}
 
 	protected void assertValid(
-		Page<DataDefinition> page, Map<String, Map> expectedActions) {
+		Page<DataDefinition> page,
+		Map<String, Map<String, String>> expectedActions) {
 
 		boolean valid = false;
 
@@ -1464,7 +1465,7 @@ public abstract class BaseDataDefinitionResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		Map<String, Map> actions = page.getActions();
+		Map<String, Map<String, String>> actions = page.getActions();
 
 		for (String key : expectedActions.keySet()) {
 			Map action = actions.get(key);

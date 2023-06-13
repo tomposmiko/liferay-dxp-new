@@ -226,10 +226,11 @@ public abstract class BaseAppResourceTestCase {
 		appResource.deleteApp(app2.getId());
 	}
 
-	protected Map<String, Map> testGetAppsPage_getExpectedActions()
+	protected Map<String, Map<String, String>>
+			testGetAppsPage_getExpectedActions()
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -640,11 +641,12 @@ public abstract class BaseAppResourceTestCase {
 		appResource.deleteApp(app2.getId());
 	}
 
-	protected Map<String, Map> testGetDataDefinitionAppsPage_getExpectedActions(
-			Long dataDefinitionId)
+	protected Map<String, Map<String, String>>
+			testGetDataDefinitionAppsPage_getExpectedActions(
+				Long dataDefinitionId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -894,11 +896,11 @@ public abstract class BaseAppResourceTestCase {
 		appResource.deleteApp(app2.getId());
 	}
 
-	protected Map<String, Map> testGetSiteAppsPage_getExpectedActions(
-			Long siteId)
+	protected Map<String, Map<String, String>>
+			testGetSiteAppsPage_getExpectedActions(Long siteId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -1262,7 +1264,7 @@ public abstract class BaseAppResourceTestCase {
 	}
 
 	protected void assertValid(
-		Page<App> page, Map<String, Map> expectedActions) {
+		Page<App> page, Map<String, Map<String, String>> expectedActions) {
 
 		boolean valid = false;
 
@@ -1279,7 +1281,7 @@ public abstract class BaseAppResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		Map<String, Map> actions = page.getActions();
+		Map<String, Map<String, String>> actions = page.getActions();
 
 		for (String key : expectedActions.keySet()) {
 			Map action = actions.get(key);

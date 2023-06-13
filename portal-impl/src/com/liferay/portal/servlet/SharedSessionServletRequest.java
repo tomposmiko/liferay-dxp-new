@@ -30,8 +30,6 @@ public class SharedSessionServletRequest extends HttpServletRequestWrapper {
 		super(httpServletRequest);
 
 		_shared = shared;
-
-		_portalSession = httpServletRequest.getSession();
 	}
 
 	@Override
@@ -41,34 +39,19 @@ public class SharedSessionServletRequest extends HttpServletRequestWrapper {
 
 	@Override
 	public HttpSession getSession(boolean create) {
-		if (create) {
-			checkPortalSession();
+		if (!create || _shared) {
+			return _getPortalHttpSession(create);
 		}
 
-		if (_shared) {
-			return _portalSession;
-		}
-
-		HttpSession portletSession = super.getSession(create);
-
-		if ((portletSession != null) && (portletSession != _portalSession)) {
-			return getSharedSessionWrapper(_portalSession, portletSession);
-		}
-
-		return portletSession;
+		return getSharedSessionWrapper(
+			_getPortalHttpSession(true), super.getSession(true));
 	}
 
 	public HttpSession getSharedSession() {
-		return _portalSession;
+		return _getPortalHttpSession(true);
 	}
 
 	protected void checkPortalSession() {
-		try {
-			_portalSession.isNew();
-		}
-		catch (IllegalStateException illegalStateException) {
-			_portalSession = super.getSession(true);
-		}
 	}
 
 	protected HttpSession getSharedSessionWrapper(
@@ -77,7 +60,16 @@ public class SharedSessionServletRequest extends HttpServletRequestWrapper {
 		return new SharedSessionWrapper(portalSession, portletSession);
 	}
 
-	private HttpSession _portalSession;
+	private HttpSession _getPortalHttpSession(boolean create) {
+		HttpSession httpSession = super.getSession(false);
+
+		if (httpSession == null) {
+			httpSession = super.getSession(create);
+		}
+
+		return httpSession;
+	}
+
 	private final boolean _shared;
 
 }

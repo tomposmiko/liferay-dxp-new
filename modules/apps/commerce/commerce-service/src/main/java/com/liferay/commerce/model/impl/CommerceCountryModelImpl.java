@@ -357,113 +357,119 @@ public class CommerceCountryModelImpl
 
 	private static final Map<String, Function<CommerceCountry, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CommerceCountry, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceCountry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<CommerceCountry, Object>>();
+
+		attributeGetterFunctions.put("uuid", CommerceCountry::getUuid);
+		attributeGetterFunctions.put(
+			"commerceCountryId", CommerceCountry::getCommerceCountryId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceCountry::getCompanyId);
+		attributeGetterFunctions.put("userId", CommerceCountry::getUserId);
+		attributeGetterFunctions.put("userName", CommerceCountry::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceCountry::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceCountry::getModifiedDate);
+		attributeGetterFunctions.put("name", CommerceCountry::getName);
+		attributeGetterFunctions.put(
+			"billingAllowed", CommerceCountry::getBillingAllowed);
+		attributeGetterFunctions.put(
+			"shippingAllowed", CommerceCountry::getShippingAllowed);
+		attributeGetterFunctions.put(
+			"twoLettersISOCode", CommerceCountry::getTwoLettersISOCode);
+		attributeGetterFunctions.put(
+			"threeLettersISOCode", CommerceCountry::getThreeLettersISOCode);
+		attributeGetterFunctions.put(
+			"numericISOCode", CommerceCountry::getNumericISOCode);
+		attributeGetterFunctions.put(
+			"subjectToVAT", CommerceCountry::getSubjectToVAT);
+		attributeGetterFunctions.put("priority", CommerceCountry::getPriority);
+		attributeGetterFunctions.put("active", CommerceCountry::getActive);
+		attributeGetterFunctions.put(
+			"lastPublishDate", CommerceCountry::getLastPublishDate);
+		attributeGetterFunctions.put(
+			"channelFilterEnabled", CommerceCountry::getChannelFilterEnabled);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CommerceCountry, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<CommerceCountry, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CommerceCountry, ?>>();
 
-		attributeGetterFunctions.put("uuid", CommerceCountry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CommerceCountry, String>)CommerceCountry::setUuid);
-		attributeGetterFunctions.put(
-			"commerceCountryId", CommerceCountry::getCommerceCountryId);
 		attributeSetterBiConsumers.put(
 			"commerceCountryId",
 			(BiConsumer<CommerceCountry, Long>)
 				CommerceCountry::setCommerceCountryId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceCountry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceCountry, Long>)CommerceCountry::setCompanyId);
-		attributeGetterFunctions.put("userId", CommerceCountry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceCountry, Long>)CommerceCountry::setUserId);
-		attributeGetterFunctions.put("userName", CommerceCountry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceCountry, String>)CommerceCountry::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceCountry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceCountry, Date>)CommerceCountry::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceCountry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceCountry, Date>)
 				CommerceCountry::setModifiedDate);
-		attributeGetterFunctions.put("name", CommerceCountry::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommerceCountry, String>)CommerceCountry::setName);
-		attributeGetterFunctions.put(
-			"billingAllowed", CommerceCountry::getBillingAllowed);
 		attributeSetterBiConsumers.put(
 			"billingAllowed",
 			(BiConsumer<CommerceCountry, Boolean>)
 				CommerceCountry::setBillingAllowed);
-		attributeGetterFunctions.put(
-			"shippingAllowed", CommerceCountry::getShippingAllowed);
 		attributeSetterBiConsumers.put(
 			"shippingAllowed",
 			(BiConsumer<CommerceCountry, Boolean>)
 				CommerceCountry::setShippingAllowed);
-		attributeGetterFunctions.put(
-			"twoLettersISOCode", CommerceCountry::getTwoLettersISOCode);
 		attributeSetterBiConsumers.put(
 			"twoLettersISOCode",
 			(BiConsumer<CommerceCountry, String>)
 				CommerceCountry::setTwoLettersISOCode);
-		attributeGetterFunctions.put(
-			"threeLettersISOCode", CommerceCountry::getThreeLettersISOCode);
 		attributeSetterBiConsumers.put(
 			"threeLettersISOCode",
 			(BiConsumer<CommerceCountry, String>)
 				CommerceCountry::setThreeLettersISOCode);
-		attributeGetterFunctions.put(
-			"numericISOCode", CommerceCountry::getNumericISOCode);
 		attributeSetterBiConsumers.put(
 			"numericISOCode",
 			(BiConsumer<CommerceCountry, Integer>)
 				CommerceCountry::setNumericISOCode);
-		attributeGetterFunctions.put(
-			"subjectToVAT", CommerceCountry::getSubjectToVAT);
 		attributeSetterBiConsumers.put(
 			"subjectToVAT",
 			(BiConsumer<CommerceCountry, Boolean>)
 				CommerceCountry::setSubjectToVAT);
-		attributeGetterFunctions.put("priority", CommerceCountry::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority",
 			(BiConsumer<CommerceCountry, Double>)CommerceCountry::setPriority);
-		attributeGetterFunctions.put("active", CommerceCountry::getActive);
 		attributeSetterBiConsumers.put(
 			"active",
 			(BiConsumer<CommerceCountry, Boolean>)CommerceCountry::setActive);
-		attributeGetterFunctions.put(
-			"lastPublishDate", CommerceCountry::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<CommerceCountry, Date>)
 				CommerceCountry::setLastPublishDate);
-		attributeGetterFunctions.put(
-			"channelFilterEnabled", CommerceCountry::getChannelFilterEnabled);
 		attributeSetterBiConsumers.put(
 			"channelFilterEnabled",
 			(BiConsumer<CommerceCountry, Boolean>)
 				CommerceCountry::setChannelFilterEnabled);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

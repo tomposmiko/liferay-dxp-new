@@ -43,6 +43,8 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.RoleLocalService;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
 import com.liferay.portal.kernel.service.permission.PortletPermissionUtil;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -456,7 +458,6 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 		throws PortalException {
 
 		return new DDMFormDisplayContext(
-			renderRequest, new MockRenderResponse(),
 			mock(DDMFormFieldTypeServicesTracker.class),
 			_ddmFormInstanceLocalService,
 			mock(DDMFormInstanceRecordService.class),
@@ -465,8 +466,10 @@ public class DDMFormDisplayContextTest extends PowerMockito {
 			mock(DDMFormRenderer.class), mock(DDMFormValuesFactory.class),
 			mock(DDMFormValuesMerger.class), _ddmFormWebConfiguration,
 			mock(DDMStorageAdapterTracker.class), mock(GroupLocalService.class),
-			new JSONFactoryImpl(),
-			mock(WorkflowDefinitionLinkLocalService.class), mock(Portal.class));
+			new JSONFactoryImpl(), mock(Portal.class), renderRequest,
+			new MockRenderResponse(), mock(RoleLocalService.class),
+			mock(UserLocalService.class),
+			mock(WorkflowDefinitionLinkLocalService.class));
 	}
 
 	protected DDMFormDisplayContext createSpy(

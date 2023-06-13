@@ -211,26 +211,32 @@ public class DSLQueryEntryModelImpl
 
 	private static final Map<String, Function<DSLQueryEntry, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<DSLQueryEntry, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<DSLQueryEntry, Object>> attributeGetterFunctions =
 			new LinkedHashMap<String, Function<DSLQueryEntry, Object>>();
-		Map<String, BiConsumer<DSLQueryEntry, ?>> attributeSetterBiConsumers =
-			new LinkedHashMap<String, BiConsumer<DSLQueryEntry, ?>>();
 
 		attributeGetterFunctions.put(
 			"dslQueryEntryId", DSLQueryEntry::getDslQueryEntryId);
-		attributeSetterBiConsumers.put(
-			"dslQueryEntryId",
-			(BiConsumer<DSLQueryEntry, Long>)DSLQueryEntry::setDslQueryEntryId);
 		attributeGetterFunctions.put("name", DSLQueryEntry::getName);
-		attributeSetterBiConsumers.put(
-			"name", (BiConsumer<DSLQueryEntry, String>)DSLQueryEntry::setName);
 
 		_attributeGetterFunctions = Collections.unmodifiableMap(
 			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<DSLQueryEntry, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<DSLQueryEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<DSLQueryEntry, ?>>();
+
+		attributeSetterBiConsumers.put(
+			"dslQueryEntryId",
+			(BiConsumer<DSLQueryEntry, Long>)DSLQueryEntry::setDslQueryEntryId);
+		attributeSetterBiConsumers.put(
+			"name", (BiConsumer<DSLQueryEntry, String>)DSLQueryEntry::setName);
+
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

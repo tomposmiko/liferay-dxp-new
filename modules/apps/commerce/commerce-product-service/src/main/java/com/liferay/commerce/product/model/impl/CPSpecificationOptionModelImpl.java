@@ -331,98 +331,104 @@ public class CPSpecificationOptionModelImpl
 
 	private static final Map<String, Function<CPSpecificationOption, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CPSpecificationOption, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CPSpecificationOption, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CPSpecificationOption, Object>>();
+
+		attributeGetterFunctions.put("uuid", CPSpecificationOption::getUuid);
+		attributeGetterFunctions.put(
+			"CPSpecificationOptionId",
+			CPSpecificationOption::getCPSpecificationOptionId);
+		attributeGetterFunctions.put(
+			"companyId", CPSpecificationOption::getCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CPSpecificationOption::getUserId);
+		attributeGetterFunctions.put(
+			"userName", CPSpecificationOption::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CPSpecificationOption::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CPSpecificationOption::getModifiedDate);
+		attributeGetterFunctions.put(
+			"CPOptionCategoryId", CPSpecificationOption::getCPOptionCategoryId);
+		attributeGetterFunctions.put("title", CPSpecificationOption::getTitle);
+		attributeGetterFunctions.put(
+			"description", CPSpecificationOption::getDescription);
+		attributeGetterFunctions.put(
+			"facetable", CPSpecificationOption::getFacetable);
+		attributeGetterFunctions.put("key", CPSpecificationOption::getKey);
+		attributeGetterFunctions.put(
+			"lastPublishDate", CPSpecificationOption::getLastPublishDate);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CPSpecificationOption, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<CPSpecificationOption, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CPSpecificationOption, ?>>();
 
-		attributeGetterFunctions.put("uuid", CPSpecificationOption::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CPSpecificationOption, String>)
 				CPSpecificationOption::setUuid);
-		attributeGetterFunctions.put(
-			"CPSpecificationOptionId",
-			CPSpecificationOption::getCPSpecificationOptionId);
 		attributeSetterBiConsumers.put(
 			"CPSpecificationOptionId",
 			(BiConsumer<CPSpecificationOption, Long>)
 				CPSpecificationOption::setCPSpecificationOptionId);
-		attributeGetterFunctions.put(
-			"companyId", CPSpecificationOption::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CPSpecificationOption, Long>)
 				CPSpecificationOption::setCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CPSpecificationOption::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CPSpecificationOption, Long>)
 				CPSpecificationOption::setUserId);
-		attributeGetterFunctions.put(
-			"userName", CPSpecificationOption::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CPSpecificationOption, String>)
 				CPSpecificationOption::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CPSpecificationOption::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CPSpecificationOption, Date>)
 				CPSpecificationOption::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CPSpecificationOption::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CPSpecificationOption, Date>)
 				CPSpecificationOption::setModifiedDate);
-		attributeGetterFunctions.put(
-			"CPOptionCategoryId", CPSpecificationOption::getCPOptionCategoryId);
 		attributeSetterBiConsumers.put(
 			"CPOptionCategoryId",
 			(BiConsumer<CPSpecificationOption, Long>)
 				CPSpecificationOption::setCPOptionCategoryId);
-		attributeGetterFunctions.put("title", CPSpecificationOption::getTitle);
 		attributeSetterBiConsumers.put(
 			"title",
 			(BiConsumer<CPSpecificationOption, String>)
 				CPSpecificationOption::setTitle);
-		attributeGetterFunctions.put(
-			"description", CPSpecificationOption::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<CPSpecificationOption, String>)
 				CPSpecificationOption::setDescription);
-		attributeGetterFunctions.put(
-			"facetable", CPSpecificationOption::getFacetable);
 		attributeSetterBiConsumers.put(
 			"facetable",
 			(BiConsumer<CPSpecificationOption, Boolean>)
 				CPSpecificationOption::setFacetable);
-		attributeGetterFunctions.put("key", CPSpecificationOption::getKey);
 		attributeSetterBiConsumers.put(
 			"key",
 			(BiConsumer<CPSpecificationOption, String>)
 				CPSpecificationOption::setKey);
-		attributeGetterFunctions.put(
-			"lastPublishDate", CPSpecificationOption::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<CPSpecificationOption, Date>)
 				CPSpecificationOption::setLastPublishDate);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

@@ -75,15 +75,14 @@ public class CommerceCatalogLocalServiceImpl
 		CommerceCatalog commerceCatalog = commerceCatalogPersistence.create(
 			commerceCatalogId);
 
+		commerceCatalog.setExternalReferenceCode(externalReferenceCode);
 		commerceCatalog.setCompanyId(user.getCompanyId());
 		commerceCatalog.setUserId(user.getUserId());
 		commerceCatalog.setUserName(user.getFullName());
-
 		commerceCatalog.setName(name);
 		commerceCatalog.setCommerceCurrencyCode(commerceCurrencyCode);
 		commerceCatalog.setCatalogDefaultLanguageId(catalogDefaultLanguageId);
 		commerceCatalog.setSystem(system);
-		commerceCatalog.setExternalReferenceCode(externalReferenceCode);
 
 		// Group
 

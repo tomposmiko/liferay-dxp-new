@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
+import com.liferay.portal.tools.service.builder.test.exception.DuplicateERCCompanyEntryExternalReferenceCodeException;
 import com.liferay.portal.tools.service.builder.test.exception.NoSuchERCCompanyEntryException;
 import com.liferay.portal.tools.service.builder.test.model.ERCCompanyEntry;
 import com.liferay.portal.tools.service.builder.test.model.ERCCompanyEntryTable;
@@ -1748,6 +1749,33 @@ public class ERCCompanyEntryPersistenceImpl
 
 		if (Validator.isNull(ercCompanyEntry.getExternalReferenceCode())) {
 			ercCompanyEntry.setExternalReferenceCode(ercCompanyEntry.getUuid());
+		}
+		else {
+			ERCCompanyEntry ercERCCompanyEntry = fetchByC_ERC(
+				ercCompanyEntry.getCompanyId(),
+				ercCompanyEntry.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercERCCompanyEntry != null) {
+					throw new DuplicateERCCompanyEntryExternalReferenceCodeException(
+						"Duplicate erc company entry with external reference code " +
+							ercCompanyEntry.getExternalReferenceCode() +
+								" and company " +
+									ercCompanyEntry.getCompanyId());
+				}
+			}
+			else {
+				if ((ercERCCompanyEntry != null) &&
+					(ercCompanyEntry.getErcCompanyEntryId() !=
+						ercERCCompanyEntry.getErcCompanyEntryId())) {
+
+					throw new DuplicateERCCompanyEntryExternalReferenceCodeException(
+						"Duplicate erc company entry with external reference code " +
+							ercCompanyEntry.getExternalReferenceCode() +
+								" and company " +
+									ercCompanyEntry.getCompanyId());
+				}
+			}
 		}
 
 		Session session = null;

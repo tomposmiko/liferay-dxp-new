@@ -335,104 +335,110 @@ public class CommerceMLForecastAlertEntryModelImpl
 	private static final Map
 		<String, Function<CommerceMLForecastAlertEntry, Object>>
 			_attributeGetterFunctions;
-	private static final Map
-		<String, BiConsumer<CommerceMLForecastAlertEntry, Object>>
-			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceMLForecastAlertEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceMLForecastAlertEntry, Object>>();
+
+		attributeGetterFunctions.put(
+			"uuid", CommerceMLForecastAlertEntry::getUuid);
+		attributeGetterFunctions.put(
+			"commerceMLForecastAlertEntryId",
+			CommerceMLForecastAlertEntry::getCommerceMLForecastAlertEntryId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceMLForecastAlertEntry::getCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceMLForecastAlertEntry::getUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceMLForecastAlertEntry::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceMLForecastAlertEntry::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceMLForecastAlertEntry::getModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceAccountId",
+			CommerceMLForecastAlertEntry::getCommerceAccountId);
+		attributeGetterFunctions.put(
+			"actual", CommerceMLForecastAlertEntry::getActual);
+		attributeGetterFunctions.put(
+			"forecast", CommerceMLForecastAlertEntry::getForecast);
+		attributeGetterFunctions.put(
+			"timestamp", CommerceMLForecastAlertEntry::getTimestamp);
+		attributeGetterFunctions.put(
+			"relativeChange", CommerceMLForecastAlertEntry::getRelativeChange);
+		attributeGetterFunctions.put(
+			"status", CommerceMLForecastAlertEntry::getStatus);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map
+		<String, BiConsumer<CommerceMLForecastAlertEntry, Object>>
+			_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<CommerceMLForecastAlertEntry, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceMLForecastAlertEntry, ?>>();
 
-		attributeGetterFunctions.put(
-			"uuid", CommerceMLForecastAlertEntry::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CommerceMLForecastAlertEntry, String>)
 				CommerceMLForecastAlertEntry::setUuid);
-		attributeGetterFunctions.put(
-			"commerceMLForecastAlertEntryId",
-			CommerceMLForecastAlertEntry::getCommerceMLForecastAlertEntryId);
 		attributeSetterBiConsumers.put(
 			"commerceMLForecastAlertEntryId",
 			(BiConsumer<CommerceMLForecastAlertEntry, Long>)
 				CommerceMLForecastAlertEntry::
 					setCommerceMLForecastAlertEntryId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceMLForecastAlertEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceMLForecastAlertEntry, Long>)
 				CommerceMLForecastAlertEntry::setCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceMLForecastAlertEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceMLForecastAlertEntry, Long>)
 				CommerceMLForecastAlertEntry::setUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceMLForecastAlertEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceMLForecastAlertEntry, String>)
 				CommerceMLForecastAlertEntry::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceMLForecastAlertEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceMLForecastAlertEntry, Date>)
 				CommerceMLForecastAlertEntry::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceMLForecastAlertEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceMLForecastAlertEntry, Date>)
 				CommerceMLForecastAlertEntry::setModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceAccountId",
-			CommerceMLForecastAlertEntry::getCommerceAccountId);
 		attributeSetterBiConsumers.put(
 			"commerceAccountId",
 			(BiConsumer<CommerceMLForecastAlertEntry, Long>)
 				CommerceMLForecastAlertEntry::setCommerceAccountId);
-		attributeGetterFunctions.put(
-			"actual", CommerceMLForecastAlertEntry::getActual);
 		attributeSetterBiConsumers.put(
 			"actual",
 			(BiConsumer<CommerceMLForecastAlertEntry, Double>)
 				CommerceMLForecastAlertEntry::setActual);
-		attributeGetterFunctions.put(
-			"forecast", CommerceMLForecastAlertEntry::getForecast);
 		attributeSetterBiConsumers.put(
 			"forecast",
 			(BiConsumer<CommerceMLForecastAlertEntry, Double>)
 				CommerceMLForecastAlertEntry::setForecast);
-		attributeGetterFunctions.put(
-			"timestamp", CommerceMLForecastAlertEntry::getTimestamp);
 		attributeSetterBiConsumers.put(
 			"timestamp",
 			(BiConsumer<CommerceMLForecastAlertEntry, Date>)
 				CommerceMLForecastAlertEntry::setTimestamp);
-		attributeGetterFunctions.put(
-			"relativeChange", CommerceMLForecastAlertEntry::getRelativeChange);
 		attributeSetterBiConsumers.put(
 			"relativeChange",
 			(BiConsumer<CommerceMLForecastAlertEntry, Double>)
 				CommerceMLForecastAlertEntry::setRelativeChange);
-		attributeGetterFunctions.put(
-			"status", CommerceMLForecastAlertEntry::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<CommerceMLForecastAlertEntry, Integer>)
 				CommerceMLForecastAlertEntry::setStatus);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

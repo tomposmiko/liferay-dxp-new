@@ -277,12 +277,12 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		documentFolderResource.deleteDocumentFolder(documentFolder2.getId());
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetAssetLibraryDocumentFoldersPage_getExpectedActions(
 				Long assetLibraryId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		Map createBatchAction = new HashMap<>();
 		createBatchAction.put("method", "POST");
@@ -951,12 +951,12 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		documentFolderResource.deleteDocumentFolder(documentFolder2.getId());
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetDocumentFolderDocumentFoldersPage_getExpectedActions(
 				Long parentDocumentFolderId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -1368,11 +1368,11 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		documentFolderResource.deleteDocumentFolder(documentFolder2.getId());
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetSiteDocumentFoldersPage_getExpectedActions(Long siteId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		Map createBatchAction = new HashMap<>();
 		createBatchAction.put("method", "POST");
@@ -2087,7 +2087,8 @@ public abstract class BaseDocumentFolderResourceTestCase {
 	}
 
 	protected void assertValid(
-		Page<DocumentFolder> page, Map<String, Map> expectedActions) {
+		Page<DocumentFolder> page,
+		Map<String, Map<String, String>> expectedActions) {
 
 		boolean valid = false;
 
@@ -2104,7 +2105,7 @@ public abstract class BaseDocumentFolderResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		Map<String, Map> actions = page.getActions();
+		Map<String, Map<String, String>> actions = page.getActions();
 
 		for (String key : expectedActions.keySet()) {
 			Map action = actions.get(key);

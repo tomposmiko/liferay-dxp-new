@@ -385,141 +385,147 @@ public class CommerceAddressModelImpl
 
 	private static final Map<String, Function<CommerceAddress, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CommerceAddress, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceAddress, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<CommerceAddress, Object>>();
-		Map<String, BiConsumer<CommerceAddress, ?>> attributeSetterBiConsumers =
-			new LinkedHashMap<String, BiConsumer<CommerceAddress, ?>>();
 
 		attributeGetterFunctions.put(
 			"externalReferenceCode", CommerceAddress::getExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"commerceAddressId", CommerceAddress::getCommerceAddressId);
+		attributeGetterFunctions.put("groupId", CommerceAddress::getGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceAddress::getCompanyId);
+		attributeGetterFunctions.put("userId", CommerceAddress::getUserId);
+		attributeGetterFunctions.put("userName", CommerceAddress::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceAddress::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceAddress::getModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", CommerceAddress::getClassNameId);
+		attributeGetterFunctions.put("classPK", CommerceAddress::getClassPK);
+		attributeGetterFunctions.put("name", CommerceAddress::getName);
+		attributeGetterFunctions.put(
+			"description", CommerceAddress::getDescription);
+		attributeGetterFunctions.put("street1", CommerceAddress::getStreet1);
+		attributeGetterFunctions.put("street2", CommerceAddress::getStreet2);
+		attributeGetterFunctions.put("street3", CommerceAddress::getStreet3);
+		attributeGetterFunctions.put("city", CommerceAddress::getCity);
+		attributeGetterFunctions.put("zip", CommerceAddress::getZip);
+		attributeGetterFunctions.put(
+			"commerceRegionId", CommerceAddress::getCommerceRegionId);
+		attributeGetterFunctions.put(
+			"commerceCountryId", CommerceAddress::getCommerceCountryId);
+		attributeGetterFunctions.put("latitude", CommerceAddress::getLatitude);
+		attributeGetterFunctions.put(
+			"longitude", CommerceAddress::getLongitude);
+		attributeGetterFunctions.put(
+			"phoneNumber", CommerceAddress::getPhoneNumber);
+		attributeGetterFunctions.put(
+			"defaultBilling", CommerceAddress::getDefaultBilling);
+		attributeGetterFunctions.put(
+			"defaultShipping", CommerceAddress::getDefaultShipping);
+		attributeGetterFunctions.put("type", CommerceAddress::getType);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CommerceAddress, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<CommerceAddress, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<CommerceAddress, ?>>();
+
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<CommerceAddress, String>)
 				CommerceAddress::setExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"commerceAddressId", CommerceAddress::getCommerceAddressId);
 		attributeSetterBiConsumers.put(
 			"commerceAddressId",
 			(BiConsumer<CommerceAddress, Long>)
 				CommerceAddress::setCommerceAddressId);
-		attributeGetterFunctions.put("groupId", CommerceAddress::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceAddress, Long>)CommerceAddress::setGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceAddress::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceAddress, Long>)CommerceAddress::setCompanyId);
-		attributeGetterFunctions.put("userId", CommerceAddress::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceAddress, Long>)CommerceAddress::setUserId);
-		attributeGetterFunctions.put("userName", CommerceAddress::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceAddress, String>)CommerceAddress::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceAddress::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceAddress, Date>)CommerceAddress::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceAddress::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceAddress, Date>)
 				CommerceAddress::setModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", CommerceAddress::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<CommerceAddress, Long>)CommerceAddress::setClassNameId);
-		attributeGetterFunctions.put("classPK", CommerceAddress::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<CommerceAddress, Long>)CommerceAddress::setClassPK);
-		attributeGetterFunctions.put("name", CommerceAddress::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommerceAddress, String>)CommerceAddress::setName);
-		attributeGetterFunctions.put(
-			"description", CommerceAddress::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<CommerceAddress, String>)
 				CommerceAddress::setDescription);
-		attributeGetterFunctions.put("street1", CommerceAddress::getStreet1);
 		attributeSetterBiConsumers.put(
 			"street1",
 			(BiConsumer<CommerceAddress, String>)CommerceAddress::setStreet1);
-		attributeGetterFunctions.put("street2", CommerceAddress::getStreet2);
 		attributeSetterBiConsumers.put(
 			"street2",
 			(BiConsumer<CommerceAddress, String>)CommerceAddress::setStreet2);
-		attributeGetterFunctions.put("street3", CommerceAddress::getStreet3);
 		attributeSetterBiConsumers.put(
 			"street3",
 			(BiConsumer<CommerceAddress, String>)CommerceAddress::setStreet3);
-		attributeGetterFunctions.put("city", CommerceAddress::getCity);
 		attributeSetterBiConsumers.put(
 			"city",
 			(BiConsumer<CommerceAddress, String>)CommerceAddress::setCity);
-		attributeGetterFunctions.put("zip", CommerceAddress::getZip);
 		attributeSetterBiConsumers.put(
 			"zip",
 			(BiConsumer<CommerceAddress, String>)CommerceAddress::setZip);
-		attributeGetterFunctions.put(
-			"commerceRegionId", CommerceAddress::getCommerceRegionId);
 		attributeSetterBiConsumers.put(
 			"commerceRegionId",
 			(BiConsumer<CommerceAddress, Long>)
 				CommerceAddress::setCommerceRegionId);
-		attributeGetterFunctions.put(
-			"commerceCountryId", CommerceAddress::getCommerceCountryId);
 		attributeSetterBiConsumers.put(
 			"commerceCountryId",
 			(BiConsumer<CommerceAddress, Long>)
 				CommerceAddress::setCommerceCountryId);
-		attributeGetterFunctions.put("latitude", CommerceAddress::getLatitude);
 		attributeSetterBiConsumers.put(
 			"latitude",
 			(BiConsumer<CommerceAddress, Double>)CommerceAddress::setLatitude);
-		attributeGetterFunctions.put(
-			"longitude", CommerceAddress::getLongitude);
 		attributeSetterBiConsumers.put(
 			"longitude",
 			(BiConsumer<CommerceAddress, Double>)CommerceAddress::setLongitude);
-		attributeGetterFunctions.put(
-			"phoneNumber", CommerceAddress::getPhoneNumber);
 		attributeSetterBiConsumers.put(
 			"phoneNumber",
 			(BiConsumer<CommerceAddress, String>)
 				CommerceAddress::setPhoneNumber);
-		attributeGetterFunctions.put(
-			"defaultBilling", CommerceAddress::getDefaultBilling);
 		attributeSetterBiConsumers.put(
 			"defaultBilling",
 			(BiConsumer<CommerceAddress, Boolean>)
 				CommerceAddress::setDefaultBilling);
-		attributeGetterFunctions.put(
-			"defaultShipping", CommerceAddress::getDefaultShipping);
 		attributeSetterBiConsumers.put(
 			"defaultShipping",
 			(BiConsumer<CommerceAddress, Boolean>)
 				CommerceAddress::setDefaultShipping);
-		attributeGetterFunctions.put("type", CommerceAddress::getType);
 		attributeSetterBiConsumers.put(
 			"type",
 			(BiConsumer<CommerceAddress, Integer>)CommerceAddress::setType);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

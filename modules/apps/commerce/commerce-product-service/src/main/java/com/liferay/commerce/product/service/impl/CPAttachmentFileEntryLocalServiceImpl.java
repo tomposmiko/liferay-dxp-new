@@ -189,8 +189,8 @@ public class CPAttachmentFileEntryLocalServiceImpl
 			throw new DuplicateCPAttachmentFileEntryException();
 		}
 
-		cpAttachmentFileEntry.setFileEntryId(fileEntryId);
 		cpAttachmentFileEntry.setExternalReferenceCode(externalReferenceCode);
+		cpAttachmentFileEntry.setFileEntryId(fileEntryId);
 
 		cpAttachmentFileEntry.setDisplayDate(displayDate);
 		cpAttachmentFileEntry.setExpirationDate(expirationDate);

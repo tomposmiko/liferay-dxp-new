@@ -323,100 +323,106 @@ public class CommerceShippingMethodModelImpl
 
 	private static final Map<String, Function<CommerceShippingMethod, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CommerceShippingMethod, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceShippingMethod, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceShippingMethod, Object>>();
+
+		attributeGetterFunctions.put(
+			"commerceShippingMethodId",
+			CommerceShippingMethod::getCommerceShippingMethodId);
+		attributeGetterFunctions.put(
+			"groupId", CommerceShippingMethod::getGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceShippingMethod::getCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceShippingMethod::getUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceShippingMethod::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceShippingMethod::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceShippingMethod::getModifiedDate);
+		attributeGetterFunctions.put("name", CommerceShippingMethod::getName);
+		attributeGetterFunctions.put(
+			"description", CommerceShippingMethod::getDescription);
+		attributeGetterFunctions.put(
+			"imageId", CommerceShippingMethod::getImageId);
+		attributeGetterFunctions.put(
+			"engineKey", CommerceShippingMethod::getEngineKey);
+		attributeGetterFunctions.put(
+			"priority", CommerceShippingMethod::getPriority);
+		attributeGetterFunctions.put(
+			"active", CommerceShippingMethod::getActive);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CommerceShippingMethod, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<CommerceShippingMethod, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceShippingMethod, ?>>();
 
-		attributeGetterFunctions.put(
-			"commerceShippingMethodId",
-			CommerceShippingMethod::getCommerceShippingMethodId);
 		attributeSetterBiConsumers.put(
 			"commerceShippingMethodId",
 			(BiConsumer<CommerceShippingMethod, Long>)
 				CommerceShippingMethod::setCommerceShippingMethodId);
-		attributeGetterFunctions.put(
-			"groupId", CommerceShippingMethod::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceShippingMethod, Long>)
 				CommerceShippingMethod::setGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceShippingMethod::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceShippingMethod, Long>)
 				CommerceShippingMethod::setCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceShippingMethod::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceShippingMethod, Long>)
 				CommerceShippingMethod::setUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceShippingMethod::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceShippingMethod, String>)
 				CommerceShippingMethod::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceShippingMethod::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceShippingMethod, Date>)
 				CommerceShippingMethod::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceShippingMethod::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceShippingMethod, Date>)
 				CommerceShippingMethod::setModifiedDate);
-		attributeGetterFunctions.put("name", CommerceShippingMethod::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommerceShippingMethod, String>)
 				CommerceShippingMethod::setName);
-		attributeGetterFunctions.put(
-			"description", CommerceShippingMethod::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<CommerceShippingMethod, String>)
 				CommerceShippingMethod::setDescription);
-		attributeGetterFunctions.put(
-			"imageId", CommerceShippingMethod::getImageId);
 		attributeSetterBiConsumers.put(
 			"imageId",
 			(BiConsumer<CommerceShippingMethod, Long>)
 				CommerceShippingMethod::setImageId);
-		attributeGetterFunctions.put(
-			"engineKey", CommerceShippingMethod::getEngineKey);
 		attributeSetterBiConsumers.put(
 			"engineKey",
 			(BiConsumer<CommerceShippingMethod, String>)
 				CommerceShippingMethod::setEngineKey);
-		attributeGetterFunctions.put(
-			"priority", CommerceShippingMethod::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority",
 			(BiConsumer<CommerceShippingMethod, Double>)
 				CommerceShippingMethod::setPriority);
-		attributeGetterFunctions.put(
-			"active", CommerceShippingMethod::getActive);
 		attributeSetterBiConsumers.put(
 			"active",
 			(BiConsumer<CommerceShippingMethod, Boolean>)
 				CommerceShippingMethod::setActive);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

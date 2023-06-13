@@ -212,39 +212,45 @@ public class CTMessageModelImpl
 
 	private static final Map<String, Function<CTMessage, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CTMessage, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CTMessage, Object>> attributeGetterFunctions =
 			new LinkedHashMap<String, Function<CTMessage, Object>>();
+
+		attributeGetterFunctions.put("mvccVersion", CTMessage::getMvccVersion);
+		attributeGetterFunctions.put("ctMessageId", CTMessage::getCtMessageId);
+		attributeGetterFunctions.put("companyId", CTMessage::getCompanyId);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CTMessage::getCtCollectionId);
+		attributeGetterFunctions.put(
+			"messageContent", CTMessage::getMessageContent);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CTMessage, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<CTMessage, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CTMessage, ?>>();
 
-		attributeGetterFunctions.put("mvccVersion", CTMessage::getMvccVersion);
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CTMessage, Long>)CTMessage::setMvccVersion);
-		attributeGetterFunctions.put("ctMessageId", CTMessage::getCtMessageId);
 		attributeSetterBiConsumers.put(
 			"ctMessageId",
 			(BiConsumer<CTMessage, Long>)CTMessage::setCtMessageId);
-		attributeGetterFunctions.put("companyId", CTMessage::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<CTMessage, Long>)CTMessage::setCompanyId);
-		attributeGetterFunctions.put(
-			"ctCollectionId", CTMessage::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<CTMessage, Long>)CTMessage::setCtCollectionId);
-		attributeGetterFunctions.put(
-			"messageContent", CTMessage::getMessageContent);
 		attributeSetterBiConsumers.put(
 			"messageContent",
 			(BiConsumer<CTMessage, String>)CTMessage::setMessageContent);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

@@ -2122,27 +2122,16 @@ definition {
 			var loginAttempts = 1;
 		}
 
-		if (!(isSet(maxLoginAttempts))) {
-			var maxLoginAttempts = 0;
-		}
-
 		while (${count} != ${loginAttempts}) {
 			var count = ${count} + 1;
 
-			User._login(
+			User.firstLoginUI(
 				password = ${password},
 				userEmailAddress = ${userEmailAddress});
 
-			if (${count} == ${maximumFailure}) {
-				AssertTextEquals.assertPartialText(
-					locator1 = "Message#ERROR_DISMISSIBLE",
-					value1 = "This account is locked. Please contact an administrator to have this account unlocked.");
-			}
-			else {
-				AssertTextEquals.assertPartialText(
-					locator1 = "Message#ERROR_DISMISSIBLE",
-					value1 = "Authentication failed. Please try again.");
-			}
+			AssertTextEquals.assertPartialText(
+				locator1 = "Message#ERROR_DISMISSIBLE",
+				value1 = "Authentication failed. Please try again.");
 		}
 	}
 

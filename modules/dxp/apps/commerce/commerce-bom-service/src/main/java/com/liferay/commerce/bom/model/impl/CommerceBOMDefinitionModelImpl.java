@@ -298,84 +298,90 @@ public class CommerceBOMDefinitionModelImpl
 
 	private static final Map<String, Function<CommerceBOMDefinition, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CommerceBOMDefinition, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceBOMDefinition, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceBOMDefinition, Object>>();
+
+		attributeGetterFunctions.put(
+			"commerceBOMDefinitionId",
+			CommerceBOMDefinition::getCommerceBOMDefinitionId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceBOMDefinition::getCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceBOMDefinition::getUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceBOMDefinition::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceBOMDefinition::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceBOMDefinition::getModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceBOMFolderId",
+			CommerceBOMDefinition::getCommerceBOMFolderId);
+		attributeGetterFunctions.put(
+			"CPAttachmentFileEntryId",
+			CommerceBOMDefinition::getCPAttachmentFileEntryId);
+		attributeGetterFunctions.put("name", CommerceBOMDefinition::getName);
+		attributeGetterFunctions.put(
+			"friendlyUrl", CommerceBOMDefinition::getFriendlyUrl);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CommerceBOMDefinition, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<CommerceBOMDefinition, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceBOMDefinition, ?>>();
 
-		attributeGetterFunctions.put(
-			"commerceBOMDefinitionId",
-			CommerceBOMDefinition::getCommerceBOMDefinitionId);
 		attributeSetterBiConsumers.put(
 			"commerceBOMDefinitionId",
 			(BiConsumer<CommerceBOMDefinition, Long>)
 				CommerceBOMDefinition::setCommerceBOMDefinitionId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceBOMDefinition::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceBOMDefinition, Long>)
 				CommerceBOMDefinition::setCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceBOMDefinition::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceBOMDefinition, Long>)
 				CommerceBOMDefinition::setUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceBOMDefinition::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceBOMDefinition, String>)
 				CommerceBOMDefinition::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceBOMDefinition::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceBOMDefinition, Date>)
 				CommerceBOMDefinition::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceBOMDefinition::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceBOMDefinition, Date>)
 				CommerceBOMDefinition::setModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceBOMFolderId",
-			CommerceBOMDefinition::getCommerceBOMFolderId);
 		attributeSetterBiConsumers.put(
 			"commerceBOMFolderId",
 			(BiConsumer<CommerceBOMDefinition, Long>)
 				CommerceBOMDefinition::setCommerceBOMFolderId);
-		attributeGetterFunctions.put(
-			"CPAttachmentFileEntryId",
-			CommerceBOMDefinition::getCPAttachmentFileEntryId);
 		attributeSetterBiConsumers.put(
 			"CPAttachmentFileEntryId",
 			(BiConsumer<CommerceBOMDefinition, Long>)
 				CommerceBOMDefinition::setCPAttachmentFileEntryId);
-		attributeGetterFunctions.put("name", CommerceBOMDefinition::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommerceBOMDefinition, String>)
 				CommerceBOMDefinition::setName);
-		attributeGetterFunctions.put(
-			"friendlyUrl", CommerceBOMDefinition::getFriendlyUrl);
 		attributeSetterBiConsumers.put(
 			"friendlyUrl",
 			(BiConsumer<CommerceBOMDefinition, String>)
 				CommerceBOMDefinition::setFriendlyUrl);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

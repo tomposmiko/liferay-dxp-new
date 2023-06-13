@@ -64,6 +64,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -81,6 +82,8 @@ import java.security.Principal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -177,6 +180,135 @@ public class LayoutModelDocumentContributor
 			}
 
 			return;
+		}
+
+		HttpServletRequest httpServletRequest = null;
+		HttpServletResponse httpServletResponse = null;
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if ((serviceContext != null) && (serviceContext.getRequest() != null)) {
+			httpServletRequest = DynamicServletRequest.addQueryString(
+				serviceContext.getRequest(),
+				StringBundler.concat(
+					"p_l_id=", layout.getPlid(), "&p_l_mode=",
+					Constants.SEARCH),
+				false);
+
+			httpServletResponse = serviceContext.getResponse();
+		}
+
+		if ((httpServletRequest == null) || (httpServletResponse == null)) {
+			MockContextHelper mockContextHelper = new MockContextHelper(
+				layout,
+				_userLocalService.fetchDefaultUser(layout.getCompanyId()));
+
+			for (Locale locale : locales) {
+				String content = StringPool.BLANK;
+
+				try {
+					content = _getLayoutContent(
+						layoutPageTemplateStructure, locale, mockContextHelper,
+						serviceContext);
+				}
+				catch (Exception exception) {
+					if (_log.isWarnEnabled()) {
+						_log.warn("Unable to get layout content", exception);
+					}
+				}
+
+				_addLocalizedContentField(content, document, locale);
+			}
+
+			return;
+		}
+
+		Layout originalRequestLayout = (Layout)httpServletRequest.getAttribute(
+			WebKeys.LAYOUT);
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
+
+		Layout originalThemeDisplayLayout = themeDisplay.getLayout();
+		long originalThemeDisplayPlid = themeDisplay.getPlid();
+
+		try {
+			httpServletRequest.setAttribute(WebKeys.LAYOUT, layout);
+
+			themeDisplay.setLayout(layout);
+			themeDisplay.setPlid(layout.getPlid());
+
+			for (Locale locale : locales) {
+				String content = StringPool.BLANK;
+
+				try {
+					content =
+						LayoutPageTemplateStructureRenderUtil.
+							renderLayoutContent(
+								_fragmentRendererController, httpServletRequest,
+								httpServletResponse,
+								layoutPageTemplateStructure,
+								FragmentEntryLinkConstants.VIEW,
+								Collections.emptyMap(), locale,
+								new long[] {
+									SegmentsExperienceConstants.ID_DEFAULT
+								});
+				}
+				catch (Exception exception) {
+					if (_log.isWarnEnabled()) {
+						_log.warn("Unable to get layout content", exception);
+					}
+				}
+
+				_addLocalizedContentField(content, document, locale);
+			}
+		}
+		finally {
+			httpServletRequest.setAttribute(
+				WebKeys.LAYOUT, originalRequestLayout);
+
+			themeDisplay.setLayout(originalThemeDisplayLayout);
+			themeDisplay.setPlid(originalThemeDisplayPlid);
+		}
+
+		_addContent(document, layout, layoutPageTemplateStructure);
+	}
+
+	private void _addContent(
+		Document document, Layout layout,
+		LayoutPageTemplateStructure layoutPageTemplateStructure) {
+
+		Set<Locale> locales = new HashSet<>(
+			LanguageUtil.getAvailableLocales(layout.getGroupId()));
+
+		if (_isUseLayoutCrawler(layout)) {
+			Iterator<Locale> iterator = locales.iterator();
+
+			while (iterator.hasNext()) {
+				String content = StringPool.BLANK;
+				Locale locale = iterator.next();
+
+				try {
+					content = _layoutCrawler.getLayoutContent(layout, locale);
+				}
+				catch (Exception exception) {
+					if (_log.isWarnEnabled()) {
+						_log.warn("Unable to get layout content", exception);
+					}
+				}
+
+				if (Validator.isNull(content)) {
+					iterator.remove();
+
+					_addLocalizedContentField(content, document, locale);
+				}
+			}
+
+			if (SetUtil.isEmpty(locales)) {
+				return;
+			}
 		}
 
 		HttpServletRequest httpServletRequest = null;

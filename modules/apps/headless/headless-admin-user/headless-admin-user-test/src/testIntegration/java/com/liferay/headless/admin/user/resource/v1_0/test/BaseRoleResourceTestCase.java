@@ -217,10 +217,11 @@ public abstract class BaseRoleResourceTestCase {
 		assertValid(page, testGetRolesPage_getExpectedActions());
 	}
 
-	protected Map<String, Map> testGetRolesPage_getExpectedActions()
+	protected Map<String, Map<String, String>>
+			testGetRolesPage_getExpectedActions()
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -690,7 +691,7 @@ public abstract class BaseRoleResourceTestCase {
 	}
 
 	protected void assertValid(
-		Page<Role> page, Map<String, Map> expectedActions) {
+		Page<Role> page, Map<String, Map<String, String>> expectedActions) {
 
 		boolean valid = false;
 
@@ -707,7 +708,7 @@ public abstract class BaseRoleResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		Map<String, Map> actions = page.getActions();
+		Map<String, Map<String, String>> actions = page.getActions();
 
 		for (String key : expectedActions.keySet()) {
 			Map action = actions.get(key);

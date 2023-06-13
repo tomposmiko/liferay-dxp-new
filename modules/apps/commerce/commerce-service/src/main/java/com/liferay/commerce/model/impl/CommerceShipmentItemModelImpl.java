@@ -318,90 +318,96 @@ public class CommerceShipmentItemModelImpl
 
 	private static final Map<String, Function<CommerceShipmentItem, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CommerceShipmentItem, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceShipmentItem, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceShipmentItem, Object>>();
+
+		attributeGetterFunctions.put(
+			"commerceShipmentItemId",
+			CommerceShipmentItem::getCommerceShipmentItemId);
+		attributeGetterFunctions.put(
+			"groupId", CommerceShipmentItem::getGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceShipmentItem::getCompanyId);
+		attributeGetterFunctions.put("userId", CommerceShipmentItem::getUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceShipmentItem::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceShipmentItem::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceShipmentItem::getModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceShipmentId", CommerceShipmentItem::getCommerceShipmentId);
+		attributeGetterFunctions.put(
+			"commerceOrderItemId",
+			CommerceShipmentItem::getCommerceOrderItemId);
+		attributeGetterFunctions.put(
+			"commerceInventoryWarehouseId",
+			CommerceShipmentItem::getCommerceInventoryWarehouseId);
+		attributeGetterFunctions.put(
+			"quantity", CommerceShipmentItem::getQuantity);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CommerceShipmentItem, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<CommerceShipmentItem, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceShipmentItem, ?>>();
 
-		attributeGetterFunctions.put(
-			"commerceShipmentItemId",
-			CommerceShipmentItem::getCommerceShipmentItemId);
 		attributeSetterBiConsumers.put(
 			"commerceShipmentItemId",
 			(BiConsumer<CommerceShipmentItem, Long>)
 				CommerceShipmentItem::setCommerceShipmentItemId);
-		attributeGetterFunctions.put(
-			"groupId", CommerceShipmentItem::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceShipmentItem, Long>)
 				CommerceShipmentItem::setGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceShipmentItem::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceShipmentItem, Long>)
 				CommerceShipmentItem::setCompanyId);
-		attributeGetterFunctions.put("userId", CommerceShipmentItem::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceShipmentItem, Long>)
 				CommerceShipmentItem::setUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceShipmentItem::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceShipmentItem, String>)
 				CommerceShipmentItem::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceShipmentItem::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceShipmentItem, Date>)
 				CommerceShipmentItem::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceShipmentItem::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceShipmentItem, Date>)
 				CommerceShipmentItem::setModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceShipmentId", CommerceShipmentItem::getCommerceShipmentId);
 		attributeSetterBiConsumers.put(
 			"commerceShipmentId",
 			(BiConsumer<CommerceShipmentItem, Long>)
 				CommerceShipmentItem::setCommerceShipmentId);
-		attributeGetterFunctions.put(
-			"commerceOrderItemId",
-			CommerceShipmentItem::getCommerceOrderItemId);
 		attributeSetterBiConsumers.put(
 			"commerceOrderItemId",
 			(BiConsumer<CommerceShipmentItem, Long>)
 				CommerceShipmentItem::setCommerceOrderItemId);
-		attributeGetterFunctions.put(
-			"commerceInventoryWarehouseId",
-			CommerceShipmentItem::getCommerceInventoryWarehouseId);
 		attributeSetterBiConsumers.put(
 			"commerceInventoryWarehouseId",
 			(BiConsumer<CommerceShipmentItem, Long>)
 				CommerceShipmentItem::setCommerceInventoryWarehouseId);
-		attributeGetterFunctions.put(
-			"quantity", CommerceShipmentItem::getQuantity);
 		attributeSetterBiConsumers.put(
 			"quantity",
 			(BiConsumer<CommerceShipmentItem, Integer>)
 				CommerceShipmentItem::setQuantity);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

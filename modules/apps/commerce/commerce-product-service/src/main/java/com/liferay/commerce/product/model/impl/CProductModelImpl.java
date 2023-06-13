@@ -254,58 +254,64 @@ public class CProductModelImpl
 
 	private static final Map<String, Function<CProduct, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CProduct, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CProduct, Object>> attributeGetterFunctions =
 			new LinkedHashMap<String, Function<CProduct, Object>>();
+
+		attributeGetterFunctions.put("uuid", CProduct::getUuid);
+		attributeGetterFunctions.put(
+			"externalReferenceCode", CProduct::getExternalReferenceCode);
+		attributeGetterFunctions.put("CProductId", CProduct::getCProductId);
+		attributeGetterFunctions.put("groupId", CProduct::getGroupId);
+		attributeGetterFunctions.put("companyId", CProduct::getCompanyId);
+		attributeGetterFunctions.put("userId", CProduct::getUserId);
+		attributeGetterFunctions.put("userName", CProduct::getUserName);
+		attributeGetterFunctions.put("createDate", CProduct::getCreateDate);
+		attributeGetterFunctions.put("modifiedDate", CProduct::getModifiedDate);
+		attributeGetterFunctions.put(
+			"publishedCPDefinitionId", CProduct::getPublishedCPDefinitionId);
+		attributeGetterFunctions.put(
+			"latestVersion", CProduct::getLatestVersion);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CProduct, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<CProduct, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CProduct, ?>>();
 
-		attributeGetterFunctions.put("uuid", CProduct::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<CProduct, String>)CProduct::setUuid);
-		attributeGetterFunctions.put(
-			"externalReferenceCode", CProduct::getExternalReferenceCode);
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<CProduct, String>)CProduct::setExternalReferenceCode);
-		attributeGetterFunctions.put("CProductId", CProduct::getCProductId);
 		attributeSetterBiConsumers.put(
 			"CProductId", (BiConsumer<CProduct, Long>)CProduct::setCProductId);
-		attributeGetterFunctions.put("groupId", CProduct::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<CProduct, Long>)CProduct::setGroupId);
-		attributeGetterFunctions.put("companyId", CProduct::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId", (BiConsumer<CProduct, Long>)CProduct::setCompanyId);
-		attributeGetterFunctions.put("userId", CProduct::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<CProduct, Long>)CProduct::setUserId);
-		attributeGetterFunctions.put("userName", CProduct::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName", (BiConsumer<CProduct, String>)CProduct::setUserName);
-		attributeGetterFunctions.put("createDate", CProduct::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate", (BiConsumer<CProduct, Date>)CProduct::setCreateDate);
-		attributeGetterFunctions.put("modifiedDate", CProduct::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CProduct, Date>)CProduct::setModifiedDate);
-		attributeGetterFunctions.put(
-			"publishedCPDefinitionId", CProduct::getPublishedCPDefinitionId);
 		attributeSetterBiConsumers.put(
 			"publishedCPDefinitionId",
 			(BiConsumer<CProduct, Long>)CProduct::setPublishedCPDefinitionId);
-		attributeGetterFunctions.put(
-			"latestVersion", CProduct::getLatestVersion);
 		attributeSetterBiConsumers.put(
 			"latestVersion",
 			(BiConsumer<CProduct, Integer>)CProduct::setLatestVersion);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

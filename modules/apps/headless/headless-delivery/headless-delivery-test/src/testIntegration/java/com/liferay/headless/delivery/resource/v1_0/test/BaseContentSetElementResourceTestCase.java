@@ -277,12 +277,12 @@ public abstract class BaseContentSetElementResourceTestCase {
 				assetLibraryId, key));
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetAssetLibraryContentSetByKeyContentSetElementsPage_getExpectedActions(
 				Long assetLibraryId, String key)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -449,12 +449,12 @@ public abstract class BaseContentSetElementResourceTestCase {
 				assetLibraryId, uuid));
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetAssetLibraryContentSetByUuidContentSetElementsPage_getExpectedActions(
 				Long assetLibraryId, String uuid)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -610,12 +610,12 @@ public abstract class BaseContentSetElementResourceTestCase {
 				contentSetId));
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetContentSetContentSetElementsPage_getExpectedActions(
 				Long contentSetId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -759,12 +759,12 @@ public abstract class BaseContentSetElementResourceTestCase {
 				siteId, key));
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetSiteContentSetByKeyContentSetElementsPage_getExpectedActions(
 				Long siteId, String key)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -926,12 +926,12 @@ public abstract class BaseContentSetElementResourceTestCase {
 				siteId, uuid));
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetSiteContentSetByUuidContentSetElementsPage_getExpectedActions(
 				Long siteId, String uuid)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -1168,7 +1168,8 @@ public abstract class BaseContentSetElementResourceTestCase {
 	}
 
 	protected void assertValid(
-		Page<ContentSetElement> page, Map<String, Map> expectedActions) {
+		Page<ContentSetElement> page,
+		Map<String, Map<String, String>> expectedActions) {
 
 		boolean valid = false;
 
@@ -1186,7 +1187,7 @@ public abstract class BaseContentSetElementResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		Map<String, Map> actions = page.getActions();
+		Map<String, Map<String, String>> actions = page.getActions();
 
 		for (String key : expectedActions.keySet()) {
 			Map action = actions.get(key);

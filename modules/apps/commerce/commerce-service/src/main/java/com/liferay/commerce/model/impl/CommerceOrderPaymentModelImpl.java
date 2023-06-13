@@ -236,88 +236,94 @@ public class CommerceOrderPaymentModelImpl
 
 	private static final Map<String, Function<CommerceOrderPayment, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CommerceOrderPayment, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceOrderPayment, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceOrderPayment, Object>>();
+
+		attributeGetterFunctions.put(
+			"commerceOrderPaymentId",
+			CommerceOrderPayment::getCommerceOrderPaymentId);
+		attributeGetterFunctions.put(
+			"groupId", CommerceOrderPayment::getGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceOrderPayment::getCompanyId);
+		attributeGetterFunctions.put("userId", CommerceOrderPayment::getUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceOrderPayment::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceOrderPayment::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceOrderPayment::getModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceOrderId", CommerceOrderPayment::getCommerceOrderId);
+		attributeGetterFunctions.put(
+			"commercePaymentMethodKey",
+			CommerceOrderPayment::getCommercePaymentMethodKey);
+		attributeGetterFunctions.put(
+			"content", CommerceOrderPayment::getContent);
+		attributeGetterFunctions.put("status", CommerceOrderPayment::getStatus);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CommerceOrderPayment, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<CommerceOrderPayment, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceOrderPayment, ?>>();
 
-		attributeGetterFunctions.put(
-			"commerceOrderPaymentId",
-			CommerceOrderPayment::getCommerceOrderPaymentId);
 		attributeSetterBiConsumers.put(
 			"commerceOrderPaymentId",
 			(BiConsumer<CommerceOrderPayment, Long>)
 				CommerceOrderPayment::setCommerceOrderPaymentId);
-		attributeGetterFunctions.put(
-			"groupId", CommerceOrderPayment::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceOrderPayment, Long>)
 				CommerceOrderPayment::setGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceOrderPayment::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceOrderPayment, Long>)
 				CommerceOrderPayment::setCompanyId);
-		attributeGetterFunctions.put("userId", CommerceOrderPayment::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceOrderPayment, Long>)
 				CommerceOrderPayment::setUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceOrderPayment::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceOrderPayment, String>)
 				CommerceOrderPayment::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceOrderPayment::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceOrderPayment, Date>)
 				CommerceOrderPayment::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceOrderPayment::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceOrderPayment, Date>)
 				CommerceOrderPayment::setModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceOrderId", CommerceOrderPayment::getCommerceOrderId);
 		attributeSetterBiConsumers.put(
 			"commerceOrderId",
 			(BiConsumer<CommerceOrderPayment, Long>)
 				CommerceOrderPayment::setCommerceOrderId);
-		attributeGetterFunctions.put(
-			"commercePaymentMethodKey",
-			CommerceOrderPayment::getCommercePaymentMethodKey);
 		attributeSetterBiConsumers.put(
 			"commercePaymentMethodKey",
 			(BiConsumer<CommerceOrderPayment, String>)
 				CommerceOrderPayment::setCommercePaymentMethodKey);
-		attributeGetterFunctions.put(
-			"content", CommerceOrderPayment::getContent);
 		attributeSetterBiConsumers.put(
 			"content",
 			(BiConsumer<CommerceOrderPayment, String>)
 				CommerceOrderPayment::setContent);
-		attributeGetterFunctions.put("status", CommerceOrderPayment::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<CommerceOrderPayment, Integer>)
 				CommerceOrderPayment::setStatus);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

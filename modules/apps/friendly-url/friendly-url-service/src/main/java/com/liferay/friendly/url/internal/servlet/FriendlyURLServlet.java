@@ -932,13 +932,19 @@ public class FriendlyURLServlet extends HttpServlet {
 	}
 
 	private String _normalizeFriendlyURL(String friendlyURL) {
-		if (Validator.isNotNull(friendlyURL) &&
-			friendlyURL.startsWith(StringPool.SLASH)) {
-
-			return friendlyURL.substring(1);
+		if (Validator.isNull(friendlyURL)) {
+			return friendlyURL;
 		}
 
-		return friendlyURL;
+		String normalizedFriendlyURL =
+			FriendlyURLNormalizerUtil.normalizeWithEncoding(
+				HttpUtil.decodeURL(friendlyURL));
+
+		if (normalizedFriendlyURL.startsWith(StringPool.SLASH)) {
+			return normalizedFriendlyURL.substring(1);
+		}
+
+		return normalizedFriendlyURL;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

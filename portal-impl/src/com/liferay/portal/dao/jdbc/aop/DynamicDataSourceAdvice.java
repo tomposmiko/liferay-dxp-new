@@ -17,7 +17,6 @@ package com.liferay.portal.dao.jdbc.aop;
 import com.liferay.portal.kernel.aop.AopMethodInvocation;
 import com.liferay.portal.kernel.aop.ChainableMethodAdvice;
 import com.liferay.portal.kernel.dao.jdbc.aop.DynamicDataSourceTargetSource;
-import com.liferay.portal.kernel.dao.jdbc.aop.MasterDataSource;
 import com.liferay.portal.kernel.dao.jdbc.aop.Operation;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.spring.transaction.TransactionAttributeBuilder;
@@ -32,7 +31,9 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 /**
  * @author Shuyang Zhou
  * @author László Csontos
+ * @deprecated As of Athanasius (7.3.x), with no direct replacement
  */
+@Deprecated
 public class DynamicDataSourceAdvice extends ChainableMethodAdvice {
 
 	public DynamicDataSourceAdvice(
@@ -58,10 +59,7 @@ public class DynamicDataSourceAdvice extends ChainableMethodAdvice {
 
 		Operation operation = Operation.WRITE;
 
-		MasterDataSource masterDataSource = (MasterDataSource)annotations.get(
-			MasterDataSource.class);
-
-		if ((masterDataSource == null) && transactional.readOnly()) {
+		if (transactional.readOnly()) {
 			operation = Operation.READ;
 		}
 

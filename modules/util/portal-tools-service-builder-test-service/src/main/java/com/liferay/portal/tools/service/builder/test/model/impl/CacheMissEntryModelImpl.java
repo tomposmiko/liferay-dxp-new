@@ -213,35 +213,41 @@ public class CacheMissEntryModelImpl
 
 	private static final Map<String, Function<CacheMissEntry, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CacheMissEntry, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CacheMissEntry, Object>> attributeGetterFunctions =
 			new LinkedHashMap<String, Function<CacheMissEntry, Object>>();
-		Map<String, BiConsumer<CacheMissEntry, ?>> attributeSetterBiConsumers =
-			new LinkedHashMap<String, BiConsumer<CacheMissEntry, ?>>();
 
 		attributeGetterFunctions.put(
 			"mvccVersion", CacheMissEntry::getMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", CacheMissEntry::getCtCollectionId);
+		attributeGetterFunctions.put(
+			"cacheMissEntryId", CacheMissEntry::getCacheMissEntryId);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CacheMissEntry, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<CacheMissEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<CacheMissEntry, ?>>();
+
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<CacheMissEntry, Long>)CacheMissEntry::setMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", CacheMissEntry::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<CacheMissEntry, Long>)
 				CacheMissEntry::setCtCollectionId);
-		attributeGetterFunctions.put(
-			"cacheMissEntryId", CacheMissEntry::getCacheMissEntryId);
 		attributeSetterBiConsumers.put(
 			"cacheMissEntryId",
 			(BiConsumer<CacheMissEntry, Long>)
 				CacheMissEntry::setCacheMissEntryId);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

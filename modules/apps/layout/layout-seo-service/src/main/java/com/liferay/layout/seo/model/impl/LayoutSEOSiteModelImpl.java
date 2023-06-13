@@ -311,81 +311,87 @@ public class LayoutSEOSiteModelImpl
 
 	private static final Map<String, Function<LayoutSEOSite, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<LayoutSEOSite, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<LayoutSEOSite, Object>> attributeGetterFunctions =
 			new LinkedHashMap<String, Function<LayoutSEOSite, Object>>();
-		Map<String, BiConsumer<LayoutSEOSite, ?>> attributeSetterBiConsumers =
-			new LinkedHashMap<String, BiConsumer<LayoutSEOSite, ?>>();
 
 		attributeGetterFunctions.put(
 			"mvccVersion", LayoutSEOSite::getMvccVersion);
+		attributeGetterFunctions.put(
+			"ctCollectionId", LayoutSEOSite::getCtCollectionId);
+		attributeGetterFunctions.put("uuid", LayoutSEOSite::getUuid);
+		attributeGetterFunctions.put(
+			"layoutSEOSiteId", LayoutSEOSite::getLayoutSEOSiteId);
+		attributeGetterFunctions.put("groupId", LayoutSEOSite::getGroupId);
+		attributeGetterFunctions.put("companyId", LayoutSEOSite::getCompanyId);
+		attributeGetterFunctions.put("userId", LayoutSEOSite::getUserId);
+		attributeGetterFunctions.put("userName", LayoutSEOSite::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", LayoutSEOSite::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", LayoutSEOSite::getModifiedDate);
+		attributeGetterFunctions.put(
+			"openGraphEnabled", LayoutSEOSite::getOpenGraphEnabled);
+		attributeGetterFunctions.put(
+			"openGraphImageAlt", LayoutSEOSite::getOpenGraphImageAlt);
+		attributeGetterFunctions.put(
+			"openGraphImageFileEntryId",
+			LayoutSEOSite::getOpenGraphImageFileEntryId);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<LayoutSEOSite, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<LayoutSEOSite, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<LayoutSEOSite, ?>>();
+
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<LayoutSEOSite, Long>)LayoutSEOSite::setMvccVersion);
-		attributeGetterFunctions.put(
-			"ctCollectionId", LayoutSEOSite::getCtCollectionId);
 		attributeSetterBiConsumers.put(
 			"ctCollectionId",
 			(BiConsumer<LayoutSEOSite, Long>)LayoutSEOSite::setCtCollectionId);
-		attributeGetterFunctions.put("uuid", LayoutSEOSite::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid", (BiConsumer<LayoutSEOSite, String>)LayoutSEOSite::setUuid);
-		attributeGetterFunctions.put(
-			"layoutSEOSiteId", LayoutSEOSite::getLayoutSEOSiteId);
 		attributeSetterBiConsumers.put(
 			"layoutSEOSiteId",
 			(BiConsumer<LayoutSEOSite, Long>)LayoutSEOSite::setLayoutSEOSiteId);
-		attributeGetterFunctions.put("groupId", LayoutSEOSite::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<LayoutSEOSite, Long>)LayoutSEOSite::setGroupId);
-		attributeGetterFunctions.put("companyId", LayoutSEOSite::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<LayoutSEOSite, Long>)LayoutSEOSite::setCompanyId);
-		attributeGetterFunctions.put("userId", LayoutSEOSite::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<LayoutSEOSite, Long>)LayoutSEOSite::setUserId);
-		attributeGetterFunctions.put("userName", LayoutSEOSite::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<LayoutSEOSite, String>)LayoutSEOSite::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", LayoutSEOSite::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<LayoutSEOSite, Date>)LayoutSEOSite::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", LayoutSEOSite::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<LayoutSEOSite, Date>)LayoutSEOSite::setModifiedDate);
-		attributeGetterFunctions.put(
-			"openGraphEnabled", LayoutSEOSite::getOpenGraphEnabled);
 		attributeSetterBiConsumers.put(
 			"openGraphEnabled",
 			(BiConsumer<LayoutSEOSite, Boolean>)
 				LayoutSEOSite::setOpenGraphEnabled);
-		attributeGetterFunctions.put(
-			"openGraphImageAlt", LayoutSEOSite::getOpenGraphImageAlt);
 		attributeSetterBiConsumers.put(
 			"openGraphImageAlt",
 			(BiConsumer<LayoutSEOSite, String>)
 				LayoutSEOSite::setOpenGraphImageAlt);
-		attributeGetterFunctions.put(
-			"openGraphImageFileEntryId",
-			LayoutSEOSite::getOpenGraphImageFileEntryId);
 		attributeSetterBiConsumers.put(
 			"openGraphImageFileEntryId",
 			(BiConsumer<LayoutSEOSite, Long>)
 				LayoutSEOSite::setOpenGraphImageFileEntryId);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

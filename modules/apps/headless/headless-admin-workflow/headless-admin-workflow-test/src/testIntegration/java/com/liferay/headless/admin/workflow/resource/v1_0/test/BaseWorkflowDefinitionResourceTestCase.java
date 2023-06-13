@@ -232,11 +232,11 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 		assertValid(page, testGetWorkflowDefinitionsPage_getExpectedActions());
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetWorkflowDefinitionsPage_getExpectedActions()
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -552,7 +552,8 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 	}
 
 	protected void assertValid(
-		Page<WorkflowDefinition> page, Map<String, Map> expectedActions) {
+		Page<WorkflowDefinition> page,
+		Map<String, Map<String, String>> expectedActions) {
 
 		boolean valid = false;
 
@@ -570,7 +571,7 @@ public abstract class BaseWorkflowDefinitionResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		Map<String, Map> actions = page.getActions();
+		Map<String, Map<String, String>> actions = page.getActions();
 
 		for (String key : expectedActions.keySet()) {
 			Map action = actions.get(key);

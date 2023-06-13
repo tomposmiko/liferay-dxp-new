@@ -572,12 +572,12 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 			messageBoardMessage2.getId());
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetMessageBoardMessageMessageBoardMessagesPage_getExpectedActions(
 				Long parentMessageBoardMessageId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -1023,12 +1023,12 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 			messageBoardMessage2.getId());
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetMessageBoardThreadMessageBoardMessagesPage_getExpectedActions(
 				Long messageBoardThreadId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		Map createBatchAction = new HashMap<>();
 		createBatchAction.put("method", "POST");
@@ -1473,11 +1473,11 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 			messageBoardMessage2.getId());
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetSiteMessageBoardMessagesPage_getExpectedActions(Long siteId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -2337,7 +2337,8 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 	}
 
 	protected void assertValid(
-		Page<MessageBoardMessage> page, Map<String, Map> expectedActions) {
+		Page<MessageBoardMessage> page,
+		Map<String, Map<String, String>> expectedActions) {
 
 		boolean valid = false;
 
@@ -2355,7 +2356,7 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		Map<String, Map> actions = page.getActions();
+		Map<String, Map<String, String>> actions = page.getActions();
 
 		for (String key : expectedActions.keySet()) {
 			Map action = actions.get(key);

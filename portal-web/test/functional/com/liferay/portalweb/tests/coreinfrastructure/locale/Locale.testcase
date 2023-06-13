@@ -519,6 +519,12 @@ definition {
 			userLastName = "userln",
 			userScreenName = "usersn");
 
+		User.openUsersAdmin();
+
+		User.editPasswordCP(
+			userEmailAddress = "userea@liferay.com",
+			userScreenName = "usersn");
+
 		ApplicationsMenu.gotoPortlet(
 			category = "Security",
 			panel = "Control Panel",
@@ -541,6 +547,14 @@ definition {
 
 			var count = ${count} + 1;
 		}
+
+		AssertTextEquals.assertPartialText(
+			locator1 = "Message#ERROR_DISMISSIBLE",
+			value1 = "Authentication failed. Please try again.");
+
+		User._login(
+			password = "test",
+			userEmailAddress = "userea@liferay.com");
 
 		task ("Assert Timezone is included with account lockout message.") {
 			AssertTextEquals.assertPartialText(

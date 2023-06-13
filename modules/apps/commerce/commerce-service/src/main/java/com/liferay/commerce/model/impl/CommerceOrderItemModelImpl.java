@@ -438,272 +438,278 @@ public class CommerceOrderItemModelImpl
 
 	private static final Map<String, Function<CommerceOrderItem, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CommerceOrderItem, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceOrderItem, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceOrderItem, Object>>();
-		Map<String, BiConsumer<CommerceOrderItem, ?>>
-			attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<CommerceOrderItem, ?>>();
 
 		attributeGetterFunctions.put(
 			"externalReferenceCode",
 			CommerceOrderItem::getExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"commerceOrderItemId", CommerceOrderItem::getCommerceOrderItemId);
+		attributeGetterFunctions.put("groupId", CommerceOrderItem::getGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceOrderItem::getCompanyId);
+		attributeGetterFunctions.put("userId", CommerceOrderItem::getUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceOrderItem::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceOrderItem::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceOrderItem::getModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceOrderId", CommerceOrderItem::getCommerceOrderId);
+		attributeGetterFunctions.put(
+			"commercePriceListId", CommerceOrderItem::getCommercePriceListId);
+		attributeGetterFunctions.put(
+			"CProductId", CommerceOrderItem::getCProductId);
+		attributeGetterFunctions.put(
+			"CPInstanceId", CommerceOrderItem::getCPInstanceId);
+		attributeGetterFunctions.put(
+			"parentCommerceOrderItemId",
+			CommerceOrderItem::getParentCommerceOrderItemId);
+		attributeGetterFunctions.put(
+			"quantity", CommerceOrderItem::getQuantity);
+		attributeGetterFunctions.put(
+			"shippedQuantity", CommerceOrderItem::getShippedQuantity);
+		attributeGetterFunctions.put("json", CommerceOrderItem::getJson);
+		attributeGetterFunctions.put("name", CommerceOrderItem::getName);
+		attributeGetterFunctions.put("sku", CommerceOrderItem::getSku);
+		attributeGetterFunctions.put(
+			"unitPrice", CommerceOrderItem::getUnitPrice);
+		attributeGetterFunctions.put(
+			"promoPrice", CommerceOrderItem::getPromoPrice);
+		attributeGetterFunctions.put(
+			"discountAmount", CommerceOrderItem::getDiscountAmount);
+		attributeGetterFunctions.put(
+			"finalPrice", CommerceOrderItem::getFinalPrice);
+		attributeGetterFunctions.put(
+			"discountPercentageLevel1",
+			CommerceOrderItem::getDiscountPercentageLevel1);
+		attributeGetterFunctions.put(
+			"discountPercentageLevel2",
+			CommerceOrderItem::getDiscountPercentageLevel2);
+		attributeGetterFunctions.put(
+			"discountPercentageLevel3",
+			CommerceOrderItem::getDiscountPercentageLevel3);
+		attributeGetterFunctions.put(
+			"discountPercentageLevel4",
+			CommerceOrderItem::getDiscountPercentageLevel4);
+		attributeGetterFunctions.put(
+			"unitPriceWithTaxAmount",
+			CommerceOrderItem::getUnitPriceWithTaxAmount);
+		attributeGetterFunctions.put(
+			"promoPriceWithTaxAmount",
+			CommerceOrderItem::getPromoPriceWithTaxAmount);
+		attributeGetterFunctions.put(
+			"discountWithTaxAmount",
+			CommerceOrderItem::getDiscountWithTaxAmount);
+		attributeGetterFunctions.put(
+			"finalPriceWithTaxAmount",
+			CommerceOrderItem::getFinalPriceWithTaxAmount);
+		attributeGetterFunctions.put(
+			"discountPercentageLevel1WithTaxAmount",
+			CommerceOrderItem::getDiscountPercentageLevel1WithTaxAmount);
+		attributeGetterFunctions.put(
+			"discountPercentageLevel2WithTaxAmount",
+			CommerceOrderItem::getDiscountPercentageLevel2WithTaxAmount);
+		attributeGetterFunctions.put(
+			"discountPercentageLevel3WithTaxAmount",
+			CommerceOrderItem::getDiscountPercentageLevel3WithTaxAmount);
+		attributeGetterFunctions.put(
+			"discountPercentageLevel4WithTaxAmount",
+			CommerceOrderItem::getDiscountPercentageLevel4WithTaxAmount);
+		attributeGetterFunctions.put(
+			"subscription", CommerceOrderItem::getSubscription);
+		attributeGetterFunctions.put(
+			"deliveryGroup", CommerceOrderItem::getDeliveryGroup);
+		attributeGetterFunctions.put(
+			"shippingAddressId", CommerceOrderItem::getShippingAddressId);
+		attributeGetterFunctions.put(
+			"printedNote", CommerceOrderItem::getPrintedNote);
+		attributeGetterFunctions.put(
+			"requestedDeliveryDate",
+			CommerceOrderItem::getRequestedDeliveryDate);
+		attributeGetterFunctions.put(
+			"bookedQuantityId", CommerceOrderItem::getBookedQuantityId);
+		attributeGetterFunctions.put(
+			"manuallyAdjusted", CommerceOrderItem::getManuallyAdjusted);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CommerceOrderItem, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<CommerceOrderItem, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<CommerceOrderItem, ?>>();
+
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<CommerceOrderItem, String>)
 				CommerceOrderItem::setExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"commerceOrderItemId", CommerceOrderItem::getCommerceOrderItemId);
 		attributeSetterBiConsumers.put(
 			"commerceOrderItemId",
 			(BiConsumer<CommerceOrderItem, Long>)
 				CommerceOrderItem::setCommerceOrderItemId);
-		attributeGetterFunctions.put("groupId", CommerceOrderItem::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceOrderItem, Long>)CommerceOrderItem::setGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceOrderItem::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceOrderItem, Long>)
 				CommerceOrderItem::setCompanyId);
-		attributeGetterFunctions.put("userId", CommerceOrderItem::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceOrderItem, Long>)CommerceOrderItem::setUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceOrderItem::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceOrderItem, String>)
 				CommerceOrderItem::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceOrderItem::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceOrderItem, Date>)
 				CommerceOrderItem::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceOrderItem::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceOrderItem, Date>)
 				CommerceOrderItem::setModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceOrderId", CommerceOrderItem::getCommerceOrderId);
 		attributeSetterBiConsumers.put(
 			"commerceOrderId",
 			(BiConsumer<CommerceOrderItem, Long>)
 				CommerceOrderItem::setCommerceOrderId);
-		attributeGetterFunctions.put(
-			"commercePriceListId", CommerceOrderItem::getCommercePriceListId);
 		attributeSetterBiConsumers.put(
 			"commercePriceListId",
 			(BiConsumer<CommerceOrderItem, Long>)
 				CommerceOrderItem::setCommercePriceListId);
-		attributeGetterFunctions.put(
-			"CProductId", CommerceOrderItem::getCProductId);
 		attributeSetterBiConsumers.put(
 			"CProductId",
 			(BiConsumer<CommerceOrderItem, Long>)
 				CommerceOrderItem::setCProductId);
-		attributeGetterFunctions.put(
-			"CPInstanceId", CommerceOrderItem::getCPInstanceId);
 		attributeSetterBiConsumers.put(
 			"CPInstanceId",
 			(BiConsumer<CommerceOrderItem, Long>)
 				CommerceOrderItem::setCPInstanceId);
-		attributeGetterFunctions.put(
-			"parentCommerceOrderItemId",
-			CommerceOrderItem::getParentCommerceOrderItemId);
 		attributeSetterBiConsumers.put(
 			"parentCommerceOrderItemId",
 			(BiConsumer<CommerceOrderItem, Long>)
 				CommerceOrderItem::setParentCommerceOrderItemId);
-		attributeGetterFunctions.put(
-			"quantity", CommerceOrderItem::getQuantity);
 		attributeSetterBiConsumers.put(
 			"quantity",
 			(BiConsumer<CommerceOrderItem, Integer>)
 				CommerceOrderItem::setQuantity);
-		attributeGetterFunctions.put(
-			"shippedQuantity", CommerceOrderItem::getShippedQuantity);
 		attributeSetterBiConsumers.put(
 			"shippedQuantity",
 			(BiConsumer<CommerceOrderItem, Integer>)
 				CommerceOrderItem::setShippedQuantity);
-		attributeGetterFunctions.put("json", CommerceOrderItem::getJson);
 		attributeSetterBiConsumers.put(
 			"json",
 			(BiConsumer<CommerceOrderItem, String>)CommerceOrderItem::setJson);
-		attributeGetterFunctions.put("name", CommerceOrderItem::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommerceOrderItem, String>)CommerceOrderItem::setName);
-		attributeGetterFunctions.put("sku", CommerceOrderItem::getSku);
 		attributeSetterBiConsumers.put(
 			"sku",
 			(BiConsumer<CommerceOrderItem, String>)CommerceOrderItem::setSku);
-		attributeGetterFunctions.put(
-			"unitPrice", CommerceOrderItem::getUnitPrice);
 		attributeSetterBiConsumers.put(
 			"unitPrice",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setUnitPrice);
-		attributeGetterFunctions.put(
-			"promoPrice", CommerceOrderItem::getPromoPrice);
 		attributeSetterBiConsumers.put(
 			"promoPrice",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setPromoPrice);
-		attributeGetterFunctions.put(
-			"discountAmount", CommerceOrderItem::getDiscountAmount);
 		attributeSetterBiConsumers.put(
 			"discountAmount",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setDiscountAmount);
-		attributeGetterFunctions.put(
-			"finalPrice", CommerceOrderItem::getFinalPrice);
 		attributeSetterBiConsumers.put(
 			"finalPrice",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setFinalPrice);
-		attributeGetterFunctions.put(
-			"discountPercentageLevel1",
-			CommerceOrderItem::getDiscountPercentageLevel1);
 		attributeSetterBiConsumers.put(
 			"discountPercentageLevel1",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setDiscountPercentageLevel1);
-		attributeGetterFunctions.put(
-			"discountPercentageLevel2",
-			CommerceOrderItem::getDiscountPercentageLevel2);
 		attributeSetterBiConsumers.put(
 			"discountPercentageLevel2",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setDiscountPercentageLevel2);
-		attributeGetterFunctions.put(
-			"discountPercentageLevel3",
-			CommerceOrderItem::getDiscountPercentageLevel3);
 		attributeSetterBiConsumers.put(
 			"discountPercentageLevel3",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setDiscountPercentageLevel3);
-		attributeGetterFunctions.put(
-			"discountPercentageLevel4",
-			CommerceOrderItem::getDiscountPercentageLevel4);
 		attributeSetterBiConsumers.put(
 			"discountPercentageLevel4",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setDiscountPercentageLevel4);
-		attributeGetterFunctions.put(
-			"unitPriceWithTaxAmount",
-			CommerceOrderItem::getUnitPriceWithTaxAmount);
 		attributeSetterBiConsumers.put(
 			"unitPriceWithTaxAmount",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setUnitPriceWithTaxAmount);
-		attributeGetterFunctions.put(
-			"promoPriceWithTaxAmount",
-			CommerceOrderItem::getPromoPriceWithTaxAmount);
 		attributeSetterBiConsumers.put(
 			"promoPriceWithTaxAmount",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setPromoPriceWithTaxAmount);
-		attributeGetterFunctions.put(
-			"discountWithTaxAmount",
-			CommerceOrderItem::getDiscountWithTaxAmount);
 		attributeSetterBiConsumers.put(
 			"discountWithTaxAmount",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setDiscountWithTaxAmount);
-		attributeGetterFunctions.put(
-			"finalPriceWithTaxAmount",
-			CommerceOrderItem::getFinalPriceWithTaxAmount);
 		attributeSetterBiConsumers.put(
 			"finalPriceWithTaxAmount",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setFinalPriceWithTaxAmount);
-		attributeGetterFunctions.put(
-			"discountPercentageLevel1WithTaxAmount",
-			CommerceOrderItem::getDiscountPercentageLevel1WithTaxAmount);
 		attributeSetterBiConsumers.put(
 			"discountPercentageLevel1WithTaxAmount",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setDiscountPercentageLevel1WithTaxAmount);
-		attributeGetterFunctions.put(
-			"discountPercentageLevel2WithTaxAmount",
-			CommerceOrderItem::getDiscountPercentageLevel2WithTaxAmount);
 		attributeSetterBiConsumers.put(
 			"discountPercentageLevel2WithTaxAmount",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setDiscountPercentageLevel2WithTaxAmount);
-		attributeGetterFunctions.put(
-			"discountPercentageLevel3WithTaxAmount",
-			CommerceOrderItem::getDiscountPercentageLevel3WithTaxAmount);
 		attributeSetterBiConsumers.put(
 			"discountPercentageLevel3WithTaxAmount",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setDiscountPercentageLevel3WithTaxAmount);
-		attributeGetterFunctions.put(
-			"discountPercentageLevel4WithTaxAmount",
-			CommerceOrderItem::getDiscountPercentageLevel4WithTaxAmount);
 		attributeSetterBiConsumers.put(
 			"discountPercentageLevel4WithTaxAmount",
 			(BiConsumer<CommerceOrderItem, BigDecimal>)
 				CommerceOrderItem::setDiscountPercentageLevel4WithTaxAmount);
-		attributeGetterFunctions.put(
-			"subscription", CommerceOrderItem::getSubscription);
 		attributeSetterBiConsumers.put(
 			"subscription",
 			(BiConsumer<CommerceOrderItem, Boolean>)
 				CommerceOrderItem::setSubscription);
-		attributeGetterFunctions.put(
-			"deliveryGroup", CommerceOrderItem::getDeliveryGroup);
 		attributeSetterBiConsumers.put(
 			"deliveryGroup",
 			(BiConsumer<CommerceOrderItem, String>)
 				CommerceOrderItem::setDeliveryGroup);
-		attributeGetterFunctions.put(
-			"shippingAddressId", CommerceOrderItem::getShippingAddressId);
 		attributeSetterBiConsumers.put(
 			"shippingAddressId",
 			(BiConsumer<CommerceOrderItem, Long>)
 				CommerceOrderItem::setShippingAddressId);
-		attributeGetterFunctions.put(
-			"printedNote", CommerceOrderItem::getPrintedNote);
 		attributeSetterBiConsumers.put(
 			"printedNote",
 			(BiConsumer<CommerceOrderItem, String>)
 				CommerceOrderItem::setPrintedNote);
-		attributeGetterFunctions.put(
-			"requestedDeliveryDate",
-			CommerceOrderItem::getRequestedDeliveryDate);
 		attributeSetterBiConsumers.put(
 			"requestedDeliveryDate",
 			(BiConsumer<CommerceOrderItem, Date>)
 				CommerceOrderItem::setRequestedDeliveryDate);
-		attributeGetterFunctions.put(
-			"bookedQuantityId", CommerceOrderItem::getBookedQuantityId);
 		attributeSetterBiConsumers.put(
 			"bookedQuantityId",
 			(BiConsumer<CommerceOrderItem, Long>)
 				CommerceOrderItem::setBookedQuantityId);
-		attributeGetterFunctions.put(
-			"manuallyAdjusted", CommerceOrderItem::getManuallyAdjusted);
 		attributeSetterBiConsumers.put(
 			"manuallyAdjusted",
 			(BiConsumer<CommerceOrderItem, Boolean>)
 				CommerceOrderItem::setManuallyAdjusted);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

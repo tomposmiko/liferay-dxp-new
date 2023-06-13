@@ -241,11 +241,11 @@ public abstract class BaseNodeMetricResourceTestCase {
 			page, testGetProcessNodeMetricsPage_getExpectedActions(processId));
 	}
 
-	protected Map<String, Map> testGetProcessNodeMetricsPage_getExpectedActions(
-			Long processId)
+	protected Map<String, Map<String, String>>
+			testGetProcessNodeMetricsPage_getExpectedActions(Long processId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -594,7 +594,8 @@ public abstract class BaseNodeMetricResourceTestCase {
 	}
 
 	protected void assertValid(
-		Page<NodeMetric> page, Map<String, Map> expectedActions) {
+		Page<NodeMetric> page,
+		Map<String, Map<String, String>> expectedActions) {
 
 		boolean valid = false;
 
@@ -611,7 +612,7 @@ public abstract class BaseNodeMetricResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		Map<String, Map> actions = page.getActions();
+		Map<String, Map<String, String>> actions = page.getActions();
 
 		for (String key : expectedActions.keySet()) {
 			Map action = actions.get(key);

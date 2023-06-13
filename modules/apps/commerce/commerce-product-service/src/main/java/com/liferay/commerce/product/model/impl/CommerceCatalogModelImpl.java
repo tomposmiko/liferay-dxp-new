@@ -307,76 +307,82 @@ public class CommerceCatalogModelImpl
 
 	private static final Map<String, Function<CommerceCatalog, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CommerceCatalog, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceCatalog, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap<String, Function<CommerceCatalog, Object>>();
-		Map<String, BiConsumer<CommerceCatalog, ?>> attributeSetterBiConsumers =
-			new LinkedHashMap<String, BiConsumer<CommerceCatalog, ?>>();
 
 		attributeGetterFunctions.put(
 			"externalReferenceCode", CommerceCatalog::getExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"commerceCatalogId", CommerceCatalog::getCommerceCatalogId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceCatalog::getCompanyId);
+		attributeGetterFunctions.put("userId", CommerceCatalog::getUserId);
+		attributeGetterFunctions.put("userName", CommerceCatalog::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceCatalog::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceCatalog::getModifiedDate);
+		attributeGetterFunctions.put("name", CommerceCatalog::getName);
+		attributeGetterFunctions.put(
+			"commerceCurrencyCode", CommerceCatalog::getCommerceCurrencyCode);
+		attributeGetterFunctions.put(
+			"catalogDefaultLanguageId",
+			CommerceCatalog::getCatalogDefaultLanguageId);
+		attributeGetterFunctions.put("system", CommerceCatalog::getSystem);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CommerceCatalog, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<CommerceCatalog, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<CommerceCatalog, ?>>();
+
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<CommerceCatalog, String>)
 				CommerceCatalog::setExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"commerceCatalogId", CommerceCatalog::getCommerceCatalogId);
 		attributeSetterBiConsumers.put(
 			"commerceCatalogId",
 			(BiConsumer<CommerceCatalog, Long>)
 				CommerceCatalog::setCommerceCatalogId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceCatalog::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceCatalog, Long>)CommerceCatalog::setCompanyId);
-		attributeGetterFunctions.put("userId", CommerceCatalog::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceCatalog, Long>)CommerceCatalog::setUserId);
-		attributeGetterFunctions.put("userName", CommerceCatalog::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceCatalog, String>)CommerceCatalog::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceCatalog::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceCatalog, Date>)CommerceCatalog::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceCatalog::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceCatalog, Date>)
 				CommerceCatalog::setModifiedDate);
-		attributeGetterFunctions.put("name", CommerceCatalog::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommerceCatalog, String>)CommerceCatalog::setName);
-		attributeGetterFunctions.put(
-			"commerceCurrencyCode", CommerceCatalog::getCommerceCurrencyCode);
 		attributeSetterBiConsumers.put(
 			"commerceCurrencyCode",
 			(BiConsumer<CommerceCatalog, String>)
 				CommerceCatalog::setCommerceCurrencyCode);
-		attributeGetterFunctions.put(
-			"catalogDefaultLanguageId",
-			CommerceCatalog::getCatalogDefaultLanguageId);
 		attributeSetterBiConsumers.put(
 			"catalogDefaultLanguageId",
 			(BiConsumer<CommerceCatalog, String>)
 				CommerceCatalog::setCatalogDefaultLanguageId);
-		attributeGetterFunctions.put("system", CommerceCatalog::getSystem);
 		attributeSetterBiConsumers.put(
 			"system",
 			(BiConsumer<CommerceCatalog, Boolean>)CommerceCatalog::setSystem);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

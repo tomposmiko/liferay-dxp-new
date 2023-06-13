@@ -324,78 +324,84 @@ public class CommerceRegionModelImpl
 
 	private static final Map<String, Function<CommerceRegion, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CommerceRegion, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceRegion, Object>> attributeGetterFunctions =
 			new LinkedHashMap<String, Function<CommerceRegion, Object>>();
+
+		attributeGetterFunctions.put("uuid", CommerceRegion::getUuid);
+		attributeGetterFunctions.put(
+			"commerceRegionId", CommerceRegion::getCommerceRegionId);
+		attributeGetterFunctions.put("companyId", CommerceRegion::getCompanyId);
+		attributeGetterFunctions.put("userId", CommerceRegion::getUserId);
+		attributeGetterFunctions.put("userName", CommerceRegion::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceRegion::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceRegion::getModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceCountryId", CommerceRegion::getCommerceCountryId);
+		attributeGetterFunctions.put("name", CommerceRegion::getName);
+		attributeGetterFunctions.put("code", CommerceRegion::getCode);
+		attributeGetterFunctions.put("priority", CommerceRegion::getPriority);
+		attributeGetterFunctions.put("active", CommerceRegion::getActive);
+		attributeGetterFunctions.put(
+			"lastPublishDate", CommerceRegion::getLastPublishDate);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CommerceRegion, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<CommerceRegion, ?>> attributeSetterBiConsumers =
 			new LinkedHashMap<String, BiConsumer<CommerceRegion, ?>>();
 
-		attributeGetterFunctions.put("uuid", CommerceRegion::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CommerceRegion, String>)CommerceRegion::setUuid);
-		attributeGetterFunctions.put(
-			"commerceRegionId", CommerceRegion::getCommerceRegionId);
 		attributeSetterBiConsumers.put(
 			"commerceRegionId",
 			(BiConsumer<CommerceRegion, Long>)
 				CommerceRegion::setCommerceRegionId);
-		attributeGetterFunctions.put("companyId", CommerceRegion::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceRegion, Long>)CommerceRegion::setCompanyId);
-		attributeGetterFunctions.put("userId", CommerceRegion::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceRegion, Long>)CommerceRegion::setUserId);
-		attributeGetterFunctions.put("userName", CommerceRegion::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceRegion, String>)CommerceRegion::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceRegion::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceRegion, Date>)CommerceRegion::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceRegion::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceRegion, Date>)CommerceRegion::setModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceCountryId", CommerceRegion::getCommerceCountryId);
 		attributeSetterBiConsumers.put(
 			"commerceCountryId",
 			(BiConsumer<CommerceRegion, Long>)
 				CommerceRegion::setCommerceCountryId);
-		attributeGetterFunctions.put("name", CommerceRegion::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommerceRegion, String>)CommerceRegion::setName);
-		attributeGetterFunctions.put("code", CommerceRegion::getCode);
 		attributeSetterBiConsumers.put(
 			"code",
 			(BiConsumer<CommerceRegion, String>)CommerceRegion::setCode);
-		attributeGetterFunctions.put("priority", CommerceRegion::getPriority);
 		attributeSetterBiConsumers.put(
 			"priority",
 			(BiConsumer<CommerceRegion, Double>)CommerceRegion::setPriority);
-		attributeGetterFunctions.put("active", CommerceRegion::getActive);
 		attributeSetterBiConsumers.put(
 			"active",
 			(BiConsumer<CommerceRegion, Boolean>)CommerceRegion::setActive);
-		attributeGetterFunctions.put(
-			"lastPublishDate", CommerceRegion::getLastPublishDate);
 		attributeSetterBiConsumers.put(
 			"lastPublishDate",
 			(BiConsumer<CommerceRegion, Date>)
 				CommerceRegion::setLastPublishDate);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

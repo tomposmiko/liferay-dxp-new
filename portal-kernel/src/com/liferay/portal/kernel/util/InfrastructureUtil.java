@@ -40,6 +40,10 @@ public class InfrastructureUtil {
 		return _dataSource;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	public static DynamicDataSourceTargetSource
 		getDynamicDataSourceTargetSource() {
 
@@ -62,6 +66,10 @@ public class InfrastructureUtil {
 		_dataSource = dataSource;
 	}
 
+	/**
+	 * @deprecated As of Athanasius (7.3.x), with no direct replacement
+	 */
+	@Deprecated
 	public void setDynamicDataSourceTargetSource(
 		DynamicDataSourceTargetSource dynamicDataSourceTargetSource) {
 

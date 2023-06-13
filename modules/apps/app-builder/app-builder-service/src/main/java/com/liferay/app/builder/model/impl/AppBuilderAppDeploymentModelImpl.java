@@ -222,53 +222,59 @@ public class AppBuilderAppDeploymentModelImpl
 
 	private static final Map<String, Function<AppBuilderAppDeployment, Object>>
 		_attributeGetterFunctions;
-	private static final Map
-		<String, BiConsumer<AppBuilderAppDeployment, Object>>
-			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<AppBuilderAppDeployment, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<AppBuilderAppDeployment, Object>>();
+
+		attributeGetterFunctions.put(
+			"appBuilderAppDeploymentId",
+			AppBuilderAppDeployment::getAppBuilderAppDeploymentId);
+		attributeGetterFunctions.put(
+			"companyId", AppBuilderAppDeployment::getCompanyId);
+		attributeGetterFunctions.put(
+			"appBuilderAppId", AppBuilderAppDeployment::getAppBuilderAppId);
+		attributeGetterFunctions.put(
+			"settings", AppBuilderAppDeployment::getSettings);
+		attributeGetterFunctions.put("type", AppBuilderAppDeployment::getType);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map
+		<String, BiConsumer<AppBuilderAppDeployment, Object>>
+			_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<AppBuilderAppDeployment, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<AppBuilderAppDeployment, ?>>();
 
-		attributeGetterFunctions.put(
-			"appBuilderAppDeploymentId",
-			AppBuilderAppDeployment::getAppBuilderAppDeploymentId);
 		attributeSetterBiConsumers.put(
 			"appBuilderAppDeploymentId",
 			(BiConsumer<AppBuilderAppDeployment, Long>)
 				AppBuilderAppDeployment::setAppBuilderAppDeploymentId);
-		attributeGetterFunctions.put(
-			"companyId", AppBuilderAppDeployment::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AppBuilderAppDeployment, Long>)
 				AppBuilderAppDeployment::setCompanyId);
-		attributeGetterFunctions.put(
-			"appBuilderAppId", AppBuilderAppDeployment::getAppBuilderAppId);
 		attributeSetterBiConsumers.put(
 			"appBuilderAppId",
 			(BiConsumer<AppBuilderAppDeployment, Long>)
 				AppBuilderAppDeployment::setAppBuilderAppId);
-		attributeGetterFunctions.put(
-			"settings", AppBuilderAppDeployment::getSettings);
 		attributeSetterBiConsumers.put(
 			"settings",
 			(BiConsumer<AppBuilderAppDeployment, String>)
 				AppBuilderAppDeployment::setSettings);
-		attributeGetterFunctions.put("type", AppBuilderAppDeployment::getType);
 		attributeSetterBiConsumers.put(
 			"type",
 			(BiConsumer<AppBuilderAppDeployment, String>)
 				AppBuilderAppDeployment::setType);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

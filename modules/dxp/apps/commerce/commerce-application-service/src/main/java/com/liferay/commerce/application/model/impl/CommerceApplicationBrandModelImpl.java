@@ -292,71 +292,77 @@ public class CommerceApplicationBrandModelImpl
 
 	private static final Map<String, Function<CommerceApplicationBrand, Object>>
 		_attributeGetterFunctions;
-	private static final Map
-		<String, BiConsumer<CommerceApplicationBrand, Object>>
-			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceApplicationBrand, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceApplicationBrand, Object>>();
+
+		attributeGetterFunctions.put(
+			"commerceApplicationBrandId",
+			CommerceApplicationBrand::getCommerceApplicationBrandId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceApplicationBrand::getCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceApplicationBrand::getUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceApplicationBrand::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceApplicationBrand::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceApplicationBrand::getModifiedDate);
+		attributeGetterFunctions.put("name", CommerceApplicationBrand::getName);
+		attributeGetterFunctions.put(
+			"logoId", CommerceApplicationBrand::getLogoId);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map
+		<String, BiConsumer<CommerceApplicationBrand, Object>>
+			_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<CommerceApplicationBrand, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceApplicationBrand, ?>>();
 
-		attributeGetterFunctions.put(
-			"commerceApplicationBrandId",
-			CommerceApplicationBrand::getCommerceApplicationBrandId);
 		attributeSetterBiConsumers.put(
 			"commerceApplicationBrandId",
 			(BiConsumer<CommerceApplicationBrand, Long>)
 				CommerceApplicationBrand::setCommerceApplicationBrandId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceApplicationBrand::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceApplicationBrand, Long>)
 				CommerceApplicationBrand::setCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceApplicationBrand::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceApplicationBrand, Long>)
 				CommerceApplicationBrand::setUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceApplicationBrand::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceApplicationBrand, String>)
 				CommerceApplicationBrand::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceApplicationBrand::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceApplicationBrand, Date>)
 				CommerceApplicationBrand::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceApplicationBrand::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceApplicationBrand, Date>)
 				CommerceApplicationBrand::setModifiedDate);
-		attributeGetterFunctions.put("name", CommerceApplicationBrand::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommerceApplicationBrand, String>)
 				CommerceApplicationBrand::setName);
-		attributeGetterFunctions.put(
-			"logoId", CommerceApplicationBrand::getLogoId);
 		attributeSetterBiConsumers.put(
 			"logoId",
 			(BiConsumer<CommerceApplicationBrand, Long>)
 				CommerceApplicationBrand::setLogoId);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

@@ -306,87 +306,93 @@ public class AccountEntryModelImpl
 
 	private static final Map<String, Function<AccountEntry, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<AccountEntry, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<AccountEntry, Object>> attributeGetterFunctions =
 			new LinkedHashMap<String, Function<AccountEntry, Object>>();
-		Map<String, BiConsumer<AccountEntry, ?>> attributeSetterBiConsumers =
-			new LinkedHashMap<String, BiConsumer<AccountEntry, ?>>();
 
 		attributeGetterFunctions.put(
 			"mvccVersion", AccountEntry::getMvccVersion);
+		attributeGetterFunctions.put(
+			"externalReferenceCode", AccountEntry::getExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"accountEntryId", AccountEntry::getAccountEntryId);
+		attributeGetterFunctions.put("companyId", AccountEntry::getCompanyId);
+		attributeGetterFunctions.put("userId", AccountEntry::getUserId);
+		attributeGetterFunctions.put("userName", AccountEntry::getUserName);
+		attributeGetterFunctions.put("createDate", AccountEntry::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", AccountEntry::getModifiedDate);
+		attributeGetterFunctions.put(
+			"parentAccountEntryId", AccountEntry::getParentAccountEntryId);
+		attributeGetterFunctions.put("name", AccountEntry::getName);
+		attributeGetterFunctions.put(
+			"description", AccountEntry::getDescription);
+		attributeGetterFunctions.put("domains", AccountEntry::getDomains);
+		attributeGetterFunctions.put("logoId", AccountEntry::getLogoId);
+		attributeGetterFunctions.put(
+			"taxIdNumber", AccountEntry::getTaxIdNumber);
+		attributeGetterFunctions.put("type", AccountEntry::getType);
+		attributeGetterFunctions.put("status", AccountEntry::getStatus);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<AccountEntry, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<AccountEntry, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<AccountEntry, ?>>();
+
 		attributeSetterBiConsumers.put(
 			"mvccVersion",
 			(BiConsumer<AccountEntry, Long>)AccountEntry::setMvccVersion);
-		attributeGetterFunctions.put(
-			"externalReferenceCode", AccountEntry::getExternalReferenceCode);
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<AccountEntry, String>)
 				AccountEntry::setExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"accountEntryId", AccountEntry::getAccountEntryId);
 		attributeSetterBiConsumers.put(
 			"accountEntryId",
 			(BiConsumer<AccountEntry, Long>)AccountEntry::setAccountEntryId);
-		attributeGetterFunctions.put("companyId", AccountEntry::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AccountEntry, Long>)AccountEntry::setCompanyId);
-		attributeGetterFunctions.put("userId", AccountEntry::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId", (BiConsumer<AccountEntry, Long>)AccountEntry::setUserId);
-		attributeGetterFunctions.put("userName", AccountEntry::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<AccountEntry, String>)AccountEntry::setUserName);
-		attributeGetterFunctions.put("createDate", AccountEntry::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<AccountEntry, Date>)AccountEntry::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", AccountEntry::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<AccountEntry, Date>)AccountEntry::setModifiedDate);
-		attributeGetterFunctions.put(
-			"parentAccountEntryId", AccountEntry::getParentAccountEntryId);
 		attributeSetterBiConsumers.put(
 			"parentAccountEntryId",
 			(BiConsumer<AccountEntry, Long>)
 				AccountEntry::setParentAccountEntryId);
-		attributeGetterFunctions.put("name", AccountEntry::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<AccountEntry, String>)AccountEntry::setName);
-		attributeGetterFunctions.put(
-			"description", AccountEntry::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<AccountEntry, String>)AccountEntry::setDescription);
-		attributeGetterFunctions.put("domains", AccountEntry::getDomains);
 		attributeSetterBiConsumers.put(
 			"domains",
 			(BiConsumer<AccountEntry, String>)AccountEntry::setDomains);
-		attributeGetterFunctions.put("logoId", AccountEntry::getLogoId);
 		attributeSetterBiConsumers.put(
 			"logoId", (BiConsumer<AccountEntry, Long>)AccountEntry::setLogoId);
-		attributeGetterFunctions.put(
-			"taxIdNumber", AccountEntry::getTaxIdNumber);
 		attributeSetterBiConsumers.put(
 			"taxIdNumber",
 			(BiConsumer<AccountEntry, String>)AccountEntry::setTaxIdNumber);
-		attributeGetterFunctions.put("type", AccountEntry::getType);
 		attributeSetterBiConsumers.put(
 			"type", (BiConsumer<AccountEntry, String>)AccountEntry::setType);
-		attributeGetterFunctions.put("status", AccountEntry::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<AccountEntry, Integer>)AccountEntry::setStatus);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

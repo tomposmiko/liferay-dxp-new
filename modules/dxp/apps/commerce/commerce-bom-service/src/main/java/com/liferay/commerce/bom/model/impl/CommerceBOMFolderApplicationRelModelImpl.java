@@ -305,9 +305,6 @@ public class CommerceBOMFolderApplicationRelModelImpl
 	private static final Map
 		<String, Function<CommerceBOMFolderApplicationRel, Object>>
 			_attributeGetterFunctions;
-	private static final Map
-		<String, BiConsumer<CommerceBOMFolderApplicationRel, Object>>
-			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceBOMFolderApplicationRel, Object>>
@@ -315,67 +312,76 @@ public class CommerceBOMFolderApplicationRelModelImpl
 				new LinkedHashMap
 					<String,
 					 Function<CommerceBOMFolderApplicationRel, Object>>();
-		Map<String, BiConsumer<CommerceBOMFolderApplicationRel, ?>>
-			attributeSetterBiConsumers =
-				new LinkedHashMap
-					<String, BiConsumer<CommerceBOMFolderApplicationRel, ?>>();
 
 		attributeGetterFunctions.put(
 			"commerceBOMFolderApplicationRelId",
 			CommerceBOMFolderApplicationRel::
 				getCommerceBOMFolderApplicationRelId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceBOMFolderApplicationRel::getCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceBOMFolderApplicationRel::getUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceBOMFolderApplicationRel::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceBOMFolderApplicationRel::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceBOMFolderApplicationRel::getModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceBOMFolderId",
+			CommerceBOMFolderApplicationRel::getCommerceBOMFolderId);
+		attributeGetterFunctions.put(
+			"commerceApplicationModelId",
+			CommerceBOMFolderApplicationRel::getCommerceApplicationModelId);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map
+		<String, BiConsumer<CommerceBOMFolderApplicationRel, Object>>
+			_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<CommerceBOMFolderApplicationRel, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String, BiConsumer<CommerceBOMFolderApplicationRel, ?>>();
+
 		attributeSetterBiConsumers.put(
 			"commerceBOMFolderApplicationRelId",
 			(BiConsumer<CommerceBOMFolderApplicationRel, Long>)
 				CommerceBOMFolderApplicationRel::
 					setCommerceBOMFolderApplicationRelId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceBOMFolderApplicationRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceBOMFolderApplicationRel, Long>)
 				CommerceBOMFolderApplicationRel::setCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceBOMFolderApplicationRel::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceBOMFolderApplicationRel, Long>)
 				CommerceBOMFolderApplicationRel::setUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceBOMFolderApplicationRel::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceBOMFolderApplicationRel, String>)
 				CommerceBOMFolderApplicationRel::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceBOMFolderApplicationRel::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceBOMFolderApplicationRel, Date>)
 				CommerceBOMFolderApplicationRel::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceBOMFolderApplicationRel::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceBOMFolderApplicationRel, Date>)
 				CommerceBOMFolderApplicationRel::setModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceBOMFolderId",
-			CommerceBOMFolderApplicationRel::getCommerceBOMFolderId);
 		attributeSetterBiConsumers.put(
 			"commerceBOMFolderId",
 			(BiConsumer<CommerceBOMFolderApplicationRel, Long>)
 				CommerceBOMFolderApplicationRel::setCommerceBOMFolderId);
-		attributeGetterFunctions.put(
-			"commerceApplicationModelId",
-			CommerceBOMFolderApplicationRel::getCommerceApplicationModelId);
 		attributeSetterBiConsumers.put(
 			"commerceApplicationModelId",
 			(BiConsumer<CommerceBOMFolderApplicationRel, Long>)
 				CommerceBOMFolderApplicationRel::setCommerceApplicationModelId);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

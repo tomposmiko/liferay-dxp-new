@@ -247,12 +247,12 @@ public abstract class BaseTransitionResourceTestCase {
 				workflowInstanceId));
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetWorkflowInstanceNextTransitionsPage_getExpectedActions(
 				Long workflowInstanceId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -381,12 +381,12 @@ public abstract class BaseTransitionResourceTestCase {
 				workflowTaskId));
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetWorkflowTaskNextTransitionsPage_getExpectedActions(
 				Long workflowTaskId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -561,7 +561,8 @@ public abstract class BaseTransitionResourceTestCase {
 	}
 
 	protected void assertValid(
-		Page<Transition> page, Map<String, Map> expectedActions) {
+		Page<Transition> page,
+		Map<String, Map<String, String>> expectedActions) {
 
 		boolean valid = false;
 
@@ -578,7 +579,7 @@ public abstract class BaseTransitionResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		Map<String, Map> actions = page.getActions();
+		Map<String, Map<String, String>> actions = page.getActions();
 
 		for (String key : expectedActions.keySet()) {
 			Map action = actions.get(key);

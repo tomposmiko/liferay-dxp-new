@@ -252,12 +252,12 @@ public abstract class BaseWorkflowLogResourceTestCase {
 				workflowInstanceId));
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetWorkflowInstanceWorkflowLogsPage_getExpectedActions(
 				Long workflowInstanceId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -451,12 +451,12 @@ public abstract class BaseWorkflowLogResourceTestCase {
 				workflowTaskId));
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetWorkflowTaskWorkflowLogsPage_getExpectedActions(
 				Long workflowTaskId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -710,7 +710,8 @@ public abstract class BaseWorkflowLogResourceTestCase {
 	}
 
 	protected void assertValid(
-		Page<WorkflowLog> page, Map<String, Map> expectedActions) {
+		Page<WorkflowLog> page,
+		Map<String, Map<String, String>> expectedActions) {
 
 		boolean valid = false;
 
@@ -727,7 +728,7 @@ public abstract class BaseWorkflowLogResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		Map<String, Map> actions = page.getActions();
+		Map<String, Map<String, String>> actions = page.getActions();
 
 		for (String key : expectedActions.keySet()) {
 			Map action = actions.get(key);

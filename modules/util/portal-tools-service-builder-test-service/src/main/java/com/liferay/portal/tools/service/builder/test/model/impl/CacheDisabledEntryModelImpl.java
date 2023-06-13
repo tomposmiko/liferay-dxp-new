@@ -218,33 +218,39 @@ public class CacheDisabledEntryModelImpl
 
 	private static final Map<String, Function<CacheDisabledEntry, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CacheDisabledEntry, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CacheDisabledEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CacheDisabledEntry, Object>>();
-		Map<String, BiConsumer<CacheDisabledEntry, ?>>
-			attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<CacheDisabledEntry, ?>>();
 
 		attributeGetterFunctions.put(
 			"cacheDisabledEntryId",
 			CacheDisabledEntry::getCacheDisabledEntryId);
+		attributeGetterFunctions.put("name", CacheDisabledEntry::getName);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CacheDisabledEntry, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<CacheDisabledEntry, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<CacheDisabledEntry, ?>>();
+
 		attributeSetterBiConsumers.put(
 			"cacheDisabledEntryId",
 			(BiConsumer<CacheDisabledEntry, Long>)
 				CacheDisabledEntry::setCacheDisabledEntryId);
-		attributeGetterFunctions.put("name", CacheDisabledEntry::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CacheDisabledEntry, String>)
 				CacheDisabledEntry::setName);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

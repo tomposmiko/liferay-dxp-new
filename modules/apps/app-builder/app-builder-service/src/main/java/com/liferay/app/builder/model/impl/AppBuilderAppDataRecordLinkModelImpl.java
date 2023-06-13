@@ -226,61 +226,67 @@ public class AppBuilderAppDataRecordLinkModelImpl
 	private static final Map
 		<String, Function<AppBuilderAppDataRecordLink, Object>>
 			_attributeGetterFunctions;
-	private static final Map
-		<String, BiConsumer<AppBuilderAppDataRecordLink, Object>>
-			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<AppBuilderAppDataRecordLink, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<AppBuilderAppDataRecordLink, Object>>();
+
+		attributeGetterFunctions.put(
+			"appBuilderAppDataRecordLinkId",
+			AppBuilderAppDataRecordLink::getAppBuilderAppDataRecordLinkId);
+		attributeGetterFunctions.put(
+			"groupId", AppBuilderAppDataRecordLink::getGroupId);
+		attributeGetterFunctions.put(
+			"companyId", AppBuilderAppDataRecordLink::getCompanyId);
+		attributeGetterFunctions.put(
+			"appBuilderAppId", AppBuilderAppDataRecordLink::getAppBuilderAppId);
+		attributeGetterFunctions.put(
+			"appBuilderAppVersionId",
+			AppBuilderAppDataRecordLink::getAppBuilderAppVersionId);
+		attributeGetterFunctions.put(
+			"ddlRecordId", AppBuilderAppDataRecordLink::getDdlRecordId);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map
+		<String, BiConsumer<AppBuilderAppDataRecordLink, Object>>
+			_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<AppBuilderAppDataRecordLink, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<AppBuilderAppDataRecordLink, ?>>();
 
-		attributeGetterFunctions.put(
-			"appBuilderAppDataRecordLinkId",
-			AppBuilderAppDataRecordLink::getAppBuilderAppDataRecordLinkId);
 		attributeSetterBiConsumers.put(
 			"appBuilderAppDataRecordLinkId",
 			(BiConsumer<AppBuilderAppDataRecordLink, Long>)
 				AppBuilderAppDataRecordLink::setAppBuilderAppDataRecordLinkId);
-		attributeGetterFunctions.put(
-			"groupId", AppBuilderAppDataRecordLink::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<AppBuilderAppDataRecordLink, Long>)
 				AppBuilderAppDataRecordLink::setGroupId);
-		attributeGetterFunctions.put(
-			"companyId", AppBuilderAppDataRecordLink::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<AppBuilderAppDataRecordLink, Long>)
 				AppBuilderAppDataRecordLink::setCompanyId);
-		attributeGetterFunctions.put(
-			"appBuilderAppId", AppBuilderAppDataRecordLink::getAppBuilderAppId);
 		attributeSetterBiConsumers.put(
 			"appBuilderAppId",
 			(BiConsumer<AppBuilderAppDataRecordLink, Long>)
 				AppBuilderAppDataRecordLink::setAppBuilderAppId);
-		attributeGetterFunctions.put(
-			"appBuilderAppVersionId",
-			AppBuilderAppDataRecordLink::getAppBuilderAppVersionId);
 		attributeSetterBiConsumers.put(
 			"appBuilderAppVersionId",
 			(BiConsumer<AppBuilderAppDataRecordLink, Long>)
 				AppBuilderAppDataRecordLink::setAppBuilderAppVersionId);
-		attributeGetterFunctions.put(
-			"ddlRecordId", AppBuilderAppDataRecordLink::getDdlRecordId);
 		attributeSetterBiConsumers.put(
 			"ddlRecordId",
 			(BiConsumer<AppBuilderAppDataRecordLink, Long>)
 				AppBuilderAppDataRecordLink::setDdlRecordId);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

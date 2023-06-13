@@ -268,12 +268,12 @@ public abstract class BaseAccountUserResourceTestCase {
 				externalReferenceCode));
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetAccountUsersByExternalReferenceCodePage_getExpectedActions(
 				String externalReferenceCode)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -667,11 +667,11 @@ public abstract class BaseAccountUserResourceTestCase {
 			page, testGetAccountUsersPage_getExpectedActions(accountId));
 	}
 
-	protected Map<String, Map> testGetAccountUsersPage_getExpectedActions(
-			Long accountId)
+	protected Map<String, Map<String, String>>
+			testGetAccountUsersPage_getExpectedActions(Long accountId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -1191,7 +1191,8 @@ public abstract class BaseAccountUserResourceTestCase {
 	}
 
 	protected void assertValid(
-		Page<AccountUser> page, Map<String, Map> expectedActions) {
+		Page<AccountUser> page,
+		Map<String, Map<String, String>> expectedActions) {
 
 		boolean valid = false;
 
@@ -1208,7 +1209,7 @@ public abstract class BaseAccountUserResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		Map<String, Map> actions = page.getActions();
+		Map<String, Map<String, String>> actions = page.getActions();
 
 		for (String key : expectedActions.keySet()) {
 			Map action = actions.get(key);

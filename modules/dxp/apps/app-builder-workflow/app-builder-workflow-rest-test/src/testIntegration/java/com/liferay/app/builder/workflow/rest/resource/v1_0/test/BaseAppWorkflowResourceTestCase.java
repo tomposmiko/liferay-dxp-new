@@ -369,7 +369,8 @@ public abstract class BaseAppWorkflowResourceTestCase {
 	}
 
 	protected void assertValid(
-		Page<AppWorkflow> page, Map<String, Map> expectedActions) {
+		Page<AppWorkflow> page,
+		Map<String, Map<String, String>> expectedActions) {
 
 		boolean valid = false;
 
@@ -386,7 +387,7 @@ public abstract class BaseAppWorkflowResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		Map<String, Map> actions = page.getActions();
+		Map<String, Map<String, String>> actions = page.getActions();
 
 		for (String key : expectedActions.keySet()) {
 			Map action = actions.get(key);

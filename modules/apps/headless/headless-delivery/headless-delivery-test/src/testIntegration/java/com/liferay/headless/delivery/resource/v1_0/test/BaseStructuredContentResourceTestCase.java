@@ -292,12 +292,12 @@ public abstract class BaseStructuredContentResourceTestCase {
 			structuredContent2.getId());
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetAssetLibraryStructuredContentsPage_getExpectedActions(
 				Long assetLibraryId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		Map createBatchAction = new HashMap<>();
 		createBatchAction.put("method", "POST");
@@ -730,12 +730,12 @@ public abstract class BaseStructuredContentResourceTestCase {
 			structuredContent2.getId());
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetContentStructureStructuredContentsPage_getExpectedActions(
 				Long contentStructureId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		return expectedActions;
 	}
@@ -1134,11 +1134,11 @@ public abstract class BaseStructuredContentResourceTestCase {
 			structuredContent2.getId());
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetSiteStructuredContentsPage_getExpectedActions(Long siteId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		Map createBatchAction = new HashMap<>();
 		createBatchAction.put("method", "POST");
@@ -1887,12 +1887,12 @@ public abstract class BaseStructuredContentResourceTestCase {
 			structuredContent2.getId());
 	}
 
-	protected Map<String, Map>
+	protected Map<String, Map<String, String>>
 			testGetStructuredContentFolderStructuredContentsPage_getExpectedActions(
 				Long structuredContentFolderId)
 		throws Exception {
 
-		Map<String, Map> expectedActions = new HashMap<>();
+		Map<String, Map<String, String>> expectedActions = new HashMap<>();
 
 		Map createBatchAction = new HashMap<>();
 		createBatchAction.put("method", "POST");
@@ -3135,7 +3135,8 @@ public abstract class BaseStructuredContentResourceTestCase {
 	}
 
 	protected void assertValid(
-		Page<StructuredContent> page, Map<String, Map> expectedActions) {
+		Page<StructuredContent> page,
+		Map<String, Map<String, String>> expectedActions) {
 
 		boolean valid = false;
 
@@ -3153,7 +3154,7 @@ public abstract class BaseStructuredContentResourceTestCase {
 
 		Assert.assertTrue(valid);
 
-		Map<String, Map> actions = page.getActions();
+		Map<String, Map<String, String>> actions = page.getActions();
 
 		for (String key : expectedActions.keySet()) {
 			Map action = actions.get(key);

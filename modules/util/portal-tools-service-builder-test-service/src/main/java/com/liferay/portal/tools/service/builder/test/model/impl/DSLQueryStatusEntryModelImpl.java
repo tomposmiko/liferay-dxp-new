@@ -217,45 +217,51 @@ public class DSLQueryStatusEntryModelImpl
 
 	private static final Map<String, Function<DSLQueryStatusEntry, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<DSLQueryStatusEntry, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<DSLQueryStatusEntry, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<DSLQueryStatusEntry, Object>>();
-		Map<String, BiConsumer<DSLQueryStatusEntry, ?>>
-			attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<DSLQueryStatusEntry, ?>>();
 
 		attributeGetterFunctions.put(
 			"dslQueryStatusEntryId",
 			DSLQueryStatusEntry::getDslQueryStatusEntryId);
+		attributeGetterFunctions.put(
+			"dslQueryEntryId", DSLQueryStatusEntry::getDslQueryEntryId);
+		attributeGetterFunctions.put("status", DSLQueryStatusEntry::getStatus);
+		attributeGetterFunctions.put(
+			"statusDate", DSLQueryStatusEntry::getStatusDate);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<DSLQueryStatusEntry, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<DSLQueryStatusEntry, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<DSLQueryStatusEntry, ?>>();
+
 		attributeSetterBiConsumers.put(
 			"dslQueryStatusEntryId",
 			(BiConsumer<DSLQueryStatusEntry, Long>)
 				DSLQueryStatusEntry::setDslQueryStatusEntryId);
-		attributeGetterFunctions.put(
-			"dslQueryEntryId", DSLQueryStatusEntry::getDslQueryEntryId);
 		attributeSetterBiConsumers.put(
 			"dslQueryEntryId",
 			(BiConsumer<DSLQueryStatusEntry, Long>)
 				DSLQueryStatusEntry::setDslQueryEntryId);
-		attributeGetterFunctions.put("status", DSLQueryStatusEntry::getStatus);
 		attributeSetterBiConsumers.put(
 			"status",
 			(BiConsumer<DSLQueryStatusEntry, String>)
 				DSLQueryStatusEntry::setStatus);
-		attributeGetterFunctions.put(
-			"statusDate", DSLQueryStatusEntry::getStatusDate);
 		attributeSetterBiConsumers.put(
 			"statusDate",
 			(BiConsumer<DSLQueryStatusEntry, Date>)
 				DSLQueryStatusEntry::setStatusDate);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

@@ -21,7 +21,9 @@ ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_
 
 DispatchTrigger dispatchTrigger = (DispatchTrigger)row.getObject();
 
-String runNowButton = "runNowButton" + row.getRowId();
+String rowId = row.getRowId();
+
+String runNowButton = "runNowButton" + rowId;
 %>
 
 <span aria-hidden="true" class="hide icon-spinner icon-spin dispatch-check-row-icon-spinner<%= row.getRowId() %>"></span>
@@ -40,6 +42,13 @@ String runNowButton = "runNowButton" + row.getRowId();
 				'<%= dispatchTrigger.getDispatchTriggerId() %>',
 		};
 
+		var statuses = {
+			cancelled: '<%= LanguageUtil.get(request, "cancelled") %>',
+			failed: '<%= LanguageUtil.get(request, "failed") %>',
+			'in-progress': '<%= LanguageUtil.get(request, "in-progress") %>',
+			successful: '<%= LanguageUtil.get(request, "successful") %>',
+		};
+
 		this.attr('disabled', true);
 
 		var iconSpinnerContainer = A.one(
@@ -55,17 +64,25 @@ String runNowButton = "runNowButton" + row.getRowId();
 				on: {
 					success: function (event, id, obj) {
 						var response = JSON.parse(obj.response);
+						var status = response.status;
+						var cssClass = response.cssClass;
+						var statusRow = A.one('.status-row-<%= rowId %>');
 
-						if (response.success) {
+						statusRow._node.className = '';
+						statusRow.addClass('status-row-<%= rowId %>');
+						statusRow.addClass('background-task-status-row');
+						statusRow.addClass('background-task-status-' + status);
+						statusRow.addClass(cssClass);
+
+						statusRow.setContent(statuses[status]);
+
+						if (!response.success) {
 							iconSpinnerContainer.addClass('hide');
-						}
-						else {
+
 							A.one('#<portlet:namespace /><%= runNowButton %>').attr(
 								'disabled',
 								false
 							);
-
-							iconSpinnerContainer.addClass('hide');
 
 							new Liferay.Notification({
 								closeable: true,

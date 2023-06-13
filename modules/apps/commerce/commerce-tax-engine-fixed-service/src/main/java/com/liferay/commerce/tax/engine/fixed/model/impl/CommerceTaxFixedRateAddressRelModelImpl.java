@@ -321,9 +321,6 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 	private static final Map
 		<String, Function<CommerceTaxFixedRateAddressRel, Object>>
 			_attributeGetterFunctions;
-	private static final Map
-		<String, BiConsumer<CommerceTaxFixedRateAddressRel, Object>>
-			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceTaxFixedRateAddressRel, Object>>
@@ -331,99 +328,108 @@ public class CommerceTaxFixedRateAddressRelModelImpl
 				new LinkedHashMap
 					<String,
 					 Function<CommerceTaxFixedRateAddressRel, Object>>();
-		Map<String, BiConsumer<CommerceTaxFixedRateAddressRel, ?>>
-			attributeSetterBiConsumers =
-				new LinkedHashMap
-					<String, BiConsumer<CommerceTaxFixedRateAddressRel, ?>>();
 
 		attributeGetterFunctions.put(
 			"commerceTaxFixedRateAddressRelId",
 			CommerceTaxFixedRateAddressRel::
 				getCommerceTaxFixedRateAddressRelId);
+		attributeGetterFunctions.put(
+			"groupId", CommerceTaxFixedRateAddressRel::getGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceTaxFixedRateAddressRel::getCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceTaxFixedRateAddressRel::getUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceTaxFixedRateAddressRel::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceTaxFixedRateAddressRel::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceTaxFixedRateAddressRel::getModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceTaxMethodId",
+			CommerceTaxFixedRateAddressRel::getCommerceTaxMethodId);
+		attributeGetterFunctions.put(
+			"CPTaxCategoryId",
+			CommerceTaxFixedRateAddressRel::getCPTaxCategoryId);
+		attributeGetterFunctions.put(
+			"commerceCountryId",
+			CommerceTaxFixedRateAddressRel::getCommerceCountryId);
+		attributeGetterFunctions.put(
+			"commerceRegionId",
+			CommerceTaxFixedRateAddressRel::getCommerceRegionId);
+		attributeGetterFunctions.put(
+			"zip", CommerceTaxFixedRateAddressRel::getZip);
+		attributeGetterFunctions.put(
+			"rate", CommerceTaxFixedRateAddressRel::getRate);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map
+		<String, BiConsumer<CommerceTaxFixedRateAddressRel, Object>>
+			_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<CommerceTaxFixedRateAddressRel, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap
+					<String, BiConsumer<CommerceTaxFixedRateAddressRel, ?>>();
+
 		attributeSetterBiConsumers.put(
 			"commerceTaxFixedRateAddressRelId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
 				CommerceTaxFixedRateAddressRel::
 					setCommerceTaxFixedRateAddressRelId);
-		attributeGetterFunctions.put(
-			"groupId", CommerceTaxFixedRateAddressRel::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
 				CommerceTaxFixedRateAddressRel::setGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceTaxFixedRateAddressRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
 				CommerceTaxFixedRateAddressRel::setCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceTaxFixedRateAddressRel::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
 				CommerceTaxFixedRateAddressRel::setUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceTaxFixedRateAddressRel::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, String>)
 				CommerceTaxFixedRateAddressRel::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceTaxFixedRateAddressRel::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Date>)
 				CommerceTaxFixedRateAddressRel::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceTaxFixedRateAddressRel::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Date>)
 				CommerceTaxFixedRateAddressRel::setModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceTaxMethodId",
-			CommerceTaxFixedRateAddressRel::getCommerceTaxMethodId);
 		attributeSetterBiConsumers.put(
 			"commerceTaxMethodId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
 				CommerceTaxFixedRateAddressRel::setCommerceTaxMethodId);
-		attributeGetterFunctions.put(
-			"CPTaxCategoryId",
-			CommerceTaxFixedRateAddressRel::getCPTaxCategoryId);
 		attributeSetterBiConsumers.put(
 			"CPTaxCategoryId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
 				CommerceTaxFixedRateAddressRel::setCPTaxCategoryId);
-		attributeGetterFunctions.put(
-			"commerceCountryId",
-			CommerceTaxFixedRateAddressRel::getCommerceCountryId);
 		attributeSetterBiConsumers.put(
 			"commerceCountryId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
 				CommerceTaxFixedRateAddressRel::setCommerceCountryId);
-		attributeGetterFunctions.put(
-			"commerceRegionId",
-			CommerceTaxFixedRateAddressRel::getCommerceRegionId);
 		attributeSetterBiConsumers.put(
 			"commerceRegionId",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Long>)
 				CommerceTaxFixedRateAddressRel::setCommerceRegionId);
-		attributeGetterFunctions.put(
-			"zip", CommerceTaxFixedRateAddressRel::getZip);
 		attributeSetterBiConsumers.put(
 			"zip",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, String>)
 				CommerceTaxFixedRateAddressRel::setZip);
-		attributeGetterFunctions.put(
-			"rate", CommerceTaxFixedRateAddressRel::getRate);
 		attributeSetterBiConsumers.put(
 			"rate",
 			(BiConsumer<CommerceTaxFixedRateAddressRel, Double>)
 				CommerceTaxFixedRateAddressRel::setRate);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

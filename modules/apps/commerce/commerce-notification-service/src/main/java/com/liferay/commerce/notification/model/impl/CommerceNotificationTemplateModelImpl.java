@@ -363,137 +363,143 @@ public class CommerceNotificationTemplateModelImpl
 	private static final Map
 		<String, Function<CommerceNotificationTemplate, Object>>
 			_attributeGetterFunctions;
-	private static final Map
-		<String, BiConsumer<CommerceNotificationTemplate, Object>>
-			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceNotificationTemplate, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceNotificationTemplate, Object>>();
+
+		attributeGetterFunctions.put(
+			"uuid", CommerceNotificationTemplate::getUuid);
+		attributeGetterFunctions.put(
+			"commerceNotificationTemplateId",
+			CommerceNotificationTemplate::getCommerceNotificationTemplateId);
+		attributeGetterFunctions.put(
+			"groupId", CommerceNotificationTemplate::getGroupId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceNotificationTemplate::getCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceNotificationTemplate::getUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceNotificationTemplate::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceNotificationTemplate::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceNotificationTemplate::getModifiedDate);
+		attributeGetterFunctions.put(
+			"name", CommerceNotificationTemplate::getName);
+		attributeGetterFunctions.put(
+			"description", CommerceNotificationTemplate::getDescription);
+		attributeGetterFunctions.put(
+			"from", CommerceNotificationTemplate::getFrom);
+		attributeGetterFunctions.put(
+			"fromName", CommerceNotificationTemplate::getFromName);
+		attributeGetterFunctions.put("to", CommerceNotificationTemplate::getTo);
+		attributeGetterFunctions.put("cc", CommerceNotificationTemplate::getCc);
+		attributeGetterFunctions.put(
+			"bcc", CommerceNotificationTemplate::getBcc);
+		attributeGetterFunctions.put(
+			"type", CommerceNotificationTemplate::getType);
+		attributeGetterFunctions.put(
+			"enabled", CommerceNotificationTemplate::getEnabled);
+		attributeGetterFunctions.put(
+			"subject", CommerceNotificationTemplate::getSubject);
+		attributeGetterFunctions.put(
+			"body", CommerceNotificationTemplate::getBody);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map
+		<String, BiConsumer<CommerceNotificationTemplate, Object>>
+			_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<CommerceNotificationTemplate, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String, BiConsumer<CommerceNotificationTemplate, ?>>();
 
-		attributeGetterFunctions.put(
-			"uuid", CommerceNotificationTemplate::getUuid);
 		attributeSetterBiConsumers.put(
 			"uuid",
 			(BiConsumer<CommerceNotificationTemplate, String>)
 				CommerceNotificationTemplate::setUuid);
-		attributeGetterFunctions.put(
-			"commerceNotificationTemplateId",
-			CommerceNotificationTemplate::getCommerceNotificationTemplateId);
 		attributeSetterBiConsumers.put(
 			"commerceNotificationTemplateId",
 			(BiConsumer<CommerceNotificationTemplate, Long>)
 				CommerceNotificationTemplate::
 					setCommerceNotificationTemplateId);
-		attributeGetterFunctions.put(
-			"groupId", CommerceNotificationTemplate::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId",
 			(BiConsumer<CommerceNotificationTemplate, Long>)
 				CommerceNotificationTemplate::setGroupId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceNotificationTemplate::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceNotificationTemplate, Long>)
 				CommerceNotificationTemplate::setCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceNotificationTemplate::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceNotificationTemplate, Long>)
 				CommerceNotificationTemplate::setUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceNotificationTemplate::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceNotificationTemplate, String>)
 				CommerceNotificationTemplate::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceNotificationTemplate::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceNotificationTemplate, Date>)
 				CommerceNotificationTemplate::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceNotificationTemplate::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceNotificationTemplate, Date>)
 				CommerceNotificationTemplate::setModifiedDate);
-		attributeGetterFunctions.put(
-			"name", CommerceNotificationTemplate::getName);
 		attributeSetterBiConsumers.put(
 			"name",
 			(BiConsumer<CommerceNotificationTemplate, String>)
 				CommerceNotificationTemplate::setName);
-		attributeGetterFunctions.put(
-			"description", CommerceNotificationTemplate::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<CommerceNotificationTemplate, String>)
 				CommerceNotificationTemplate::setDescription);
-		attributeGetterFunctions.put(
-			"from", CommerceNotificationTemplate::getFrom);
 		attributeSetterBiConsumers.put(
 			"from",
 			(BiConsumer<CommerceNotificationTemplate, String>)
 				CommerceNotificationTemplate::setFrom);
-		attributeGetterFunctions.put(
-			"fromName", CommerceNotificationTemplate::getFromName);
 		attributeSetterBiConsumers.put(
 			"fromName",
 			(BiConsumer<CommerceNotificationTemplate, String>)
 				CommerceNotificationTemplate::setFromName);
-		attributeGetterFunctions.put("to", CommerceNotificationTemplate::getTo);
 		attributeSetterBiConsumers.put(
 			"to",
 			(BiConsumer<CommerceNotificationTemplate, String>)
 				CommerceNotificationTemplate::setTo);
-		attributeGetterFunctions.put("cc", CommerceNotificationTemplate::getCc);
 		attributeSetterBiConsumers.put(
 			"cc",
 			(BiConsumer<CommerceNotificationTemplate, String>)
 				CommerceNotificationTemplate::setCc);
-		attributeGetterFunctions.put(
-			"bcc", CommerceNotificationTemplate::getBcc);
 		attributeSetterBiConsumers.put(
 			"bcc",
 			(BiConsumer<CommerceNotificationTemplate, String>)
 				CommerceNotificationTemplate::setBcc);
-		attributeGetterFunctions.put(
-			"type", CommerceNotificationTemplate::getType);
 		attributeSetterBiConsumers.put(
 			"type",
 			(BiConsumer<CommerceNotificationTemplate, String>)
 				CommerceNotificationTemplate::setType);
-		attributeGetterFunctions.put(
-			"enabled", CommerceNotificationTemplate::getEnabled);
 		attributeSetterBiConsumers.put(
 			"enabled",
 			(BiConsumer<CommerceNotificationTemplate, Boolean>)
 				CommerceNotificationTemplate::setEnabled);
-		attributeGetterFunctions.put(
-			"subject", CommerceNotificationTemplate::getSubject);
 		attributeSetterBiConsumers.put(
 			"subject",
 			(BiConsumer<CommerceNotificationTemplate, String>)
 				CommerceNotificationTemplate::setSubject);
-		attributeGetterFunctions.put(
-			"body", CommerceNotificationTemplate::getBody);
 		attributeSetterBiConsumers.put(
 			"body",
 			(BiConsumer<CommerceNotificationTemplate, String>)
 				CommerceNotificationTemplate::setBody);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

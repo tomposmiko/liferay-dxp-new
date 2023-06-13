@@ -304,74 +304,80 @@ public class CommerceChannelRelModelImpl
 
 	private static final Map<String, Function<CommerceChannelRel, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CommerceChannelRel, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceChannelRel, Object>>
 			attributeGetterFunctions =
 				new LinkedHashMap
 					<String, Function<CommerceChannelRel, Object>>();
-		Map<String, BiConsumer<CommerceChannelRel, ?>>
-			attributeSetterBiConsumers =
-				new LinkedHashMap<String, BiConsumer<CommerceChannelRel, ?>>();
 
 		attributeGetterFunctions.put(
 			"commerceChannelRelId",
 			CommerceChannelRel::getCommerceChannelRelId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceChannelRel::getCompanyId);
+		attributeGetterFunctions.put("userId", CommerceChannelRel::getUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceChannelRel::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceChannelRel::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CommerceChannelRel::getModifiedDate);
+		attributeGetterFunctions.put(
+			"classNameId", CommerceChannelRel::getClassNameId);
+		attributeGetterFunctions.put("classPK", CommerceChannelRel::getClassPK);
+		attributeGetterFunctions.put(
+			"commerceChannelId", CommerceChannelRel::getCommerceChannelId);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CommerceChannelRel, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<CommerceChannelRel, ?>>
+			attributeSetterBiConsumers =
+				new LinkedHashMap<String, BiConsumer<CommerceChannelRel, ?>>();
+
 		attributeSetterBiConsumers.put(
 			"commerceChannelRelId",
 			(BiConsumer<CommerceChannelRel, Long>)
 				CommerceChannelRel::setCommerceChannelRelId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceChannelRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceChannelRel, Long>)
 				CommerceChannelRel::setCompanyId);
-		attributeGetterFunctions.put("userId", CommerceChannelRel::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceChannelRel, Long>)
 				CommerceChannelRel::setUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceChannelRel::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceChannelRel, String>)
 				CommerceChannelRel::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceChannelRel::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceChannelRel, Date>)
 				CommerceChannelRel::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CommerceChannelRel::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceChannelRel, Date>)
 				CommerceChannelRel::setModifiedDate);
-		attributeGetterFunctions.put(
-			"classNameId", CommerceChannelRel::getClassNameId);
 		attributeSetterBiConsumers.put(
 			"classNameId",
 			(BiConsumer<CommerceChannelRel, Long>)
 				CommerceChannelRel::setClassNameId);
-		attributeGetterFunctions.put("classPK", CommerceChannelRel::getClassPK);
 		attributeSetterBiConsumers.put(
 			"classPK",
 			(BiConsumer<CommerceChannelRel, Long>)
 				CommerceChannelRel::setClassPK);
-		attributeGetterFunctions.put(
-			"commerceChannelId", CommerceChannelRel::getCommerceChannelId);
 		attributeSetterBiConsumers.put(
 			"commerceChannelId",
 			(BiConsumer<CommerceChannelRel, Long>)
 				CommerceChannelRel::setCommerceChannelId);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

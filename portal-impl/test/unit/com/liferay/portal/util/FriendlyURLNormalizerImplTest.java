@@ -16,6 +16,7 @@ package com.liferay.portal.util;
 
 import com.liferay.petra.nio.CharsetEncoderUtil;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.util.File;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
@@ -149,13 +150,26 @@ public class FriendlyURLNormalizerImplTest {
 	@Test
 	public void testNormalizeWithEncodingUnicode() throws Exception {
 		_testNormalizeWithEncodingUnicode("\u5F15");
-		_testNormalizeWithEncodingUnicode("テスト");
-		_testNormalizeWithEncodingUnicode("اختبار");
+
+		String expectedText = new String(
+			_file.getBytes(
+				FriendlyURLNormalizerImplTest.class.getResourceAsStream(
+					"dependencies/test-normalize-with-encoding-arabic.txt")));
+
+		_testNormalizeWithEncodingUnicode(expectedText);
+
+		expectedText = new String(
+			_file.getBytes(
+				FriendlyURLNormalizerImplTest.class.getResourceAsStream(
+					"dependencies/test-normalize-with-encoding-japanese.txt")));
+
+		_testNormalizeWithEncodingUnicode(expectedText);
+
 		_testNormalizeWithEncodingUnicode("\uD801\uDC37");
 		_testNormalizeWithEncodingUnicode(
 			String.valueOf(Character.MAX_HIGH_SURROGATE));
 
-		String value = "テスト";
+		String value = expectedText;
 
 		String encodedValue = URLEncoder.encode(value, StringPool.UTF8);
 
@@ -206,6 +220,7 @@ public class FriendlyURLNormalizerImplTest {
 			_friendlyURLNormalizerImpl.normalizeWithEncoding(s));
 	}
 
+	private final File _file = FileImpl.getInstance();
 	private final FriendlyURLNormalizerImpl _friendlyURLNormalizerImpl =
 		new FriendlyURLNormalizerImpl();
 

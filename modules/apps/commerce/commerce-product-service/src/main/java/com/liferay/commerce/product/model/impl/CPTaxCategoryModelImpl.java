@@ -300,59 +300,65 @@ public class CPTaxCategoryModelImpl
 
 	private static final Map<String, Function<CPTaxCategory, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<CPTaxCategory, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CPTaxCategory, Object>> attributeGetterFunctions =
 			new LinkedHashMap<String, Function<CPTaxCategory, Object>>();
-		Map<String, BiConsumer<CPTaxCategory, ?>> attributeSetterBiConsumers =
-			new LinkedHashMap<String, BiConsumer<CPTaxCategory, ?>>();
 
 		attributeGetterFunctions.put(
 			"externalReferenceCode", CPTaxCategory::getExternalReferenceCode);
+		attributeGetterFunctions.put(
+			"CPTaxCategoryId", CPTaxCategory::getCPTaxCategoryId);
+		attributeGetterFunctions.put("companyId", CPTaxCategory::getCompanyId);
+		attributeGetterFunctions.put("userId", CPTaxCategory::getUserId);
+		attributeGetterFunctions.put("userName", CPTaxCategory::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CPTaxCategory::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate", CPTaxCategory::getModifiedDate);
+		attributeGetterFunctions.put("name", CPTaxCategory::getName);
+		attributeGetterFunctions.put(
+			"description", CPTaxCategory::getDescription);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<CPTaxCategory, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<CPTaxCategory, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<CPTaxCategory, ?>>();
+
 		attributeSetterBiConsumers.put(
 			"externalReferenceCode",
 			(BiConsumer<CPTaxCategory, String>)
 				CPTaxCategory::setExternalReferenceCode);
-		attributeGetterFunctions.put(
-			"CPTaxCategoryId", CPTaxCategory::getCPTaxCategoryId);
 		attributeSetterBiConsumers.put(
 			"CPTaxCategoryId",
 			(BiConsumer<CPTaxCategory, Long>)CPTaxCategory::setCPTaxCategoryId);
-		attributeGetterFunctions.put("companyId", CPTaxCategory::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CPTaxCategory, Long>)CPTaxCategory::setCompanyId);
-		attributeGetterFunctions.put("userId", CPTaxCategory::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CPTaxCategory, Long>)CPTaxCategory::setUserId);
-		attributeGetterFunctions.put("userName", CPTaxCategory::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CPTaxCategory, String>)CPTaxCategory::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CPTaxCategory::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CPTaxCategory, Date>)CPTaxCategory::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate", CPTaxCategory::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CPTaxCategory, Date>)CPTaxCategory::setModifiedDate);
-		attributeGetterFunctions.put("name", CPTaxCategory::getName);
 		attributeSetterBiConsumers.put(
 			"name", (BiConsumer<CPTaxCategory, String>)CPTaxCategory::setName);
-		attributeGetterFunctions.put(
-			"description", CPTaxCategory::getDescription);
 		attributeSetterBiConsumers.put(
 			"description",
 			(BiConsumer<CPTaxCategory, String>)CPTaxCategory::setDescription);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

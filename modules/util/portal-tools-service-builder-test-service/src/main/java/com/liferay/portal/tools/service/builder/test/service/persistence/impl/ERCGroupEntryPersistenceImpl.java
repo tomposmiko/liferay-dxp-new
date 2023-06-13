@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.spring.extender.service.ServiceReference;
+import com.liferay.portal.tools.service.builder.test.exception.DuplicateERCGroupEntryExternalReferenceCodeException;
 import com.liferay.portal.tools.service.builder.test.exception.NoSuchERCGroupEntryException;
 import com.liferay.portal.tools.service.builder.test.model.ERCGroupEntry;
 import com.liferay.portal.tools.service.builder.test.model.ERCGroupEntryTable;
@@ -2005,6 +2006,31 @@ public class ERCGroupEntryPersistenceImpl
 
 		if (Validator.isNull(ercGroupEntry.getExternalReferenceCode())) {
 			ercGroupEntry.setExternalReferenceCode(ercGroupEntry.getUuid());
+		}
+		else {
+			ERCGroupEntry ercERCGroupEntry = fetchByG_ERC(
+				ercGroupEntry.getGroupId(),
+				ercGroupEntry.getExternalReferenceCode());
+
+			if (isNew) {
+				if (ercERCGroupEntry != null) {
+					throw new DuplicateERCGroupEntryExternalReferenceCodeException(
+						"Duplicate erc group entry with external reference code " +
+							ercGroupEntry.getExternalReferenceCode() +
+								" and group " + ercGroupEntry.getGroupId());
+				}
+			}
+			else {
+				if ((ercERCGroupEntry != null) &&
+					(ercGroupEntry.getErcGroupEntryId() !=
+						ercERCGroupEntry.getErcGroupEntryId())) {
+
+					throw new DuplicateERCGroupEntryExternalReferenceCodeException(
+						"Duplicate erc group entry with external reference code " +
+							ercGroupEntry.getExternalReferenceCode() +
+								" and group " + ercGroupEntry.getGroupId());
+				}
+			}
 		}
 
 		Session session = null;

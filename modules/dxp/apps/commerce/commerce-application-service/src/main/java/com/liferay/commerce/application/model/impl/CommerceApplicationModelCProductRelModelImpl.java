@@ -305,9 +305,6 @@ public class CommerceApplicationModelCProductRelModelImpl
 	private static final Map
 		<String, Function<CommerceApplicationModelCProductRel, Object>>
 			_attributeGetterFunctions;
-	private static final Map
-		<String, BiConsumer<CommerceApplicationModelCProductRel, Object>>
-			_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<CommerceApplicationModelCProductRel, Object>>
@@ -315,69 +312,78 @@ public class CommerceApplicationModelCProductRelModelImpl
 				new LinkedHashMap
 					<String,
 					 Function<CommerceApplicationModelCProductRel, Object>>();
+
+		attributeGetterFunctions.put(
+			"commerceApplicationModelCProductRelId",
+			CommerceApplicationModelCProductRel::
+				getCommerceApplicationModelCProductRelId);
+		attributeGetterFunctions.put(
+			"companyId", CommerceApplicationModelCProductRel::getCompanyId);
+		attributeGetterFunctions.put(
+			"userId", CommerceApplicationModelCProductRel::getUserId);
+		attributeGetterFunctions.put(
+			"userName", CommerceApplicationModelCProductRel::getUserName);
+		attributeGetterFunctions.put(
+			"createDate", CommerceApplicationModelCProductRel::getCreateDate);
+		attributeGetterFunctions.put(
+			"modifiedDate",
+			CommerceApplicationModelCProductRel::getModifiedDate);
+		attributeGetterFunctions.put(
+			"commerceApplicationModelId",
+			CommerceApplicationModelCProductRel::getCommerceApplicationModelId);
+		attributeGetterFunctions.put(
+			"CProductId", CommerceApplicationModelCProductRel::getCProductId);
+
+		_attributeGetterFunctions = Collections.unmodifiableMap(
+			attributeGetterFunctions);
+	}
+
+	private static final Map
+		<String, BiConsumer<CommerceApplicationModelCProductRel, Object>>
+			_attributeSetterBiConsumers;
+
+	static {
 		Map<String, BiConsumer<CommerceApplicationModelCProductRel, ?>>
 			attributeSetterBiConsumers =
 				new LinkedHashMap
 					<String,
 					 BiConsumer<CommerceApplicationModelCProductRel, ?>>();
 
-		attributeGetterFunctions.put(
-			"commerceApplicationModelCProductRelId",
-			CommerceApplicationModelCProductRel::
-				getCommerceApplicationModelCProductRelId);
 		attributeSetterBiConsumers.put(
 			"commerceApplicationModelCProductRelId",
 			(BiConsumer<CommerceApplicationModelCProductRel, Long>)
 				CommerceApplicationModelCProductRel::
 					setCommerceApplicationModelCProductRelId);
-		attributeGetterFunctions.put(
-			"companyId", CommerceApplicationModelCProductRel::getCompanyId);
 		attributeSetterBiConsumers.put(
 			"companyId",
 			(BiConsumer<CommerceApplicationModelCProductRel, Long>)
 				CommerceApplicationModelCProductRel::setCompanyId);
-		attributeGetterFunctions.put(
-			"userId", CommerceApplicationModelCProductRel::getUserId);
 		attributeSetterBiConsumers.put(
 			"userId",
 			(BiConsumer<CommerceApplicationModelCProductRel, Long>)
 				CommerceApplicationModelCProductRel::setUserId);
-		attributeGetterFunctions.put(
-			"userName", CommerceApplicationModelCProductRel::getUserName);
 		attributeSetterBiConsumers.put(
 			"userName",
 			(BiConsumer<CommerceApplicationModelCProductRel, String>)
 				CommerceApplicationModelCProductRel::setUserName);
-		attributeGetterFunctions.put(
-			"createDate", CommerceApplicationModelCProductRel::getCreateDate);
 		attributeSetterBiConsumers.put(
 			"createDate",
 			(BiConsumer<CommerceApplicationModelCProductRel, Date>)
 				CommerceApplicationModelCProductRel::setCreateDate);
-		attributeGetterFunctions.put(
-			"modifiedDate",
-			CommerceApplicationModelCProductRel::getModifiedDate);
 		attributeSetterBiConsumers.put(
 			"modifiedDate",
 			(BiConsumer<CommerceApplicationModelCProductRel, Date>)
 				CommerceApplicationModelCProductRel::setModifiedDate);
-		attributeGetterFunctions.put(
-			"commerceApplicationModelId",
-			CommerceApplicationModelCProductRel::getCommerceApplicationModelId);
 		attributeSetterBiConsumers.put(
 			"commerceApplicationModelId",
 			(BiConsumer<CommerceApplicationModelCProductRel, Long>)
 				CommerceApplicationModelCProductRel::
 					setCommerceApplicationModelId);
-		attributeGetterFunctions.put(
-			"CProductId", CommerceApplicationModelCProductRel::getCProductId);
 		attributeSetterBiConsumers.put(
 			"CProductId",
 			(BiConsumer<CommerceApplicationModelCProductRel, Long>)
 				CommerceApplicationModelCProductRel::setCProductId);
 
-		_attributeGetterFunctions = Collections.unmodifiableMap(
-			attributeGetterFunctions);
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

@@ -227,54 +227,60 @@ public class TodoItemModelImpl
 
 	private static final Map<String, Function<TodoItem, Object>>
 		_attributeGetterFunctions;
-	private static final Map<String, BiConsumer<TodoItem, Object>>
-		_attributeSetterBiConsumers;
 
 	static {
 		Map<String, Function<TodoItem, Object>> attributeGetterFunctions =
 			new LinkedHashMap<String, Function<TodoItem, Object>>();
-		Map<String, BiConsumer<TodoItem, ?>> attributeSetterBiConsumers =
-			new LinkedHashMap<String, BiConsumer<TodoItem, ?>>();
 
 		attributeGetterFunctions.put("mvccVersion", TodoItem::getMvccVersion);
-		attributeSetterBiConsumers.put(
-			"mvccVersion",
-			(BiConsumer<TodoItem, Long>)TodoItem::setMvccVersion);
 		attributeGetterFunctions.put("todoItemId", TodoItem::getTodoItemId);
-		attributeSetterBiConsumers.put(
-			"todoItemId", (BiConsumer<TodoItem, Long>)TodoItem::setTodoItemId);
 		attributeGetterFunctions.put("companyId", TodoItem::getCompanyId);
-		attributeSetterBiConsumers.put(
-			"companyId", (BiConsumer<TodoItem, Long>)TodoItem::setCompanyId);
 		attributeGetterFunctions.put("userId", TodoItem::getUserId);
-		attributeSetterBiConsumers.put(
-			"userId", (BiConsumer<TodoItem, Long>)TodoItem::setUserId);
 		attributeGetterFunctions.put("userName", TodoItem::getUserName);
-		attributeSetterBiConsumers.put(
-			"userName", (BiConsumer<TodoItem, String>)TodoItem::setUserName);
 		attributeGetterFunctions.put("createDate", TodoItem::getCreateDate);
-		attributeSetterBiConsumers.put(
-			"createDate", (BiConsumer<TodoItem, Date>)TodoItem::setCreateDate);
 		attributeGetterFunctions.put("modifiedDate", TodoItem::getModifiedDate);
-		attributeSetterBiConsumers.put(
-			"modifiedDate",
-			(BiConsumer<TodoItem, Date>)TodoItem::setModifiedDate);
 		attributeGetterFunctions.put("todoListId", TodoItem::getTodoListId);
-		attributeSetterBiConsumers.put(
-			"todoListId", (BiConsumer<TodoItem, Long>)TodoItem::setTodoListId);
 		attributeGetterFunctions.put("description", TodoItem::getDescription);
-		attributeSetterBiConsumers.put(
-			"description",
-			(BiConsumer<TodoItem, String>)TodoItem::setDescription);
 		attributeGetterFunctions.put("priority", TodoItem::getPriority);
-		attributeSetterBiConsumers.put(
-			"priority", (BiConsumer<TodoItem, Integer>)TodoItem::setPriority);
 		attributeGetterFunctions.put("status", TodoItem::getStatus);
-		attributeSetterBiConsumers.put(
-			"status", (BiConsumer<TodoItem, Integer>)TodoItem::setStatus);
 
 		_attributeGetterFunctions = Collections.unmodifiableMap(
 			attributeGetterFunctions);
+	}
+
+	private static final Map<String, BiConsumer<TodoItem, Object>>
+		_attributeSetterBiConsumers;
+
+	static {
+		Map<String, BiConsumer<TodoItem, ?>> attributeSetterBiConsumers =
+			new LinkedHashMap<String, BiConsumer<TodoItem, ?>>();
+
+		attributeSetterBiConsumers.put(
+			"mvccVersion",
+			(BiConsumer<TodoItem, Long>)TodoItem::setMvccVersion);
+		attributeSetterBiConsumers.put(
+			"todoItemId", (BiConsumer<TodoItem, Long>)TodoItem::setTodoItemId);
+		attributeSetterBiConsumers.put(
+			"companyId", (BiConsumer<TodoItem, Long>)TodoItem::setCompanyId);
+		attributeSetterBiConsumers.put(
+			"userId", (BiConsumer<TodoItem, Long>)TodoItem::setUserId);
+		attributeSetterBiConsumers.put(
+			"userName", (BiConsumer<TodoItem, String>)TodoItem::setUserName);
+		attributeSetterBiConsumers.put(
+			"createDate", (BiConsumer<TodoItem, Date>)TodoItem::setCreateDate);
+		attributeSetterBiConsumers.put(
+			"modifiedDate",
+			(BiConsumer<TodoItem, Date>)TodoItem::setModifiedDate);
+		attributeSetterBiConsumers.put(
+			"todoListId", (BiConsumer<TodoItem, Long>)TodoItem::setTodoListId);
+		attributeSetterBiConsumers.put(
+			"description",
+			(BiConsumer<TodoItem, String>)TodoItem::setDescription);
+		attributeSetterBiConsumers.put(
+			"priority", (BiConsumer<TodoItem, Integer>)TodoItem::setPriority);
+		attributeSetterBiConsumers.put(
+			"status", (BiConsumer<TodoItem, Integer>)TodoItem::setStatus);
+
 		_attributeSetterBiConsumers = Collections.unmodifiableMap(
 			(Map)attributeSetterBiConsumers);
 	}

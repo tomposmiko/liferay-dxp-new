@@ -133,6 +133,7 @@ public class CommerceAddressLocalServiceImpl
 		commerceAddress.setUserId(user.getUserId());
 		commerceAddress.setUserName(user.getFullName());
 		commerceAddress.setClassName(className);
+		commerceAddress.setExternalReferenceCode(externalReferenceCode);
 		commerceAddress.setClassPK(classPK);
 		commerceAddress.setName(name);
 		commerceAddress.setDescription(description);
@@ -145,7 +146,6 @@ public class CommerceAddressLocalServiceImpl
 		commerceAddress.setCommerceCountryId(commerceCountryId);
 		commerceAddress.setPhoneNumber(phoneNumber);
 		commerceAddress.setType(type);
-		commerceAddress.setExternalReferenceCode(externalReferenceCode);
 
 		return commerceAddressPersistence.update(commerceAddress);
 	}
