@@ -210,9 +210,17 @@ KBArticleURLHelper kbArticleURLHelper = new KBArticleURLHelper(renderRequest, re
 								</span>
 							</liferay-ui:search-container-column-text>
 
-							<liferay-ui:search-container-column-jsp
-								path="/admin/kb_folder_action.jsp"
-							/>
+							<liferay-ui:search-container-column-text>
+
+								<%
+								KBDropdownItemsProvider kbDropdownItemsProvider = new KBDropdownItemsProvider(liferayPortletRequest, liferayPortletResponse);
+								%>
+
+								<clay:dropdown-actions
+									dropdownItems="<%= kbDropdownItemsProvider.getKBFolderDropdownItems(kbFolder) %>"
+									propsTransformer="admin/js/KBDropdownPropsTransformer"
+								/>
+							</liferay-ui:search-container-column-text>
 						</c:when>
 						<c:otherwise>
 
@@ -288,11 +296,17 @@ KBArticleURLHelper kbArticleURLHelper = new KBArticleURLHelper(renderRequest, re
 								</span>
 							</liferay-ui:search-container-column-text>
 
-							<liferay-ui:search-container-column-jsp
-								align="right"
-								cssClass="entry-action"
-								path="/admin/kb_article_action.jsp"
-							/>
+							<liferay-ui:search-container-column-text>
+
+								<%
+								KBDropdownItemsProvider kbDropdownItemsProvider = new KBDropdownItemsProvider(liferayPortletRequest, liferayPortletResponse);
+								%>
+
+								<clay:dropdown-actions
+									dropdownItems="<%= kbDropdownItemsProvider.getKBArticleDropdownItems(kbArticle) %>"
+									propsTransformer="admin/js/KBDropdownPropsTransformer"
+								/>
+							</liferay-ui:search-container-column-text>
 						</c:otherwise>
 					</c:choose>
 				</liferay-ui:search-container-row>

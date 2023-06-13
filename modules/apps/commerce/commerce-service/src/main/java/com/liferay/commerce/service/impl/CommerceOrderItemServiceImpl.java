@@ -24,7 +24,10 @@ import com.liferay.commerce.model.CommerceOrderItem;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.permission.CommerceProductViewPermission;
 import com.liferay.commerce.product.service.CPInstanceLocalService;
+import com.liferay.commerce.service.CommerceOrderLocalService;
+import com.liferay.commerce.service.CommerceOrderService;
 import com.liferay.commerce.service.base.CommerceOrderItemServiceBaseImpl;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.search.BaseModelSearchResult;
 import com.liferay.portal.kernel.search.Sort;
@@ -75,7 +78,7 @@ public class CommerceOrderItemServiceImpl
 
 		_commerceOrderModelResourcePermission.check(
 			getPermissionChecker(),
-			commerceOrderService.getCommerceOrder(commerceOrderId),
+			_commerceOrderService.getCommerceOrder(commerceOrderId),
 			ActionKeys.UPDATE);
 
 		CPInstance cpInstance = cpInstanceLocalService.getCPInstance(
@@ -425,7 +428,7 @@ public class CommerceOrderItemServiceImpl
 	@Override
 	public CommerceOrderItem updateCommerceOrderItem(
 			long commerceOrderItemId, long cpMeasurementUnitId, int quantity,
-			ServiceContext serviceContext, boolean validateOrder)
+			ServiceContext serviceContext)
 		throws PortalException {
 
 		CommerceOrderItem commerceOrderItem =
@@ -437,8 +440,7 @@ public class CommerceOrderItemServiceImpl
 			ActionKeys.UPDATE);
 
 		return commerceOrderItemLocalService.updateCommerceOrderItem(
-			commerceOrderItemId, cpMeasurementUnitId, quantity, serviceContext,
-			validateOrder);
+			commerceOrderItemId, cpMeasurementUnitId, quantity, serviceContext);
 	}
 
 	@Override
@@ -556,7 +558,7 @@ public class CommerceOrderItemServiceImpl
 			ActionKeys.UPDATE);
 
 		CommerceOrder commerceOrder =
-			commerceOrderLocalService.getCommerceOrder(
+			_commerceOrderLocalService.getCommerceOrder(
 				commerceOrderItem.getCommerceOrderId());
 
 		_portletResourcePermission.check(
@@ -595,7 +597,7 @@ public class CommerceOrderItemServiceImpl
 			ActionKeys.UPDATE);
 
 		CommerceOrder commerceOrder =
-			commerceOrderLocalService.getCommerceOrder(
+			_commerceOrderLocalService.getCommerceOrder(
 				commerceOrderItem.getCommerceOrderId());
 
 		_portletResourcePermission.check(
@@ -630,7 +632,7 @@ public class CommerceOrderItemServiceImpl
 			ActionKeys.UPDATE);
 
 		CommerceOrder commerceOrder =
-			commerceOrderLocalService.getCommerceOrder(
+			_commerceOrderLocalService.getCommerceOrder(
 				commerceOrderItem.getCommerceOrderId());
 
 		_portletResourcePermission.check(
@@ -656,7 +658,7 @@ public class CommerceOrderItemServiceImpl
 			ActionKeys.UPDATE);
 
 		CommerceOrder commerceOrder =
-			commerceOrderLocalService.getCommerceOrder(
+			_commerceOrderLocalService.getCommerceOrder(
 				commerceOrderItem.getCommerceOrderId());
 
 		_portletResourcePermission.check(
@@ -681,7 +683,7 @@ public class CommerceOrderItemServiceImpl
 			ActionKeys.UPDATE);
 
 		CommerceOrder commerceOrder =
-			commerceOrderLocalService.getCommerceOrder(
+			_commerceOrderLocalService.getCommerceOrder(
 				commerceOrderItem.getCommerceOrderId());
 
 		_portletResourcePermission.check(
@@ -746,5 +748,11 @@ public class CommerceOrderItemServiceImpl
 				CommerceOrderItemServiceImpl.class,
 				"_portletResourcePermission",
 				CommerceOrderConstants.RESOURCE_NAME);
+
+	@BeanReference(type = CommerceOrderLocalService.class)
+	private CommerceOrderLocalService _commerceOrderLocalService;
+
+	@BeanReference(type = CommerceOrderService.class)
+	private CommerceOrderService _commerceOrderService;
 
 }

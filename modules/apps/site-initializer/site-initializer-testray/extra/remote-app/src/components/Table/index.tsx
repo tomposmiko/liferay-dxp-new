@@ -22,6 +22,7 @@ import {KeyedMutator} from 'swr';
 
 import {Sort} from '../../context/ListViewContext';
 import useContextMenu from '../../hooks/useContextMenu';
+import {APIResponse} from '../../services/rest';
 import {Action, SortDirection, SortOption} from '../../types';
 import {Permission} from '../../util/permission';
 import ContextMenu from '../ContextMenu';
@@ -30,7 +31,11 @@ import DropDown from '../DropDown/DropDown';
 type Column<T = any> = {
 	clickable?: boolean;
 	key: string;
-	render?: (itemValue: any, item: T) => String | React.ReactNode;
+	render?: (
+		itemValue: any,
+		item: T,
+		mutate: KeyedMutator<APIResponse<T>>
+	) => String | React.ReactNode;
 	size?: 'sm' | 'md' | 'lg' | 'xl' | 'none';
 	sorteable?: boolean;
 	value: string;
@@ -38,7 +43,8 @@ type Column<T = any> = {
 
 export type TableProps<T = any> = {
 	actions?: Action[];
-	columns: Column[];
+	allRowsChecked?: boolean;
+	columns: Column<T>[];
 	items: T[];
 	mutate: KeyedMutator<T>;
 	navigateTo?: (item: T) => string;
@@ -52,6 +58,7 @@ export type TableProps<T = any> = {
 };
 
 const Table: React.FC<TableProps> = ({
+	allRowsChecked = false,
 	actions,
 	columns,
 	items,
@@ -80,7 +87,6 @@ const Table: React.FC<TableProps> = ({
 	} = useContextMenu(displayActionColumn);
 
 	const [activeRow, setActiveRow] = useState<number | undefined>();
-	const [checked, setChecked] = useState(false);
 	const [sorted, setSorted] = useState<SortDirection>(SortOption.ASC);
 
 	const navigate = useNavigate();
@@ -126,10 +132,9 @@ const Table: React.FC<TableProps> = ({
 						{rowSelectable && (
 							<ClayTable.Cell>
 								<ClayCheckbox
-									checked={checked}
+									checked={allRowsChecked}
 									onChange={() => {
 										onSelectAllRows();
-										setChecked(!checked);
 									}}
 								/>
 							</ClayTable.Cell>
@@ -190,7 +195,9 @@ const Table: React.FC<TableProps> = ({
 											checked={selectedRows.includes(
 												item.id
 											)}
-											onChange={() => onSelectRow(item)}
+											onChange={() =>
+												onSelectRow(item.id)
+											}
 										/>
 									</ClayTable.Cell>
 								)}
@@ -222,10 +229,14 @@ const Table: React.FC<TableProps> = ({
 										}}
 									>
 										{column.render
-											? column.render(item[column.key], {
-													...item,
-													rowIndex,
-											  })
+											? column.render(
+													item[column.key],
+													{
+														...item,
+														rowIndex,
+													},
+													mutate
+											  )
 											: item[column.key]}
 									</ClayTable.Cell>
 								))}

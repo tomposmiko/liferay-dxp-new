@@ -781,13 +781,11 @@ public class CommerceOrderItemLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.model.CommerceOrderItem updateCommerceOrderItem(
 			long commerceOrderItemId, long cpMeasurementUnitId, int quantity,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext,
-			boolean validateOrder)
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceOrderItemLocalService.updateCommerceOrderItem(
-			commerceOrderItemId, cpMeasurementUnitId, quantity, serviceContext,
-			validateOrder);
+			commerceOrderItemId, cpMeasurementUnitId, quantity, serviceContext);
 	}
 
 	@Override
@@ -805,12 +803,11 @@ public class CommerceOrderItemLocalServiceWrapper
 	@Override
 	public com.liferay.commerce.model.CommerceOrderItem updateCommerceOrderItem(
 			long commerceOrderItemId, String json, int quantity,
-			com.liferay.portal.kernel.service.ServiceContext serviceContext,
-			boolean validateOrder)
+			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _commerceOrderItemLocalService.updateCommerceOrderItem(
-			commerceOrderItemId, json, quantity, serviceContext, validateOrder);
+			commerceOrderItemId, json, quantity, serviceContext);
 	}
 
 	@Override

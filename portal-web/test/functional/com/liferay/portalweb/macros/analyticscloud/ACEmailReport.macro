@@ -1,0 +1,33 @@
+definition {
+
+	macro accessEmailReportSettings {
+		Click(locator1 = "ACEmailReport#EMAIL_REPORT_WIDGET_ICON");
+	}
+
+	macro disableEmailReport {
+		ACEmailReport.accessEmailReportSettings();
+
+		ACEmailReport.disableEmailReportToggle();
+
+		Button.clickSave();
+	}
+
+	macro disableEmailReportToggle {
+		Uncheck.uncheckToggleSwitch(locator1 = "ACUtils#TOGGLE_ICON");
+	}
+
+	macro enableEmailReport {
+		ACEmailReport.accessEmailReportSettings();
+
+		ACEmailReport.enableEmailReportToggle();
+
+		ACUtils.selectGenericOption(optionValue = "${frequency}");
+
+		Button.clickSave();
+	}
+
+	macro enableEmailReportToggle {
+		Check.checkToggleSwitch(locator1 = "ACUtils#TOGGLE_ICON");
+	}
+
+}

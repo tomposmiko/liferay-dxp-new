@@ -66,24 +66,24 @@ public class WorkflowTaskManagerProxyBean
 	}
 
 	@Override
-	public WorkflowTask fetchWorkflowTask(long companyId, long workflowTaskId) {
+	public WorkflowTask fetchWorkflowTask(long workflowTaskId) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public List<User> getAssignableUsers(long companyId, long workflowTaskId) {
+	public List<User> getAssignableUsers(long workflowTaskId) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public List<String> getNextTransitionNames(
-		long companyId, long userId, long workflowTaskId) {
+		long userId, long workflowTaskId) {
 
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public WorkflowTask getWorkflowTask(long companyId, long workflowTaskId) {
+	public WorkflowTask getWorkflowTask(long workflowTaskId) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -185,7 +185,7 @@ public class WorkflowTaskManagerProxyBean
 	}
 
 	@Override
-	public boolean hasAssignableUsers(long companyId, long workflowTaskId) {
+	public boolean hasAssignableUsers(long workflowTaskId) {
 		throw new UnsupportedOperationException();
 	}
 

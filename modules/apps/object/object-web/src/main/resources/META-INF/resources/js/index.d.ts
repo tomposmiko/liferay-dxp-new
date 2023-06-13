@@ -103,6 +103,8 @@ interface ObjectDefinition {
 	active: boolean;
 	dateCreated: string;
 	dateModified: string;
+	enabledCategorization: boolean;
+	enabledComments: boolean;
 	id: number;
 	label: LocalizedValue<string>;
 	name: string;
@@ -133,8 +135,13 @@ interface ObjectFieldSetting {
 		| number
 		| boolean
 		| ObjectFieldFilterSetting[]
-		| {id: number; objectStates: ObjectState[]};
+		| ObjectFieldPicklistSetting;
 }
+
+type ObjectFieldPicklistSetting = {
+	id: number;
+	objectStates: ObjectState[];
+};
 
 type ObjectFieldFilterSetting = {
 	filterBy?: string;

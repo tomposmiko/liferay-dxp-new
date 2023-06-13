@@ -19,9 +19,10 @@ import {
 	API,
 	AutoComplete,
 	DatePicker,
-	FormCustomSelect,
 	Input,
-	invalidateRequired,
+	MultipleSelect,
+	SingleSelect,
+	stringIncludesQuery,
 } from '@liferay/object-js-components-web';
 import React, {
 	FormEvent,
@@ -33,7 +34,6 @@ import React, {
 
 import './ModalAddFilter.scss';
 
-const REQUIRED_MSG = Liferay.Language.get('required');
 const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 export function ModalAddFilter({
@@ -42,11 +42,13 @@ export function ModalAddFilter({
 	editingFilter,
 	editingObjectFieldName,
 	filterOperators,
+	filterTypeRequired,
 	header,
 	objectFields,
 	observer,
 	onClose,
 	onSave,
+	validate,
 	workflowStatusJSONArray,
 }: IProps) {
 	const [items, setItems] = useState<IItem[]>([]);
@@ -59,19 +61,31 @@ export function ModalAddFilter({
 	] = useState<LabelValueObject | null>();
 	const [value, setValue] = useState<string>();
 
-	const [errors, setErrors] = useState<TErrors>({});
+	const [errors, setErrors] = useState<FilterErrors>({});
 
 	const [query, setQuery] = useState<string>('');
 
 	const [filterStartDate, setFilterStartDate] = useState('');
-	const [filterEndtDate, setFilterEndDate] = useState('');
+	const [filterEndDate, setFilterEndDate] = useState('');
 
 	const filteredAvailableFields = useMemo(() => {
-		return objectFields.filter(({label}: ObjectField) => {
-			return label[defaultLanguageId]
-				?.toLowerCase()
-				.includes(query.toLowerCase());
-		});
+		const availableFields = objectFields.filter(
+			(objectField: ObjectFieldView) => {
+				if (
+					(objectField.businessType === 'Picklist' &&
+						!objectField.hasFilter) ||
+					objectField.name === 'createDate' ||
+					objectField.name === 'modifiedDate' ||
+					(objectField.name === 'status' && !objectField.hasFilter)
+				) {
+					return objectField;
+				}
+			}
+		);
+
+		return availableFields.filter(({label}: ObjectField) =>
+			stringIncludesQuery(label[defaultLanguageId] as string, query)
+		);
 	}, [objectFields, query]);
 
 	const getCheckedWorkflowStatusItems = (
@@ -248,58 +262,20 @@ export function ModalAddFilter({
 		}
 	}, [editingFilter, editingObjectFieldName, objectFields]);
 
-	const validate = (checkedItems: IItem[]) => {
-		setErrors({});
-		const currentErrors: TErrors = {};
-
-		if (!selectedFilterBy) {
-			currentErrors.selectedFilterBy = REQUIRED_MSG;
-		}
-		if (!selectedFilterType && !disableDateValues) {
-			currentErrors.selectedFilterType = REQUIRED_MSG;
-		}
-		if (
-			(selectedFilterBy?.name === 'status' ||
-				selectedFilterBy?.businessType === 'Picklist') &&
-			!checkedItems.length
-		) {
-			currentErrors.items = REQUIRED_MSG;
-		}
-		if (
-			selectedFilterBy?.businessType === 'Date' &&
-			selectedFilterType?.value === 'range' &&
-			!disableDateValues
-		) {
-			const startDate = items.find((date) => date.value === 'ge');
-			const endDate = items.find((date) => date.value === 'le');
-
-			if (!startDate) {
-				currentErrors.startDate = REQUIRED_MSG;
-			}
-
-			if (!endDate) {
-				currentErrors.endDate = REQUIRED_MSG;
-			}
-		}
-		if (
-			(selectedFilterBy?.businessType === 'Integer' ||
-				selectedFilterBy?.businessType === 'LongInteger') &&
-			invalidateRequired(value)
-		) {
-			currentErrors.value = REQUIRED_MSG;
-		}
-
-		setErrors(currentErrors);
-
-		return currentErrors;
-	};
-
 	const handleSaveFilter = (event: FormEvent) => {
 		event.preventDefault();
 
 		const checkedItems = items.filter((item) => item.checked);
 
-		const currentErrors = validate(checkedItems);
+		const currentErrors = validate({
+			checkedItems,
+			disableDateValues,
+			items,
+			selectedFilterBy,
+			selectedFilterType,
+			setErrors,
+			value,
+		});
 
 		if (Object.keys(currentErrors).length) {
 			return;
@@ -370,66 +346,70 @@ export function ModalAddFilter({
 					</AutoComplete>
 				)}
 
-				{selectedFilterBy?.businessType !== 'Date' && (
-					<FormCustomSelect
-						error={errors.selectedFilterType}
-						label={Liferay.Language.get('filter-type')}
-						onChange={(target: LabelValueObject) =>
-							setSelectedFilterType(target)
-						}
-						options={
-							selectedFilterBy?.businessType === 'Integer' ||
-							selectedFilterBy?.businessType === 'LongInteger'
-								? filterOperators.numericOperators
-								: filterOperators.picklistOperators
-						}
-						required
-						value={selectedFilterType?.label ?? ''}
-					/>
-				)}
+				{selectedFilterBy &&
+					selectedFilterBy?.businessType !== 'Date' && (
+						<SingleSelect
+							error={errors.selectedFilterType}
+							label={Liferay.Language.get('filter-type')}
+							onChange={(target: LabelValueObject) =>
+								setSelectedFilterType(target)
+							}
+							options={
+								selectedFilterBy?.businessType === 'Integer' ||
+								selectedFilterBy?.businessType === 'LongInteger'
+									? filterOperators.numericOperators
+									: filterOperators.picklistOperators
+							}
+							required={filterTypeRequired}
+							value={selectedFilterType?.label ?? ''}
+						/>
+					)}
 
-				{selectedFilterBy?.businessType === 'Date' &&
+				{selectedFilterBy &&
+					selectedFilterBy?.businessType === 'Date' &&
 					!disableDateValues && (
-						<FormCustomSelect
+						<SingleSelect
 							error={errors.selectedFilterType}
 							label={Liferay.Language.get('filter-type')}
 							onChange={(target: LabelValueObject) =>
 								setSelectedFilterType(target)
 							}
 							options={filterOperators.dateOperators}
-							required
+							required={filterTypeRequired}
 							value={selectedFilterType?.label ?? ''}
 						/>
 					)}
 
-				{(selectedFilterBy?.businessType === 'Integer' ||
-					selectedFilterBy?.businessType === 'LongInteger') && (
-					<Input
-						error={errors.value}
-						label={Liferay.Language.get('value')}
-						onChange={({target: {value}}) => {
-							const newValue = value.replace(/[\D]/g, '');
-							setValue(newValue);
-						}}
-						required
-						type="number"
-						value={value}
-					/>
-				)}
+				{selectedFilterType &&
+					(selectedFilterBy?.businessType === 'Integer' ||
+						selectedFilterBy?.businessType === 'LongInteger') && (
+						<Input
+							error={errors.value}
+							label={Liferay.Language.get('value')}
+							onChange={({target: {value}}) => {
+								const newValue = value.replace(/[\D]/g, '');
+								setValue(newValue);
+							}}
+							required
+							type="number"
+							value={value}
+						/>
+					)}
 
-				{(selectedFilterBy?.name === 'status' ||
-					selectedFilterBy?.businessType === 'Picklist') && (
-					<FormCustomSelect
-						error={errors.items}
-						label={Liferay.Language.get('value')}
-						multipleChoice
-						options={items}
-						required
-						setOptions={setItems}
-					/>
-				)}
+				{selectedFilterType &&
+					(selectedFilterBy?.name === 'status' ||
+						selectedFilterBy?.businessType === 'Picklist') && (
+						<MultipleSelect
+							error={errors.items}
+							label={Liferay.Language.get('value')}
+							options={items}
+							required
+							setOptions={setItems}
+						/>
+					)}
 
-				{selectedFilterBy?.businessType === 'Date' &&
+				{selectedFilterType &&
+					selectedFilterBy?.businessType === 'Date' &&
 					!disableDateValues && (
 						<div className="row">
 							<div className="col-lg-6">
@@ -472,7 +452,7 @@ export function ModalAddFilter({
 										setFilterEndDate(value);
 									}}
 									required
-									value={filterEndtDate}
+									value={filterEndDate}
 								/>
 							</div>
 						</div>
@@ -508,6 +488,7 @@ interface IProps {
 	editingFilter: boolean;
 	editingObjectFieldName: string;
 	filterOperators: TFilterOperators;
+	filterTypeRequired?: boolean;
 	header: string;
 	objectFields: ObjectField[];
 	observer: Observer;
@@ -521,6 +502,15 @@ interface IProps {
 		valueList?: IItem[],
 		value?: string
 	) => void;
+	validate: ({
+		checkedItems,
+		disableDateValues,
+		items,
+		selectedFilterBy,
+		selectedFilterType,
+		setErrors,
+		value,
+	}: FilterValidation) => FilterErrors;
 	workflowStatusJSONArray: TWorkflowStatus[];
 }
 
@@ -528,12 +518,22 @@ interface IItem extends LabelValueObject {
 	checked?: boolean;
 }
 
-type TErrors = {
+export type FilterErrors = {
 	endDate?: string;
 	items?: string;
 	selectedFilterBy?: string;
 	selectedFilterType?: string;
 	startDate?: string;
+	value?: string;
+};
+
+export type FilterValidation = {
+	checkedItems: IItem[];
+	disableDateValues?: boolean;
+	items: IItem[];
+	selectedFilterBy?: ObjectField;
+	selectedFilterType?: LabelValueObject | null;
+	setErrors: (value: FilterErrors) => void;
 	value?: string;
 };
 

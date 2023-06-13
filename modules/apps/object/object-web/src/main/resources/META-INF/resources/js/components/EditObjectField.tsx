@@ -23,6 +23,7 @@ import {
 	Select,
 	SidePanelForm,
 	Toggle,
+	invalidateRequired,
 	openToast,
 	saveAndReload,
 } from '@liferay/object-js-components-web';
@@ -35,7 +36,7 @@ import {
 	normalizeFieldSettings,
 	updateFieldSettings,
 } from '../utils/fieldSettings';
-import {ModalAddFilter} from './ModalAddFilter';
+import {FilterErrors, FilterValidation, ModalAddFilter} from './ModalAddFilter';
 import ObjectFieldFormBase, {
 	ObjectFieldErrors,
 	useObjectFieldForm,
@@ -43,6 +44,7 @@ import ObjectFieldFormBase, {
 
 import './EditObjectField.scss';
 
+const REQUIRED_MSG = Liferay.Language.get('required');
 const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 const languages = Liferay.Language.available;
 const languageLabels = Object.values(languages);
@@ -115,11 +117,10 @@ export default function EditObjectField({
 		onSubmit,
 	});
 
-	const disabled = !!(
-		readOnly ||
+	const disableFieldFormBase = !!(
 		isApproved ||
-		values.relationshipType ||
-		values.system
+		values.system ||
+		values.relationshipType
 	);
 
 	const handleSettingsChange = ({name, value}: ObjectFieldSetting) =>
@@ -307,6 +308,62 @@ export default function EditObjectField({
 		return picklistFilterValues;
 	};
 
+	const validateFilters = ({
+		checkedItems,
+		items,
+		selectedFilterBy,
+		selectedFilterType,
+		setErrors,
+		value,
+	}: FilterValidation) => {
+		setErrors({});
+		const currentErrors: FilterErrors = {};
+
+		if (!selectedFilterBy) {
+			currentErrors.selectedFilterBy = REQUIRED_MSG;
+		}
+
+		if (!selectedFilterType) {
+			currentErrors.selectedFilterType = REQUIRED_MSG;
+		}
+
+		if (
+			(selectedFilterBy?.name === 'status' ||
+				selectedFilterBy?.businessType === 'Picklist') &&
+			!checkedItems.length
+		) {
+			currentErrors.items = REQUIRED_MSG;
+		}
+
+		if (
+			selectedFilterBy?.businessType === 'Date' &&
+			selectedFilterType?.value === 'range'
+		) {
+			const startDate = items.find((date) => date.value === 'ge');
+			const endDate = items.find((date) => date.value === 'le');
+
+			if (!startDate) {
+				currentErrors.startDate = REQUIRED_MSG;
+			}
+
+			if (!endDate) {
+				currentErrors.endDate = REQUIRED_MSG;
+			}
+		}
+
+		if (
+			(selectedFilterBy?.businessType === 'Integer' ||
+				selectedFilterBy?.businessType === 'LongInteger') &&
+			invalidateRequired(value)
+		) {
+			currentErrors.value = REQUIRED_MSG;
+		}
+
+		setErrors(currentErrors);
+
+		return currentErrors;
+	};
+
 	useEffect(() => {
 		if (values.businessType === 'Aggregation' && objectDefinitionId2) {
 			API.getObjectFields(objectDefinitionId2).then(setObjectFields);
@@ -456,21 +513,13 @@ export default function EditObjectField({
 		<SidePanelForm
 			className="lfr-objects__edit-object-field"
 			onSubmit={handleSubmit}
-			readOnly={
-				values.system && objectName !== 'AccountEntry'
-					? disabled
-					: readOnly
-			}
+			readOnly={readOnly}
 			title={Liferay.Language.get('field')}
 		>
 			<Card title={Liferay.Language.get('basic-info')}>
 				<InputLocalized
-					disableFlag={values.system && objectName !== 'AccountEntry'}
-					disabled={
-						values.system && objectName !== 'AccountEntry'
-							? disabled
-							: readOnly
-					}
+					disableFlag={readOnly}
+					disabled={readOnly}
 					error={errors.label}
 					label={Liferay.Language.get('label')}
 					onChange={(label) => setValues({label})}
@@ -479,7 +528,7 @@ export default function EditObjectField({
 				/>
 
 				<ObjectFieldFormBase
-					disabled={disabled}
+					disabled={disableFieldFormBase}
 					editingField
 					errors={errors}
 					handleChange={handleChange}
@@ -504,13 +553,8 @@ export default function EditObjectField({
 					{(values.businessType === 'Text' ||
 						values.businessType === 'LongText') && (
 						<MaxLengthProperties
-							disabled={
-								values.system && objectName !== 'AccountEntry'
-									? disabled
-									: readOnly
-							}
+							disabled={values.system}
 							errors={errors}
-							isSystemObjectField={!!values.system}
 							objectField={values}
 							objectFieldSettings={
 								values.objectFieldSettings as ObjectFieldSetting[]
@@ -553,6 +597,7 @@ export default function EditObjectField({
 					editingFilter={editingFilter}
 					editingObjectFieldName={editingObjectFieldName}
 					filterOperators={filterOperators}
+					filterTypeRequired
 					header={Liferay.Language.get('filter')}
 					objectFields={
 						objectFields?.filter((objectField) => {
@@ -570,13 +615,14 @@ export default function EditObjectField({
 					observer={observer}
 					onClose={onClose}
 					onSave={handleSaveFilterColumn}
+					validate={validateFilters}
 					workflowStatusJSONArray={workflowStatusJSONArray}
 				/>
 			)}
 
 			{values.DBType !== 'Blob' && (
 				<SearchableContainer
-					disabled={disabled}
+					disabled={disableFieldFormBase}
 					errors={errors}
 					isApproved={isApproved}
 					objectField={values}
@@ -696,7 +742,6 @@ function SearchableContainer({
 function MaxLengthProperties({
 	disabled,
 	errors,
-	isSystemObjectField,
 	objectField,
 	objectFieldSettings,
 	onSettingsChange,
@@ -730,7 +775,7 @@ function MaxLengthProperties({
 		<>
 			<ClayForm.Group>
 				<Toggle
-					disabled={isSystemObjectField ?? disabled}
+					disabled={disabled}
 					label={Liferay.Language.get('limit-characters')}
 					name="showCounter"
 					onToggle={(value) => {
@@ -756,6 +801,7 @@ function MaxLengthProperties({
 			<ClayForm.Group>
 				{settings.showCounter && (
 					<Input
+						disabled={disabled}
 						error={errors.maxLength}
 						feedbackMessage={sub(
 							Liferay.Language.get(
@@ -876,9 +922,8 @@ interface IAttachmentPropertiesProps {
 }
 
 interface IMaxLengthPropertiesProps {
-	disabled: boolean;
+	disabled?: boolean;
 	errors: ObjectFieldErrors;
-	isSystemObjectField: boolean;
 	objectField: Partial<ObjectField>;
 	objectFieldSettings: ObjectFieldSetting[];
 	onSettingsChange: (setting: ObjectFieldSetting) => void;
@@ -901,7 +946,7 @@ interface IProps {
 }
 
 interface ISearchableProps {
-	disabled: boolean;
+	disabled?: boolean;
 	errors: ObjectFieldErrors;
 	isApproved: boolean;
 	objectField: Partial<ObjectField>;

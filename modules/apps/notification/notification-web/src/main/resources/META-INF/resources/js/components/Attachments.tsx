@@ -17,7 +17,8 @@ import {
 	API,
 	AutoComplete,
 	CustomItem,
-	FormCustomSelect,
+	MultipleSelect,
+	stringIncludesQuery,
 } from '@liferay/object-js-components-web';
 import React, {useEffect, useMemo, useState} from 'react';
 
@@ -41,11 +42,9 @@ export function Attachments({setValues, values}: IProps) {
 
 	const filteredObjectDefinitions = useMemo(() => {
 		if (objectDefinitions?.length) {
-			return objectDefinitions.filter(({label}) => {
-				return label[defaultLanguageId]
-					?.toLowerCase()
-					?.includes(query.toLowerCase());
-			});
+			return objectDefinitions.filter(({label}) =>
+				stringIncludesQuery(label[defaultLanguageId] as string, query)
+			);
 		}
 	}, [objectDefinitions, query]);
 
@@ -171,10 +170,9 @@ export function Attachments({setValues, values}: IProps) {
 					</div>
 
 					<div className="lfr__notification-template-attachments-fields">
-						<FormCustomSelect
+						<MultipleSelect
 							disabled={!selectedEntity}
 							label={Liferay.Language.get('field')}
-							multipleChoice
 							options={attachmentsFields}
 							placeholder={Liferay.Language.get('select-a-field')}
 							setOptions={setAttachmentsFields}

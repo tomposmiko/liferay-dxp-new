@@ -21,7 +21,10 @@ function main {
 	then
 		local release_info_version_trivial=$(get_property "release.info.version.trivial")
 
-		release_info_version_trivial=$((${release_info_version_trivial} - 1))
+		if [ branch != "master" ]
+		then
+			release_info_version_trivial=$((${release_info_version_trivial} - 1))
+		fi
 
 		git fetch -f origin release-7.4.13.${release_info_version_trivial}:release-7.4.13.${release_info_version_trivial}
 
@@ -29,7 +32,7 @@ function main {
 
 		git tag 7.4.3.${release_info_version_trivial}-ga${release_info_version_trivial} ${hash}
 
-		push_tag origin 7.4.3.${release_info_version_trivial}-ga${release_info_version_trivial}
+		push_tag 7.4.3.${release_info_version_trivial}-ga${release_info_version_trivial}
 
 		delete_branch release-7.4.13.${release_info_version_trivial}
 

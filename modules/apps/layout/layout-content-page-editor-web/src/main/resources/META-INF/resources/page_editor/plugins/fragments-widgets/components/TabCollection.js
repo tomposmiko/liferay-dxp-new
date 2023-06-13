@@ -58,7 +58,9 @@ export default function TabCollection({
 					/>
 				))}
 
-			<ul className="d-flex flex-wrap list-unstyled w-100">
+			<ul
+				className={`list-unstyled page-editor__fragments-widgets__tab-collection-${displayStyle} pb-2 w-100`}
+			>
 				{collection.children.map((item) => (
 					<React.Fragment key={item.itemId}>
 						<TabItem

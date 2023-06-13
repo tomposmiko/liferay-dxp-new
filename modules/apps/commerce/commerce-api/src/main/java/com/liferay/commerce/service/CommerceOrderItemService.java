@@ -197,7 +197,7 @@ public interface CommerceOrderItemService extends BaseService {
 
 	public CommerceOrderItem updateCommerceOrderItem(
 			long commerceOrderItemId, long cpMeasurementUnitId, int quantity,
-			ServiceContext serviceContext, boolean validateOrder)
+			ServiceContext serviceContext)
 		throws PortalException;
 
 	public CommerceOrderItem updateCommerceOrderItem(
