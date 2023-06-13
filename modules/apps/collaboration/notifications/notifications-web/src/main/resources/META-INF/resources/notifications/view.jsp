@@ -120,7 +120,7 @@ navigationURL.setParameter(SearchContainer.DEFAULT_CUR_PARAM, "0");
 	<aui:form action="<%= currentURL %>" method="get" name="fm">
 		<div class="user-notifications">
 			<liferay-ui:search-container
-				rowChecker="<%= new EmptyOnClickRowChecker(renderResponse) %>"
+				rowChecker="<%= new UserNotificationEventRowChecker(renderResponse) %>"
 				searchContainer="<%= notificationsSearchContainer %>"
 			>
 				<liferay-ui:search-container-row
@@ -128,6 +128,17 @@ navigationURL.setParameter(SearchContainer.DEFAULT_CUR_PARAM, "0");
 					keyProperty="userNotificationEventId"
 					modelVar="userNotificationEvent"
 				>
+
+					<%
+					Map<String, Object> rowData = new HashMap<String, Object>();
+
+					UserNotificationFeedEntry userNotificationFeedEntry = UserNotificationManagerUtil.interpret(StringPool.BLANK, userNotificationEvent, ServiceContextFactory.getInstance(request));
+
+					rowData.put("userNotificationFeedEntry", userNotificationFeedEntry);
+
+					row.setData(rowData);
+					%>
+
 					<%@ include file="/notifications/user_notification_entry.jspf" %>
 				</liferay-ui:search-container-row>
 

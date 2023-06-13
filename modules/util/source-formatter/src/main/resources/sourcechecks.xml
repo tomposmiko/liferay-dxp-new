@@ -19,82 +19,7 @@
 
 		<check name="BNDBundleInformationCheck" />
 		<check name="BNDDirectoryNameCheck" />
-		<check name="BNDExportsCheck">
-			<property name="allowedExportPackageDirNames" value="apio-architect-sample-liferay-portal" />
-			<property name="allowedExportPackageDirNames" value="dynamic-data-mapping-data-provider" />
-			<property name="allowedExportPackageDirNames" value="dynamic-data-mapping-expression" />
-			<property name="allowedExportPackageDirNames" value="dynamic-data-mapping-form-builder" />
-			<property name="allowedExportPackageDirNames" value="dynamic-data-mapping-form-evaluator" />
-			<property name="allowedExportPackageDirNames" value="dynamic-data-mapping-form-field-type" />
-			<property name="allowedExportPackageDirNames" value="dynamic-data-mapping-form-renderer" />
-			<property name="allowedExportPackageDirNames" value="dynamic-data-mapping-form-values-factory" />
-			<property name="allowedExportPackageDirNames" value="dynamic-data-mapping-form-values-query" />
-			<property name="allowedExportPackageDirNames" value="dynamic-data-mapping-io" />
-			<property name="allowedExportPackageDirNames" value="dynamic-data-mapping-service" />
-			<property name="allowedExportPackageDirNames" value="dynamic-data-mapping-validator" />
-			<property name="allowedExportPackageDirNames" value="journal-content-asset-addon-entry/journal-content-asset-addon-entry-common" />
-			<property name="allowedExportPackageDirNames" value="journal-service" />
-			<property name="allowedExportPackageDirNames" value="journal-web" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/collaboration/blogs/blogs-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/collaboration/bookmarks/bookmarks-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/collaboration/message-boards/message-boards-web" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/collaboration/microblogs/microblogs-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/collaboration/wiki/wiki-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/events-display/events-display-web" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/forms-and-workflow/calendar/calendar-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/forms-and-workflow/dynamic-data-lists/dynamic-data-lists-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/alloy/alloy-mvc" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/frontend-editor/frontend-editor-lang" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/mobile-device-rules/mobile-device-rules-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/petra/petra-content" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/petra/petra-doulos" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/petra/petra-encryptor" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/petra/petra-io-delta" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/petra/petra-json-web-service-client" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/petra/petra-log4j" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/petra/petra-mail" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/petra/petra-model-adapter" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/petra/petra-salesforce-client" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/petra/petra-xml" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal/portal-dao-orm-custom-sql" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal/portal-instance-lifecycle" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal/portal-spring-extender" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal/portal-upgrade" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-cache/portal-cache" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-cache/portal-cache-ehcache" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-cache/portal-cache-ehcache-provider" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-cache/portal-cache-ehcache-spi" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-configuration/portal-configuration-upgrade-util" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-portlet-bridge/portal-portlet-bridge-soy" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-remote/portal-remote-soap-extender" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-search/portal-search-elasticsearch" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-search/portal-search-web" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-security/portal-security-auth-verifier" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-security/portal-security-auto-login" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-security/portal-security-ldap" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-security/portal-security-service-access-policy-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-security-sso/portal-security-sso-openid-connect" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-settings/portal-settings-web" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/portal-template/portal-template-soy" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/foundation/users-admin/users-admin-web" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/knowledge-base/knowledge-base-markdown-converter" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/knowledge-base/knowledge-base-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/mail-reader/mail-reader-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/portal-security-wedeploy-auth/portal-security-wedeploy-auth-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/push-notifications/push-notifications-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/shopping/shopping-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/static/" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/sync/sync-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/web-experience/asset/asset-categories-admin-web" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/web-experience/asset/asset-publisher-web" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/web-experience/asset/asset-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/web-experience/export-import/export-import-service" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/web-experience/export-import/export-import-web" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/web-experience/layout/layout-item-selector-web" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/web-experience/portlet-display-template/portlet-display-template" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/web-experience/product-navigation/product-navigation-product-menu-web" />
-			<property name="allowedExportPackageDirNames" value="modules/apps/web-experience/rss/rss-util" />
-		</check>
+		<check name="BNDExportsCheck" />
 		<check name="BNDIncludeResourceCheck" />
 		<check name="BNDWebContextPathCheck" />
 	</source-processor>
@@ -129,6 +54,7 @@
 		<check name="FTLImportsCheck" />
 		<check name="FTLLiferayVariableOrderCheck" />
 		<check name="FTLStringRelationalOperatorCheck" />
+		<check name="FTLStylingCheck" />
 		<check name="FTLTagCheck" />
 		<check name="FTLWhitespaceCheck" />
 	</source-processor>
@@ -136,7 +62,9 @@
 		<check name="GradleBlockOrderCheck" />
 		<check name="GradleBodyCheck" />
 		<check name="GradleDependenciesCheck" />
-		<check name="GradleExportedPackageDependenciesCheck" />
+		<check name="GradleExportedPackageDependenciesCheck">
+			<property name="enabled" value="false" />
+		</check>
 		<check name="GradleImportsCheck" />
 		<check name="GradleIndentationCheck" />
 		<check name="GradlePropertiesCheck" />
@@ -159,7 +87,9 @@
 		<check name="GetterUtilCheck" />
 		<check name="Java2HTMLCheck" />
 		<check name="JavaAggregateTestRuleParameterOrderCheck" />
-		<check name="JavaAnnotationsCheck" />
+		<check name="JavaAnnotationsCheck">
+			<property name="enabled" value="false" />
+		</check>
 		<check name="JavaAssertEqualsCheck" />
 		<check name="JavaBooleanStatementCheck" />
 		<check name="JavaBooleanUsageCheck" />
@@ -168,7 +98,6 @@
 		<check name="JavaConfigurationAdminCheck" />
 		<check name="JavaConstructorParameterOrderCheck" />
 		<check name="JavaConstructorSuperCallCheck" />
-		<check name="JavaDataAccessConnectionCheck" />
 		<check name="JavaDeprecatedJavadocCheck" />
 		<check name="JavaDiamondOperatorCheck" />
 		<check name="JavaDeserializationSecurityCheck" />
@@ -183,35 +112,14 @@
 		<check name="JavaIndexableCheck" />
 		<check name="JavaInterfaceCheck" />
 		<check name="JavaIOExceptionCheck" />
+		<check name="JavaJSPDynamicIncludeCheck">
+			<property name="enabled" value="false" />
+		</check>
 		<check name="JavaLineBreakCheck" />
 		<check name="JavaLocalSensitiveComparisonCheck" />
 		<check name="JavaLongLinesCheck" />
 		<check name="JavaMetaOCDIdCheck" />
-		<check name="JavaPackagePathCheck">
-			<property name="allowedInternalPackageDirNames" value="modules/apps/adaptive-media/adaptive-media-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/collaboration/blogs/blogs-item-selector-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/collaboration/comment/comment-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/collaboration/item-selector/item-selector-criteria-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/collaboration/wiki/wiki-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/foundation/captcha/captcha-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/foundation/organizations/organizations-item-selector-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/foundation/portal-mobile-device-recognition/portal-mobile-device-recognition-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/foundation/portal-scripting/portal-scripting-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/foundation/portal-security-audit/portal-security-audit-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/foundation/roles/roles-item-selector-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/foundation/user-groups-admin/user-groups-admin-item-selector-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/foundation/users-admin/users-admin-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/foundation/users-admin/users-admin-item-selector-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/knowledge-base/knowledge-base-item-selector-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/web-experience/journal/journal-item-selector-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/web-experience/layout/layout-item-selector-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/web-experience/portlet-configuration/portlet-configuration-icon-locator-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/web-experience/portlet-configuration/portlet-configuration-toolbar-contributor-locator-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/web-experience/site-navigation/site-navigation-item-selector-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/web-experience/site/site-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/apps/web-experience/site/site-item-selector-api" />
-			<property name="allowedInternalPackageDirNames" value="modules/core/registry-api" />
-		</check>
+		<check name="JavaPackagePathCheck" />
 		<check name="JavaParameterAnnotationsCheck" />
 		<check name="JavaProcessCallableCheck" />
 		<check name="JavaRedundantConstructorCheck" />
@@ -239,6 +147,9 @@
 
 		<!-- Module checks -->
 
+		<check name="JavaModuleComponentCheck">
+			<property name="enabled" value="false" />
+		</check>
 		<check name="JavaModuleExtendedObjectClassDefinitionCheck" />
 		<check name="JavaModuleIllegalImportsCheck">
 			<property name="checkRegistryInTestClasses" value="false" />
@@ -268,6 +179,7 @@
 		<!-- Portal checks -->
 
 		<check name="JavaAPISignatureCheck">
+			<property name="enabled" value="false" />
 			<property name="illegalAPIParameterTypes" value="HttpServletRequest" />
 			<property name="illegalAPIParameterTypes" value="HttpServletResponse" />
 			<property name="illegalAPIParameterTypes" value="ThemeDisplay" />
@@ -275,6 +187,10 @@
 		</check>
 		<check name="JavaCleanUpMethodSuperCleanUpCheck" />
 		<check name="JavaCleanUpMethodVariablesCheck" />
+		<check name="JavaDataAccessConnectionCheck" />
+		<check name="JavaDeprecatedKernelClassesCheck">
+			<property name="enabled" value="false" />
+		</check>
 		<check name="JavaFinderCacheCheck" />
 		<check name="JavaFinderImplCustomSQLCheck" />
 		<check name="JavaLogClassNameCheck" />
@@ -329,7 +245,9 @@
 		<check name="JSPStringBundlerCheck" />
 		<check name="JSPStylingCheck" />
 		<check name="JSPSubnameCheck" />
-		<check name="JSPTagAttributesCheck" />
+		<check name="JSPTagAttributesCheck">
+			<property name="enabled" value="false" />
+		</check>
 		<check name="JSPTaglibVariableCheck" />
 		<check name="JSPUnusedTermsCheck" />
 		<check name="JSPWhitespaceCheck" />
@@ -434,7 +352,9 @@
 		<check name="XMLServiceFileCheck" />
 		<check name="XMLSolrSchemaFileCheck" />
 		<check name="XMLSuppressionsFileCheck" />
-		<check name="XMLTagAttributesCheck" />
+		<check name="XMLTagAttributesCheck">
+			<property name="enabled" value="false" />
+		</check>
 		<check name="XMLToggleFileCheck" />
 		<check name="XMLWhitespaceCheck" />
 
