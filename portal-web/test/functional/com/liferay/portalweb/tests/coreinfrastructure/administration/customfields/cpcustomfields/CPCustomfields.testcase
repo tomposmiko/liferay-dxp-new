@@ -261,8 +261,7 @@ definition {
 			startingValue = "Nickname");
 	}
 
-	@description = "This is a use case for LPS-146795.The test is blocked and waiting on POSHI-256"
-	@ignore = "true"
+	@description = "This is a use case for LPS-146795. The user admin could add new user with space character in geolocation custom field name."
 	@priority = "4"
 	test AddNewUserWithGeolocationCustomFields {
 		ApplicationsMenu.gotoPortlet(
@@ -281,7 +280,8 @@ definition {
 			portlet = "Users and Organizations");
 
 		User.addCP(
-			destination = "100,100",
+			lat = "39.88446750779911",
+			lng = "116.37856166209812",
 			userEmailAddress = "userea@liferay.com",
 			userFirstName = "userfn",
 			userLastName = "userln",

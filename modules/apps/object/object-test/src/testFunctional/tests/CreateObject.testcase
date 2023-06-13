@@ -650,7 +650,7 @@ definition {
 		LexiconEntry.gotoAdd();
 
 		Type(
-			locator1 = "ObjectAdmin#OBJECT_FIELDS_LABEL_INPUT",
+			locator1 = "ObjectField#LABEL_INPUT",
 			value1 = "Custom Field");
 
 		ObjectField.selectType(fieldType = "Text");
@@ -692,7 +692,7 @@ definition {
 
 		Button.clickCancel();
 
-		ObjectAdmin.assertNoItemsWereFound();
+		ObjectAdmin.assertNoResultsWereFound();
 	}
 
 	@description = "LPS-135397 - Verify it is possible to Cancel the update of a Layout"
@@ -1472,7 +1472,7 @@ definition {
 
 		ObjectAdmin.selectKebabMenuOption(kebabOption = "Delete");
 
-		ObjectAdmin.assertNoItemsWereFound();
+		ObjectAdmin.assertNoResultsWereFound();
 	}
 
 	@description = "LPS-135390 - Verify it is not possible to add an Object without the Add Object Definition permission"
@@ -1790,10 +1790,10 @@ definition {
 
 		ObjectAdmin.addObjectFieldViaUI(
 			fieldLabel = "Custom Field",
-			fieldName = " ",
+			fieldName = "",
 			fieldType = "Text");
 
-		ObjectAdmin.viewFieldErrorMessage(message = "Required");
+		ObjectAdmin.viewFieldErrorMessage(errorMessage = "Required");
 	}
 
 	@description = "LPS-135549 - Verify it is not possible to leave the Label field blank"
@@ -5243,8 +5243,6 @@ definition {
 	@description = "LPS-135401 - Verify if Cascade deletion type of Relationship One to Many will allow the entry with relation (from the parent Object) and its relations to be deleted"
 	@priority = "5"
 	test CascadeDeletionOneToManyWillAllowDeleteParent {
-		property portal.upstream = "quarantine";
-
 		for (var letter : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object ${letter} 124",
@@ -5462,8 +5460,6 @@ definition {
 	@description = "LPS-135649 - Verify that a completed entry is displayed with an Approved status"
 	@priority = "5"
 	test CompletedEntryDisplaysApprovedStatus {
-		property portal.acceptance = "quarantine";
-
 		ObjectAdmin.addObjectViaAPI(
 			labelName = "Custom Object 141629",
 			objectName = "CustomObject141629",
@@ -5730,8 +5726,6 @@ definition {
 	@description = "LPS-135401 - Verify if Disassociate deletion type of Relationship One to Many will allow the entry with relation (from the parent Object) to be deleted and its relations to be disassociated"
 	@priority = "5"
 	test DisassociateDeletionOneToManyWillAllowDeleteParent {
-		property portal.acceptance = "quarantine";
-
 		for (var nameObject : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object ${nameObject} 129",
@@ -5810,7 +5804,7 @@ definition {
 
 		Search.searchCP(searchTerm = "Object X 130");
 
-		ObjectAdmin.assertNoItemsWereFound();
+		ObjectAdmin.assertNoResultsWereFound();
 	}
 
 	@description = "LPS-135547 - Verify the empty state when searching for an Object field returns nothing"
@@ -5838,7 +5832,7 @@ definition {
 
 		Search.searchCP(searchTerm = "CustomObject X 130");
 
-		ObjectAdmin.assertNoItemsWereFound();
+		ObjectAdmin.assertNoResultsWereFound();
 	}
 
 	@description = "LPS-135400 - Verify the empty state message when there is no Relationship"
@@ -5855,7 +5849,7 @@ definition {
 
 		ObjectAdmin.gotoRelationshipsTab();
 
-		ObjectAdmin.assertNoItemsWereFound();
+		ObjectAdmin.assertNoResultsWereFound();
 	}
 
 	@description = "LPS-135549 - Verify that the Field Name is autofilled when Label is filled"
@@ -8016,7 +8010,7 @@ definition {
 
 		ObjectAdmin.goToFieldsTab();
 
-		CreateObject.viewEmptyFieldTable();
+		ObjectAdmin.assertNoResultsWereFound();
 	}
 
 	@description = "LPS-139005 - Verify that the Relationship field is displayed again when the parent object is reactivated (One to Many)"
@@ -8096,8 +8090,6 @@ definition {
 	@description = "LPS-139005 - Verify that the Relationship tab is no longer displayed when the other object is inactivated (Many to Many)"
 	@priority = "4"
 	test RelationshipTabDisappearsWhenInactivatedManyToMany {
-		property portal.upstream = "quarantine";
-
 		for (var letter : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object ${letter} 173",
@@ -8205,8 +8197,6 @@ definition {
 	@description = "LPS-139005 - Verify that the Relationship tab is no longer displayed when the child object is inactivated (One to Many)"
 	@priority = "4"
 	test RelationshipTabDisappearsWhenInactivatedOneToMany {
-		property portal.upstream = "quarantine";
-
 		for (var letter : list "A,B") {
 			ObjectAdmin.addObjectViaAPI(
 				labelName = "Custom Object ${letter} 174",

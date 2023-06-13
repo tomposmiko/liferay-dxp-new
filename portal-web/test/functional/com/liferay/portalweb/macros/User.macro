@@ -311,16 +311,10 @@ definition {
 				value1 = "${userComment}");
 		}
 
-		if (isSet(destination)) {
-			var origin = Geolocation.getMarkerPosition();
-
-			Geolocation.setMarkerPosition(destination = "${destination}");
-
-			var current = Geolocation.getMarkerPosition();
-
-			TestUtils.assertNotEquals(
-				actual = "${current}",
-				expected = "${origin}");
+		if (isSet(lat) && isSet(lng)) {
+			Geolocation.setMarkerPosition(
+				lat = "${lat}",
+				lng = "${lng}");
 		}
 
 		var browserType = PropsUtil.get("browser.type");
@@ -783,6 +777,34 @@ definition {
 
 			Button.viewNotPresent(button = "${localizedSaveButton}");
 		}
+	}
+
+	macro assignAccountCP {
+		User.openUsersAdmin();
+
+		UserNavigator.gotoUser(userScreenName = "${userScreenName}");
+
+		UserNavigator.gotoMemberships();
+
+		AssertClick(
+			locator1 = "UsersAndOrganizationsEditUser#ACCOUNTS_SELECT_LINK",
+			value1 = "SELECT");
+
+		SelectFrame(
+			key_title = "Select Account",
+			locator1 = "IFrame#MODAL_ANY");
+
+		for (var accountName : list "${accountName}") {
+			Check(
+				key_tableEntry = "${accountName}",
+				locator1 = "LexiconTable#TABLE_ENTRY_CHECKBOX");
+		}
+
+		SelectFrame(value1 = "relative=top");
+
+		Button.clickAdd();
+
+		PortletEntry.save();
 	}
 
 	macro assignAssetLibraryRole {

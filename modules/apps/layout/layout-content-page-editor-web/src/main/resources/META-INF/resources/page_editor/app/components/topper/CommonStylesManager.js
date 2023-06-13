@@ -12,7 +12,6 @@
  * details.
  */
 
-import {usePrevious} from '@liferay/frontend-js-react-web';
 import {useEffect, useRef} from 'react';
 
 import {CONTAINER_WIDTH_TYPES} from '../../config/constants/containerWidthTypes';
@@ -33,6 +32,9 @@ const LAYOUT_DATA_ITEMS_WITH_COMMON_STYLES = [
 ];
 
 export default function CommonStylesManager() {
+	const stylesPerViewportRef = useRef({});
+	const masterStylesPerViewportRef = useRef({});
+
 	const layoutData = useSelector((state) => state.layoutData);
 	const masterLayoutData = useSelector(
 		(state) => state.masterLayout?.masterLayoutData
@@ -41,95 +43,59 @@ export default function CommonStylesManager() {
 		(state) => state.selectedViewportSize
 	);
 
-	const previousMasterLayoutData = usePrevious(masterLayoutData);
-
 	const globalContext = useGlobalContext();
 
-	const layoutDataItemsConfigRef = useRef(null);
-	const masterLayoutDataItemsConfigRef = useRef(null);
-
 	useEffect(() => {
-		const items = Object.values(layoutData.items);
+		const {styleSheet: previousStyleSheet, styles: previousStyles} =
+			stylesPerViewportRef.current[selectedViewportSize] || {};
 
-		const nextStyles = {};
-
-		items.forEach((item) => {
-			if (hasCommonStyles(item)) {
-				const styles = getResponsiveConfig(
-					item.config,
-					selectedViewportSize
-				)?.styles;
-
-				nextStyles[item.itemId] = filterStyles({
-					item,
-					selectedViewportSize,
-					styles,
-				});
-			}
+		const {styleSheet, styles} = calculateStyles({
+			hasTopper: true,
+			items: Object.values(layoutData.items),
+			previousStyleSheet,
+			previousStyles,
+			selectedViewportSize,
 		});
 
-		if (
-			!layoutDataItemsConfigRef.current ||
-			!deepEqual(nextStyles, layoutDataItemsConfigRef.current)
-		) {
-			layoutDataItemsConfigRef.current = nextStyles;
+		stylesPerViewportRef.current[selectedViewportSize] = {
+			styleSheet,
+			styles,
+		};
 
-			const styleSheet = generateStyleSheet(nextStyles);
-
-			createOrUpdateStyleTag({
-				globalContext,
-				id: 'layout-common-styles',
-				styleSheet,
-			});
-		}
+		createOrUpdateStyleTag({
+			globalContext,
+			id: 'layout-common-styles',
+			styleSheet,
+		});
 	}, [layoutData.items, selectedViewportSize, globalContext]);
 
 	useEffect(() => {
-		if (previousMasterLayoutData === masterLayoutData) {
+		if (!masterLayoutData) {
 			return;
 		}
 
-		const items = Object.values(masterLayoutData.items);
+		const {styleSheet: previousStyleSheet, styles: previousStyles} =
+			masterStylesPerViewportRef.current[selectedViewportSize] || {};
 
-		const nextStyles = {};
-
-		items.forEach((item) => {
-			if (hasCommonStyles(item)) {
-				const styles = getResponsiveConfig(
-					item.config,
-					selectedViewportSize
-				)?.styles;
-
-				nextStyles[item.itemId] = filterStyles({
-					item,
-					selectedViewportSize,
-					styles,
-				});
-			}
+		const {styleSheet, styles} = calculateStyles({
+			hasTopper: false,
+			items: Object.values(masterLayoutData.items),
+			previousStyleSheet,
+			previousStyles,
+			selectedViewportSize,
 		});
 
-		if (
-			!masterLayoutDataItemsConfigRef.current ||
-			!deepEqual(nextStyles, masterLayoutDataItemsConfigRef.current)
-		) {
-			masterLayoutDataItemsConfigRef.current = nextStyles;
+		masterStylesPerViewportRef.current[selectedViewportSize] = {
+			styleSheet,
+			styles,
+		};
 
-			const styleSheet = generateStyleSheet(nextStyles, {
-				hasTopper: false,
-			});
-
-			createOrUpdateStyleTag({
-				globalContext,
-				id: 'layout-master-common-styles',
-				styleSheet,
-			});
-		}
-	}, [
-		masterLayoutData,
-		selectedViewportSize,
-		globalContext,
-		previousMasterLayoutData,
-	]);
+		createOrUpdateStyleTag({
+			globalContext,
+			id: 'layout-master-common-styles',
+			styleSheet,
+		});
+	}, [masterLayoutData, selectedViewportSize, globalContext]);
 
 	return null;
 }
@@ -174,8 +140,8 @@ function filterStyles({item, selectedViewportSize, styles}) {
 
 		if (
 			styleValue &&
-			defaultValue !== styleValue &&
-			selectedViewportSize === VIEWPORT_SIZES.desktop &&
+			(defaultValue !== styleValue ||
+				selectedViewportSize !== VIEWPORT_SIZES.desktop) &&
 			(!isContainerFixed ||
 				(styleName !== 'marginRight' && styleName !== 'marginLeft'))
 		) {
@@ -184,4 +150,43 @@ function filterStyles({item, selectedViewportSize, styles}) {
 	});
 
 	return filteredStyles;
+}
+
+function calculateStyles({
+	hasTopper,
+	items,
+	previousStyleSheet,
+	previousStyles,
+	selectedViewportSize,
+}) {
+	const nextStyles = {};
+
+	items.forEach((item) => {
+		if (hasCommonStyles(item)) {
+			const styles = getResponsiveConfig(
+				item.config,
+				selectedViewportSize
+			)?.styles;
+
+			nextStyles[item.itemId] = filterStyles({
+				item,
+				selectedViewportSize,
+				styles,
+			});
+		}
+	});
+
+	if (
+		!previousStyles ||
+		!previousStyleSheet ||
+		!deepEqual(previousStyles, nextStyles)
+	) {
+		const styleSheet = generateStyleSheet(nextStyles, {
+			hasTopper,
+		});
+
+		return {styleSheet, styles: nextStyles};
+	}
+
+	return {styleSheet: previousStyleSheet, styles: nextStyles};
 }

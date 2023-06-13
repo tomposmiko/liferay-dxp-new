@@ -16,7 +16,6 @@ import {COLLECTION_APPLIED_FILTERS_FRAGMENT_ENTRY_KEY} from '../../../../../app/
 import {COLLECTION_FILTER_FRAGMENT_ENTRY_KEY} from '../../../../../app/config/constants/collectionFilterFragmentEntryKey';
 import {EDITABLE_FRAGMENT_ENTRY_PROCESSOR} from '../../../../../app/config/constants/editableFragmentEntryProcessor';
 import {EDITABLE_TYPES} from '../../../../../app/config/constants/editableTypes';
-import {FRAGMENT_CONFIGURATION_ROLES} from '../../../../../app/config/constants/fragmentConfigurationRoles';
 import {ITEM_TYPES} from '../../../../../app/config/constants/itemTypes';
 import {LAYOUT_DATA_ITEM_TYPES} from '../../../../../app/config/constants/layoutDataItemTypes';
 import {VIEWPORT_SIZES} from '../../../../../app/config/constants/viewportSizes';
@@ -38,6 +37,11 @@ import {RowAdvancedPanel} from '../components/item-configuration-panels/RowAdvan
 import {RowGeneralPanel} from '../components/item-configuration-panels/RowGeneralPanel';
 import {RowStylesPanel} from '../components/item-configuration-panels/RowStylesPanel';
 import {CollectionGeneralPanel} from '../components/item-configuration-panels/collection-general-panel/CollectionGeneralPanel';
+
+const FRAGMENT_WITH_CUSTOM_PANEL = [
+	COLLECTION_FILTER_FRAGMENT_ENTRY_KEY,
+	COLLECTION_APPLIED_FILTERS_FRAGMENT_ENTRY_KEY,
+];
 
 export const PANEL_IDS = {
 	collectionAppliedFiltersGeneral: 'collectionAppliedFiltersGeneral',
@@ -211,21 +215,15 @@ export function selectPanels(activeItemId, activeItemType, state) {
 			state.fragmentEntryLinks[activeItem.config.fragmentEntryLinkId];
 
 		const fragmentEntryKey = fragmentEntryLink.fragmentEntryKey;
-		const fieldSets = fragmentEntryLink?.configuration?.fieldSets ?? [];
 
 		panelsIds = {
 			[PANEL_IDS.fragmentAdvanced]:
 				config.fragmentAdvancedOptionsEnabled &&
 				state.selectedViewportSize === VIEWPORT_SIZES.desktop,
 			[PANEL_IDS.fragmentStyles]: true,
-			[PANEL_IDS.fragmentGeneral]:
-				fragmentEntryKey !== COLLECTION_FILTER_FRAGMENT_ENTRY_KEY &&
-				fieldSets.some((fieldSet) =>
-					config.fragmentAdvancedOptionsEnabled
-						? !fieldSet.configurationRole
-						: fieldSet.configurationRole !==
-						  FRAGMENT_CONFIGURATION_ROLES.style
-				),
+			[PANEL_IDS.fragmentGeneral]: !FRAGMENT_WITH_CUSTOM_PANEL.includes(
+				fragmentEntryKey
+			),
 			[PANEL_IDS.collectionAppliedFiltersGeneral]:
 				fragmentEntryKey ===
 					COLLECTION_APPLIED_FILTERS_FRAGMENT_ENTRY_KEY &&

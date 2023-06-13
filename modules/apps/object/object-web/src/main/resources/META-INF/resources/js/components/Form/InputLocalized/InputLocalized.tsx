@@ -13,11 +13,14 @@
  */
 
 import ClayLocalizedInput from '@clayui/localized-input';
+import classNames from 'classnames';
 import React from 'react';
 
 import FieldBase from '../FieldBase';
 
 import './InputLocalized.scss';
+
+const defaultLanguageId = Liferay.ThemeDisplay.getDefaultLanguageId();
 
 export default function InputLocalized({
 	disabled,
@@ -37,17 +40,27 @@ export default function InputLocalized({
 		<FieldBase
 			className="lfr-objects__input-localized"
 			disabled={disabled}
-			error={error}
+			errorMessage={error}
 			id={id}
 			label={label}
 			required={required}
 		>
 			<ClayLocalizedInput
 				{...otherProps}
+				className={classNames({
+					'lfr-objects__input-localized--rtl':
+
+						// @ts-ignore
+
+						Liferay.Language.direction[selectedLocale.label] ===
+						'rtl',
+				})}
 				disabled={disabled}
 				id={id}
 				label=""
-				locales={locales}
+				locales={locales.sort((a) =>
+					a.label === defaultLanguageId ? -1 : 1
+				)}
 				name={name}
 				onSelectedLocaleChange={onSelectedLocaleChange}
 				onTranslationsChange={onTranslationsChange}

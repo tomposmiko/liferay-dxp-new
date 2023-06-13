@@ -40,6 +40,7 @@ import {showTab} from './portal/tabs.es';
 import {showTooltip} from './portal/tooltip.es';
 import portlet, {minimizePortlet} from './portlet/portlet.es';
 import SideNavigation from './side_navigation.es';
+import statusCode from './status_code';
 import addParams from './util/add_params';
 import getCountries from './util/address/get_countries.es';
 import getRegions from './util/address/get_regions.es';
@@ -78,6 +79,8 @@ import createActionURL from './util/portlet_url/create_action_url.es';
 import createPortletURL from './util/portlet_url/create_portlet_url.es';
 import createRenderURL from './util/portlet_url/create_render_url.es';
 import createResourceURL from './util/portlet_url/create_resource_url.es';
+import removeEntitySelection from './util/remove_entity_selection';
+import selectFolder from './util/select_folder';
 import {getSessionValue, setSessionValue} from './util/session.es';
 import sub from './util/sub';
 import toCharCode from './util/to_char_code.es';
@@ -91,6 +94,14 @@ Liferay = window.Liferay || {};
  */
 Liferay.BREAKPOINTS = BREAKPOINTS;
 
+/**
+ * @deprecated As of Cavanaugh (7.4.x), replaced by `import {STATUS_CODE} from 'frontend-js-web'`
+ */
+Liferay.STATUS_CODE = statusCode;
+
+/**
+ * @deprecated As of Cavanaugh (7.4.x), replaced by `import {zIndex} from 'frontend-js-web'`
+ */
 Liferay.zIndex = zIndex;
 
 Liferay.component = component;
@@ -298,6 +309,8 @@ Liferay.Util.openToast = (...args) => {
 	);
 };
 
+Liferay.Util.removeEntitySelection = removeEntitySelection;
+Liferay.Util.selectFolder = selectFolder;
 Liferay.Util.sub = sub;
 
 Liferay.Util.Session = {

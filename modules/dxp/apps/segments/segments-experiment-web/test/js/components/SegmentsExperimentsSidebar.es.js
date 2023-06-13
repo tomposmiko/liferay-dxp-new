@@ -74,7 +74,18 @@ describe('SegmentsExperimentsSidebar', () => {
 		getByText(segmentsExperiment.goal.label);
 
 		getByText('edit');
+		expect(
+			document.querySelectorAll(
+				'.dropdown-item .lexicon-icon.lexicon-icon-pencil'
+			).length
+		).toBe(1);
+
 		getByText('delete');
+		expect(
+			document.querySelectorAll(
+				'.dropdown-item .lexicon-icon.lexicon-icon-trash'
+			).length
+		).toBe(1);
 
 		getByText('review-and-run-test');
 		getByText('view-data-in-analytics-cloud');
@@ -168,6 +179,16 @@ describe('Variants', () => {
 
 		expect(control).not.toBe(null);
 		expect(variant).not.toBe(null);
+		expect(
+			document.querySelectorAll(
+				'.dropdown-item .lexicon-icon.lexicon-icon-pencil'
+			).length
+		).toBe(2);
+		expect(
+			document.querySelectorAll(
+				'.dropdown-item .lexicon-icon.lexicon-icon-trash'
+			).length
+		).toBe(2);
 	});
 
 	it('Create variant button', async () => {

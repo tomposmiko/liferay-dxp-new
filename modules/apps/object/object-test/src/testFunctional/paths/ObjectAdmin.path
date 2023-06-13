@@ -12,7 +12,7 @@
 <tbody>
 	<tr>
 		<td>ANY_TAB_ON_ENTRY</td>
-		<td>//a[contains(text(),'${key_tabName}')]</td>
+		<td>//span[contains(text(),'${key_tabName}')]</td>
 		<td></td>
 	</tr>
 	<tr>
@@ -122,7 +122,7 @@
 	</tr>
 	<tr>
 		<td>ENTRY_RELATIONSHIP_TAB</td>
-		<td>//a[contains(text(),'${key_tabName}')]</td>
+		<td>//*[contains(@class,'nav-link')]//span[contains(text(),'${key_tabName}')]</td>
 		<td></td>
 	</tr>
 	<tr>
@@ -207,7 +207,7 @@
 	</tr>
 	<tr>
 		<td>NAME_OBJECT_RELATIONSHIP_REQUIRED</td>
-		<td>//input[@id ='objectRelationshipName']/..//div//span[contains(text(),'Required')]</td>
+		<td>//input[@id ='objectRelationshipName']/following-sibling::div[contains(.,'Required')]</td>
 		<td></td>
 	</tr>
 	<tr>
@@ -242,17 +242,17 @@
 	</tr>
 	<tr>
 		<td>OBJECT_DETAILS_TAB</td>
-		<td>//a[contains(text(), 'Details')]</td>
+		<td>//*[contains(@class,'nav-link')]//span[contains(text(), 'Details')]</td>
 		<td></td>
 	</tr>
 	<tr>
 		<td>OBJECT_FIELDS_REQUIRED_ERROR_MESSAGE</td>
-		<td>//div[contains(@class,'form-group has-error')]//span[contains(text(),'Required')]</td>
+		<td>//div[contains(@class,'form-feedback-item') and contains (.,'Required')]</td>
 		<td></td>
 	</tr>
 	<tr>
 		<td>OBJECT_FIELDS_TAB</td>
-		<td>//a[contains(text(),'Fields')]</td>
+		<td>//*[contains(@class,'nav-link')]//span[contains(text(),'Fields')]</td>
 		<td></td>
 	</tr>
 	<tr>
@@ -267,17 +267,12 @@
 	</tr>
 	<tr>
 		<td>OBJECT_LAYOUTS_TAB</td>
-		<td>//a[contains(text(), 'Layouts')]</td>
+		<td>//*[contains(@class,'nav-link')]//span[contains(text(), 'Layouts')]</td>
 		<td></td>
 	</tr>
 	<tr>
 		<td>OBJECT_RELATIONSHIPS_TAB</td>
-		<td>//a[contains(text(),'Relationship')]</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td>OBJECT_FIELDS_LABEL_INPUT</td>
-		<td>//input[contains(@id,'objectFieldLabel')]</td>
+		<td>//*[contains(@class,'nav-link')]//span[contains(text(),'Relationship')]</td>
 		<td></td>
 	</tr>
 	<tr>
@@ -292,7 +287,7 @@
 	</tr>
 	<tr>
 		<td>RELATIONSHIPS_TYPE_FORM_REQUIRED</td>
-		<td>//input[contains(@class, 'form-control')]/../following-sibling::div//span[contains(text(),'Required')]</td>
+		<td>//input[contains(@class, 'object__custom-select-input')]/../../following-sibling::div[contains(.,'Required')]</td>
 		<td></td>
 	</tr>
 	<tr>
@@ -367,7 +362,7 @@
 	</tr>
 	<tr>
 		<td>SELECT_OBJECT_RELATIONSHIP_REQUIRED</td>
-		<td>//select[@class = 'form-control']/following-sibling::div//span[contains(text(),'Required')]</td>
+		<td>//select[@class = 'form-control']/following-sibling::div[contains(.,'Required')]</td>
 		<td></td>
 	</tr>
 	<tr>
@@ -446,23 +441,13 @@
 		<td></td>
 	</tr>
 	<tr>
-		<td>TYPE_FIELD_REQUIRED</td>
-		<td>//input[@placeholder='Choose an Option']/ancestor::div//span[contains(text(),'Required')]</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td>LABEL_FIELD_REQUIRED</td>
-		<td>//input[@id='objectFieldLabel']/following-sibling::div//span[contains(text(),'Required')]</td>
-		<td></td>
-	</tr>
-	<tr>
 		<td>OBJECT_LABEL_FIELD_REQUIRED</td>
-		<td>//input[@id='objectDefinitionLabel']/following-sibling::div//span[contains(text(),'Required')]</td>
+		<td>//input[@id='objectDefinitionLabel']/following-sibling::div[contains(.,'Required')]</td>
 		<td></td>
 	</tr>
 	<tr>
 		<td>OBJECT_NAME_FIELD_REQUIRED</td>
-		<td>//input[@id='objectDefinitionName']/following-sibling::div//span[contains(text(),'Required')]</td>
+		<td>//input[@id='objectDefinitionName']/following-sibling::div[contains(.,'Required')]</td>
 		<td></td>
 	</tr>
 	<tr>
@@ -477,7 +462,7 @@
 	</tr>
 	<tr>
 		<td>OBJECT_ACTIONS_TAB</td>
-		<td>//a[contains(text(),'Actions')]</td>
+		<td>//*[contains(@class,'nav-link')]//span[contains(text(),'Actions')]</td>
 		<td></td>
 	</tr>
 	<tr>
@@ -562,7 +547,7 @@
 	</tr>
 	<tr>
 		<td>LABEL_OBJECT_RELATIONSHIP_REQUIRED</td>
-		<td>//input[@id ='objectRelationshipLabel']/..//div//span[contains(text(),'Required')]</td>
+		<td>//input[@id ='objectRelationshipLabel']/following-sibling::div[contains(.,'Required')]</td>
 		<td></td>
 	</tr>
 </tbody>

@@ -18,6 +18,7 @@ import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetLinkConstants;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.asset.kernel.service.AssetLinkLocalService;
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeEntryLocalService;
@@ -1611,6 +1612,44 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
+	private void _validateFileExtension(
+			String fileExtension, long objectFieldId, String objectFieldName)
+		throws PortalException {
+
+		ObjectFieldSetting objectFieldSetting =
+			_objectFieldSettingPersistence.fetchByOFI_N(
+				objectFieldId, "acceptedFileExtensions");
+
+		String acceptedFileExtensions = objectFieldSetting.getValue();
+
+		if (!ArrayUtil.contains(
+				acceptedFileExtensions.split("\\s*,\\s*"), fileExtension,
+				true)) {
+
+			throw new ObjectEntryValuesException.InvalidFileExtension(
+				fileExtension, objectFieldName);
+		}
+	}
+
+	private void _validateFileSize(
+			long fileSize, long objectFieldId, String objectFieldName)
+		throws PortalException {
+
+		ObjectFieldSetting objectFieldSetting =
+			_objectFieldSettingPersistence.fetchByOFI_N(
+				objectFieldId, "maximumFileSize");
+
+		long maximumFileSize = GetterUtil.getLong(
+			objectFieldSetting.getValue());
+
+		if ((maximumFileSize > 0) &&
+			(fileSize > (maximumFileSize * 1024 * 1024))) {
+
+			throw new ObjectEntryValuesException.ExceedsMaxFileSize(
+				maximumFileSize, objectFieldName);
+		}
+	}
+
 	private void _validateGroupId(long groupId, String scope)
 		throws PortalException {
 
@@ -1700,6 +1739,27 @@ public class ObjectEntryLocalServiceImpl
 		}
 	}
 
+	private void _validateTextMaxLength(
+			int defaultMaxLength, String objectEntryValue, long objectFieldId,
+			String objectFieldName)
+		throws PortalException {
+
+		int maxLength = defaultMaxLength;
+
+		ObjectFieldSetting objectFieldSetting =
+			_objectFieldSettingPersistence.fetchByOFI_N(
+				objectFieldId, "maxLength");
+
+		if (objectFieldSetting != null) {
+			maxLength = GetterUtil.getInteger(objectFieldSetting.getValue());
+		}
+
+		if (objectEntryValue.length() > maxLength) {
+			throw new ObjectEntryValuesException.ExceedsTextMaxLength(
+				maxLength, objectFieldName);
+		}
+	}
+
 	private void _validateValues(
 			long objectDefinitionId, Map<String, Serializable> values)
 		throws PortalException {
@@ -1728,9 +1788,41 @@ public class ObjectEntryLocalServiceImpl
 			return;
 		}
 
-		String dbType = objectField.getDBType();
+		if (StringUtil.equals(
+				objectField.getBusinessType(),
+				ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT)) {
 
-		if (StringUtil.equals(dbType, "Integer")) {
+			DLFileEntry dlFileEntry = _dlFileEntryLocalService.fetchDLFileEntry(
+				GetterUtil.getLong(entry.getValue()));
+
+			if (dlFileEntry != null) {
+				_validateFileExtension(
+					dlFileEntry.getExtension(), objectField.getObjectFieldId(),
+					objectField.getName());
+				_validateFileSize(
+					dlFileEntry.getSize(), objectField.getObjectFieldId(),
+					objectField.getName());
+
+				return;
+			}
+
+			if (objectField.isRequired()) {
+				throw new ObjectEntryValuesException.Required(
+					objectField.getName());
+			}
+		}
+		else if (StringUtil.equals(
+					objectField.getBusinessType(),
+					ObjectFieldConstants.BUSINESS_TYPE_LONG_TEXT)) {
+
+			_validateTextMaxLength(
+				65000, GetterUtil.getString(entry.getValue()),
+				objectField.getObjectFieldId(), objectField.getName());
+		}
+		else if (StringUtil.equals(
+					objectField.getDBType(),
+					ObjectFieldConstants.DB_TYPE_INTEGER)) {
+
 			Serializable entryValue = entry.getValue();
 
 			String entryValueString = entryValue.toString();
@@ -1745,7 +1837,10 @@ public class ObjectEntryLocalServiceImpl
 				}
 			}
 		}
-		else if (StringUtil.equals(dbType, "Long")) {
+		else if (StringUtil.equals(
+					objectField.getDBType(),
+					ObjectFieldConstants.DB_TYPE_LONG)) {
+
 			Serializable entryValue = entry.getValue();
 
 			String entryValueString = entryValue.toString();
@@ -1766,12 +1861,13 @@ public class ObjectEntryLocalServiceImpl
 				}
 			}
 		}
-		else if (StringUtil.equals(dbType, "String")) {
-			String value = (String)entry.getValue();
+		else if (StringUtil.equals(
+					objectField.getDBType(),
+					ObjectFieldConstants.DB_TYPE_STRING)) {
 
-			if ((value != null) && (value.length() > 280)) {
-				throw new ObjectEntryValuesException.Exceeds280Characters();
-			}
+			_validateTextMaxLength(
+				280, GetterUtil.getString(entry.getValue()),
+				objectField.getObjectFieldId(), objectField.getName());
 		}
 
 		if (objectField.getListTypeDefinitionId() != 0) {

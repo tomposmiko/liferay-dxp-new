@@ -14,7 +14,10 @@
 
 package com.liferay.layout.internal.search.spi.model.index.contributor;
 
+import com.liferay.fragment.constants.FragmentEntryLinkConstants;
+import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.layout.crawler.LayoutCrawler;
+import com.liferay.layout.internal.search.util.LayoutPageTemplateStructureRenderUtil;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.petra.string.StringPool;
@@ -25,15 +28,21 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.search.Document;
 import com.liferay.portal.kernel.search.Field;
-import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
+import com.liferay.portal.kernel.servlet.DynamicServletRequest;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.search.spi.model.index.contributor.ModelDocumentContributor;
+import com.liferay.segments.constants.SegmentsExperienceConstants;
 
 import java.util.Locale;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -75,7 +84,7 @@ public class LayoutModelDocumentContributor
 				layout.getName(locale));
 		}
 
-		if (layout.isPrivateLayout()) {
+		if (!layout.isPublished()) {
 			return;
 		}
 
@@ -94,15 +103,6 @@ public class LayoutModelDocumentContributor
 			return;
 		}
 
-		Layout draftLayout = layout.fetchDraftLayout();
-
-		if ((draftLayout == null) ||
-			!GetterUtil.getBoolean(
-				draftLayout.getTypeSettingsProperty("published"))) {
-
-			return;
-		}
-
 		Set<Locale> locales = LanguageUtil.getAvailableLocales(
 			layout.getGroupId());
 
@@ -110,7 +110,8 @@ public class LayoutModelDocumentContributor
 			String content = StringPool.BLANK;
 
 			try {
-				content = _layoutCrawler.getLayoutContent(layout, locale);
+				content = _getLayoutContent(
+					layout, layoutPageTemplateStructure, locale);
 			}
 			catch (Exception exception) {
 				if (_log.isWarnEnabled()) {
@@ -133,21 +134,43 @@ public class LayoutModelDocumentContributor
 		}
 	}
 
+	private String _getLayoutContent(
+			Layout layout,
+			LayoutPageTemplateStructure layoutPageTemplateStructure,
+			Locale locale)
+		throws Exception {
+
+		if (!layout.isPrivateLayout()) {
+			return _layoutCrawler.getLayoutContent(layout, locale);
+		}
+
+		HttpServletRequest httpServletRequest = null;
+		HttpServletResponse httpServletResponse = null;
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if ((serviceContext != null) && (serviceContext.getRequest() != null)) {
+			httpServletRequest = DynamicServletRequest.addQueryString(
+				serviceContext.getRequest(), "p_l_id=" + layout.getPlid(),
+				false);
+
+			httpServletResponse = serviceContext.getResponse();
+		}
+
+		if ((httpServletRequest == null) || (httpServletResponse == null)) {
+			return StringPool.BLANK;
+		}
+
+		return LayoutPageTemplateStructureRenderUtil.renderLayoutContent(
+			_fragmentRendererController, httpServletRequest,
+			httpServletResponse, layoutPageTemplateStructure,
+			FragmentEntryLinkConstants.VIEW, locale,
+			SegmentsExperienceConstants.ID_DEFAULT);
+	}
+
 	private int _getStatus(Layout layout) {
-		if (!layout.isTypeContent()) {
-			return WorkflowConstants.STATUS_APPROVED;
-		}
-
-		Layout draftLayout = layout.fetchDraftLayout();
-
-		boolean published = false;
-
-		if (draftLayout != null) {
-			published = GetterUtil.getBoolean(
-				draftLayout.getTypeSettingsProperty("published"));
-		}
-
-		if (published) {
+		if (layout.isPublished()) {
 			return WorkflowConstants.STATUS_APPROVED;
 		}
 
@@ -169,6 +192,9 @@ public class LayoutModelDocumentContributor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutModelDocumentContributor.class);
+
+	@Reference
+	private FragmentRendererController _fragmentRendererController;
 
 	@Reference
 	private Html _html;

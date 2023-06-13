@@ -127,14 +127,14 @@ declare module Liferay {
 			cssClass?: string
 		): string;
 
-		export function getTop(): Window;
-
 		export function getOpener(): any;
 
 		/**
 		 * Returns the portlet namespace with underscores prepended and appended to it
 		 */
 		export function getPortletNamespace(portletId: string): string;
+
+		export function getTop(): Window;
 
 		export function getURLWithSessionId(url: string): string;
 
@@ -169,6 +169,23 @@ declare module Liferay {
 		export function postForm(
 			form: HTMLFormElement | string,
 			options?: {data: Object; url: string}
+		): void;
+
+		export function removeEntitySelection(
+			entityIdString: string,
+			entityNameString: string,
+			removeEntityButton: string | HTMLElement,
+			namespace: string
+		): void;
+
+		export function selectFolder(
+			folderData: {
+				idString: string;
+				idValue: string;
+				nameString: string;
+				nameValue: string;
+			},
+			namespace: string
 		): void;
 
 		/**

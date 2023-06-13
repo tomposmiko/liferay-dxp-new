@@ -14,7 +14,6 @@
 
 import {useQuery} from '@apollo/client';
 import ClayButton from '@clayui/button';
-import ClayButtonGroup from '@clayui/button/lib/Group';
 import ClayLayout from '@clayui/layout';
 import {useState} from 'react';
 import {Link, useOutletContext} from 'react-router-dom';
@@ -50,29 +49,31 @@ const CaseResult = () => {
 
 	return (
 		<ClayLayout.Row>
-			<ClayButtonGroup className="ml-3" spaced>
-				<ClayButton>{i18n.translate('assign')}</ClayButton>
+			<ClayLayout.Col xs={12}>
+				<ClayButton.Group className="ml-3" spaced>
+					<ClayButton>{i18n.translate('assign')}</ClayButton>
 
-				<ClayButton displayType="secondary">
-					{i18n.translate('assign-to-me')}
-				</ClayButton>
+					<ClayButton displayType="secondary">
+						{i18n.translate('assign-to-me')}
+					</ClayButton>
 
-				<ClayButton disabled displayType="unstyled">
-					{i18n.translate('start-test')}
-				</ClayButton>
+					<ClayButton disabled displayType="unstyled">
+						{i18n.translate('start-test')}
+					</ClayButton>
 
-				<ClayButton disabled displayType="unstyled">
-					{i18n.translate('complete-test')}
-				</ClayButton>
+					<ClayButton disabled displayType="unstyled">
+						{i18n.translate('complete-test')}
+					</ClayButton>
 
-				<ClayButton disabled displayType="unstyled">
-					{i18n.translate('reopen-test')}
-				</ClayButton>
+					<ClayButton disabled displayType="unstyled">
+						{i18n.translate('reopen-test')}
+					</ClayButton>
 
-				<ClayButton displayType="secondary">
-					{i18n.translate('edit')}
-				</ClayButton>
-			</ClayButtonGroup>
+					<ClayButton displayType="secondary">
+						{i18n.translate('edit')}
+					</ClayButton>
+				</ClayButton.Group>
+			</ClayLayout.Col>
 
 			<ClayLayout.Col xs={9}>
 				<Container className="mt-4" title="Test Details">
@@ -186,7 +187,7 @@ const CaseResult = () => {
 				</Container>
 			</ClayLayout.Col>
 
-			<ClayLayout.Col>
+			<ClayLayout.Col xs={3}>
 				<Container className="mt-4" title={i18n.translate('dates')}>
 					<QATable
 						items={[

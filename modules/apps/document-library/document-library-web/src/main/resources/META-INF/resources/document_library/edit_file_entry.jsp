@@ -551,6 +551,21 @@ renderResponse.setTitle(headerTitle);
 							className="<%= DLFileEntry.class.getName() %>"
 							classPK="<%= assetClassPK %>"
 						/>
+
+						<c:if test="<%= (fileEntry != null) && dlAdminDisplayContext.isAutoTaggingEnabled() %>">
+							<clay:checkbox
+								checked="<%= false %>"
+								id='<%= liferayPortletResponse.getNamespace() + "updateAutoTags" %>'
+								label='<%= LanguageUtil.get(request, "update-auto-tags") %>'
+								name='<%= liferayPortletResponse.getNamespace() + "updateAutoTags" %>'
+							/>
+
+							<div class="ml-4">
+								<small class="text-secondary">
+									<liferay-ui:message key="update-auto-tags-help" />
+								</small>
+							</div>
+						</c:if>
 					</aui:fieldset>
 				</c:if>
 
@@ -577,7 +592,7 @@ renderResponse.setTitle(headerTitle);
 							inputAddon="<%= dlEditFileEntryDisplayContext.getFriendlyURLBase() %>"
 							localizable="<%= false %>"
 							name="urlTitle"
-							showHistory="<%= false %>"
+							showHistory="<%= true %>"
 						/>
 
 						<p class="text-secondary"><liferay-ui:message key="the-friendly-url-may-be-modified-to-ensure-uniqueness" /></p>
