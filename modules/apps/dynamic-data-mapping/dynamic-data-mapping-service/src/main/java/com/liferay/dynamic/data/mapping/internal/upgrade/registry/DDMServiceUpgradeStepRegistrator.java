@@ -20,6 +20,7 @@ import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.document.library.kernel.service.DLFileVersionLocalService;
 import com.liferay.document.library.kernel.service.DLFolderLocalService;
+import com.liferay.document.library.kernel.store.Store;
 import com.liferay.dynamic.data.mapping.data.provider.settings.DDMDataProviderSettingsProvider;
 import com.liferay.dynamic.data.mapping.internal.upgrade.v1_0_0.SchemaUpgradeProcess;
 import com.liferay.dynamic.data.mapping.internal.upgrade.v1_0_0.UpgradeCompanyId;
@@ -54,6 +55,7 @@ import com.liferay.dynamic.data.mapping.internal.upgrade.v4_3_0.DLFileEntryTypeD
 import com.liferay.dynamic.data.mapping.internal.upgrade.v4_3_4.DDMStructureLinkDLFileEntryTypeUpgradeProcess;
 import com.liferay.dynamic.data.mapping.internal.upgrade.v4_3_4.DLFileEntryTypeDDMFieldAttributeUpgradeProcess;
 import com.liferay.dynamic.data.mapping.internal.upgrade.v4_3_5.DDMTemplateVersionUpgradeProcess;
+import com.liferay.dynamic.data.mapping.internal.upgrade.v5_2_0.DDMFacetTemplateUpgradeProcess;
 import com.liferay.dynamic.data.mapping.io.DDMFormDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormLayoutSerializer;
@@ -79,7 +81,6 @@ import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
 import com.liferay.portal.kernel.upgrade.MVCCVersionUpgradeProcess;
 import com.liferay.portal.kernel.upgrade.UpgradeProcessFactory;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
-import com.liferay.portlet.documentlibrary.store.StoreFactory;
 import com.liferay.view.count.service.ViewCountEntryLocalService;
 
 import org.osgi.framework.BundleContext;
@@ -132,7 +133,7 @@ public class DDMServiceUpgradeStepRegistrator
 					_dlFolderLocalService, _expandoRowLocalService,
 					_expandoTableLocalService, _expandoValueLocalService,
 					_resourceActions, _resourceLocalService,
-					_resourcePermissionLocalService, _storeFactory.getStore(),
+					_resourcePermissionLocalService, _store,
 					_viewCountEntryLocalService),
 			new UpgradeLastPublishDate());
 
@@ -499,6 +500,10 @@ public class DDMServiceUpgradeStepRegistrator
 			"5.1.4", "5.1.5",
 			new com.liferay.dynamic.data.mapping.internal.upgrade.v5_1_5.
 				DDMStructureLayoutUpgradeProcess(_jsonFactory));
+
+		registry.register(
+			"5.1.5", "5.2.0",
+			new DDMFacetTemplateUpgradeProcess(_classNameLocalService));
 	}
 
 	@Activate
@@ -585,8 +590,8 @@ public class DDMServiceUpgradeStepRegistrator
 	private ServiceTrackerMap<String, DDMDataProviderSettingsProvider>
 		_serviceTrackerMap;
 
-	@Reference(target = "(dl.store.impl.enabled=true)")
-	private StoreFactory _storeFactory;
+	@Reference(target = "(default=true)")
+	private Store _store;
 
 	@Reference
 	private ViewCountEntryLocalService _viewCountEntryLocalService;

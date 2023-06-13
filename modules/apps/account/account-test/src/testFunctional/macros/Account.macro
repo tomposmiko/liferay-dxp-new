@@ -1100,18 +1100,16 @@ definition {
 		Account._goToInviteUsers(accountName = "${accountName}");
 
 		Type(
-			key_text = "Emails",
+			key_text = "Email Addresses",
 			locator1 = "TextInput#ANY",
 			value1 = "${userEmailAddress}");
 
 		KeyPress(
-			key_text = "Emails",
+			key_text = "Email Addresses",
 			locator1 = "TextInput#ANY",
 			value1 = "\RETURN");
 
 		Button.click(button = "Invite");
-
-		Alert.viewSuccessMessage();
 	}
 
 	macro openAccountsAdmin {

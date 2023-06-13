@@ -32,8 +32,28 @@ public @interface CETProperty {
 
 	String name() default "";
 
-	String type() default "";
+	String label() default "";
 
-	boolean url() default false;
+	Type type();
+
+	public enum Type {
+
+		Boolean, String, StringList, URL(true), URLList(true);
+
+		public boolean isURL() {
+			return _url;
+		}
+
+		private Type() {
+			this(false);
+		}
+
+		private Type(boolean url) {
+			_url = url;
+		}
+
+		private boolean _url;
+
+	}
 
 }

@@ -21,6 +21,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>CARD_FOLDER</td>
+	<td>//div[contains(@class,'card-horizontal')]/.</td>
+	<td></td>
+</tr>
+<tr>
 	<td>CHECKIN_DIALOG_TITLE</td>
 	<td>//div[contains(@class,'modal-title') and contains(text(),'Describe Your Changes')]</td>
 	<td></td>
@@ -277,6 +282,16 @@
 <tr>
 	<td>TOOLBAR_ACTIONS</td>
 	<td>//div[contains(@class,'dropdown')]//button[*[name()='svg'][contains(@class,'icon-ellipsis')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TOOLBAR_INFO_PANEL</td>
+	<td>//li//button[*[name()='svg'][contains(@class,'info-circle')]]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>TOOLBAR_INFO_PANEL_DETAILS_MESSAGE</td>
+	<td>//strong[contains(.,'${key_detailsMessage}')]</td>
 	<td></td>
 </tr>
 <tr>

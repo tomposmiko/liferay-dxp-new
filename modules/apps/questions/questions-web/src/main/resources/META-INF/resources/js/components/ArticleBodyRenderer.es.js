@@ -20,9 +20,11 @@ export default function ArticleBodyRenderer({
 	articleBody,
 	compactMode = false,
 	companyName,
+	elapsedTime,
 	encodingFormat,
 	hasCompanyMx,
 	id,
+	showSignature = true,
 	signature,
 }) {
 	const [
@@ -50,12 +52,12 @@ export default function ArticleBodyRenderer({
 				</div>
 			)}
 
-			{signature && (
+			{showSignature && signature && (
 				<style
 					dangerouslySetInnerHTML={{
 						__html: `.questions-article-body-${id} ${
 							articleBodyContainsParagraph ? 'p' : 'div'
-						}:last-child:after {content: " - ${signature} ${_companyName}"; font-weight: bold;}`,
+						}:last-child:after {content: " - ${signature} ${_companyName} - ${elapsedTime}"; font-weight: bold;}`,
 					}}
 				/>
 			)}

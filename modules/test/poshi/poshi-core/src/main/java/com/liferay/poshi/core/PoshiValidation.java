@@ -18,6 +18,7 @@ import com.liferay.poshi.core.elements.PoshiElement;
 import com.liferay.poshi.core.elements.PoshiElementException;
 import com.liferay.poshi.core.script.PoshiScriptParserUtil;
 import com.liferay.poshi.core.selenium.LiferaySeleniumMethod;
+import com.liferay.poshi.core.util.Dom4JUtil;
 import com.liferay.poshi.core.util.OSDetector;
 import com.liferay.poshi.core.util.PropsUtil;
 import com.liferay.poshi.core.util.PropsValues;
@@ -48,7 +49,10 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 
 import org.dom4j.Attribute;
+import org.dom4j.CDATA;
 import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.Text;
 
 /**
  * @author Karen Dang
@@ -1494,11 +1498,31 @@ public class PoshiValidation {
 	protected static void validatePropertyElement(PoshiElement poshiElement) {
 		String filePath = _getFilePath(poshiElement);
 
-		List<String> attributeNames = Arrays.asList(
-			"line-number", "name", "value");
+		List<String> attributeNames = Arrays.asList("line-number", "name");
 
 		validateHasNoChildElements(poshiElement);
 		validatePossibleAttributeNames(poshiElement, attributeNames);
+
+		if (Validator.isNotNull(poshiElement.attributeValue("value"))) {
+			attributeNames.add("value");
+		}
+		else {
+			boolean hasValue = false;
+
+			for (Node node : Dom4JUtil.toNodeList(poshiElement.content())) {
+				if (node instanceof CDATA || node instanceof Text) {
+					hasValue = true;
+				}
+			}
+
+			if (!hasValue) {
+				_addException(
+					poshiElement,
+					poshiElement.attributeValue("name") + " has no value",
+					filePath);
+			}
+		}
+
 		validateRequiredAttributeNames(poshiElement, attributeNames, filePath);
 		validatePossiblePropertyValues(poshiElement);
 	}

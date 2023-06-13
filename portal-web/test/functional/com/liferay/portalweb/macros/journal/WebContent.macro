@@ -596,18 +596,14 @@ definition {
 				var webContentNumericFieldLabel = "Numeric";
 			}
 
-			if ("${numericType}" == "Decimal") {
-				Type(
-					key_fieldFieldLabel = "${webContentNumericFieldLabel}",
-					locator1 = "WCEditWebContent#TEXT_INPUT",
-					value1 = "${webContentNumeric}");
-			}
-			else {
-				Type(
-					key_fieldFieldLabel = "${webContentNumericFieldLabel}",
-					locator1 = "WCEditWebContent#TEXT_INPUT",
-					value1 = "${webContentNumeric}");
-			}
+			TripleClick(
+				key_fieldFieldLabel = "${webContentNumericFieldLabel}",
+				locator1 = "WCEditWebContent#TEXT_INPUT");
+
+			Type.sendKeys(
+				key_fieldFieldLabel = "${webContentNumericFieldLabel}",
+				locator1 = "WCEditWebContent#TEXT_INPUT",
+				value1 = "${webContentNumeric}");
 		}
 
 		if (isSet(webContentRichText)) {
@@ -1134,17 +1130,33 @@ definition {
 			var displayPageTemplateType = "Specific";
 		}
 
-		Select(
-			locator1 = "Select#SELECT_ID",
-			selectFieldId = "displayPageType",
-			value1 = "${displayPageTemplateType}");
-
-		if ("${displayPageTemplateType}" == "Specific") {
-			WaitForLiferayEvent.initializeLiferayEventLog();
+		if (IsElementPresent(locator1 = "Select#SELECT_ID", selectFieldId = "displayPageType")) {
+			Select(
+				locator1 = "Select#SELECT_ID",
+				selectFieldId = "displayPageType",
+				value1 = "${displayPageTemplateType}");
+		}
+		else {
+			Click(
+				ariaLabel = "Select Display Page Type",
+				locator1 = "Button#ANY_WITH_ARIA_LABEL");
 
 			Click(
-				buttonId = "chooseSpecificDisplayPage",
-				locator1 = "Button#BUTTON_ID");
+				key_menuItem = "${displayPageTemplateType}",
+				locator1 = "MenuItem#ANY_MENU_ITEM");
+		}
+
+		if ("${displayPageTemplateType}" == "Specific") {
+			if (IsElementPresent(buttonId = "chooseSpecificDisplayPage", locator1 = "Button#BUTTON_ID")) {
+				Click(
+					buttonId = "chooseSpecificDisplayPage",
+					locator1 = "Button#BUTTON_ID");
+			}
+			else {
+				Click(
+					ariaLabel = "Select Display Page",
+					locator1 = "Button#ANY_WITH_ARIA_LABEL");
+			}
 
 			SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
@@ -1179,31 +1191,61 @@ definition {
 
 			SelectFrameTop();
 
-			if ("${pageType}" == "Public Pages") {
-				AssertTextEquals(
-					inputFieldId = "specificDisplayPageNameInput",
-					locator1 = "TextInput#INPUT_ID",
-					value1 = "Public Pages > ${pageName}");
-			}
-			else if ("${pageType}" == "Pages") {
-				AssertTextEquals(
-					inputFieldId = "specificDisplayPageNameInput",
-					locator1 = "TextInput#INPUT_ID",
-					value1 = "Pages > ${pageName}");
+			if (IsElementPresent(inputFieldId = "specificDisplayPageNameInput", locator1 = "TextInput#INPUT_ID")) {
+				if ("${pageType}" == "Public Pages") {
+					AssertTextEquals(
+						inputFieldId = "specificDisplayPageNameInput",
+						locator1 = "TextInput#INPUT_ID",
+						value1 = "Public Pages > ${pageName}");
+				}
+				else if ("${pageType}" == "Pages") {
+					AssertTextEquals(
+						inputFieldId = "specificDisplayPageNameInput",
+						locator1 = "TextInput#INPUT_ID",
+						value1 = "Pages > ${pageName}");
+				}
+				else {
+					AssertTextEquals(
+						inputFieldId = "specificDisplayPageNameInput",
+						locator1 = "TextInput#INPUT_ID",
+						value1 = "${pageName}");
+				}
 			}
 			else {
-				AssertTextEquals(
-					inputFieldId = "specificDisplayPageNameInput",
-					locator1 = "TextInput#INPUT_ID",
-					value1 = "${pageName}");
+				if ("${pageType}" == "Public Pages") {
+					AssertTextEquals(
+						key_placeHolder = "Select Display Page",
+						locator1 = "TextInput#ANY_PLACEHOLDER",
+						value1 = "Public Pages > ${pageName}");
+				}
+				else if ("${pageType}" == "Pages") {
+					AssertTextEquals(
+						key_placeHolder = "Select Display Page",
+						locator1 = "TextInput#ANY_PLACEHOLDER",
+						value1 = "Pages > ${pageName}");
+				}
+				else {
+					AssertTextEquals(
+						key_placeHolder = "Select Display Page",
+						locator1 = "TextInput#ANY_PLACEHOLDER",
+						value1 = "${pageName}");
+				}
 			}
 		}
 
 		if ("${displayPageTemplateType}" == "Default") {
-			AssertTextEquals(
-				inputFieldId = "defaultDisplayPageNameInput",
-				locator1 = "TextInput#INPUT_ID",
-				value1 = "${pageName}");
+			if (IsElementPresent(inputFieldId = "defaultDisplayPageNameInput", locator1 = "TextInput#INPUT_ID")) {
+				AssertTextEquals(
+					inputFieldId = "defaultDisplayPageNameInput",
+					locator1 = "TextInput#INPUT_ID",
+					value1 = "${pageName}");
+			}
+			else {
+				AssertTextEquals(
+					ariaLabel = "Display Page Name",
+					locator1 = "TextInput#ANY_WITH_AIRA_LABEL",
+					value1 = "${pageName}");
+			}
 		}
 	}
 
@@ -1609,9 +1651,7 @@ definition {
 
 		WaitForLiferayEvent.initializeLiferayEventLog();
 
-		Click(
-			key_fieldsetName = "displayPage",
-			locator1 = "WC#PREVIEW_BUTTON");
+		Button.click(button = "Preview");
 
 		SelectFrame(locator1 = "IFrame#MODAL_BODY");
 
@@ -2358,16 +2398,40 @@ definition {
 	macro viewSelectedDisplayPageTemplateCP {
 		Panel.expandPanel(panel = "Display Page");
 
-		AssertSelectedLabel(
-			locator1 = "Select#SELECT_ID",
-			selectFieldId = "displayPageType",
-			value1 = "${displayPageTemplateType}");
+		if (IsElementPresent(locator1 = "Select#SELECT_ID", selectFieldId = "displayPageType")) {
+			AssertSelectedLabel(
+				locator1 = "Select#SELECT_ID",
+				selectFieldId = "displayPageType",
+				value1 = "${displayPageTemplateType}");
+		}
+		else {
+			AssertTextEquals(
+				ariaLabel = "Select Display Page Type",
+				locator1 = "Button#ANY_WITH_ARIA_LABEL",
+				value1 = "${displayPageTemplateType}");
+		}
 
 		if (isSet(displayPageTemplateName)) {
-			AssertTextEquals(
-				key_titleName = "${displayPageTemplateType} Display Page Template",
-				locator1 = "TextInput#INPUT_CONTAINS_TITLE",
-				value1 = "${displayPageTemplateName}");
+			if (IsElementPresent(key_titleName = "Display Page Template", locator1 = "TextInput#INPUT_CONTAINS_TITLE")) {
+				AssertTextEquals(
+					key_titleName = "${displayPageTemplateType} Display Page Template",
+					locator1 = "TextInput#INPUT_CONTAINS_TITLE",
+					value1 = "${displayPageTemplateName}");
+			}
+			else {
+				if ("${displayPageTemplateType}" == "Default") {
+					AssertTextEquals(
+						ariaLabel = "Display Page Name",
+						locator1 = "TextInput#ANY_WITH_AIRA_LABEL",
+						value1 = "${displayPageTemplateName}");
+				}
+				else {
+					AssertTextEquals(
+						key_placeHolder = "Select Display Page",
+						locator1 = "TextInput#ANY_PLACEHOLDER",
+						value1 = "${displayPageTemplateName}");
+				}
+			}
 		}
 	}
 

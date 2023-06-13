@@ -74,6 +74,33 @@ definition {
 	}
 
 	@priority = "4"
+	test CanEditTheRoleTitle {
+		JSONRole.addRegularRole(
+			roleKey = "Update Role Title",
+			roleTitle = "Update Role Title");
+
+		Role.openRolesAdmin();
+
+		RoleNavigator.gotoRoleType();
+
+		LexiconEntry.gotoEntry(rowEntry = "Update Role Title");
+
+		Role.editRole(
+			roleDescriptionEdit = "This is an updated role description.",
+			roleKeyEdit = "This is an updated Role Key",
+			roleTitleEdit = "This is an updated Role Title");
+
+		Role.openRolesAdmin();
+
+		RoleNavigator.gotoRoleType();
+
+		Role.viewCP(
+			roleDescription = "This is an updated role description.",
+			roleKey = "This is an updated Role Key",
+			roleTitle = "This is an updated Role Title");
+	}
+
+	@priority = "4"
 	test CannotAddRoleIfSimilarKeyExists {
 		Role.openRolesAdmin();
 
@@ -130,7 +157,6 @@ definition {
 			permissionNavItem = "Documents and Media",
 			permissionSheetSubtitle = "Documents",
 			permissionValues = "View",
-			roleTitle = "Remove Permission Scope",
 			siteNameScope = "${siteName}");
 
 		Role.viewPermissionCP(
@@ -151,8 +177,7 @@ definition {
 			permissionNavItem = "Documents and Media",
 			permissionSheetSubtitle = "Documents",
 			permissionValues = "View",
-			removeSiteScope = "${siteName}",
-			roleTitle = "Remove Permission Scope");
+			removeSiteScope = "${siteName}");
 
 		Role.viewPermissionCP(
 			permissionDefinitionValue = "View",
@@ -213,12 +238,16 @@ definition {
 
 		Role.openRolesAdmin();
 
-		// The define permission via json macro is not able to change the permission scope
+		RoleNavigator.gotoRoleType();
 
-		Role.definePermissionCmdCP(
-			permissionDefinitionKey = "SITE_ADMIN_APPLICATIONS_DOCUMENTS_AND_MEDIA_RESOURCE_PERMISSIONS_DOCUMENT_VIEW_CHECKBOX",
-			permissionDefinitionValue = "View",
-			roleTitle = "Permission Scope",
+		LexiconEntry.gotoEntry(rowEntry = "Permission Scope");
+
+		Role.editPermissionCmdCPUI(
+			define = "true",
+			permissionNavHeader = "Applications",
+			permissionNavItem = "Documents and Media",
+			permissionSheetSubtitle = "Document",
+			permissionValues = "View",
 			siteNameScope = "${siteName}");
 
 		Role.viewPermissionCP(

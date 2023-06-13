@@ -31,6 +31,14 @@ public class CETFDSEntry {
 		_locale = locale;
 	}
 
+	public String getConfiguredFrom() {
+		if (_cet.isReadOnly()) {
+			return "workspace";
+		}
+
+		return "ui";
+	}
+
 	public String getExternalReferenceCode() {
 		return _cet.getExternalReferenceCode();
 	}
@@ -46,7 +54,7 @@ public class CETFDSEntry {
 	}
 
 	public String getType() {
-		return CETLabelUtil.getTypeNameLabel(_locale, _cet.getType());
+		return CETLabelUtil.getTypeLabel(_locale, _cet.getType());
 	}
 
 	public boolean isReadOnly() {

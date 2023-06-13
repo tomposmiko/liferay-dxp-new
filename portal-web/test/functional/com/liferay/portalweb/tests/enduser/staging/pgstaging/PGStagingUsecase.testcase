@@ -221,13 +221,11 @@ definition {
 
 		Role.openRolesAdmin();
 
-		Role.removePermissionCP(
-			permissionDefinitionKey = "SITE_ADMIN_CONTENT_BLOGS_RESOURCE_PERMISSIONS_BLOGS_ENTRIES_ADD_ENTRY_CHECKBOX",
-			permissionDefinitionValue = "Add Entry",
-			permissionNavigationKey = "SITE_ADMIN_CONTENT_BLOGS",
-			permissionNavigationValue = "Blogs",
+		Permissions.removePermissionViaAPI(
+			resourceAction = "ADD_ENTRY",
+			resourceName = "com.liferay.blogs",
 			roleTitle = "Organization User",
-			roleType = "Organization");
+			roleType = "organization");
 
 		var key_permissionDefinitionValue = "Add Entry";
 		var key_permissionNavigationValue = "Blogs";

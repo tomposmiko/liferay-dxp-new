@@ -104,8 +104,14 @@ public class MinifierUtil {
 
 			return unsyncStringWriter.toString();
 		}
-		catch (Exception exception) {
-			_log.error("Unable to minify CSS:\n" + content, exception);
+		catch (Throwable throwable) {
+			String failingContent = content;
+
+			if (content.length() > 1048576) {
+				failingContent = failingContent.substring(0, 1048575);
+			}
+
+			_log.error("Unable to minify CSS:\n" + failingContent, throwable);
 
 			unsyncStringWriter.append(content);
 

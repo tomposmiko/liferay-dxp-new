@@ -169,7 +169,9 @@ public abstract class BaseCETImpl implements CET {
 		for (Method method : cetClass.getDeclaredMethods()) {
 			CETProperty cetProperty = method.getAnnotation(CETProperty.class);
 
-			if (cetProperty.url()) {
+			CETProperty.Type type = cetProperty.type();
+
+			if (type.isURL()) {
 				urlCETPropertyNames.add(cetProperty.name());
 			}
 		}

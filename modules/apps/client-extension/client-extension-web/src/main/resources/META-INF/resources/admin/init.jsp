@@ -24,9 +24,14 @@ page import="com.liferay.client.extension.type.IFrameCET" %><%@
 page import="com.liferay.client.extension.type.ThemeCSSCET" %><%@
 page import="com.liferay.client.extension.type.ThemeFaviconCET" %><%@
 page import="com.liferay.client.extension.type.ThemeJSCET" %><%@
+page import="com.liferay.client.extension.type.annotation.CETProperty" %><%@
 page import="com.liferay.client.extension.web.internal.constants.ClientExtensionAdminFDSNames" %><%@
 page import="com.liferay.client.extension.web.internal.constants.ClientExtensionAdminWebKeys" %><%@
 page import="com.liferay.client.extension.web.internal.display.context.ClientExtensionAdminDisplayContext" %><%@
 page import="com.liferay.client.extension.web.internal.display.context.EditClientExtensionEntryDisplayContext" %><%@
-page import="com.liferay.client.extension.web.internal.display.context.EditClientExtensionEntryPartDisplayContext" %><%@
+page import="com.liferay.client.extension.web.internal.display.context.ViewClientExtensionEntryDisplayContext" %><%@
 page import="com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalServiceUtil" %>
+
+<%@ page import="java.lang.reflect.Method" %>
+
+<%@ page import="java.util.Collection" %>

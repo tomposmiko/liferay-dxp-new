@@ -242,11 +242,13 @@ function Rule({
 			{!disabled && (
 				<div className="container-trash">
 					<ClayButton
+						aria-label={Liferay.Language.get('delete-condition')}
 						className="condition-card-delete"
 						data-index={index}
 						monospaced
 						onClick={onDeleteRule}
 						small
+						title={Liferay.Language.get('delete-condition')}
 					>
 						<ClayIcon symbol="trash" />
 					</ClayButton>
@@ -345,10 +347,12 @@ function AssetFilterBuilder({
 				<div className="addbutton-timeline-item">
 					<div className="add-condition timeline-increment-icon">
 						<ClayButton
+							aria-label={Liferay.Language.get('add-condition')}
 							className="form-builder-rule-add-condition form-builder-timeline-add-item"
 							monospaced
 							onClick={handleAddRule}
 							small
+							title={Liferay.Language.get('add-condition')}
 						>
 							<ClayIcon symbol="plus" />
 						</ClayButton>

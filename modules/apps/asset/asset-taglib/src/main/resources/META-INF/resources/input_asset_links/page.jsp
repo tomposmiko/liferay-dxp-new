@@ -16,33 +16,6 @@
 
 <%@ include file="/input_asset_links/init.jsp" %>
 
-<liferay-ui:icon-menu
-	cssClass="select-existing-selector"
-	direction="right"
-	id='<%= inputAssetLinksDisplayContext.getRandomNamespace() + "inputAssetLinks" %>'
-	message="select"
-	showArrow="<%= false %>"
-	showWhenSingleIcon="<%= true %>"
->
-
-	<%
-	for (Map<String, Object> selectorEntry : inputAssetLinksDisplayContext.getSelectorEntries()) {
-	%>
-
-		<liferay-ui:icon
-			cssClass="asset-selector"
-			data='<%= (Map<String, Object>)selectorEntry.get("data") %>'
-			id='<%= (String)selectorEntry.get("id") %>'
-			message='<%= HtmlUtil.escape((String)selectorEntry.get("message")) %>'
-			url="javascript:void(0);"
-		/>
-
-	<%
-	}
-	%>
-
-</liferay-ui:icon-menu>
-
 <liferay-util:buffer
 	var="removeLinkIcon"
 >
@@ -52,6 +25,19 @@
 		message="remove"
 	/>
 </liferay-util:buffer>
+
+<clay:dropdown-menu
+	additionalProps='<%=
+		HashMapBuilder.<String, Object>put(
+			"removeIcon", removeLinkIcon
+		).build()
+	%>'
+	aria-label='<%= LanguageUtil.get(request, "select-items") %>'
+	cssClass="btn btn-secondary"
+	dropdownItems="<%= inputAssetLinksDisplayContext.getActionDropdownItems() %>"
+	label='<%= LanguageUtil.get(request, "select") %>'
+	propsTransformer="js/InputAssetLinkDropdownDefaultPropsTransformer"
+/>
 
 <liferay-ui:search-container
 	compactEmptyResultsMessage="<%= true %>"
@@ -110,86 +96,6 @@
 </c:if>
 
 <aui:input name="assetLinkEntryIds" type="hidden" />
-
-<aui:script use="aui-base,liferay-search-container">
-	var assetSelectorHandle = A.getBody().delegate(
-		'click',
-		(event) => {
-			event.preventDefault();
-
-			var searchContainerName =
-				'<portlet:namespace />assetLinksSearchContainer';
-
-			var searchContainer = Liferay.SearchContainer.get(searchContainerName);
-
-			var searchContainerData = searchContainer.getData();
-
-			if (searchContainerData) {
-				searchContainerData = searchContainerData.split(',');
-			}
-			else {
-				searchContainerData = [];
-			}
-
-			Liferay.Util.openSelectionModal({
-				buttonAddLabel: '<liferay-ui:message key="done" />',
-				multiple: true,
-				onSelect: function (selectedItems) {
-					if (selectedItems) {
-						Array.prototype.forEach.call(
-							selectedItems,
-							(selectedItem) => {
-								const assetEntry = JSON.parse(selectedItem.value);
-
-								var entityId = assetEntry.assetEntryId;
-
-								if (searchContainerData.indexOf(entityId) == -1) {
-									var entryLink =
-										'<div class="text-right"><a class="modify-link" data-rowId="' +
-										entityId +
-										'" href="javascript:void(0);"><%= UnicodeFormatter.toString(removeLinkIcon) %></a></div>';
-
-									var entryHtml =
-										'<h4 class="list-group-title">' +
-										Liferay.Util.escapeHTML(assetEntry.title) +
-										'</h4><p class="list-group-subtitle">' +
-										Liferay.Util.escapeHTML(
-											assetEntry.assetType
-										) +
-										'</p><p class="list-group-subtitle"><liferay-ui:message key="scope" />: ' +
-										Liferay.Util.escapeHTML(
-											assetEntry.groupDescriptiveName
-										) +
-										'</p>';
-
-									searchContainer.addRow(
-										[entryHtml, entryLink],
-										entityId
-									);
-
-									searchContainer.updateDataStore();
-								}
-							}
-						);
-					}
-				},
-				title: event.currentTarget.attr('data-title'),
-				url: event.currentTarget.attr('data-href'),
-			});
-		},
-		'.asset-selector a'
-	);
-
-	var clearAssetSelectorHandle = function (event) {
-		if (event.portletId === '<%= portletDisplay.getId() %>') {
-			assetSelectorHandle.detach();
-
-			Liferay.detach('destroyPortlet', clearAssetSelectorHandle);
-		}
-	};
-
-	Liferay.on('destroyPortlet', clearAssetSelectorHandle);
-</aui:script>
 
 <aui:script use="liferay-search-container">
 	var searchContainer = Liferay.SearchContainer.get(

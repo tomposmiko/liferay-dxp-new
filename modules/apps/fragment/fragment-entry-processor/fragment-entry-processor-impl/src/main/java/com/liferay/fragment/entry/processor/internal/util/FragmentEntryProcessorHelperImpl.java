@@ -19,6 +19,7 @@ import com.liferay.fragment.processor.FragmentEntryProcessorContext;
 import com.liferay.info.exception.NoSuchInfoItemException;
 import com.liferay.info.field.InfoField;
 import com.liferay.info.field.InfoFieldValue;
+import com.liferay.info.field.type.DateInfoFieldType;
 import com.liferay.info.field.type.TextInfoFieldType;
 import com.liferay.info.formatter.InfoCollectionTextFormatter;
 import com.liferay.info.formatter.InfoTextFormatter;
@@ -49,6 +50,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import java.util.Collection;
@@ -314,33 +316,42 @@ public class FragmentEntryProcessorHelperImpl
 		JSONObject editableValueJSONObject, Date date, Locale locale) {
 
 		if (editableValueJSONObject == null) {
-			return _DEFAULT_DATE_FORMAT.format(date);
+			return _DATE_FORMAT.format(date);
 		}
 
 		JSONObject configJSONObject = editableValueJSONObject.getJSONObject(
 			"config");
 
 		if (configJSONObject == null) {
-			return _DEFAULT_DATE_FORMAT.format(date);
+			return _DATE_FORMAT.format(date);
 		}
 
 		JSONObject dateFormatJSONObject = configJSONObject.getJSONObject(
 			"dateFormat");
 
 		if (dateFormatJSONObject == null) {
-			return _DEFAULT_DATE_FORMAT.format(date);
+			return _DATE_FORMAT.format(date);
 		}
 
 		String pattern = dateFormatJSONObject.getString(
 			_language.getLanguageId(locale), null);
 
 		if (Validator.isNull(pattern)) {
-			return _DEFAULT_DATE_FORMAT.format(date);
+			return _DATE_FORMAT.format(date);
 		}
 
-		DateFormat dateFormatPattern = new SimpleDateFormat(pattern);
+		try {
+			DateFormat dateFormatPattern = new SimpleDateFormat(pattern);
 
-		return dateFormatPattern.format(date);
+			return dateFormatPattern.format(date);
+		}
+		catch (Exception exception) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(exception);
+			}
+
+			return _DATE_FORMAT.format(date);
+		}
 	}
 
 	private long _getFileEntryId(
@@ -499,7 +510,26 @@ public class FragmentEntryProcessorHelperImpl
 		if (value instanceof String) {
 			InfoField infoField = infoFieldValue.getInfoField();
 
-			if (infoField.getInfoFieldType() instanceof TextInfoFieldType) {
+			if (infoField.getInfoFieldType() instanceof DateInfoFieldType) {
+				try {
+					SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+						"MM/dd/yy", locale);
+
+					return _getDateValue(
+						editableValueJSONObject,
+						simpleDateFormat.parse(value.toString()), locale);
+				}
+				catch (ParseException parseException) {
+					if (_log.isDebugEnabled()) {
+						_log.debug(parseException);
+					}
+
+					return value;
+				}
+			}
+			else if (infoField.getInfoFieldType() instanceof
+						TextInfoFieldType) {
+
 				Optional<Boolean> htmlOptional = infoField.getAttributeOptional(
 					TextInfoFieldType.HTML);
 
@@ -537,7 +567,7 @@ public class FragmentEntryProcessorHelperImpl
 		return value.toString();
 	}
 
-	private static final DateFormat _DEFAULT_DATE_FORMAT = new SimpleDateFormat(
+	private static final DateFormat _DATE_FORMAT = new SimpleDateFormat(
 		"MM/dd/yy hh:mm a", LocaleUtil.US);
 
 	private static final InfoCollectionTextFormatter<Object>

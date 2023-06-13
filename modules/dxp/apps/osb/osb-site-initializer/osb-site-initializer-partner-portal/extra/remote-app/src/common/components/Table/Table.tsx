@@ -21,6 +21,7 @@ interface TableProps<T> {
 	noWrap?: boolean;
 	responsive?: boolean;
 	rows: T[];
+	truncate?: boolean;
 }
 
 const Table = <T extends unknown>({
@@ -35,7 +36,7 @@ const Table = <T extends unknown>({
 				{columns.map((column: TableColumn<T>, index: number) => (
 					<ClayTable.Cell
 						align="left"
-						className="border-neutral-2 rounded-0"
+						className="align-baseline border-neutral-2 rounded-0"
 						headingCell
 						key={index}
 					>
@@ -62,6 +63,7 @@ const Table = <T extends unknown>({
 										return customClickOnRow(row);
 									}
 								}}
+								{...props}
 							>
 								{column.render
 									? column.render(data, row)

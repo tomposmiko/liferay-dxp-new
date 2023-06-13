@@ -14,14 +14,12 @@
 
 package com.liferay.portal.cache.ehcache.internal;
 
-import com.liferay.portal.cache.PortalCacheListenerFactory;
-import com.liferay.portal.cache.PortalCacheManagerListenerFactory;
+import com.liferay.portal.cache.ehcache.internal.configurator.BaseEhcachePortalCacheManagerConfigurator;
 import com.liferay.portal.cache.ehcache.internal.configurator.MultiVMEhcachePortalCacheManagerConfigurator;
 import com.liferay.portal.kernel.cache.PortalCacheManager;
 import com.liferay.portal.kernel.cache.PortalCacheManagerNames;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.Props;
 import com.liferay.portal.kernel.util.PropsKeys;
 
 import java.io.Serializable;
@@ -42,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
 )
 public class MultiVMEhcachePortalCacheManager
 	<K extends Serializable, V extends Serializable>
-		extends EhcachePortalCacheManager<K, V> {
+		extends BaseEhcachePortalCacheManager<K, V> {
 
 	@Activate
 	protected void activate(BundleContext bundleContext) {
@@ -64,34 +62,11 @@ public class MultiVMEhcachePortalCacheManager
 		destroy();
 	}
 
-	@Reference(unbind = "-")
-	protected void setMultiVMEhcachePortalCacheManagerConfigurator(
-		MultiVMEhcachePortalCacheManagerConfigurator
-			multiVMEhcachePortalCacheManagerConfigurator) {
+	@Override
+	protected BaseEhcachePortalCacheManagerConfigurator
+		getBaseEhcachePortalCacheManagerConfigurator() {
 
-		baseEhcachePortalCacheManagerConfigurator =
-			multiVMEhcachePortalCacheManagerConfigurator;
-	}
-
-	@Reference(unbind = "-")
-	protected void setPortalCacheListenerFactory(
-		PortalCacheListenerFactory portalCacheListenerFactory) {
-
-		this.portalCacheListenerFactory = portalCacheListenerFactory;
-	}
-
-	@Reference(unbind = "-")
-	protected void setPortalCacheManagerListenerFactory(
-		PortalCacheManagerListenerFactory<PortalCacheManager<K, V>>
-			portalCacheManagerListenerFactory) {
-
-		this.portalCacheManagerListenerFactory =
-			portalCacheManagerListenerFactory;
-	}
-
-	@Reference(unbind = "-")
-	protected void setProps(Props props) {
-		this.props = props;
+		return _multiVMEhcachePortalCacheManagerConfigurator;
 	}
 
 	private static final String _DEFAULT_CONFIG_FILE_NAME =
@@ -99,5 +74,9 @@ public class MultiVMEhcachePortalCacheManager
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		MultiVMEhcachePortalCacheManager.class);
+
+	@Reference
+	private MultiVMEhcachePortalCacheManagerConfigurator
+		_multiVMEhcachePortalCacheManagerConfigurator;
 
 }

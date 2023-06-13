@@ -15,6 +15,7 @@
 package com.liferay.portal.spring.extender.internal.configuration;
 
 import com.liferay.portal.kernel.configuration.Configuration;
+import com.liferay.portal.kernel.configuration.ConfigurationFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.security.permission.ResourceActions;
@@ -39,7 +40,7 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
 /**
  * @author Tina Tian
  */
-@Component(immediate = true, service = {})
+@Component(service = {})
 public class PortletConfigurationExtender
 	implements BundleTrackerCustomizer
 		<PortletConfigurationExtender.PortletConfigurationExtension> {
@@ -56,8 +57,8 @@ public class PortletConfigurationExtender
 
 		ClassLoader classLoader = bundleWiring.getClassLoader();
 
-		Configuration portletConfiguration = ConfigurationUtil.getConfiguration(
-			classLoader, "portlet");
+		Configuration portletConfiguration =
+			ConfigurationFactoryUtil.getConfiguration(classLoader, "portlet");
 
 		if (portletConfiguration == null) {
 			return null;

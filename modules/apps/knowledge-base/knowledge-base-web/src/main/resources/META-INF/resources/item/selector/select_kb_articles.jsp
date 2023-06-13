@@ -75,21 +75,12 @@ KBArticleItemSelectorViewDisplayContext kbArticleItemSelectorViewDisplayContext 
 							String modifiedDateDescription = LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - modifiedDate.getTime(), true);
 							%>
 
+							<h2 class="font-weight-bold h5 text-dark">
+								<%= HtmlUtil.escape(curKBArticle.getTitle()) %>
+							</h2>
+
 							<span class="text-default">
 								<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(curKBArticle.getUserName()), modifiedDateDescription} %>" key="x-modified-x-ago" />
-							</span>
-
-							<p class="font-weight-bold h5">
-								<%= HtmlUtil.escape(curKBArticle.getTitle()) %>
-							</p>
-
-							<span class="text-default">
-								<span class="kb-descriptive-details">
-									<liferay-ui:message arguments="<%= BigDecimal.valueOf(curKBArticle.getPriority()).toPlainString() %>" key="priority-x" />
-								</span>
-								<span class="kb-descriptive-details">
-									<liferay-ui:message arguments="<%= curKBArticle.getViewCount() %>" key="x-views" />
-								</span>
 							</span>
 						</div>
 
@@ -122,47 +113,14 @@ KBArticleItemSelectorViewDisplayContext kbArticleItemSelectorViewDisplayContext 
 						String modifiedDateDescription = LanguageUtil.getTimeDescription(request, System.currentTimeMillis() - modifiedDate.getTime(), true);
 						%>
 
-						<span class="text-default">
-							<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(curKBFolder.getUserName()), modifiedDateDescription} %>" key="x-modified-x-ago" />
-						</span>
-
-						<p class="font-weight-bold h5">
+						<h2 class="font-weight-bold h5">
 							<a href="<%= kbArticleItemSelectorViewDisplayContext.getKBFolderRowURL(curKBFolder.getGroupId(), curKBFolder.getKbFolderId()) %>">
 								<%= HtmlUtil.escape(curKBFolder.getName()) %>
 							</a>
-						</p>
+						</h2>
 
 						<span class="text-default">
-							<span>
-
-								<%
-								int kbFoldersCount = KBFolderServiceUtil.getKBFoldersCount(curKBFolder.getGroupId(), curKBFolder.getKbFolderId());
-								%>
-
-								<c:choose>
-									<c:when test="<%= kbFoldersCount == 1 %>">
-										<liferay-ui:message arguments="<%= kbFoldersCount %>" key="x-folder" />
-									</c:when>
-									<c:otherwise>
-										<liferay-ui:message arguments="<%= kbFoldersCount %>" key="x-folders" />
-									</c:otherwise>
-								</c:choose>
-							</span>
-							<span class="kb-descriptive-details">
-
-								<%
-								int kbArticlesCount = KBArticleServiceUtil.getKBArticlesCount(curKBFolder.getGroupId(), curKBFolder.getKbFolderId(), WorkflowConstants.STATUS_ANY);
-								%>
-
-								<c:choose>
-									<c:when test="<%= kbArticlesCount == 1 %>">
-										<liferay-ui:message arguments="<%= kbArticlesCount %>" key="x-article" />
-									</c:when>
-									<c:otherwise>
-										<liferay-ui:message arguments="<%= kbArticlesCount %>" key="x-articles" />
-									</c:otherwise>
-								</c:choose>
-							</span>
+							<liferay-ui:message arguments="<%= new String[] {HtmlUtil.escape(curKBFolder.getUserName()), modifiedDateDescription} %>" key="x-modified-x-ago" />
 						</span>
 					</liferay-ui:search-container-column-text>
 				</c:when>

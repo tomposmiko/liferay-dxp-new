@@ -26,31 +26,44 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface CustomElementCET extends CET {
 
-	@CETProperty(defaultValue = "", name = "cssURLs", type = "list", url = true)
+	@CETProperty(
+		defaultValue = "", label = "css-urls", name = "cssURLs",
+		type = CETProperty.Type.URLList
+	)
 	public String getCSSURLs();
 
 	@CETProperty(
-		defaultValue = "", name = "friendlyURLMapping", type = "string"
+		defaultValue = "", name = "friendlyURLMapping",
+		type = CETProperty.Type.String
 	)
 	public String getFriendlyURLMapping();
 
-	@CETProperty(defaultValue = "", name = "htmlElementName", type = "string")
+	@CETProperty(
+		defaultValue = "", name = "htmlElementName",
+		type = CETProperty.Type.String
+	)
 	public String getHTMLElementName();
 
 	@CETProperty(
-		defaultValue = "", name = "portletCategoryName", type = "string"
+		defaultValue = "", name = "portletCategoryName",
+		type = CETProperty.Type.String
 	)
 	public String getPortletCategoryName();
 
-	@CETProperty(defaultValue = "", name = "urls", type = "list", url = true)
+	@CETProperty(
+		defaultValue = "", name = "urls", type = CETProperty.Type.URLList
+	)
 	public String getURLs();
 
 	@CETProperty(
-		defaultValue = "false", name = "instanceable", type = "boolean"
+		defaultValue = "false", name = "instanceable",
+		type = CETProperty.Type.Boolean
 	)
 	public boolean isInstanceable();
 
-	@CETProperty(defaultValue = "false", name = "useESM", type = "boolean")
+	@CETProperty(
+		defaultValue = "false", name = "useESM", type = CETProperty.Type.Boolean
+	)
 	public boolean isUseESM();
 
 }

@@ -5,55 +5,55 @@
 		"properties": [
 			{
 				"name": "description",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"name": "name",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "https://www.liferay.com",
 				"name": "sourceCodeURL",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"name": "type",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "",
 				"name": "cssURLs",
-				"type": "list"
+				"type": "CETProperty.Type.URLList"
 			},
 			{
 				"default": "",
 				"name": "friendlyURLMapping",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "",
 				"name": "htmlElementName",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "",
 				"name": "portletCategoryName",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "",
 				"name": "urls",
-				"type": "list"
+				"type": "CETProperty.Type.URLList"
 			},
 			{
 				"default": "false",
 				"name": "instanceable",
-				"type": "boolean"
+				"type": "CETProperty.Type.Boolean"
 			},
 			{
 				"default": "false",
 				"name": "useESM",
-				"type": "boolean"
+				"type": "CETProperty.Type.Boolean"
 			}
 		]
 	},
@@ -63,25 +63,25 @@
 		"properties": [
 			{
 				"name": "description",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"name": "name",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "https://www.liferay.com",
 				"name": "sourceCodeURL",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"name": "type",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "",
 				"name": "url",
-				"type": "string"
+				"type": "CETProperty.Type.URL"
 			}
 		]
 	},
@@ -91,25 +91,25 @@
 		"properties": [
 			{
 				"name": "description",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"name": "name",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "https://www.liferay.com",
 				"name": "sourceCodeURL",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"name": "type",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "",
 				"name": "url",
-				"type": "string"
+				"type": "CETProperty.Type.URL"
 			}
 		]
 	},
@@ -119,40 +119,40 @@
 		"properties": [
 			{
 				"name": "description",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"name": "name",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "https://www.liferay.com",
 				"name": "sourceCodeURL",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"name": "type",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "",
 				"name": "friendlyURLMapping",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "",
 				"name": "portletCategoryName",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "",
 				"name": "url",
-				"type": "string"
+				"type": "CETProperty.Type.URL"
 			},
 			{
 				"default": "false",
 				"name": "instanceable",
-				"type": "boolean"
+				"type": "CETProperty.Type.Boolean"
 			}
 		]
 	},
@@ -162,30 +162,30 @@
 		"properties": [
 			{
 				"name": "description",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"name": "name",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "https://www.liferay.com",
 				"name": "sourceCodeURL",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"name": "type",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "",
 				"name": "clayURL",
-				"type": "string"
+				"type": "CETProperty.Type.URL"
 			},
 			{
 				"default": "",
 				"name": "mainURL",
-				"type": "string"
+				"type": "CETProperty.Type.URL"
 			}
 		]
 	},
@@ -195,25 +195,25 @@
 		"properties": [
 			{
 				"name": "description",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"name": "name",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "https://www.liferay.com",
 				"name": "sourceCodeURL",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"name": "type",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "",
 				"name": "url",
-				"type": "string"
+				"type": "CETProperty.Type.URL"
 			}
 		]
 	},
@@ -223,25 +223,25 @@
 		"properties": [
 			{
 				"name": "description",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"name": "name",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "https://www.liferay.com",
 				"name": "sourceCodeURL",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"name": "type",
-				"type": "string"
+				"type": "CETProperty.Type.String"
 			},
 			{
 				"default": "",
 				"name": "url",
-				"type": "string"
+				"type": "CETProperty.Type.URL"
 			}
 		]
 	}
