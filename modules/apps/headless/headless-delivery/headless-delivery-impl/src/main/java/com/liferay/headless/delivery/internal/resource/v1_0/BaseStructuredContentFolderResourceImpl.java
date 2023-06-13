@@ -699,6 +699,9 @@ public abstract class BaseStructuredContentFolderResourceImpl
 		StructuredContentFolder existingStructuredContentFolder =
 			getStructuredContentFolder(structuredContentFolderId);
 
+		existingStructuredContentFolder.setCustomFields(
+			structuredContentFolder.getCustomFields());
+
 		if (structuredContentFolder.getDescription() != null) {
 			existingStructuredContentFolder.setDescription(
 				structuredContentFolder.getDescription());

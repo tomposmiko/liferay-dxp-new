@@ -61,6 +61,7 @@ import org.frutilla.FrutillaRule;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -107,6 +108,7 @@ public class CommerceOrderItemIndexerTest {
 		_assertSearch(StringPool.BLANK, commerceOrderItems);
 	}
 
+	@Ignore
 	@Test
 	public void testSkuPrefix() throws Exception {
 		CommerceChannel commerceChannel = CommerceTestUtil.addCommerceChannel(

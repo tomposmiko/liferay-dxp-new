@@ -299,9 +299,9 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-100545. Ensure that the correct content is selected when using itemSelector."
+	@description = "This is a test for LPS-100545. The user can map the content field from web content to a fragment via the content display."
 	@priority = 4
-	test CanSelectSpecificWebContentUsingItemSelector {
+	test CanSelectSpecificWebContentUsingContentDisplay {
 		for (var count : list "1,2,3") {
 			JSONWebcontent.addWebContent(
 				content = "WC WebContent Content ${count}",
@@ -309,44 +309,34 @@ definition {
 				title = "WebContent Title ${count}");
 		}
 
-		task ("Add a section fragment to the fragment collection via JSON") {
-			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "itemSelector_configuration.html");
-			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "itemSelector_configuration.json");
+		task ("Add a Content Display to a content page") {
+			ContentPagesNavigator.openEditContentPage(
+				pageName = "Test Content Page Name",
+				siteName = "Test Site Name");
 
-			JSONFragment.addSection(
-				collectionName = "Collection Name",
-				configuration = ${jsonSnippet},
-				fragmentStatus = "Approved",
-				groupName = "Test Site Name",
-				html = ${htmlSnippet},
-				name = "itemSelector Fragment Example");
+			PageEditor.addFragment(
+				collectionName = "Content Display",
+				fragmentName = "Content Display");
 		}
 
-		ContentPagesNavigator.openEditContentPage(
-			pageName = "Test Content Page Name",
-			siteName = "Test Site Name");
+		task ("Select the web content in Content Display") {
+			PageEditor.editContentDisplay(
+				fragmentName = "Content Display",
+				webcontent = "true",
+				webContentContent = "WC WebContent Content 2",
+				webContentTitle = "WebContent Title 2");
 
-		PageEditor.addFragment(
-			collectionName = "Collection Name",
-			fragmentName = "itemSelector Fragment Example");
+			PageEditor.clickPublish();
+		}
 
-		PageEditor.editContentDisplay(
-			fragmentName = "itemSelector Fragment Example",
-			webcontent = "true",
-			webContentContent = "WC WebContent Content 2",
-			webContentTitle = "WebContent Title 2");
+		task ("View the content of webc content shown in Content Display at view mode") {
+			ContentPagesNavigator.openViewContentPage(
+				pageName = "Test Content Page Name",
+				siteName = "Test Site Name");
 
-		PageEditor.clickPublish();
-
-		ContentPagesNavigator.openViewContentPage(
-			pageName = "Test Content Page Name",
-			siteName = "Test Site Name");
-
-		task ("Assert correct content is visible") {
-			AssertVisible(
-				key_content = "WC WebContent Content 2",
-				key_fragmentClass = "configuration",
-				locator1 = "Fragment#FRAGMENT");
+			AssertTextEquals.assertPartialTextAceEditor(
+				locator1 = "PageEditor#CONTENT_PAGE_WEB_CONTENT_CONTENT",
+				value1 = "WC WebContent Content 2");
 		}
 	}
 

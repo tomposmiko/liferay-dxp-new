@@ -86,54 +86,52 @@ definition {
 		}
 	}
 
-	@description = "This is a test for LPS-100545. An itemSelector fragment configuration can select an asset in a display page template"
+	@description = "This is a test for LPS-100545. The user can map the content field from web content to a fragment via the content display"
 	@priority = 4
-	test AddItemSelectorConfigurationFragmentToDisplayPageTemplate {
-		task ("Add a section fragment to the fragment collection via JSON") {
-			var htmlSnippet = FragmentsAPI.getFragmentFileContent(fileName = "itemSelector_configuration.html");
-			var jsonSnippet = FragmentsAPI.getFragmentFileContent(fileName = "itemSelector_configuration.json");
-
-			JSONFragment.addSection(
-				collectionName = "Collection Name",
-				configuration = ${jsonSnippet},
-				fragmentStatus = "Approved",
+	test AddContentDisplayConfigurationFragmentToDisplayPageTemplate {
+		task ("Add a web content") {
+			JSONWebcontent.addWebContent(
+				content = "WC WebContent Content",
 				groupName = "Test Site Name",
-				html = ${htmlSnippet},
-				name = "itemSelector Fragment Example");
+				title = "WebContent Title");
 		}
 
-		JSONWebcontent.addWebContent(
-			content = "WC WebContent Content",
-			groupName = "Test Site Name",
-			title = "WebContent Title");
+		task ("Add a Content Display to a display page template for Web Content Article and Basic Web Content") {
+			JSONLayoutpagetemplate.addDisplayPageTemplateEntry(
+				contentType = "Web Content Article",
+				displayPageTemplateEntryName = "Display Page Name",
+				groupName = "Test Site Name",
+				subType = "Basic Web Content");
 
-		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
-		DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
+			DisplayPageTemplatesAdmin.gotoDisplayPage(displayPageName = "Display Page Name");
 
-		PageEditor.addFragment(
-			collectionName = "Collection Name",
-			fragmentName = "itemSelector Fragment Example");
+			PageEditor.addFragment(
+				collectionName = "Content Display",
+				fragmentName = "Content Display");
+		}
 
-		PageEditor.editContentDisplay(
-			fragmentName = "itemSelector Fragment Example",
-			webcontent = "true",
-			webContentContent = "WC WebContent Content",
-			webContentTitle = "WebContent Title");
+		task ("Select the web content in Content Display") {
+			PageEditor.editContentDisplay(
+				fragmentName = "Content Display",
+				webcontent = "true",
+				webContentContent = "WC WebContent Content",
+				webContentTitle = "WebContent Title");
 
-		PageEditor.clickPublish();
+			PageEditor.clickPublish();
+		}
 
-		DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
+		task ("View the content of web content shown in Content Display") {
+			DisplayPageTemplatesAdmin.openDisplayPagesAdmin(siteURLKey = "test-site-name");
 
-		DisplayPageTemplatesAdmin.gotoDisplayPageEllipsisItem(
-			displayPageName = "Display Page Name",
-			item = "Edit");
+			DisplayPageTemplatesAdmin.gotoDisplayPageEllipsisItem(
+				displayPageName = "Display Page Name",
+				item = "Edit");
 
-		task ("Assert correct content is visible") {
-			AssertVisible(
-				key_content = "WC WebContent Content",
-				key_fragmentClass = "configuration",
-				locator1 = "Fragment#FRAGMENT");
+			AssertTextEquals.assertPartialTextAceEditor(
+				locator1 = "PageEditor#CONTENT_PAGE_WEB_CONTENT_CONTENT",
+				value1 = "WC WebContent Content");
 		}
 	}
 

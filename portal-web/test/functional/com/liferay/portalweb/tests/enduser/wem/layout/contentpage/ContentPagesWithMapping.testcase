@@ -554,10 +554,18 @@ definition {
 
 			var baseURL = PropsUtil.get("portal.url");
 
-			AssertVisible(
-				key_append = "//img",
-				key_URL = "${baseURL}/web/test-site-name/w/web-content-title",
-				locator1 = "Fragment#FRAGMENT_LINK");
+			if (IsElementPresent(locator1 = "xpath=(//a[contains(@href,'${baseURL}/en/web/test-site-name/w/web-content-title')])")) {
+				AssertVisible(
+					key_append = "//img",
+					key_URL = "${baseURL}/en/web/test-site-name/w/web-content-title",
+					locator1 = "Fragment#FRAGMENT_LINK");
+			}
+			else {
+				AssertVisible(
+					key_append = "//img",
+					key_URL = "${baseURL}/web/test-site-name/w/web-content-title",
+					locator1 = "Fragment#FRAGMENT_LINK");
+			}
 
 			PageEditor.clickPublish();
 		}
@@ -569,15 +577,28 @@ definition {
 
 			var baseURL = PropsUtil.get("portal.url");
 
-			AssertVisible(
-				key_append = "/img",
-				key_URL = "${baseURL}/web/test-site-name/w/web-content-title",
-				locator1 = "Fragment#FRAGMENT_LINK");
+			if (IsElementPresent(locator1 = "xpath=(//a[contains(@href,'${baseURL}/en/web/test-site-name/w/web-content-title')])")) {
+				AssertVisible(
+					key_append = "/img",
+					key_URL = "${baseURL}/en/web/test-site-name/w/web-content-title",
+					locator1 = "Fragment#FRAGMENT_LINK");
 
-			Click(
-				key_append = "/img",
-				key_URL = "${baseURL}/web/test-site-name/w/web-content-title",
-				locator1 = "Fragment#FRAGMENT_LINK");
+				Click(
+					key_append = "/img",
+					key_URL = "${baseURL}/en/web/test-site-name/w/web-content-title",
+					locator1 = "Fragment#FRAGMENT_LINK");
+			}
+			else {
+				AssertVisible(
+					key_append = "/img",
+					key_URL = "${baseURL}/web/test-site-name/w/web-content-title",
+					locator1 = "Fragment#FRAGMENT_LINK");
+
+				Click(
+					key_append = "/img",
+					key_URL = "${baseURL}/web/test-site-name/w/web-content-title",
+					locator1 = "Fragment#FRAGMENT_LINK");
+			}
 
 			AssertTextEquals(
 				locator1 = "ControlMenu#HEADING",

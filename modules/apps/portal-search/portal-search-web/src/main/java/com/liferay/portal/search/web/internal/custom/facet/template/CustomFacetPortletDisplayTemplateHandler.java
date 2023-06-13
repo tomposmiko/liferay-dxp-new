@@ -37,7 +37,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author Kevin Tan
  */
 @Component(
-	configurationPid = "com.liferay.portal.search.web.internal.custom.facet.configuration.SearchFacetsWebTemplateConfiguration",
 	immediate = true,
 	property = "javax.portlet.name=" + CustomFacetPortletKeys.CUSTOM_FACET,
 	service = TemplateHandler.class

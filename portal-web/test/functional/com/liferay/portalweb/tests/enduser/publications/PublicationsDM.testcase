@@ -63,10 +63,6 @@ definition {
 			dmDocumentTitle = "Check in as major version",
 			revision = "Major");
 
-		// Workaround LPS-174096
-
-		Click(locator1 = "Button#SAVE");
-
 		ProductMenu.gotoPortlet(
 			category = "Content & Data",
 			portlet = "Documents and Media");

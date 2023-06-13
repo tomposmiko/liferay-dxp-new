@@ -161,8 +161,7 @@ public abstract class BaseIndexResourceImpl
 			Map<String, Serializable> parameters, String search)
 		throws Exception {
 
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		return getIndexesPage();
 	}
 
 	@Override

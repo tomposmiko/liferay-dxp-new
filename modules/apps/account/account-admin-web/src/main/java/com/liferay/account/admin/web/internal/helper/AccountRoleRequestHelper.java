@@ -87,7 +87,9 @@ public class AccountRoleRequestHelper {
 		_personalMenuEntries.remove(personalMenuEntry);
 	}
 
-	@Reference(target = "(component.name=*.AccountRoleTypeContributor)")
+	@Reference(
+		target = "(component.name=com.liferay.account.internal.roles.admin.role.type.contributor.AccountRoleTypeContributor)"
+	)
 	private RoleTypeContributor _accountRoleTypeContributor;
 
 	@Reference

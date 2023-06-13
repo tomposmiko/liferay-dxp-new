@@ -248,8 +248,6 @@ const DatePicker = ({
 			else {
 				inputRef.current.value = '';
 			}
-
-			maskInstance.current.update(inputRef.current.value);
 		}
 	}, [
 		dateMask,

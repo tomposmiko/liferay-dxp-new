@@ -2,22 +2,23 @@ definition {
 
 	macro search {
 		Type(
-			locator1 = "TextInput#SEARCH_2",
+			locator1 = "TextInput#SEARCH",
 			value1 = ${webContentSearchTerm});
 
-		AssertClick(
-			locator1 = "Button#SEARCH",
-			value1 = "Search");
+		KeyPress(
+			locator1 = "TextInput#SEARCH",
+			value1 = "\RETURN");
 	}
 
 	macro viewNoResults {
 		AssertTextEquals(
 			locator1 = "Message#EMPTY_INFO",
-			value1 = "No pages were found that matched the keywords: ${webContentSearchTerm}.");
+			value1 = "No results were found that matched the keywords: ${webContentSearchTerm}.");
 	}
 
 	macro viewResultsEntry {
 		var key_webContentTitle = ${webContentTitle};
+		var key_webContentContent = ${webContentContent};
 
 		AssertTextEquals(
 			locator1 = "WebContentSearchResults#TITLE",

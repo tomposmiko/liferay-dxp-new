@@ -71,7 +71,6 @@ definition {
 	@priority = 5
 	test CreateRemoveUpdateDeleteEntriesOfProductMenuApp {
 		property portal.acceptance = "true";
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "AppBuilder#CreateRemoveUpdateDeleteEntriesOfProductMenuApp";
 
 		var myFormViewName = "My Registration form";
@@ -209,7 +208,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 2");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "05/02/2016");
+		AssertElementPresent(locator1 = "//table[contains(@class,'table')]//*[contains(text(),'2016-05-02')] | //table[contains(@class,'table')]//*[contains(text(),'05/02/2016')]");
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Multiple 1, Multiple 2");
 
@@ -249,7 +248,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 3");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "05/02/2000");
+		AssertElementPresent(locator1 = "//table[contains(@class,'table')]//*[contains(text(),'2000-05-02')] | //table[contains(@class,'table')]//*[contains(text(),'05/02/2000')]");
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Multiple 3");
 
@@ -263,7 +262,7 @@ definition {
 
 		DetailsView.validateEntry(entry = "Select 3");
 
-		DetailsView.validateEntry(entry = "05/02/2000");
+		AssertElementPresent(locator1 = "//div[@class='sheet']//*[contains(text(),'2000-05-02')] | //div[@class='sheet']//*[contains(text(),'05/02/2000')]");
 
 		DetailsView.validateEntry(entry = "Multiple 3");
 
@@ -277,7 +276,7 @@ definition {
 
 		DetailsView.validateEntry(entry = "Select 2");
 
-		DetailsView.validateEntry(entry = "05/02/2016");
+		AssertElementPresent(locator1 = "//div[@class='sheet']//*[contains(text(),'2016-05-02')] | //div[@class='sheet']//*[contains(text(),'05/02/2016')]");
 
 		DetailsView.validateEntry(entry = "Multiple 1");
 
@@ -353,7 +352,7 @@ definition {
 
 		DetailsView.validateEntry(entry = "Select 1");
 
-		DetailsView.validateEntry(entry = "05/02/1999");
+		AssertElementPresent(locator1 = "//div[@class='sheet']//*[contains(text(),'1999-05-02')] | //div[@class='sheet']//*[contains(text(),'05/02/1999')]");
 
 		DetailsView.validateEntry(entry = "Multiple 1");
 
@@ -367,7 +366,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 1");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "05/02/1999");
+		AssertElementPresent(locator1 = "//table[contains(@class,'table')]//*[contains(text(),'1999-05-02')] | //table[contains(@class,'table')]//*[contains(text(),'05/02/1999')]");
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Multiple 1");
 	}
@@ -376,7 +375,6 @@ definition {
 	@priority = 5
 	test CreateRemoveUpdateDeleteEntriesOfStandaloneApp {
 		property portal.acceptance = "true";
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "AppBuilder#CreateRemoveUpdateDeleteEntriesOfStandaloneApp";
 
 		var myFormViewName = "My Registration form";
@@ -516,7 +514,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 2");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "05/02/2016");
+		AssertElementPresent(locator1 = "//table[contains(@class,'table')]//*[contains(text(),'2016-05-02')] | //table[contains(@class,'table')]//*[contains(text(),'05/02/2016')]");
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Multiple 1, Multiple 2");
 
@@ -556,7 +554,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 3");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "05/02/2000");
+		AssertElementPresent(locator1 = "//table[contains(@class,'table')]//*[contains(text(),'2000-05-02')] | //table[contains(@class,'table')]//*[contains(text(),'05/02/2000')]");
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Multiple 3");
 
@@ -570,7 +568,7 @@ definition {
 
 		DetailsView.validateEntry(entry = "Select 3");
 
-		DetailsView.validateEntry(entry = "05/02/2000");
+		AssertElementPresent(locator1 = "//div[@class='sheet']//*[contains(text(),'2000-05-02')] | //div[@class='sheet']//*[contains(text(),'05/02/2000')]");
 
 		DetailsView.validateEntry(entry = "Multiple 3");
 
@@ -584,7 +582,7 @@ definition {
 
 		DetailsView.validateEntry(entry = "Select 2");
 
-		DetailsView.validateEntry(entry = "05/02/2016");
+		AssertElementPresent(locator1 = "//div[@class='sheet']//*[contains(text(),'2016-05-02')] | //div[@class='sheet']//*[contains(text(),'05/02/2016')]");
 
 		DetailsView.validateEntry(entry = "Multiple 1");
 
@@ -660,7 +658,7 @@ definition {
 
 		DetailsView.validateEntry(entry = "Select 1");
 
-		DetailsView.validateEntry(entry = "05/02/1999");
+		AssertElementPresent(locator1 = "//div[@class='sheet']//*[contains(text(),'1999-05-02')] | //div[@class='sheet']//*[contains(text(),'05/02/1999')]");
 
 		DetailsView.validateEntry(entry = "Multiple 1");
 
@@ -674,7 +672,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 1");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "05/02/1999");
+		AssertElementPresent(locator1 = "//table[contains(@class,'table')]//*[contains(text(),'1999-05-02')] | //table[contains(@class,'table')]//*[contains(text(),'05/02/1999')]");
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Multiple 1");
 	}
@@ -683,7 +681,6 @@ definition {
 	@priority = 5
 	test CreateRemoveUpdateDeleteEntriesOfWidgetApp {
 		property portal.acceptance = "true";
-		property portal.upstream = "quarantine";
 		property test.name.skip.portal.instance = "AppBuilder#CreateRemoveUpdateDeleteEntriesOfWidgetApp";
 
 		var myFormViewName = "My Registration form";
@@ -840,7 +837,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 2");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "05/02/2016");
+		AssertElementPresent(locator1 = "//table[contains(@class,'table')]//*[contains(text(),'2016-05-02')] | //table[contains(@class,'table')]//*[contains(text(),'05/02/2016')]");
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Multiple 1, Multiple 2, Multiple 3");
 
@@ -884,7 +881,7 @@ definition {
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Select 1");
 
-		AppBuilderAdmin.validateItemNameOnTable(itemName = "05/02/2014");
+		AssertElementPresent(locator1 = "//table[contains(@class,'table')]//*[contains(text(),'2014-05-02')] | //table[contains(@class,'table')]//*[contains(text(),'05/02/2014')]");
 
 		AppBuilderAdmin.validateItemNameOnTable(itemName = "Multiple 1, Multiple 3");
 

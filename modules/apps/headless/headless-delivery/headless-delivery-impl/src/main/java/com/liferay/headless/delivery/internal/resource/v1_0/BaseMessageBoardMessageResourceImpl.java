@@ -249,6 +249,9 @@ public abstract class BaseMessageBoardMessageResourceImpl
 				messageBoardMessage.getArticleBody());
 		}
 
+		existingMessageBoardMessage.setCustomFields(
+			messageBoardMessage.getCustomFields());
+
 		if (messageBoardMessage.getEncodingFormat() != null) {
 			existingMessageBoardMessage.setEncodingFormat(
 				messageBoardMessage.getEncodingFormat());

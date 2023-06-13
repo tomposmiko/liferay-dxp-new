@@ -736,8 +736,15 @@ public abstract class BaseTaxonomyCategoryResourceImpl
 			Map<String, Serializable> parameters, String search)
 		throws Exception {
 
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
+		if (parameters.containsKey("taxonomyVocabularyId")) {
+			return getTaxonomyVocabularyTaxonomyCategoriesPage(
+				_parseLong((String)parameters.get("taxonomyVocabularyId")),
+				search, filter, pagination, sorts);
+		}
+		else {
+			throw new NotSupportedException(
+				"One of the following parameters must be specified: [taxonomyVocabularyId]");
+		}
 	}
 
 	@Override

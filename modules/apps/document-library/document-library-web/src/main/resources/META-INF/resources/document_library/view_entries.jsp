@@ -104,7 +104,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 						).put(
 							"draggable", draggable
 						).put(
-							"title", fileEntry.getTitle()
+							"title", HtmlUtil.unescape(fileEntry.getTitle())
 						).build());
 
 					DLViewFileVersionDisplayContext dlViewFileVersionDisplayContext = null;
@@ -194,7 +194,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 											html="<%= customThumbnailHTML %>"
 											resultRow="<%= row %>"
 											rowChecker="<%= entriesChecker %>"
-											title="<%= latestFileVersion.getTitle() %>"
+											title="<%= HtmlUtil.unescape(latestFileVersion.getTitle()) %>"
 											url="<%= (rowURL != null) ? rowURL.toString() : null %>"
 										>
 											<%@ include file="/document_library/file_entry_vertical_card.jspf" %>
@@ -208,7 +208,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 											icon="documents-and-media"
 											resultRow="<%= row %>"
 											rowChecker="<%= entriesChecker %>"
-											title="<%= latestFileVersion.getTitle() %>"
+											title="<%= HtmlUtil.unescape(latestFileVersion.getTitle()) %>"
 											url="<%= (rowURL != null) ? rowURL.toString() : null %>"
 										>
 											<%@ include file="/document_library/file_entry_vertical_card.jspf" %>
@@ -222,7 +222,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 											imageUrl="<%= thumbnailSrc %>"
 											resultRow="<%= row %>"
 											rowChecker="<%= entriesChecker %>"
-											title="<%= latestFileVersion.getTitle() %>"
+											title="<%= HtmlUtil.unescape(latestFileVersion.getTitle()) %>"
 											url="<%= (rowURL != null) ? rowURL.toString() : null %>"
 										>
 											<%@ include file="/document_library/file_entry_vertical_card.jspf" %>
@@ -397,7 +397,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 						).put(
 							"folder-id", curFolder.getFolderId()
 						).put(
-							"title", curFolder.getName()
+							"title", HtmlUtil.unescape(curFolder.getName())
 						).build());
 
 					row.setPrimaryKey(String.valueOf(curFolder.getPrimaryKey()));
@@ -439,7 +439,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 									actionJspServletContext="<%= application %>"
 									resultRow="<%= row %>"
 									rowChecker="<%= entriesChecker %>"
-									text="<%= curFolder.getName() %>"
+									text="<%= HtmlUtil.unescape(curFolder.getName()) %>"
 									url="<%= rowURL.toString() %>"
 								>
 									<liferay-frontend:horizontal-card-col>
@@ -483,7 +483,7 @@ if (portletTitleBasedNavigation && (folderId != DLFolderConstants.DEFAULT_PARENT
 
 												<div class="autofit-col autofit-col-expand">
 													<div class="table-title">
-														<aui:a href="<%= rowURL.toString() %>"><%= HtmlUtil.escape(curFolder.getName()) %></aui:a>
+														<aui:a href="<%= rowURL.toString() %>"><%= HtmlUtil.unescape(curFolder.getName()) %></aui:a>
 													</div>
 												</div>
 											</div>

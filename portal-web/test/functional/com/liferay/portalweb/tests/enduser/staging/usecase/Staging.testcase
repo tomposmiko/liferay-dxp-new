@@ -3272,7 +3272,7 @@ definition {
 
 		WebContentNavigator.gotoEditCP(webContentTitle = '''Special Char aŐb''');
 
-		WebContent.viewFriendlyURLCP(friendlyUrl = '''special-char-aőb''');
+		WebContent.viewFriendlyURLCP(friendlyUrl = '''special-char-aob''');
 
 		WebContentNavigator.openWebContentAdmin(siteURLKey = "site-name");
 

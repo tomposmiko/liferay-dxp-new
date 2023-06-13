@@ -349,6 +349,8 @@ public abstract class BaseOrganizationResourceImpl
 			existingOrganization.setComment(organization.getComment());
 		}
 
+		existingOrganization.setCustomFields(organization.getCustomFields());
+
 		if (organization.getName() != null) {
 			existingOrganization.setName(organization.getName());
 		}

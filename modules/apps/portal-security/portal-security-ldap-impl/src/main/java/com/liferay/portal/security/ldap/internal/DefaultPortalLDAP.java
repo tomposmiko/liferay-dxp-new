@@ -81,10 +81,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
  * @author     Edward Han
  * @deprecated As of Mueller (7.2.x), replaced by {@link SafePortalLDAPImpl}
  */
-@Component(
-	configurationPid = "com.liferay.portal.security.ldap.configuration.LDAPConfiguration",
-	immediate = true, service = PortalLDAP.class
-)
+@Component(immediate = true, service = PortalLDAP.class)
 @Deprecated
 public class DefaultPortalLDAP implements PortalLDAP {
 

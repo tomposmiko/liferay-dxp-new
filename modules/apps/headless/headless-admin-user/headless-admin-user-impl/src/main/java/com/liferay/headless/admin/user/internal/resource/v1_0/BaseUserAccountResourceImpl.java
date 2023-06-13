@@ -483,6 +483,8 @@ public abstract class BaseUserAccountResourceImpl
 			existingUserAccount.setBirthDate(userAccount.getBirthDate());
 		}
 
+		existingUserAccount.setCustomFields(userAccount.getCustomFields());
+
 		if (userAccount.getEmailAddress() != null) {
 			existingUserAccount.setEmailAddress(userAccount.getEmailAddress());
 		}

@@ -211,6 +211,31 @@ public class ServletDataImpl implements ServletData {
 						new ObjectValuePair<>(
 							AccountUserResourceImpl.class,
 							"getAccountUsersPage"));
+
+					put(
+						"query#Account.rolesByExternalReferenceCode",
+						new ObjectValuePair<>(
+							AccountRoleResourceImpl.class,
+							"getAccountRolesByExternalReferenceCodePage"));
+					put(
+						"query#Account.users",
+						new ObjectValuePair<>(
+							AccountUserResourceImpl.class,
+							"getAccountUsersPage"));
+					put(
+						"query#AccountRole.account",
+						new ObjectValuePair<>(
+							AccountResourceImpl.class, "getAccount"));
+					put(
+						"query#Account.usersByExternalReferenceCode",
+						new ObjectValuePair<>(
+							AccountUserResourceImpl.class,
+							"getAccountUsersByExternalReferenceCodePage"));
+					put(
+						"query#Account.roles",
+						new ObjectValuePair<>(
+							AccountRoleResourceImpl.class,
+							"getAccountRolesPage"));
 				}
 			};
 
