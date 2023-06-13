@@ -14,8 +14,6 @@
 
 package com.liferay.staging.taglib.servlet.taglib;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.staging.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.taglib.util.IncludeTag;
 
@@ -23,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.BodyTag;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Péter Alius
@@ -88,12 +88,12 @@ public class AlertTag extends IncludeTag implements BodyTag {
 	}
 
 	@Override
-	protected void setAttributes(HttpServletRequest request) {
-		request.setAttribute(
+	protected void setAttributes(HttpServletRequest httpServletRequest) {
+		httpServletRequest.setAttribute(
 			"liferay-staging:alert:dismissible", String.valueOf(_dismissible));
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			"liferay-staging:alert:fluid", String.valueOf(_fluid));
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			"liferay-staging:alert:type", _type.getAlertCode());
 	}
 

@@ -43,17 +43,16 @@
 	<property file="${project.dir}/sql/sql.${env.HOSTNAME}.properties" />
 	<property file="${project.dir}/sql/sql.properties" />
 
-	<path id="ant.bnd.classpath">
+	<path id="bnd.invoker.classpath">
 		<fileset
 			dir="${project.dir}/lib/development"
-			includes="biz.aQute.bnd.jar,com.liferay.ant.bnd.jar"
+			includes="com.liferay.bnd.invoker.jar"
 		/>
 	</path>
 
 	<path id="lib.classpath">
 		<fileset
 			dir="${project.dir}/lib/development"
-			excludes="com.liferay.ant.bnd.jar"
 			includes="*.jar"
 		/>
 		<fileset
@@ -84,7 +83,7 @@
 		<pathelement path="${classpath.full}" />
 		<fileset
 			dir="${project.dir}/lib/development"
-			includes="biz.aQute.bnd.jar,jsp-api.jar,mail.jar,servlet-api.jar"
+			includes="osgi-annotation-versioning.jar,jsp-api.jar,mail.jar,servlet-api.jar"
 		/>
 		<fileset
 			dir="${project.dir}/lib/global"
@@ -95,9 +94,10 @@
 	</path>
 
 	<taskdef
-		classpathref="ant.bnd.classpath"
-		resource="aQute/bnd/ant/taskdef.properties"
+		classpathref="bnd.invoker.classpath"
+		resource="com/liferay/bnd/invoker/taskdef.properties"
 	/>
+
 	<taskdef
 		classpathref="lib.classpath"
 		resource="ise/antelope/tasks/antlib.xml"
@@ -445,13 +445,8 @@ information.
 						/>
 					</copy>
 
-					<path id="test.compile.classpath">
-						<pathelement path="${project.dir}/lib/development/biz.aQute.bnd.jar" />
-						<path refid="test.classpath" />
-					</path>
-
 					<javac
-						classpathref="test.compile.classpath"
+						classpathref="test.classpath"
 						compiler="${javac.compiler}"
 						debug="${javac.debug}"
 						deprecation="${javac.deprecation}"
@@ -1169,7 +1164,6 @@ information.
 	</macrodef>
 
 	<macrodef name="manifest-helper">
-		<attribute default="false" name="analyze" />
 		<sequential>
 			<trycatch>
 				<try>
@@ -1192,7 +1186,6 @@ information.
 			</trycatch>
 
 			<liferay-manifest-helper
-				analyze="@{analyze}"
 				classpathref="project.classpath"
 				projectDirPropertyName="project.dir"
 			/>
@@ -1701,7 +1694,7 @@ artifact.url=${remote.repository.url}/com/liferay/portal/com.liferay.${processed
 				<path refid="lib.pre.classpath" />
 				<fileset
 					dir="${project.dir}/lib/development"
-					excludes="biz.aQute.bnd.jar,jalopy.jar,jetty*.jar,tomcat*.jar"
+					excludes="osgi-annotation-versioning.jar,jalopy.jar,jetty*.jar,tomcat*.jar"
 					includes="*.jar"
 				/>
 				<fileset

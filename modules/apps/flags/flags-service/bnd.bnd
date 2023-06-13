@@ -1,5 +1,5 @@
 Bundle-Name: Liferay Flags Service
 Bundle-SymbolicName: com.liferay.flags.service
-Bundle-Version: 4.0.1
+Bundle-Version: 4.0.2
 Liferay-Require-SchemaVersion: 2.0.1
 Liferay-Service: true

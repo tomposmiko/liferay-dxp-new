@@ -1,5 +1,4 @@
 dependencies {
-	compileOnly group: "com.liferay", name: "com.liferay.osgi.felix.util", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.function", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "org.apache.felix.fileinstall", version: "3.6.4.LIFERAY-PATCHED-1"

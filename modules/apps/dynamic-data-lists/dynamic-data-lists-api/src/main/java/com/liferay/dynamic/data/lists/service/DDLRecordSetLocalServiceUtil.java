@@ -14,8 +14,7 @@
 
 package com.liferay.dynamic.data.lists.service;
 
-import aQute.bnd.annotation.ProviderType;
-
+import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.util.tracker.ServiceTracker;
@@ -577,7 +576,8 @@ public class DDLRecordSetLocalServiceUtil {
 	}
 
 	/**
-	 * Returns the number of all the record sets belonging the group and associated with the DDMStructure.
+	 * Returns the number of all the record sets belonging the group and
+	 * associated with the DDMStructure.
 	 *
 	 * @param groupId the primary key of the record set's group
 	 * @return the number of record sets belonging to the group

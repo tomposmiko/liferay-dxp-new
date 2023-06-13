@@ -48,6 +48,7 @@ FileVersion fileVersion = (FileVersion)request.getAttribute("file_entry_upper_tb
 						monospaced="true"
 						size="sm"
 						style="<%= false %>"
+						title='<%= LanguageUtil.get(resourceBundle, "info") %>'
 					/>
 				</li>
 

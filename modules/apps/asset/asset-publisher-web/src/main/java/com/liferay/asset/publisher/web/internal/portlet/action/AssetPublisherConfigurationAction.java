@@ -106,8 +106,8 @@ public class AssetPublisherConfigurationAction
 	extends DefaultConfigurationAction {
 
 	@Override
-	public String getJspPath(HttpServletRequest request) {
-		String cmd = ParamUtil.getString(request, Constants.CMD);
+	public String getJspPath(HttpServletRequest httpServletRequest) {
+		String cmd = ParamUtil.getString(httpServletRequest, Constants.CMD);
 
 		if (Objects.equals(cmd, "edit_query_rule")) {
 			return "/edit_query_rule.jsp";
@@ -118,12 +118,12 @@ public class AssetPublisherConfigurationAction
 
 	@Override
 	public void include(
-			PortletConfig portletConfig, HttpServletRequest request,
-			HttpServletResponse response)
+			PortletConfig portletConfig, HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
 		throws Exception {
 
 		String portletResource = ParamUtil.getString(
-			request, "portletResource");
+			httpServletRequest, "portletResource");
 
 		String rootPortletId = PortletIdCodec.decodePortletName(
 			portletResource);
@@ -132,10 +132,12 @@ public class AssetPublisherConfigurationAction
 			assetPublisherCustomizerRegistry.getAssetPublisherCustomizer(
 				rootPortletId);
 
-		RenderRequest renderRequest = (RenderRequest)request.getAttribute(
-			JavaConstants.JAVAX_PORTLET_REQUEST);
-		RenderResponse renderResponse = (RenderResponse)request.getAttribute(
-			JavaConstants.JAVAX_PORTLET_RESPONSE);
+		RenderRequest renderRequest =
+			(RenderRequest)httpServletRequest.getAttribute(
+				JavaConstants.JAVAX_PORTLET_REQUEST);
+		RenderResponse renderResponse =
+			(RenderResponse)httpServletRequest.getAttribute(
+				JavaConstants.JAVAX_PORTLET_RESPONSE);
 
 		AssetPublisherDisplayContext assetPublisherDisplayContext =
 			new AssetPublisherDisplayContext(
@@ -144,20 +146,21 @@ public class AssetPublisherConfigurationAction
 				assetPublisherWebUtil, infoListProviderTracker, renderRequest,
 				renderResponse, renderRequest.getPreferences());
 
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			AssetPublisherWebKeys.ASSET_PUBLISHER_DISPLAY_CONTEXT,
 			assetPublisherDisplayContext);
 
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			AssetPublisherWebKeys.ASSET_PUBLISHER_HELPER, assetPublisherHelper);
 
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			AssetPublisherWebKeys.ASSET_PUBLISHER_WEB_UTIL,
 			assetPublisherWebUtil);
 
-		request.setAttribute(AssetPublisherWebKeys.ITEM_SELECTOR, itemSelector);
+		httpServletRequest.setAttribute(
+			AssetPublisherWebKeys.ITEM_SELECTOR, itemSelector);
 
-		super.include(portletConfig, request, response);
+		super.include(portletConfig, httpServletRequest, httpServletResponse);
 	}
 
 	@Override
@@ -207,12 +210,13 @@ public class AssetPublisherConfigurationAction
 		}
 		else if (cmd.equals(Constants.UPDATE)) {
 			try {
-				HttpServletRequest request = portal.getHttpServletRequest(
-					actionRequest);
+				HttpServletRequest httpServletRequest =
+					portal.getHttpServletRequest(actionRequest);
 
 				AssetPublisherPortletInstanceConfiguration
 					assetPublisherPortletInstanceConfiguration =
-						_getAssetPublisherPortletInstanceConfiguration(request);
+						_getAssetPublisherPortletInstanceConfiguration(
+							httpServletRequest);
 
 				boolean emailAssetEntryAddedEnabled = GetterUtil.getBoolean(
 					getParameter(actionRequest, "emailAssetEntryAddedEnabled"),
@@ -667,8 +671,8 @@ public class AssetPublisherConfigurationAction
 		}
 
 		if (LayoutStagingUtil.isBranchingLayout(layout)) {
-			HttpServletRequest request = portal.getHttpServletRequest(
-				actionRequest);
+			HttpServletRequest httpServletRequest =
+				portal.getHttpServletRequest(actionRequest);
 
 			LayoutSetBranch layoutSetBranch =
 				LayoutStagingUtil.getLayoutSetBranch(layout.getLayoutSet());
@@ -676,7 +680,7 @@ public class AssetPublisherConfigurationAction
 			long layoutSetBranchId = layoutSetBranch.getLayoutSetBranchId();
 
 			long layoutRevisionId = staging.getRecentLayoutRevisionId(
-				request, layoutSetBranchId, layout.getPlid());
+				httpServletRequest, layoutSetBranchId, layout.getPlid());
 
 			LayoutRevision layoutRevision =
 				layoutRevisionLocalService.getLayoutRevision(layoutRevisionId);
@@ -842,11 +846,12 @@ public class AssetPublisherConfigurationAction
 
 	private AssetPublisherPortletInstanceConfiguration
 			_getAssetPublisherPortletInstanceConfiguration(
-				HttpServletRequest request)
+				HttpServletRequest httpServletRequest)
 		throws ConfigurationException {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 

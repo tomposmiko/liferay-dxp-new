@@ -28,8 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author     Adolfo Pérez
+ * @see        com.liferay.product.navigation.personal.menu.PersonalMenuEntry
  * @deprecated As of Mueller (7.2.x), with no direct replacement
- * @see com.liferay.product.navigation.personal.menu.PersonalMenuEntry
  */
 @Deprecated
 public class UserPanelCategory extends BaseJSPPanelCategory {
@@ -56,22 +56,26 @@ public class UserPanelCategory extends BaseJSPPanelCategory {
 
 	@Override
 	public boolean include(
-			HttpServletRequest request, HttpServletResponse response)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
 		throws IOException {
 
-		request.setAttribute(ApplicationListWebKeys.PANEL_CATEGORY, this);
+		httpServletRequest.setAttribute(
+			ApplicationListWebKeys.PANEL_CATEGORY, this);
 
-		return super.include(request, response);
+		return super.include(httpServletRequest, httpServletResponse);
 	}
 
 	@Override
 	public boolean includeHeader(
-			HttpServletRequest request, HttpServletResponse response)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
 		throws IOException {
 
-		request.setAttribute(ApplicationListWebKeys.PANEL_CATEGORY, this);
+		httpServletRequest.setAttribute(
+			ApplicationListWebKeys.PANEL_CATEGORY, this);
 
-		return super.includeHeader(request, response);
+		return super.includeHeader(httpServletRequest, httpServletResponse);
 	}
 
 	@Override

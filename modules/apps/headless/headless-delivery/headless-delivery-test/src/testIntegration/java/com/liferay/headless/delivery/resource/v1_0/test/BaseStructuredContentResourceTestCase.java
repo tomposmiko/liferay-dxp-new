@@ -1569,6 +1569,8 @@ public abstract class BaseStructuredContentResourceTestCase {
 
 		assertResponseCode(
 			404, invokeGetStructuredContentResponse(structuredContent.getId()));
+
+		assertResponseCode(404, invokeGetStructuredContentResponse(0L));
 	}
 
 	protected StructuredContent
@@ -1891,6 +1893,8 @@ public abstract class BaseStructuredContentResourceTestCase {
 			404,
 			invokeGetStructuredContentMyRatingResponse(
 				structuredContent.getId()));
+
+		assertResponseCode(404, invokeGetStructuredContentMyRatingResponse(0L));
 	}
 
 	protected StructuredContent
@@ -2961,7 +2965,7 @@ public abstract class BaseStructuredContentResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected StructuredContent randomStructuredContent() {
+	protected StructuredContent randomStructuredContent() throws Exception {
 		return new StructuredContent() {
 			{
 				contentStructureId = RandomTestUtil.randomLong();
@@ -2979,7 +2983,9 @@ public abstract class BaseStructuredContentResourceTestCase {
 		};
 	}
 
-	protected StructuredContent randomIrrelevantStructuredContent() {
+	protected StructuredContent randomIrrelevantStructuredContent()
+		throws Exception {
+
 		StructuredContent randomIrrelevantStructuredContent =
 			randomStructuredContent();
 
@@ -2989,7 +2995,9 @@ public abstract class BaseStructuredContentResourceTestCase {
 		return randomIrrelevantStructuredContent;
 	}
 
-	protected StructuredContent randomPatchStructuredContent() {
+	protected StructuredContent randomPatchStructuredContent()
+		throws Exception {
+
 		return randomStructuredContent();
 	}
 

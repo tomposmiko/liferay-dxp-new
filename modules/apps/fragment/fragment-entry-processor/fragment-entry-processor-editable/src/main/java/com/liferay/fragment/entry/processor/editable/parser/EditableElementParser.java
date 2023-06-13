@@ -45,6 +45,10 @@ public interface EditableElementParser {
 
 	public String getValue(Element element);
 
+	/**
+	 * @deprecated As of Judson (7.1.x), with no direct replacement
+	 */
+	@Deprecated
 	public default boolean isCss() {
 		return false;
 	}
@@ -65,9 +69,9 @@ public interface EditableElementParser {
 	 * Replaces editable element value with the provided one and apply the
 	 * configuration values
 	 *
-	 * @param element Editable element to replace
-	 * @param value New element value
-	 * @param configJSONObject Configuration values
+	 * @param  element Editable element to replace
+	 * @param  value New element value
+	 * @param  configJSONObject Configuration values
 	 * @review
 	 */
 	public default void replace(

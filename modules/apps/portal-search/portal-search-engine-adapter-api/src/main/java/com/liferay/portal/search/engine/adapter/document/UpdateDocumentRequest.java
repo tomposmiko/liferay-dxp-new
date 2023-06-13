@@ -14,11 +14,11 @@
 
 package com.liferay.portal.search.engine.adapter.document;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.search.document.Document;
 
 import java.util.function.Consumer;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Michael C. Han
@@ -30,7 +30,8 @@ public class UpdateDocumentRequest
 
 	/**
 	 * @deprecated As of Mueller (7.2.x), replaced by
-	 * UpdateDocumentRequest.UpdateDocumentRequest(String, String, Document)
+	 *             UpdateDocumentRequest.UpdateDocumentRequest(String, String,
+	 *             Document)
 	 */
 	@Deprecated
 	public UpdateDocumentRequest(

@@ -73,18 +73,6 @@ public class WikiPageAssetRenderer
 		return page.getResourcePrimKey();
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link
-	 *             #WikiPageAssetRenderer(WikiPage, WikiEngineRenderer,
-	 *             TrashHelper)}
-	 */
-	@Deprecated
-	public WikiPageAssetRenderer(
-		WikiPage page, WikiEngineRenderer wikiEngineRenderer) {
-
-		this(page, wikiEngineRenderer, null);
-	}
-
 	public WikiPageAssetRenderer(
 		WikiPage page, WikiEngineRenderer wikiEngineRenderer,
 		TrashHelper trashHelper) {
@@ -139,7 +127,9 @@ public class WikiPageAssetRenderer
 	}
 
 	@Override
-	public String getJspPath(HttpServletRequest request, String template) {
+	public String getJspPath(
+		HttpServletRequest httpServletRequest, String template) {
+
 		if (template.equals(TEMPLATE_ABSTRACT) ||
 			template.equals(TEMPLATE_FULL_CONTENT)) {
 
@@ -328,13 +318,13 @@ public class WikiPageAssetRenderer
 
 	@Override
 	public boolean include(
-			HttpServletRequest request, HttpServletResponse response,
-			String template)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, String template)
 		throws Exception {
 
-		request.setAttribute(WikiWebKeys.WIKI_PAGE, _page);
+		httpServletRequest.setAttribute(WikiWebKeys.WIKI_PAGE, _page);
 
-		return super.include(request, response, template);
+		return super.include(httpServletRequest, httpServletResponse, template);
 	}
 
 	@Override

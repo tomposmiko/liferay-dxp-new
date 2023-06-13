@@ -133,11 +133,12 @@ public class ImportLayoutsMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	protected void checkExceededSizeLimit(HttpServletRequest request)
+	protected void checkExceededSizeLimit(HttpServletRequest httpServletRequest)
 		throws PortalException {
 
-		UploadException uploadException = (UploadException)request.getAttribute(
-			WebKeys.UPLOAD_EXCEPTION);
+		UploadException uploadException =
+			(UploadException)httpServletRequest.getAttribute(
+				WebKeys.UPLOAD_EXCEPTION);
 
 		if (uploadException != null) {
 			Throwable cause = uploadException.getCause();
@@ -270,11 +271,11 @@ public class ImportLayoutsMVCActionCommand extends BaseMVCActionCommand {
 			String folderName, Exception e)
 		throws Exception {
 
-		HttpServletResponse response = _portal.getHttpServletResponse(
-			actionResponse);
+		HttpServletResponse httpServletResponse =
+			_portal.getHttpServletResponse(actionResponse);
 
-		response.setContentType(ContentTypes.TEXT_HTML);
-		response.setStatus(HttpServletResponse.SC_OK);
+		httpServletResponse.setContentType(ContentTypes.TEXT_HTML);
+		httpServletResponse.setStatus(HttpServletResponse.SC_OK);
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);

@@ -14,8 +14,6 @@
 
 package com.liferay.staging.taglib.servlet.taglib;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.staging.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.taglib.util.IncludeTag;
@@ -24,6 +22,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Levente Hudák
@@ -97,17 +97,18 @@ public class PortletListTag extends IncludeTag {
 	}
 
 	@Override
-	protected void setAttributes(HttpServletRequest request) {
-		request.setAttribute(
+	protected void setAttributes(HttpServletRequest httpServletRequest) {
+		httpServletRequest.setAttribute(
 			"liferay-staging:portlet-list:disableInputs", _disableInputs);
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			"liferay-staging:portlet-list:exportImportConfigurationId",
 			_exportImportConfigurationId);
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			"liferay-staging:portlet-list:portlets", _portlets);
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			"liferay-staging:portlet-list:showAllPortlets", _showAllPortlets);
-		request.setAttribute("liferay-staging:portlet-list:type", _type);
+		httpServletRequest.setAttribute(
+			"liferay-staging:portlet-list:type", _type);
 	}
 
 	private static final String _PAGE = "/portlet_list/page.jsp";

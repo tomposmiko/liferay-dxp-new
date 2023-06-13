@@ -546,7 +546,7 @@ public abstract class BaseSegmentUserResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected SegmentUser randomSegmentUser() {
+	protected SegmentUser randomSegmentUser() throws Exception {
 		return new SegmentUser() {
 			{
 				emailAddress = RandomTestUtil.randomString();
@@ -556,13 +556,13 @@ public abstract class BaseSegmentUserResourceTestCase {
 		};
 	}
 
-	protected SegmentUser randomIrrelevantSegmentUser() {
+	protected SegmentUser randomIrrelevantSegmentUser() throws Exception {
 		SegmentUser randomIrrelevantSegmentUser = randomSegmentUser();
 
 		return randomIrrelevantSegmentUser;
 	}
 
-	protected SegmentUser randomPatchSegmentUser() {
+	protected SegmentUser randomPatchSegmentUser() throws Exception {
 		return randomSegmentUser();
 	}
 

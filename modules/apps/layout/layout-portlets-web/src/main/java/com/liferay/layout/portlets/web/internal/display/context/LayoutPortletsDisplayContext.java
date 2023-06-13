@@ -51,14 +51,15 @@ public class LayoutPortletsDisplayContext {
 
 	public LayoutPortletsDisplayContext(
 		RenderRequest renderRequest, RenderResponse renderResponse,
-		HttpServletRequest request) {
+		HttpServletRequest httpServletRequest) {
 
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		initPortlets(themeDisplay.getCompanyId());
 	}
@@ -68,7 +69,8 @@ public class LayoutPortletsDisplayContext {
 			return _displayStyle;
 		}
 
-		_displayStyle = ParamUtil.getString(_request, "displayStyle", "list");
+		_displayStyle = ParamUtil.getString(
+			_httpServletRequest, "displayStyle", "list");
 
 		return _displayStyle;
 	}
@@ -78,7 +80,8 @@ public class LayoutPortletsDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = ParamUtil.getString(_request, "orderByCol", "name");
+		_orderByCol = ParamUtil.getString(
+			_httpServletRequest, "orderByCol", "name");
 
 		return _orderByCol;
 	}
@@ -88,7 +91,8 @@ public class LayoutPortletsDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = ParamUtil.getString(_request, "orderByType", "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -99,7 +103,7 @@ public class LayoutPortletsDisplayContext {
 		Stream<String> stream = Arrays.stream(categories);
 
 		return stream.map(
-			category -> LanguageUtil.get(_request, category)
+			category -> LanguageUtil.get(_httpServletRequest, category)
 		).collect(
 			Collectors.joining(StringPool.COMMA_AND_SPACE)
 		);
@@ -176,6 +180,7 @@ public class LayoutPortletsDisplayContext {
 	}
 
 	private String _displayStyle;
+	private final HttpServletRequest _httpServletRequest;
 	private final Map<String, String[]> _layoutPortletCategories =
 		new HashMap<>();
 	private final ArrayList<Portlet> _layoutPortlets = new ArrayList<>();
@@ -183,6 +188,5 @@ public class LayoutPortletsDisplayContext {
 	private String _orderByType;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private final HttpServletRequest _request;
 
 }

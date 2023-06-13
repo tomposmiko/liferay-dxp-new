@@ -44,10 +44,11 @@ import javax.servlet.http.HttpServletResponse;
 public class PanelAppContentHelper {
 
 	public PanelAppContentHelper(
-		HttpServletRequest request, HttpServletResponse response) {
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse) {
 
-		_request = request;
-		_response = response;
+		_httpServletRequest = httpServletRequest;
+		_httpServletResponse = httpServletResponse;
 	}
 
 	public boolean isValidPortletSelected() {
@@ -79,11 +80,11 @@ public class PanelAppContentHelper {
 		if (Validator.isNotNull(velocityTemplateId) &&
 			Validator.isNotNull(content)) {
 
-			HttpServletRequest request = getOriginalHttpServletRequest(
-				_request);
+			HttpServletRequest httpServletRequest =
+				getOriginalHttpServletRequest(_httpServletRequest);
 
 			StringBundler sb = RuntimePageUtil.getProcessedTemplate(
-				request, _response, getPortletId(),
+				httpServletRequest, _httpServletResponse, getPortletId(),
 				new StringTemplateResource(velocityTemplateId, content));
 
 			if (sb != null) {
@@ -103,24 +104,25 @@ public class PanelAppContentHelper {
 	}
 
 	protected HttpServletRequest getOriginalHttpServletRequest(
-		HttpServletRequest request) {
+		HttpServletRequest httpServletRequest) {
 
 		LiferayPortletRequest liferayPortletRequest =
 			LiferayPortletUtil.getLiferayPortletRequest(
-				(PortletRequest)_request.getAttribute(
+				(PortletRequest)_httpServletRequest.getAttribute(
 					JavaConstants.JAVAX_PORTLET_REQUEST));
 
 		if (liferayPortletRequest != null) {
 			return liferayPortletRequest.getOriginalHttpServletRequest();
 		}
 
-		HttpServletRequest originalServletRequest =
-			PortalUtil.getOriginalServletRequest(request);
+		HttpServletRequest originalHttpServletRequest =
+			PortalUtil.getOriginalServletRequest(httpServletRequest);
 
 		Portlet portlet = getPortlet();
 
 		return DynamicServletRequestUtil.createDynamicServletRequest(
-			originalServletRequest, portlet, request.getParameterMap(), false);
+			originalHttpServletRequest, portlet,
+			httpServletRequest.getParameterMap(), false);
 	}
 
 	protected Portlet getPortlet() {
@@ -134,7 +136,7 @@ public class PanelAppContentHelper {
 
 	protected String getPortletId() {
 		if (_portletId == null) {
-			_portletId = (String)_request.getAttribute(
+			_portletId = (String)_httpServletRequest.getAttribute(
 				"liferay-application-list:application-content:portletId");
 		}
 
@@ -142,13 +144,14 @@ public class PanelAppContentHelper {
 	}
 
 	private ThemeDisplay _getThemeDisplay() {
-		return (ThemeDisplay)_request.getAttribute(WebKeys.THEME_DISPLAY);
+		return (ThemeDisplay)_httpServletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
 	}
 
 	private Long _companyId;
+	private final HttpServletRequest _httpServletRequest;
+	private final HttpServletResponse _httpServletResponse;
 	private Portlet _portlet;
 	private String _portletId;
-	private final HttpServletRequest _request;
-	private final HttpServletResponse _response;
 
 }

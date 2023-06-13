@@ -54,7 +54,7 @@ public class JournalViewMoreMenuItemsDisplayContext {
 		_folderId = folderId;
 		_restrictionType = restrictionType;
 
-		_request = PortalUtil.getHttpServletRequest(_renderRequest);
+		_httpServletRequest = PortalUtil.getHttpServletRequest(_renderRequest);
 	}
 
 	public List<DDMStructure> getDDMStructures() throws PortalException {
@@ -132,7 +132,8 @@ public class JournalViewMoreMenuItemsDisplayContext {
 						navigationItem.setActive(true);
 						navigationItem.setHref(StringPool.BLANK);
 						navigationItem.setLabel(
-							LanguageUtil.get(_request, "all-menu-items"));
+							LanguageUtil.get(
+								_httpServletRequest, "all-menu-items"));
 					});
 			}
 		};
@@ -206,13 +207,13 @@ public class JournalViewMoreMenuItemsDisplayContext {
 	private SearchContainer _ddmStructuresSearchContainer;
 	private String _eventName;
 	private final long _folderId;
+	private final HttpServletRequest _httpServletRequest;
 	private String _keywords;
 	private String _orderByCol;
 	private String _orderByType;
 	private String _redirect;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private final HttpServletRequest _request;
 	private final int _restrictionType;
 
 }

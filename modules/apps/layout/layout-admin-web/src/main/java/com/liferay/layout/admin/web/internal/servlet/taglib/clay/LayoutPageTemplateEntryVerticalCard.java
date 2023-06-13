@@ -57,7 +57,7 @@ public class LayoutPageTemplateEntryVerticalCard extends BaseVerticalCard {
 		_renderResponse = renderResponse;
 
 		_layoutPageTemplateEntry = (LayoutPageTemplateEntry)baseModel;
-		_request = PortalUtil.getHttpServletRequest(renderRequest);
+		_httpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 	}
 
 	@Override
@@ -159,10 +159,11 @@ public class LayoutPageTemplateEntryVerticalCard extends BaseVerticalCard {
 				_layoutPageTemplateEntry.getType(),
 				LayoutPageTemplateEntryTypeConstants.TYPE_WIDGET_PAGE)) {
 
-			return LanguageUtil.get(_request, "widget-page-template");
+			return LanguageUtil.get(
+				_httpServletRequest, "widget-page-template");
 		}
 
-		return LanguageUtil.get(_request, "content-page-template");
+		return LanguageUtil.get(_httpServletRequest, "content-page-template");
 	}
 
 	@Override
@@ -170,8 +171,8 @@ public class LayoutPageTemplateEntryVerticalCard extends BaseVerticalCard {
 		return HtmlUtil.escape(_layoutPageTemplateEntry.getName());
 	}
 
+	private final HttpServletRequest _httpServletRequest;
 	private final LayoutPageTemplateEntry _layoutPageTemplateEntry;
 	private final RenderResponse _renderResponse;
-	private final HttpServletRequest _request;
 
 }

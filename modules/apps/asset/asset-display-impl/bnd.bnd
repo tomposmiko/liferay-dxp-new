@@ -1,3 +1,7 @@
 Bundle-Name: Liferay Asset Display Implementation
 Bundle-SymbolicName: com.liferay.asset.display.impl
-Bundle-Version: 2.0.1
+Bundle-Version: 2.0.2
+Import-Package:\
+	com.liferay.info.display.contributor;version="[1.0.0,2.0.0)",\
+	\
+	*

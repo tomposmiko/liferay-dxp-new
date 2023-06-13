@@ -182,6 +182,8 @@ public abstract class BaseDataDefinitionResourceTestCase {
 
 		assertResponseCode(
 			404, invokeGetDataDefinitionResponse(dataDefinition.getId()));
+
+		assertResponseCode(404, invokeGetDataDefinitionResponse(0L));
 	}
 
 	protected DataDefinition testDeleteDataDefinition_addDataDefinition()
@@ -1157,7 +1159,7 @@ public abstract class BaseDataDefinitionResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected DataDefinition randomDataDefinition() {
+	protected DataDefinition randomDataDefinition() throws Exception {
 		return new DataDefinition() {
 			{
 				dateCreated = RandomTestUtil.nextDate();
@@ -1170,7 +1172,7 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		};
 	}
 
-	protected DataDefinition randomIrrelevantDataDefinition() {
+	protected DataDefinition randomIrrelevantDataDefinition() throws Exception {
 		DataDefinition randomIrrelevantDataDefinition = randomDataDefinition();
 
 		randomIrrelevantDataDefinition.setSiteId(irrelevantGroup.getGroupId());
@@ -1178,7 +1180,7 @@ public abstract class BaseDataDefinitionResourceTestCase {
 		return randomIrrelevantDataDefinition;
 	}
 
-	protected DataDefinition randomPatchDataDefinition() {
+	protected DataDefinition randomPatchDataDefinition() throws Exception {
 		return randomDataDefinition();
 	}
 

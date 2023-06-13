@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.portlet;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceReference;
@@ -30,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Eduardo García
@@ -73,7 +73,7 @@ public class FriendlyURLResolverRegistryUtil {
 	public static String[] getURLSeparators() {
 		Set<String> urlSeparators = _serviceTrackerMap.keySet();
 
-		return urlSeparators.toArray(new String[urlSeparators.size()]);
+		return urlSeparators.toArray(new String[0]);
 	}
 
 	public static void register(FriendlyURLResolver friendlyURLResolver) {

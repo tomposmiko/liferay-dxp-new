@@ -18,10 +18,11 @@ import com.liferay.data.engine.rest.dto.v1_0.DataLayout;
 import com.liferay.data.engine.rest.dto.v1_0.DataLayoutColumn;
 import com.liferay.data.engine.rest.dto.v1_0.DataLayoutPage;
 import com.liferay.data.engine.rest.dto.v1_0.DataLayoutRow;
+import com.liferay.data.engine.spi.field.type.util.LocalizedValueUtil;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
-import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Objects;
@@ -123,7 +124,7 @@ public class DataLayoutUtil {
 	private static JSONObject _toJSONObject(DataLayoutPage dataLayoutPage)
 		throws Exception {
 
-		if (ArrayUtil.isEmpty(dataLayoutPage.getTitle())) {
+		if (MapUtil.isEmpty(dataLayoutPage.getTitle())) {
 			throw new Exception("Title is required");
 		}
 

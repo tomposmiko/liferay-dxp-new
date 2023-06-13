@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.portlet;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.servlet.URLEncoder;
 
@@ -29,6 +27,8 @@ import javax.portlet.RenderURL;
 import javax.portlet.ResourceURL;
 
 import javax.servlet.http.HttpServletResponse;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Raymond Augé
@@ -104,7 +104,7 @@ public interface LiferayPortletResponse extends PortletResponse {
 
 	public void setURLEncoder(URLEncoder urlEncoder);
 
-	public void transferHeaders(HttpServletResponse response);
+	public void transferHeaders(HttpServletResponse httpServletResponse);
 
 	public void transferMarkupHeadElements();
 

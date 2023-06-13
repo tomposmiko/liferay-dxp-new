@@ -14,11 +14,11 @@
 
 package com.liferay.layout.page.template.service.persistence;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.layout.page.template.exception.NoSuchPageTemplateStructureRelException;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructureRel;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The persistence interface for the layout page template structure rel service.

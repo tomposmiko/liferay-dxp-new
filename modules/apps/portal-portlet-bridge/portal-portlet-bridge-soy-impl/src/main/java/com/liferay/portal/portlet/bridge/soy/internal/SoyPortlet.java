@@ -100,16 +100,6 @@ public class SoyPortlet extends MVCPortlet {
 		_soyPortletRegister = soyPortletRegister;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), use {@link
-	 *             SoyPortlet#init(PortletConfig)}} instead
-	 */
-	@Deprecated
-	@Override
-	public void init() throws PortletException {
-		super.init();
-	}
-
 	@Override
 	public void init(PortletConfig portletConfig) throws PortletException {
 		super.init(portletConfig);
@@ -343,16 +333,9 @@ public class SoyPortlet extends MVCPortlet {
 
 	protected boolean propagateRequestParameters;
 
-	/**
-	 * @deprecated As of Judson (7.1.x), use {@link
-	 *             SoyPortlet#getTemplate(PortletRequest)}} instead
-	 */
-	@Deprecated
-	protected Template template;
-
 	private void _callProcessAction(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse,
-			HttpServletResponse response, Portlet portlet)
+			HttpServletResponse httpServletResponse, Portlet portlet)
 		throws Exception {
 
 		SoyPortletRequestFactory soyPortletRequestFactory =
@@ -377,7 +360,7 @@ public class SoyPortlet extends MVCPortlet {
 
 		redirect = HttpUtil.setParameter(redirect, "p_p_lifecycle", "2");
 
-		response.sendRedirect(redirect);
+		httpServletResponse.sendRedirect(redirect);
 	}
 
 	private void _callRender(

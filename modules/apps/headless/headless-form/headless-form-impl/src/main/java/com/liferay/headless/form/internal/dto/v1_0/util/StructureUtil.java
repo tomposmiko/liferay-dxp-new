@@ -27,14 +27,12 @@ import com.liferay.dynamic.data.mapping.model.DDMFormRule;
 import com.liferay.dynamic.data.mapping.model.DDMFormSuccessPageSettings;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.LocalizedValue;
-import com.liferay.headless.form.dto.v1_0.Column;
-import com.liferay.headless.form.dto.v1_0.Field;
+import com.liferay.headless.form.dto.v1_0.FormField;
+import com.liferay.headless.form.dto.v1_0.FormFieldOption;
 import com.liferay.headless.form.dto.v1_0.FormPage;
 import com.liferay.headless.form.dto.v1_0.FormStructure;
+import com.liferay.headless.form.dto.v1_0.FormSuccessPage;
 import com.liferay.headless.form.dto.v1_0.Grid;
-import com.liferay.headless.form.dto.v1_0.Option;
-import com.liferay.headless.form.dto.v1_0.Row;
-import com.liferay.headless.form.dto.v1_0.SuccessPage;
 import com.liferay.headless.form.dto.v1_0.Validation;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -89,13 +87,13 @@ public class StructureUtil {
 				name = ddmStructure.getName(locale);
 				siteId = ddmStructure.getGroupId();
 
-				setSuccessPage(
+				setFormSuccessPage(
 					() -> {
 						if (!ddmFormSuccessPageSettings.isEnabled()) {
 							return null;
 						}
 
-						return new SuccessPage() {
+						return new FormSuccessPage() {
 							{
 								description = _toString(
 									locale,
@@ -135,11 +133,15 @@ public class StructureUtil {
 		);
 	}
 
-	private static Field _toField(DDMFormField ddmFormField, Locale locale) {
+	private static FormField _toFormField(
+		DDMFormField ddmFormField, Locale locale) {
+
 		String type = ddmFormField.getType();
 
-		return new Field() {
+		return new FormField() {
 			{
+				displayStyle = GetterUtil.getString(
+					ddmFormField.getProperty("displayStyle"));
 				immutable = ddmFormField.isTransient();
 				inputControl = type;
 				label = _toString(locale, ddmFormField.getLabel());
@@ -147,7 +149,7 @@ public class StructureUtil {
 				multiple = ddmFormField.isMultiple();
 				name = ddmFormField.getName();
 
-				options = Optional.ofNullable(
+				formFieldOptions = Optional.ofNullable(
 					ddmFormField.getDDMFormFieldOptions()
 				).map(
 					DDMFormFieldOptions::getOptions
@@ -158,14 +160,14 @@ public class StructureUtil {
 				).orElseGet(
 					Stream::empty
 				).map(
-					entry -> new Option() {
+					entry -> new FormFieldOption() {
 						{
 							label = _toString(locale, entry.getValue());
 							value = entry.getKey();
 						}
 					}
 				).toArray(
-					Option[]::new
+					FormFieldOption[]::new
 				);
 
 				predefinedValue = _toString(
@@ -200,24 +202,24 @@ public class StructureUtil {
 							{
 								columns = TransformUtil.transform(
 									_toMapEntry(ddmFormField, "columns"),
-									entry -> new Column() {
+									entry -> new FormFieldOption() {
 										{
 											label = _toString(
 												locale, entry.getValue());
 											value = entry.getKey();
 										}
 									},
-									Column.class);
+									FormFieldOption.class);
 								rows = TransformUtil.transform(
 									_toMapEntry(ddmFormField, "rows"),
-									entry -> new Row() {
+									entry -> new FormFieldOption() {
 										{
 											label = _toString(
 												locale, entry.getValue());
 											value = entry.getKey();
 										}
 									},
-									Row.class);
+									FormFieldOption.class);
 							}
 						};
 					});
@@ -317,10 +319,10 @@ public class StructureUtil {
 		return new FormPage() {
 			{
 				headline = _toString(locale, ddmFormLayoutPage.getTitle());
-				fields = TransformUtil.transform(
+				formFields = TransformUtil.transform(
 					ddmFormFields,
-					ddmFormField -> _toField(ddmFormField, locale),
-					Field.class);
+					ddmFormField -> _toFormField(ddmFormField, locale),
+					FormField.class);
 				text = _toString(locale, ddmFormLayoutPage.getDescription());
 			}
 		};

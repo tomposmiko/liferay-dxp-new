@@ -187,6 +187,8 @@ public abstract class BaseBlogPostingImageResourceTestCase {
 
 		assertResponseCode(
 			404, invokeGetBlogPostingImageResponse(blogPostingImage.getId()));
+
+		assertResponseCode(404, invokeGetBlogPostingImageResponse(0L));
 	}
 
 	protected BlogPostingImage testDeleteBlogPostingImage_addBlogPostingImage()
@@ -1052,7 +1054,7 @@ public abstract class BaseBlogPostingImageResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected BlogPostingImage randomBlogPostingImage() {
+	protected BlogPostingImage randomBlogPostingImage() throws Exception {
 		return new BlogPostingImage() {
 			{
 				contentUrl = RandomTestUtil.randomString();
@@ -1065,14 +1067,16 @@ public abstract class BaseBlogPostingImageResourceTestCase {
 		};
 	}
 
-	protected BlogPostingImage randomIrrelevantBlogPostingImage() {
+	protected BlogPostingImage randomIrrelevantBlogPostingImage()
+		throws Exception {
+
 		BlogPostingImage randomIrrelevantBlogPostingImage =
 			randomBlogPostingImage();
 
 		return randomIrrelevantBlogPostingImage;
 	}
 
-	protected BlogPostingImage randomPatchBlogPostingImage() {
+	protected BlogPostingImage randomPatchBlogPostingImage() throws Exception {
 		return randomBlogPostingImage();
 	}
 

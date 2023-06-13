@@ -102,26 +102,6 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 		return document.asXML();
 	}
 
-	/**
-	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             #getContentByLocale(Document, String)}
-	 */
-	@Deprecated
-	public static String getContentByLocale(
-		String content, boolean templateDriven, String languageId) {
-
-		try {
-			return getContentByLocale(SAXReaderUtil.read(content), languageId);
-		}
-		catch (DocumentException de) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(de, de);
-			}
-
-			return content;
-		}
-	}
-
 	@Override
 	public Folder addImagesFolder() throws PortalException {
 		if (_imagesFolderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
@@ -214,8 +194,7 @@ public class JournalArticleImpl extends JournalArticleBaseImpl {
 			}
 		}
 
-		return availableLanguageIds.toArray(
-			new String[availableLanguageIds.size()]);
+		return availableLanguageIds.toArray(new String[0]);
 	}
 
 	@Override

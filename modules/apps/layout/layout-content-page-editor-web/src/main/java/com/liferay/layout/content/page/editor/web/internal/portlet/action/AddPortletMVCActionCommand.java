@@ -18,6 +18,7 @@ import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.FragmentEntryProcessorRegistry;
 import com.liferay.fragment.renderer.DefaultFragmentRendererContext;
+import com.liferay.fragment.renderer.FragmentPortletRenderer;
 import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
@@ -42,7 +43,6 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 
 import javax.portlet.ActionRequest;
@@ -50,8 +50,7 @@ import javax.portlet.ActionResponse;
 import javax.portlet.PortletPreferences;
 
 import javax.servlet.http.HttpServletRequest;
-
-import org.jsoup.nodes.Element;
+import javax.servlet.http.HttpServletResponse;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -97,7 +96,9 @@ public class AddPortletMVCActionCommand extends BaseMVCActionCommand {
 			}
 
 			String html = _getPortletFragmentEntryLinkHTML(
-				serviceContext.getRequest(), portletId, instanceId);
+				serviceContext.getRequest(),
+				_portal.getHttpServletResponse(actionResponse), portletId,
+				instanceId);
 
 			JSONObject editableValueJSONObject =
 				_fragmentEntryProcessorRegistry.
@@ -112,9 +113,10 @@ public class AddPortletMVCActionCommand extends BaseMVCActionCommand {
 			FragmentEntryLink fragmentEntryLink =
 				_fragmentEntryLinkLocalService.addFragmentEntryLink(
 					serviceContext.getUserId(),
-					serviceContext.getScopeGroupId(), 0, classNameId, classPK,
-					StringPool.BLANK, html, StringPool.BLANK,
-					editableValueJSONObject.toString(), 0, serviceContext);
+					serviceContext.getScopeGroupId(), 0, 0, classNameId,
+					classPK, StringPool.BLANK, html, StringPool.BLANK,
+					editableValueJSONObject.toString(), StringPool.BLANK, 0,
+					null, serviceContext);
 
 			DefaultFragmentRendererContext defaultFragmentRendererContext =
 				new DefaultFragmentRendererContext(fragmentEntryLink);
@@ -165,28 +167,18 @@ public class AddPortletMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	private String _getPortletFragmentEntryLinkHTML(
-			HttpServletRequest request, String portletId, String instanceId)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, String portletId,
+			String instanceId)
 		throws PortalException {
-
-		Element runtimeTagElement = new Element(
-			"@liferay_portlet.runtime", true);
 
 		PortletPreferences portletPreferences =
 			PortletPreferencesFactoryUtil.getPortletPreferences(
-				request, portletId);
+				httpServletRequest, portletId);
 
-		runtimeTagElement.attr(
-			"defaultPreferences",
+		return _fragmentPortletRenderer.renderPortlet(
+			httpServletRequest, httpServletResponse, portletId, instanceId,
 			PortletPreferencesFactoryUtil.toXML(portletPreferences));
-
-		if (Validator.isNotNull(instanceId)) {
-			runtimeTagElement.attr("instanceId", instanceId);
-		}
-
-		runtimeTagElement.attr("persistSettings=false", true);
-		runtimeTagElement.attr("portletName", portletId);
-
-		return runtimeTagElement.toString();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -197,6 +189,9 @@ public class AddPortletMVCActionCommand extends BaseMVCActionCommand {
 
 	@Reference
 	private FragmentEntryProcessorRegistry _fragmentEntryProcessorRegistry;
+
+	@Reference
+	private FragmentPortletRenderer _fragmentPortletRenderer;
 
 	@Reference
 	private FragmentRendererController _fragmentRendererController;

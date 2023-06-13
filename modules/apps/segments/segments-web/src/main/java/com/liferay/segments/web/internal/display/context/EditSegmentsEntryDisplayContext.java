@@ -15,16 +15,24 @@
 package com.liferay.segments.web.internal.display.context;
 
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.bean.BeanParamUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.ResourceActionsUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.segments.constants.SegmentsConstants;
 import com.liferay.segments.criteria.Criteria;
 import com.liferay.segments.criteria.contributor.SegmentsCriteriaContributor;
@@ -35,6 +43,7 @@ import com.liferay.segments.service.SegmentsEntryService;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
@@ -48,19 +57,32 @@ import javax.servlet.http.HttpServletRequest;
 public class EditSegmentsEntryDisplayContext {
 
 	public EditSegmentsEntryDisplayContext(
-		HttpServletRequest request, RenderRequest renderRequest,
+		HttpServletRequest httpServletRequest, RenderRequest renderRequest,
 		RenderResponse renderResponse,
 		SegmentsCriteriaContributorRegistry segmentsCriteriaContributorRegistry,
 		SegmentsEntryProvider segmentsEntryProvider,
 		SegmentsEntryService segmentsEntryService) {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 		_segmentsCriteriaContributorRegistry =
 			segmentsCriteriaContributorRegistry;
 		_segmentsEntryProvider = segmentsEntryProvider;
 		_segmentsEntryService = segmentsEntryService;
+
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+	}
+
+	public Set<Locale> getAvailableLocales() throws PortalException {
+		if (_availableLocales != null) {
+			return _availableLocales;
+		}
+
+		_availableLocales = LanguageUtil.getAvailableLocales(getGroupId());
+
+		return _availableLocales;
 	}
 
 	public JSONArray getContributorsJSONArray() throws PortalException {
@@ -109,6 +131,47 @@ public class EditSegmentsEntryDisplayContext {
 		return segmentsEntry.getCriteriaObj();
 	}
 
+	public String getDefaultLanguageId() throws PortalException {
+		if (_defaultLanguageId != null) {
+			return _defaultLanguageId;
+		}
+
+		Locale siteDefaultLocale = null;
+
+		try {
+			siteDefaultLocale = PortalUtil.getSiteDefaultLocale(getGroupId());
+		}
+		catch (PortalException pe) {
+			_log.error(pe, pe);
+
+			siteDefaultLocale = LocaleUtil.getSiteDefault();
+		}
+
+		SegmentsEntry segmentsEntry = getSegmentsEntry();
+
+		if (segmentsEntry == null) {
+			_defaultLanguageId = LocaleUtil.toLanguageId(siteDefaultLocale);
+		}
+		else {
+			_defaultLanguageId = LocalizationUtil.getDefaultLanguageId(
+				segmentsEntry.getName(), siteDefaultLocale);
+		}
+
+		return _defaultLanguageId;
+	}
+
+	public long getGroupId() throws PortalException {
+		if (_groupId != null) {
+			return _groupId;
+		}
+
+		_groupId = BeanParamUtil.getLong(
+			getSegmentsEntry(), _httpServletRequest, "groupId",
+			_themeDisplay.getScopeGroupId());
+
+		return _groupId;
+	}
+
 	public JSONArray getPropertyGroupsJSONArray(Locale locale)
 		throws PortalException {
 
@@ -144,7 +207,7 @@ public class EditSegmentsEntryDisplayContext {
 			return _redirect;
 		}
 
-		_redirect = ParamUtil.getString(_request, "redirect");
+		_redirect = ParamUtil.getString(_httpServletRequest, "redirect");
 
 		if (Validator.isNull(_redirect)) {
 			PortletURL portletURL = _renderResponse.createRenderURL();
@@ -200,7 +263,8 @@ public class EditSegmentsEntryDisplayContext {
 			return _segmentsEntryId;
 		}
 
-		_segmentsEntryId = ParamUtil.getLong(_request, "segmentsEntryId");
+		_segmentsEntryId = ParamUtil.getLong(
+			_httpServletRequest, "segmentsEntryId");
 
 		return _segmentsEntryId;
 	}
@@ -230,7 +294,7 @@ public class EditSegmentsEntryDisplayContext {
 		}
 
 		return ParamUtil.getString(
-			_request, "source", SegmentsConstants.SOURCE_DEFAULT);
+			_httpServletRequest, "source", SegmentsConstants.SOURCE_DEFAULT);
 	}
 
 	public String getTitle(Locale locale) throws PortalException {
@@ -248,7 +312,7 @@ public class EditSegmentsEntryDisplayContext {
 				locale, getType());
 
 			_title = LanguageUtil.format(
-				_request, "new-x-segment", type, false);
+				_httpServletRequest, "new-x-segment", type, false);
 		}
 
 		return _title;
@@ -261,7 +325,8 @@ public class EditSegmentsEntryDisplayContext {
 			return segmentsEntry.getType();
 		}
 
-		return ParamUtil.getString(_request, "type", User.class.getName());
+		return ParamUtil.getString(
+			_httpServletRequest, "type", User.class.getName());
 	}
 
 	public boolean isShowInEditMode() {
@@ -270,7 +335,7 @@ public class EditSegmentsEntryDisplayContext {
 		}
 
 		_showInEditMode = ParamUtil.getBoolean(
-			_request, "showInEditMode", true);
+			_httpServletRequest, "showInEditMode", true);
 
 		return _showInEditMode;
 	}
@@ -291,10 +356,16 @@ public class EditSegmentsEntryDisplayContext {
 		return criterion.getFilterString();
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		EditSegmentsEntryDisplayContext.class);
+
+	private Set<Locale> _availableLocales;
+	private String _defaultLanguageId;
+	private Long _groupId;
+	private final HttpServletRequest _httpServletRequest;
 	private String _redirect;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private final HttpServletRequest _request;
 	private final SegmentsCriteriaContributorRegistry
 		_segmentsCriteriaContributorRegistry;
 	private SegmentsEntry _segmentsEntry;
@@ -304,6 +375,7 @@ public class EditSegmentsEntryDisplayContext {
 	private final SegmentsEntryProvider _segmentsEntryProvider;
 	private final SegmentsEntryService _segmentsEntryService;
 	private Boolean _showInEditMode;
+	private final ThemeDisplay _themeDisplay;
 	private String _title;
 
 }

@@ -64,21 +64,23 @@ import javax.servlet.http.HttpServletRequest;
 public class UserDisplayContext {
 
 	public UserDisplayContext(
-			HttpServletRequest request, InitDisplayContext initDisplayContext)
+			HttpServletRequest httpServletRequest,
+			InitDisplayContext initDisplayContext)
 		throws PortalException {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_initDisplayContext = initDisplayContext;
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		_permissionChecker = themeDisplay.getPermissionChecker();
 
-		_renderResponse = (RenderResponse)_request.getAttribute(
+		_renderResponse = (RenderResponse)_httpServletRequest.getAttribute(
 			JavaConstants.JAVAX_PORTLET_RESPONSE);
 
-		_selUser = PortalUtil.getSelectedUser(request);
+		_selUser = PortalUtil.getSelectedUser(httpServletRequest);
 		_themeDisplay = themeDisplay;
 	}
 
@@ -157,7 +159,7 @@ public class UserDisplayContext {
 		}
 		else {
 			String organizationIds = ParamUtil.getString(
-				_request, "organizationsSearchContainerPrimaryKeys");
+				_httpServletRequest, "organizationsSearchContainerPrimaryKeys");
 
 			if (Validator.isNotNull(organizationIds)) {
 				long[] organizationIdsArray = StringUtil.split(
@@ -243,7 +245,7 @@ public class UserDisplayContext {
 		return new NavigationItemList() {
 			{
 				String toolbarItem = ParamUtil.getString(
-					_request, "toolbarItem", "view-all-users");
+					_httpServletRequest, "toolbarItem", "view-all-users");
 
 				add(
 					navigationItem -> {
@@ -255,7 +257,7 @@ public class UserDisplayContext {
 							"usersListView",
 							UserConstants.LIST_VIEW_FLAT_USERS);
 						navigationItem.setLabel(
-							LanguageUtil.get(_request, "users"));
+							LanguageUtil.get(_httpServletRequest, "users"));
 					});
 
 				add(
@@ -268,7 +270,8 @@ public class UserDisplayContext {
 							"usersListView",
 							UserConstants.LIST_VIEW_FLAT_ORGANIZATIONS);
 						navigationItem.setLabel(
-							LanguageUtil.get(_request, "organizations"));
+							LanguageUtil.get(
+								_httpServletRequest, "organizations"));
 					});
 			}
 		};
@@ -324,10 +327,10 @@ public class UserDisplayContext {
 	private static final Log _log = LogFactoryUtil.getLog(
 		UserDisplayContext.class);
 
+	private final HttpServletRequest _httpServletRequest;
 	private final InitDisplayContext _initDisplayContext;
 	private final PermissionChecker _permissionChecker;
 	private final RenderResponse _renderResponse;
-	private final HttpServletRequest _request;
 	private final User _selUser;
 	private final ThemeDisplay _themeDisplay;
 

@@ -14,9 +14,9 @@
 
 package com.liferay.document.library.content.model;
 
-import aQute.bnd.annotation.ProviderType;
-
 import java.sql.Blob;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The Blob model class for lazy loading the data column in DLContent.

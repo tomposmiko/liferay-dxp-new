@@ -100,13 +100,13 @@ public abstract class BaseWikiEngine implements WikiEngine {
 			return StringPool.BLANK;
 		}
 
-		HttpServletResponse response =
+		HttpServletResponse httpServletResponse =
 			(HttpServletResponse)pageContext.getResponse();
 
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
 		PipingServletResponse pipingServletResponse = new PipingServletResponse(
-			response, unsyncStringWriter);
+			httpServletResponse, unsyncStringWriter);
 
 		ServletContext servletContext = getHelpPageServletContext();
 
@@ -121,10 +121,10 @@ public abstract class BaseWikiEngine implements WikiEngine {
 		return sb.toString();
 	}
 
-	public String getHelpPageTitle(HttpServletRequest request) {
+	public String getHelpPageTitle(HttpServletRequest httpServletRequest) {
 		return LanguageUtil.format(
-			request, "x-syntax-help", getFormatLabel(request.getLocale()),
-			false);
+			httpServletRequest, "x-syntax-help",
+			getFormatLabel(httpServletRequest.getLocale()), false);
 	}
 
 	public abstract String getHelpURL();

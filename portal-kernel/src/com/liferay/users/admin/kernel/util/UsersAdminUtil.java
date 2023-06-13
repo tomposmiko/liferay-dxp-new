@@ -14,8 +14,6 @@
 
 package com.liferay.users.admin.kernel.util;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Address;
 import com.liferay.portal.kernel.model.EmailAddress;
@@ -42,6 +40,8 @@ import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
  * @author Brian Wing Shun Chan
  * @author Jorge Ferrer
@@ -58,12 +58,12 @@ public class UsersAdminUtil {
 	public static final String CUSTOM_QUESTION = "write-my-own-question";
 
 	public static void addPortletBreadcrumbEntries(
-			Organization organization, HttpServletRequest request,
+			Organization organization, HttpServletRequest httpServletRequest,
 			RenderResponse renderResponse)
 		throws Exception {
 
 		getUsersAdmin().addPortletBreadcrumbEntries(
-			organization, request, renderResponse);
+			organization, httpServletRequest, renderResponse);
 	}
 
 	public static long[] addRequiredRoles(long userId, long[] roleIds)

@@ -263,10 +263,10 @@ public class DDMFormDisplayContext {
 		Set<Locale> availableLocales = ddmForm.getAvailableLocales();
 
 		if (!availableLocales.contains(locale)) {
-			HttpServletRequest request = PortalUtil.getHttpServletRequest(
-				_renderRequest);
+			HttpServletRequest httpServletRequest =
+				PortalUtil.getHttpServletRequest(_renderRequest);
 
-			locale = getLocale(request, ddmForm);
+			locale = getLocale(httpServletRequest, ddmForm);
 		}
 
 		return LanguageUtil.getLanguageId(locale);
@@ -475,14 +475,15 @@ public class DDMFormDisplayContext {
 		ddmFormRenderingContext.setDDMFormValues(
 			_ddmFormValuesFactory.create(_renderRequest, ddmForm));
 
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			_renderRequest);
+		HttpServletRequest httpServletRequest =
+			PortalUtil.getHttpServletRequest(_renderRequest);
 
-		ddmFormRenderingContext.setHttpServletRequest(request);
+		ddmFormRenderingContext.setHttpServletRequest(httpServletRequest);
 
 		ddmFormRenderingContext.setHttpServletResponse(
 			PortalUtil.getHttpServletResponse(_renderResponse));
-		ddmFormRenderingContext.setLocale(getLocale(request, ddmForm));
+		ddmFormRenderingContext.setLocale(
+			getLocale(httpServletRequest, ddmForm));
 		ddmFormRenderingContext.setPortletNamespace(
 			_renderResponse.getNamespace());
 		ddmFormRenderingContext.setSharedURL(isSharedURL());
@@ -618,10 +619,12 @@ public class DDMFormDisplayContext {
 		return ddmFormLayoutPages.get(ddmFormLayoutPages.size() - 1);
 	}
 
-	protected Locale getLocale(HttpServletRequest request, DDMForm ddmForm) {
+	protected Locale getLocale(
+		HttpServletRequest httpServletRequest, DDMForm ddmForm) {
+
 		Set<Locale> availableLocales = ddmForm.getAvailableLocales();
 
-		String languageId = LanguageUtil.getLanguageId(request);
+		String languageId = LanguageUtil.getLanguageId(httpServletRequest);
 
 		Locale locale = LocaleUtil.fromLanguageId(languageId);
 

@@ -16,11 +16,14 @@ package com.liferay.change.tracking.change.lists.web.internal.portlet.action;
 
 import com.liferay.change.tracking.CTEngineManager;
 import com.liferay.change.tracking.constants.CTPortletKeys;
+import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.WebKeys;
+
+import java.util.Optional;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -56,6 +59,14 @@ public class PublishCTCollectionMVCActionCommand extends BaseMVCActionCommand {
 
 		_ctEngineManager.publishCTCollection(
 			themeDisplay.getUserId(), ctCollectionId, ignoreCollision);
+
+		Optional<CTCollection> productionCTCollectionOptional =
+			_ctEngineManager.getProductionCTCollectionOptional(
+				themeDisplay.getCompanyId());
+
+		productionCTCollectionOptional.ifPresent(
+			ctCollection -> _ctEngineManager.checkoutCTCollection(
+				themeDisplay.getUserId(), ctCollection.getCtCollectionId()));
 	}
 
 	@Reference

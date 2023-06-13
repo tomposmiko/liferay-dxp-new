@@ -475,6 +475,8 @@ public abstract class BaseDataLayoutResourceTestCase {
 
 		assertResponseCode(
 			404, invokeGetDataLayoutResponse(dataLayout.getId()));
+
+		assertResponseCode(404, invokeGetDataLayoutResponse(0L));
 	}
 
 	protected DataLayout testDeleteDataLayout_addDataLayout() throws Exception {
@@ -1285,7 +1287,7 @@ public abstract class BaseDataLayoutResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected DataLayout randomDataLayout() {
+	protected DataLayout randomDataLayout() throws Exception {
 		return new DataLayout() {
 			{
 				dataDefinitionId = RandomTestUtil.randomLong();
@@ -1299,13 +1301,13 @@ public abstract class BaseDataLayoutResourceTestCase {
 		};
 	}
 
-	protected DataLayout randomIrrelevantDataLayout() {
+	protected DataLayout randomIrrelevantDataLayout() throws Exception {
 		DataLayout randomIrrelevantDataLayout = randomDataLayout();
 
 		return randomIrrelevantDataLayout;
 	}
 
-	protected DataLayout randomPatchDataLayout() {
+	protected DataLayout randomPatchDataLayout() throws Exception {
 		return randomDataLayout();
 	}
 

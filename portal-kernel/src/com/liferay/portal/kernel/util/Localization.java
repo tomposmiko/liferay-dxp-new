@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.util;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.settings.LocalizedValuesMap;
 import com.liferay.portal.kernel.settings.Settings;
@@ -32,6 +30,8 @@ import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Stores and retrieves localized strings from XML, and provides utility methods
@@ -183,14 +183,14 @@ public interface Localization {
 	 * Returns a map of locales and localized strings for the parameter in the
 	 * request.
 	 *
-	 * @param  request the request
+	 * @param  httpServletRequest the request
 	 * @param  parameter the prefix of the parameters containing the localized
 	 *         strings. Each localization is loaded from a parameter with this
 	 *         prefix, followed by an underscore, and the language ID.
 	 * @return the locales and localized strings
 	 */
 	public Map<Locale, String> getLocalizationMap(
-		HttpServletRequest request, String parameter);
+		HttpServletRequest httpServletRequest, String parameter);
 
 	/**
 	 * Returns a map of locales and localized strings for the preference in the

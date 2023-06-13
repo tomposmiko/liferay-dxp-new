@@ -14,9 +14,9 @@
 
 package com.liferay.fragment.service;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.service.ServiceWrapper;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link FragmentEntryLinkLocalService}.
@@ -50,6 +50,13 @@ public class FragmentEntryLinkLocalServiceWrapper
 			fragmentEntryLink);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntryLink(long, long, long, long, long, long,
+	 String, String, String, String, String, int, String,
+	 ServiceContext)}
+	 */
+	@Deprecated
 	@Override
 	public com.liferay.fragment.model.FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long originalFragmentEntryLinkId,
@@ -63,6 +70,13 @@ public class FragmentEntryLinkLocalServiceWrapper
 			classNameId, classPK, rendererKey, serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntryLink(long, long, long, long, long, long,
+	 String, String, String, String, String, int, String,
+	 ServiceContext)}
+	 */
+	@Deprecated
 	@Override
 	public com.liferay.fragment.model.FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long originalFragmentEntryLinkId,
@@ -77,6 +91,13 @@ public class FragmentEntryLinkLocalServiceWrapper
 			serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntryLink(long, long, long, long, long, long,
+	 String, String, String, String, String, int, String,
+	 ServiceContext)}
+	 */
+	@Deprecated
 	@Override
 	public com.liferay.fragment.model.FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long originalFragmentEntryLinkId,
@@ -107,6 +128,13 @@ public class FragmentEntryLinkLocalServiceWrapper
 			position, rendererKey, serviceContext);
 	}
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntryLink(long, long, long, long, long, long,
+	 String, String, String, String, String, int, String,
+	 ServiceContext)}
+	 */
+	@Deprecated
 	@Override
 	public com.liferay.fragment.model.FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long fragmentEntryId, long classNameId,

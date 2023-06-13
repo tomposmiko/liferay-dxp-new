@@ -14,8 +14,6 @@
 
 package com.liferay.portal.instances.service;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.cluster.Clusterable;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -28,6 +26,8 @@ import java.sql.SQLException;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides the local service interface for PortalInstances. Methods of this
@@ -54,7 +54,7 @@ public interface PortalInstancesLocalService extends BaseLocalService {
 	public void addCompanyId(long companyId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public long getCompanyId(HttpServletRequest request);
+	public long getCompanyId(HttpServletRequest httpServletRequest);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public long[] getCompanyIds();

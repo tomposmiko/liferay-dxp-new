@@ -28,10 +28,10 @@ import javax.servlet.http.HttpServletRequest;
 public class UserActionDisplayContext {
 
 	public UserActionDisplayContext(
-		HttpServletRequest request, LiferayPortletRequest liferayPortletRequest,
-		User user, User selUser) {
+		HttpServletRequest httpServletRequest,
+		LiferayPortletRequest liferayPortletRequest, User user, User selUser) {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_liferayPortletRequest = liferayPortletRequest;
 		_user = user;
 		_selUser = selUser;
@@ -39,7 +39,7 @@ public class UserActionDisplayContext {
 
 	public UserActionContributor[] getFilteredUserActionContributors() {
 		UserActionContributor[] userActionContributors =
-			(UserActionContributor[])_request.getAttribute(
+			(UserActionContributor[])_httpServletRequest.getAttribute(
 				UsersAdminWebKeys.USER_ACTION_CONTRIBUTORS);
 
 		if (userActionContributors == null) {
@@ -52,8 +52,8 @@ public class UserActionDisplayContext {
 				_liferayPortletRequest, _user, _selUser));
 	}
 
+	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
-	private final HttpServletRequest _request;
 	private final User _selUser;
 	private final User _user;
 

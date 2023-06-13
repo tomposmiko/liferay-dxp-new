@@ -14,8 +14,6 @@
 
 package com.liferay.portal.background.task.service;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
@@ -25,6 +23,8 @@ import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides the remote service interface for BackgroundTask. Methods of this
@@ -58,7 +58,11 @@ public interface BackgroundTaskService extends BaseService {
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getBackgroundTasksCount(
-		long groupId, String taskExecutorClassName, String completed);
+		long groupId, String taskExecutorClassName, boolean completed);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getBackgroundTasksCount(
+		long groupId, String name, String taskExecutorClassName);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public String getBackgroundTaskStatusJSON(long backgroundTaskId);

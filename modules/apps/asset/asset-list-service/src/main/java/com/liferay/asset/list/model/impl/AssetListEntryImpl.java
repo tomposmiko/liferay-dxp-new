@@ -14,8 +14,6 @@
 
 package com.liferay.asset.list.model.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetEntry;
@@ -56,6 +54,7 @@ import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.util.tracker.ServiceTracker;
@@ -288,9 +287,7 @@ public class AssetListEntryImpl extends AssetListEntryBaseImpl {
 			assetCategoryIdsList.add(assetCategoryId);
 		}
 
-		return ArrayUtil.toArray(
-			assetCategoryIdsList.toArray(
-				new Long[assetCategoryIdsList.size()]));
+		return ArrayUtil.toArray(assetCategoryIdsList.toArray(new Long[0]));
 	}
 
 	private long[] _getClassNameIds(

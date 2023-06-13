@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.theme;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.admin.kernel.util.PortalMyAccountApplicationType;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.mobile.device.rules.kernel.MDRRuleGroupInstance;
@@ -78,6 +76,8 @@ import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides general configuration methods for the portal, providing access to
@@ -788,7 +788,7 @@ public class ThemeDisplay
 	 */
 	@JSON(include = false)
 	public HttpServletRequest getRequest() {
-		return _request;
+		return _httpServletRequest;
 	}
 
 	/**
@@ -798,7 +798,7 @@ public class ThemeDisplay
 	 */
 	@JSON(include = false)
 	public HttpServletResponse getResponse() {
-		return _response;
+		return _httpServletResponse;
 	}
 
 	/**
@@ -1636,12 +1636,12 @@ public class ThemeDisplay
 		_refererPlid = refererPlid;
 	}
 
-	public void setRequest(HttpServletRequest request) {
-		_request = request;
+	public void setRequest(HttpServletRequest httpServletRequest) {
+		_httpServletRequest = httpServletRequest;
 	}
 
-	public void setResponse(HttpServletResponse response) {
-		_response = response;
+	public void setResponse(HttpServletResponse httpServletResponse) {
+		_httpServletResponse = httpServletResponse;
 	}
 
 	public void setScopeGroupId(long scopeGroupId) {
@@ -1930,6 +1930,8 @@ public class ThemeDisplay
 	private String _doAsUserId = StringPool.BLANK;
 	private String _doAsUserLanguageId = StringPool.BLANK;
 	private boolean _freeformLayout;
+	private transient HttpServletRequest _httpServletRequest;
+	private transient HttpServletResponse _httpServletResponse;
 	private boolean _hubAction;
 	private boolean _hubPartialAction;
 	private boolean _hubResource;
@@ -1985,8 +1987,6 @@ public class ThemeDisplay
 	private Group _refererGroup;
 	private long _refererGroupId;
 	private long _refererPlid;
-	private transient HttpServletRequest _request;
-	private transient HttpServletResponse _response;
 	private Group _scopeGroup;
 	private long _scopeGroupId;
 	private boolean _secure;

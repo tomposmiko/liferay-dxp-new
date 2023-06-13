@@ -190,6 +190,8 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 		assertResponseCode(
 			404,
 			invokeGetMessageBoardMessageResponse(messageBoardMessage.getId()));
+
+		assertResponseCode(404, invokeGetMessageBoardMessageResponse(0L));
 	}
 
 	protected MessageBoardMessage
@@ -518,6 +520,9 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 			404,
 			invokeGetMessageBoardMessageMyRatingResponse(
 				messageBoardMessage.getId()));
+
+		assertResponseCode(
+			404, invokeGetMessageBoardMessageMyRatingResponse(0L));
 	}
 
 	protected MessageBoardMessage
@@ -2284,7 +2289,7 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected MessageBoardMessage randomMessageBoardMessage() {
+	protected MessageBoardMessage randomMessageBoardMessage() throws Exception {
 		return new MessageBoardMessage() {
 			{
 				anonymous = RandomTestUtil.randomBoolean();
@@ -2300,7 +2305,9 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 		};
 	}
 
-	protected MessageBoardMessage randomIrrelevantMessageBoardMessage() {
+	protected MessageBoardMessage randomIrrelevantMessageBoardMessage()
+		throws Exception {
+
 		MessageBoardMessage randomIrrelevantMessageBoardMessage =
 			randomMessageBoardMessage();
 
@@ -2310,7 +2317,9 @@ public abstract class BaseMessageBoardMessageResourceTestCase {
 		return randomIrrelevantMessageBoardMessage;
 	}
 
-	protected MessageBoardMessage randomPatchMessageBoardMessage() {
+	protected MessageBoardMessage randomPatchMessageBoardMessage()
+		throws Exception {
+
 		return randomMessageBoardMessage();
 	}
 

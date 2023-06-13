@@ -14,10 +14,11 @@
 
 package com.liferay.sharing.internal.configuration;
 
-import aQute.bnd.annotation.ProviderType;
 import aQute.bnd.annotation.metatype.Meta;
 
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Adolfo Pérez
@@ -44,6 +45,7 @@ public interface SharingSystemConfiguration {
 
 	/**
 	 * Enables sharing.
+	 *
 	 * @review
 	 */
 	@Meta.AD(deflt = "true", name = "enabled", required = false)

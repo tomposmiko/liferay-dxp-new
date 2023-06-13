@@ -1,5 +1,5 @@
 dependencies {
-	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "3.1.0"
+	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bnd.annotation", version: "3.1.0"
 	compileOnly group: "com.liferay", name: "com.liferay.application.list.api", version: "4.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.captcha.api", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.dynamic.data.mapping.api", version: "5.0.0"
@@ -20,7 +20,7 @@ dependencies {
 	compileOnly group: "com.liferay", name: "com.liferay.portal.upgrade.api", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.registry.api", version: "3.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "4.0.0"
-	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "4.0.0"
+	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "4.3.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.util.java", version: "4.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.util.taglib", version: "4.0.0"
 	compileOnly group: "commons-lang", name: "commons-lang", version: "2.6"

@@ -99,6 +99,42 @@ public class ConfigurationModelIndexerTest {
 	}
 
 	@Test
+	public void testLocalizedAttributes() throws Exception {
+		Map<String, String> extensionAttributes = new HashMap<>();
+
+		extensionAttributes.put("factoryInstanceLabelAttribute", "companyId");
+		extensionAttributes.put("scope", Scope.COMPANY.toString());
+
+		ExtendedAttributeDefinition[] extendedAttributeDefinitions = {
+			new SimpleExtendedAttributeDefinition(
+				"com.liferay.configuration.admin.web.test.attribute." +
+					"description",
+				"com.liferay.configuration.admin.web.test.attribute.name")
+		};
+
+		ExtendedObjectClassDefinition extendedObjectClassDefinition =
+			new SimpleExtendedObjectClassDefinition(
+				extendedAttributeDefinitions, extensionAttributes);
+
+		Object configurationModel = _configurationModelConstructor.newInstance(
+			extendedObjectClassDefinition, null,
+			"com.liferay.configuration.admin.web", StringPool.QUESTION, true);
+
+		Document document = _indexer.getDocument(configurationModel);
+
+		String[] attributeDescriptions = document.getValues(
+			"configurationModelAttributeDescription_en_US");
+
+		Assert.assertEquals(
+			"Test_Attribute_Description", attributeDescriptions[0]);
+
+		String[] attributeNames = document.getValues(
+			"configurationModelAttributeName_en_US");
+
+		Assert.assertEquals("Test_Attribute_Name", attributeNames[0]);
+	}
+
+	@Test
 	public void testSearchAfterReindex() throws Exception {
 		_addCompanyFactoryConfiguration();
 
@@ -177,6 +213,76 @@ public class ConfigurationModelIndexerTest {
 	@Inject
 	private IndexWriterHelper _indexWriterHelper;
 
+	private class SimpleExtendedAttributeDefinition
+		implements ExtendedAttributeDefinition {
+
+		public SimpleExtendedAttributeDefinition(
+			String description, String name) {
+
+			_description = description;
+			_name = name;
+		}
+
+		@Override
+		public int getCardinality() {
+			return 0;
+		}
+
+		@Override
+		public String[] getDefaultValue() {
+			return new String[0];
+		}
+
+		@Override
+		public String getDescription() {
+			return _description;
+		}
+
+		@Override
+		public Map<String, String> getExtensionAttributes(String uri) {
+			return null;
+		}
+
+		@Override
+		public Set<String> getExtensionUris() {
+			return null;
+		}
+
+		@Override
+		public String getID() {
+			return StringPool.BLANK;
+		}
+
+		@Override
+		public String getName() {
+			return _name;
+		}
+
+		@Override
+		public String[] getOptionLabels() {
+			return new String[0];
+		}
+
+		@Override
+		public String[] getOptionValues() {
+			return new String[0];
+		}
+
+		@Override
+		public int getType() {
+			return 0;
+		}
+
+		@Override
+		public String validate(String s) {
+			return null;
+		}
+
+		private final String _description;
+		private final String _name;
+
+	}
+
 	private class SimpleExtendedObjectClassDefinition
 		implements ExtendedObjectClassDefinition {
 
@@ -184,7 +290,14 @@ public class ConfigurationModelIndexerTest {
 			Configuration configuration,
 			Map<String, String> extensionAttributes) {
 
-			_configuration = configuration;
+			this(new ExtendedAttributeDefinition[0], extensionAttributes);
+		}
+
+		public SimpleExtendedObjectClassDefinition(
+			ExtendedAttributeDefinition[] extendedAttributeDefinitions,
+			Map<String, String> extensionAttributes) {
+
+			_extendedAttributeDefinitions = extendedAttributeDefinitions;
 			_extensionAttributes = extensionAttributes;
 		}
 
@@ -192,7 +305,7 @@ public class ConfigurationModelIndexerTest {
 		public ExtendedAttributeDefinition[] getAttributeDefinitions(
 			int filter) {
 
-			return new ExtendedAttributeDefinition[0];
+			return _extendedAttributeDefinitions;
 		}
 
 		@Override
@@ -217,7 +330,7 @@ public class ConfigurationModelIndexerTest {
 
 		@Override
 		public String getID() {
-			return _configuration.getFactoryPid();
+			return _PID;
 		}
 
 		@Override
@@ -225,7 +338,8 @@ public class ConfigurationModelIndexerTest {
 			return null;
 		}
 
-		private final Configuration _configuration;
+		private final ExtendedAttributeDefinition[]
+			_extendedAttributeDefinitions;
 		private final Map<String, String> _extensionAttributes;
 
 	}

@@ -14,11 +14,11 @@
 
 package com.liferay.mail.reader.service.persistence;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.mail.reader.exception.NoSuchAccountException;
 import com.liferay.mail.reader.model.Account;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The persistence interface for the account service.

@@ -6,21 +6,6 @@ exports[`SegmentEdit should render 1`] = `
     class="segment-edit-page-root"
   >
     <input
-      name="name"
-      type="hidden"
-      value=""
-    />
-    <input
-      name="name_en_US"
-      type="hidden"
-      value=""
-    />
-    <input
-      name="key"
-      type="hidden"
-      value=""
-    />
-    <input
       name="active"
       type="hidden"
       value="true"
@@ -34,39 +19,69 @@ exports[`SegmentEdit should render 1`] = `
         <div
           class="form-header-section-left"
         >
+          <input
+            name="name_en_US"
+            readonly=""
+            type="hidden"
+            value="Segment title"
+          />
+          <input
+            name="key"
+            readonly=""
+            type="hidden"
+            value="Segment title"
+          />
+          <input
+            name="name"
+            readonly=""
+            type="hidden"
+            value="Segment title"
+          />
           <div
-            class="title-editor-root"
+            class="input-group input-localized input-localized-input"
           >
-            <input
-              class="title-input hide"
-              data-testid="title-input"
-              name="name"
-              placeholder="unnamed-segment"
-              required=""
-              type="text"
-              value=""
-            />
             <div
-              class="title-display placeholder-display"
+              class="dropdown postion-relative lfr-icon-menu "
             >
-              <span>
-                unnamed-segment
-              </span>
               <button
-                class="btn btn-outline-secondary btn-sm btn-monospaced btn-outline-borderless edit-icon ml-1"
-                data-testid="edit-button"
+                aria-expanded="false"
+                aria-haspopup="true"
+                class="btn btn-monospaced btn-secondary dropdown-toggle"
+                data-testid="localized-dropdown-button"
+                role="button"
+                title=""
                 type="button"
               >
-                <svg
-                  aria-hidden="true"
-                  class="lexicon-icon lexicon-icon-pencil icon"
-                  viewBox="0 0 512 512"
+                <span
+                  class="inline-item"
                 >
-                  <use
-                    xlink:href="#pencil"
-                  />
-                </svg>
+                  <svg
+                    aria-hidden="true"
+                    class="lexicon-icon lexicon-icon-en-us"
+                    viewBox="0 0 512 512"
+                  >
+                    <use
+                      xlink:href="#en-us"
+                    />
+                  </svg>
+                </span>
+                <span
+                  class="btn-section"
+                >
+                  en-US
+                </span>
               </button>
+            </div>
+            <div
+              class="input-group-item ml-3"
+            >
+              <input
+                class="rounded form-control language-value field form-control-inline form-control"
+                data-testid="localized-main-input"
+                readonly=""
+                type="text"
+                value="Segment title"
+              />
             </div>
           </div>
           <img
@@ -138,7 +153,7 @@ exports[`SegmentEdit should render 1`] = `
               class="btn-group-item"
             >
               <a
-                class="btn btn-secondary btn-sm"
+                class="btn btn-secondary btn-sm text-capitalize"
                 href="/test-url"
               >
                 cancel
@@ -148,7 +163,7 @@ exports[`SegmentEdit should render 1`] = `
               class="btn-group-item"
             >
               <button
-                class="btn btn-primary btn-sm"
+                class="btn btn-primary btn-sm text-capitalize"
                 disabled=""
                 type="submit"
               >

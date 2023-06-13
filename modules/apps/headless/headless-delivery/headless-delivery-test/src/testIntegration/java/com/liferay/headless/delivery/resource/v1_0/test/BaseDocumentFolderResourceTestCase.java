@@ -185,6 +185,8 @@ public abstract class BaseDocumentFolderResourceTestCase {
 
 		assertResponseCode(
 			404, invokeGetDocumentFolderResponse(documentFolder.getId()));
+
+		assertResponseCode(404, invokeGetDocumentFolderResponse(0L));
 	}
 
 	protected DocumentFolder testDeleteDocumentFolder_addDocumentFolder()
@@ -1761,7 +1763,7 @@ public abstract class BaseDocumentFolderResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected DocumentFolder randomDocumentFolder() {
+	protected DocumentFolder randomDocumentFolder() throws Exception {
 		return new DocumentFolder() {
 			{
 				dateCreated = RandomTestUtil.nextDate();
@@ -1774,7 +1776,7 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		};
 	}
 
-	protected DocumentFolder randomIrrelevantDocumentFolder() {
+	protected DocumentFolder randomIrrelevantDocumentFolder() throws Exception {
 		DocumentFolder randomIrrelevantDocumentFolder = randomDocumentFolder();
 
 		randomIrrelevantDocumentFolder.setSiteId(irrelevantGroup.getGroupId());
@@ -1782,7 +1784,7 @@ public abstract class BaseDocumentFolderResourceTestCase {
 		return randomIrrelevantDocumentFolder;
 	}
 
-	protected DocumentFolder randomPatchDocumentFolder() {
+	protected DocumentFolder randomPatchDocumentFolder() throws Exception {
 		return randomDocumentFolder();
 	}
 

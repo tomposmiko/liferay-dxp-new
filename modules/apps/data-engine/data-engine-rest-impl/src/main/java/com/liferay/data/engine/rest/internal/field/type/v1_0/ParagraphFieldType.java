@@ -14,67 +14,88 @@
 
 package com.liferay.data.engine.rest.internal.field.type.v1_0;
 
-import com.liferay.data.engine.rest.dto.v1_0.DataDefinitionField;
-import com.liferay.data.engine.rest.internal.dto.v1_0.util.LocalizedValueUtil;
-import com.liferay.data.engine.rest.internal.field.type.v1_0.util.CustomPropertyUtil;
+import com.liferay.data.engine.rest.internal.field.type.v1_0.util.CustomPropertiesUtil;
+import com.liferay.data.engine.spi.field.type.BaseFieldType;
+import com.liferay.data.engine.spi.field.type.FieldType;
+import com.liferay.data.engine.spi.field.type.SPIDataDefinitionField;
+import com.liferay.data.engine.spi.field.type.util.LocalizedValueUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.template.soy.data.SoyDataFactory;
+import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * @author Marcelo Mello
  */
+@Component(
+	immediate = true,
+	property = {
+		"data.engine.field.type.description=paragraph-field-type-description",
+		"data.engine.field.type.display.order:Integer=1",
+		"data.engine.field.type.group=basic",
+		"data.engine.field.type.icon=paragraph",
+		"data.engine.field.type.js.module=dynamic-data-mapping-form-field-type/metal/Paragraph/Paragraph.es",
+		"data.engine.field.type.label=paragraph-field-type-label"
+	},
+	service = FieldType.class
+)
 public class ParagraphFieldType extends BaseFieldType {
 
-	public ParagraphFieldType(
-		DataDefinitionField dataDefinitionField,
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse,
-		SoyDataFactory soyDataFactory) {
-
-		super(
-			dataDefinitionField, httpServletRequest, httpServletResponse,
-			soyDataFactory);
-	}
-
 	@Override
-	public DataDefinitionField deserialize(JSONObject jsonObject)
+	public SPIDataDefinitionField deserialize(JSONObject jsonObject)
 		throws Exception {
 
-		DataDefinitionField dataDefinitionField = super.deserialize(jsonObject);
+		SPIDataDefinitionField spiDataDefinitionField = super.deserialize(
+			jsonObject);
 
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "text",
-				LocalizedValueUtil.toLocalizedValues(
-					jsonObject.getJSONObject("text"))));
+		Map<String, Object> customProperties =
+			spiDataDefinitionField.getCustomProperties();
 
-		return dataDefinitionField;
+		customProperties.put(
+			"text",
+			LocalizedValueUtil.toLocalizedValues(
+				jsonObject.getJSONObject("text")));
+
+		return spiDataDefinitionField;
 	}
 
 	@Override
-	public JSONObject toJSONObject() throws Exception {
-		JSONObject jsonObject = super.toJSONObject();
+	public String getName() {
+		return "paragraph";
+	}
+
+	@Override
+	public JSONObject toJSONObject(
+			SPIDataDefinitionField spiDataDefinitionField)
+		throws Exception {
+
+		JSONObject jsonObject = super.toJSONObject(spiDataDefinitionField);
 
 		return jsonObject.put(
 			"text",
 			LocalizedValueUtil.toJSONObject(
-				CustomPropertyUtil.getLocalizedValue(
-					dataDefinitionField.getCustomProperties(), "text")));
+				CustomPropertiesUtil.getMap(
+					spiDataDefinitionField.getCustomProperties(), "text")));
 	}
 
 	@Override
-	protected void addContext(Map<String, Object> context) {
+	protected void includeContext(
+		Map<String, Object> context, HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse,
+		SPIDataDefinitionField spiDataDefinitionField) {
+
 		context.put(
 			"text",
-			LocalizedValueUtil.getLocalizedValue(
-				httpServletRequest.getLocale(),
-				CustomPropertyUtil.getLocalizedValue(
-					dataDefinitionField.getCustomProperties(), "text")));
+			MapUtil.getString(
+				CustomPropertiesUtil.getMap(
+					spiDataDefinitionField.getCustomProperties(), "text"),
+				LanguageUtil.getLanguageId(httpServletRequest)));
 	}
 
 }

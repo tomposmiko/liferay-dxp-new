@@ -138,8 +138,7 @@ public interface AMImageQueryBuilder
 		 *
 		 * <p>
 		 * The distance comparator is implemented based on the value returned by
-		 * the method {@link
-		 * AMAttribute#distance(Object, Object)}.
+		 * the method {@link AMAttribute#distance(Object, Object)}.
 		 * </p>
 		 *
 		 * <p>
@@ -184,8 +183,7 @@ public interface AMImageQueryBuilder
 		 *
 		 * <p>
 		 * The distance comparator is implemented based on the value returned by
-		 * the method {@link
-		 * com.liferay.adaptive.mediaAMAttribute#distance(Object, Object)}.
+		 * the method {@link AMAttribute#distance(Object, Object)}.
 		 * </p>
 		 *
 		 * <p>
@@ -262,7 +260,7 @@ public interface AMImageQueryBuilder
 		 * </p>
 		 *
 		 * <p>
-		 * If the method {@link StrictSortStep#orderBy(AMAttribute, SortOrder)}
+		 * If the method {@link #orderBy(AMAttribute, SortOrder)}
 		 * is invoked in the same query builder, it takes precedence and this
 		 * method has no effect.
 		 * </p>

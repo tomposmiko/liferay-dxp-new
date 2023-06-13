@@ -14,16 +14,17 @@
 
 package com.liferay.dynamic.data.mapping.io;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.dynamic.data.mapping.form.field.type.DDMFormFieldType;
 import com.liferay.portal.kernel.exception.PortalException;
 
 import java.util.List;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
- * @author Bruno Basto
- * @deprecated As of Judson (7.1.x), replaced by {@link DDMFormFieldTypesSerializer}
+ * @author     Bruno Basto
+ * @deprecated As of Judson (7.1.x), replaced by {@link
+ *             DDMFormFieldTypesSerializer}
  */
 @Deprecated
 @ProviderType

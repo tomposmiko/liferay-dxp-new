@@ -14,8 +14,6 @@
 
 package com.liferay.exportimport.internal.lar;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.exportimport.kernel.exception.ExportImportRuntimeException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -28,19 +26,13 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
  * @author Daniel Kocsis
  */
 @ProviderType
 public class ExportImportProcessCallbackUtil {
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	public static List<Callable<?>> popCallbackList() {
-		return Collections.<Callable<?>>emptyList();
-	}
 
 	public static List<Callable<?>> popCallbackList(String processId) {
 		List<List<Callable<?>>> callbackListList = _callbackListListMap.get(
@@ -51,13 +43,6 @@ public class ExportImportProcessCallbackUtil {
 		}
 
 		return callbackListList.remove(callbackListList.size() - 1);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	public static void pushCallbackList() {
 	}
 
 	public static void pushCallbackList(String processId) {
@@ -71,13 +56,6 @@ public class ExportImportProcessCallbackUtil {
 		}
 
 		callbackListList.add(Collections.<Callable<?>>emptyList());
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	public static void registerCallback(Callable<?> callable) {
 	}
 
 	public static void registerCallback(

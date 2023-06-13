@@ -494,10 +494,11 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 	}
 
 	public void init(
-		PortletRequestImpl portletRequestImpl, HttpServletResponse response) {
+		PortletRequestImpl portletRequestImpl,
+		HttpServletResponse httpServletResponse) {
 
 		this.portletRequestImpl = portletRequestImpl;
-		this.response = response;
+		response = httpServletResponse;
 
 		_portlet = portletRequestImpl.getPortlet();
 
@@ -578,8 +579,9 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 	}
 
 	@Override
-	public void transferHeaders(HttpServletResponse response) {
-		TransferHeadersHelperUtil.transferHeaders(_headers, response);
+	public void transferHeaders(HttpServletResponse httpServletResponse) {
+		TransferHeadersHelperUtil.transferHeaders(
+			_headers, httpServletResponse);
 	}
 
 	@Override
@@ -591,15 +593,16 @@ public abstract class PortletResponseImpl implements LiferayPortletResponse {
 			return;
 		}
 
-		HttpServletRequest request = getHttpServletRequest();
+		HttpServletRequest httpServletRequest = getHttpServletRequest();
 
-		List<String> markupHeadElements = (List<String>)request.getAttribute(
-			MimeResponse.MARKUP_HEAD_ELEMENT);
+		List<String> markupHeadElements =
+			(List<String>)httpServletRequest.getAttribute(
+				MimeResponse.MARKUP_HEAD_ELEMENT);
 
 		if (markupHeadElements == null) {
 			markupHeadElements = new ArrayList<>();
 
-			request.setAttribute(
+			httpServletRequest.setAttribute(
 				MimeResponse.MARKUP_HEAD_ELEMENT, markupHeadElements);
 		}
 

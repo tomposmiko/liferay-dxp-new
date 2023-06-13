@@ -45,23 +45,26 @@ public class CompoundSessionIdFilter
 
 	@Override
 	public HttpServletRequest getWrappedHttpServletRequest(
-		HttpServletRequest request, HttpServletResponse response) {
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse) {
 
-		HttpServletRequest wrappedRequest = request;
+		HttpServletRequest wrappedHttpServletRequest = httpServletRequest;
 
-		while (wrappedRequest instanceof HttpServletRequestWrapper) {
-			if (wrappedRequest instanceof CompoundSessionIdServletRequest) {
-				return request;
+		while (wrappedHttpServletRequest instanceof HttpServletRequestWrapper) {
+			if (wrappedHttpServletRequest instanceof
+					CompoundSessionIdServletRequest) {
+
+				return httpServletRequest;
 			}
 
 			HttpServletRequestWrapper httpServletRequestWrapper =
-				(HttpServletRequestWrapper)wrappedRequest;
+				(HttpServletRequestWrapper)wrappedHttpServletRequest;
 
-			wrappedRequest =
+			wrappedHttpServletRequest =
 				(HttpServletRequest)httpServletRequestWrapper.getRequest();
 		}
 
-		return new CompoundSessionIdServletRequest(request);
+		return new CompoundSessionIdServletRequest(httpServletRequest);
 	}
 
 }

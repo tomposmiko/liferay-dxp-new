@@ -221,7 +221,11 @@ AUI.add(
 						var languageId = instance._getURLParameter(portletNamespace, 'languageId');
 
 						if (!languageId) {
-							languageId = instance.get('defaultLanguageId');
+							languageId = themeDisplay.getLanguageId();
+
+							if (!languageId) {
+								languageId = instance.get('defaultLanguageId');
+							}
 						}
 
 						return languageId;

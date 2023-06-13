@@ -14,12 +14,12 @@
 
 package com.liferay.user.associated.data.exporter;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.user.associated.data.component.UADComponent;
 
 import java.io.File;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Handles converting the user-related type {@code T} entities into a format
@@ -57,5 +57,16 @@ public interface UADExporter<T> extends UADComponent<T> {
 	 * @throws PortalException if a portal exception occurred
 	 */
 	public File exportAll(long userId) throws PortalException;
+
+	/**
+	 * Returns the number of export data items of type {@code T} entities
+	 * associated with the user.
+	 *
+	 * @param  userId the primary key of the user whose data to count
+	 * @return the number of export data items
+	 */
+	public default long getExportDataCount(long userId) throws PortalException {
+		return count(userId);
+	}
 
 }

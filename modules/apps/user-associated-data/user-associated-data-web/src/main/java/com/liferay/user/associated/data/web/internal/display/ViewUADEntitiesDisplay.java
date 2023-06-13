@@ -42,13 +42,13 @@ public class ViewUADEntitiesDisplay {
 	}
 
 	public String getSearchContainerID(
-		HttpServletRequest request, String namespace) {
+		HttpServletRequest httpServletRequest, String namespace) {
 
 		if (_searchContainer == null) {
 			return StringPool.BLANK;
 		}
 
-		return _searchContainer.getId(request, namespace);
+		return _searchContainer.getId(httpServletRequest, namespace);
 	}
 
 	public Class<?>[] getTypeClasses() {
@@ -79,8 +79,7 @@ public class ViewUADEntitiesDisplay {
 		}
 
 		return StringUtil.merge(
-			userOwnedPKs.toArray(new String[userOwnedPKs.size()]),
-			StringPool.COMMA);
+			userOwnedPKs.toArray(new String[0]), StringPool.COMMA);
 	}
 
 	public boolean isHierarchy() {

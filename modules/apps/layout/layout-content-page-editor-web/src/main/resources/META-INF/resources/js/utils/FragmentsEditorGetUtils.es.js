@@ -110,7 +110,7 @@ function getFragmentColumn(structure, fragmentEntryLinkId) {
  * Returns the row index of a given fragmentEntryLinkId.
  * -1 if it is not present.
  *
- * @param {array} structure
+ * @param {Array} structure
  * @param {string} fragmentEntryLinkId
  * @return {number}
  */
@@ -150,7 +150,7 @@ function getItemMoveDirection(keycode) {
  * @param {string|null} itemId
  * @param {string|null} itemType
  * @param {object[]} structure
- * @return {{itemId: string, itemType}[]}
+ * @return {Array<{itemId: string, itemType}>}
  */
 function getItemPath(itemId, itemType, structure) {
 	let itemPath = [];
@@ -240,7 +240,7 @@ function getRowFragmentEntryLinkIds(row) {
 
 /**
  * Returns the index of the row with the given rowId
- * @param {array} structure
+ * @param {Array} structure
  * @param {string} rowId
  * @return {number}
  */
@@ -271,7 +271,7 @@ function getTargetBorder(direction) {
 
 /**
  * Get widget from the widgets tree by portletId
- * @param {!array} widgets
+ * @param {!Array} widgets
  * @param {!string} portletId
  * @return {object}
  * @review
@@ -298,7 +298,7 @@ function getWidget(widgets, portletId) {
 
 /**
  * Get widget path from the widgets tree by portletId
- * @param {Array<{categories: [], portlets: []}>} widgets
+ * @param {Array<{categories: Array, portlets: Array}>} widgets
  * @param {string} portletId
  * @param {string[]} [_path=['widgets']]
  * @return {object}

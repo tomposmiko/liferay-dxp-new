@@ -870,7 +870,7 @@ public abstract class BasePostalAddressResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected PostalAddress randomPostalAddress() {
+	protected PostalAddress randomPostalAddress() throws Exception {
 		return new PostalAddress() {
 			{
 				addressCountry = RandomTestUtil.randomString();
@@ -887,13 +887,13 @@ public abstract class BasePostalAddressResourceTestCase {
 		};
 	}
 
-	protected PostalAddress randomIrrelevantPostalAddress() {
+	protected PostalAddress randomIrrelevantPostalAddress() throws Exception {
 		PostalAddress randomIrrelevantPostalAddress = randomPostalAddress();
 
 		return randomIrrelevantPostalAddress;
 	}
 
-	protected PostalAddress randomPatchPostalAddress() {
+	protected PostalAddress randomPatchPostalAddress() throws Exception {
 		return randomPostalAddress();
 	}
 

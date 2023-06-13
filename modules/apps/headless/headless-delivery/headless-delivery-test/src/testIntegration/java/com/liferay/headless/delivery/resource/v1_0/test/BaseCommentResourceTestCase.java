@@ -575,6 +575,8 @@ public abstract class BaseCommentResourceTestCase {
 		assertResponseCode(204, invokeDeleteCommentResponse(comment.getId()));
 
 		assertResponseCode(404, invokeGetCommentResponse(comment.getId()));
+
+		assertResponseCode(404, invokeGetCommentResponse(0L));
 	}
 
 	protected Comment testDeleteComment_addComment() throws Exception {
@@ -2247,7 +2249,7 @@ public abstract class BaseCommentResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected Comment randomComment() {
+	protected Comment randomComment() throws Exception {
 		return new Comment() {
 			{
 				dateCreated = RandomTestUtil.nextDate();
@@ -2258,13 +2260,13 @@ public abstract class BaseCommentResourceTestCase {
 		};
 	}
 
-	protected Comment randomIrrelevantComment() {
+	protected Comment randomIrrelevantComment() throws Exception {
 		Comment randomIrrelevantComment = randomComment();
 
 		return randomIrrelevantComment;
 	}
 
-	protected Comment randomPatchComment() {
+	protected Comment randomPatchComment() throws Exception {
 		return randomComment();
 	}
 

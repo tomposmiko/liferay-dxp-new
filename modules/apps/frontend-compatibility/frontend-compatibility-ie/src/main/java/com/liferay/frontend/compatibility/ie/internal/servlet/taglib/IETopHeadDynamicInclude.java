@@ -43,16 +43,16 @@ public class IETopHeadDynamicInclude extends BaseDynamicInclude {
 
 	@Override
 	public void include(
-			HttpServletRequest request, HttpServletResponse response,
-			String key)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, String key)
 		throws IOException {
 
-		if (_browserSniffer.isIe(request)) {
-			PrintWriter printWriter = response.getWriter();
+		if (_browserSniffer.isIe(httpServletRequest)) {
+			PrintWriter printWriter = httpServletResponse.getWriter();
 
 			AbsolutePortalURLBuilder absolutePortalURLBuilder =
 				_absolutePortalURLBuilderFactory.getAbsolutePortalURLBuilder(
-					request);
+					httpServletRequest);
 
 			for (String fileName : _FILE_NAMES) {
 				printWriter.print(
@@ -85,7 +85,7 @@ public class IETopHeadDynamicInclude extends BaseDynamicInclude {
 		"/array.from.js", "/array.includes.js", "/array.of.js", "/fetch.js",
 		"/formdata.js", "/object.assign.js", "/object.entries.js",
 		"/object.values.js", "/promise.js", "/string.endswith.js",
-		"/uint16array.slice.js", "/url.search.params.js"
+		"/string.includes.js", "/uint16array.slice.js", "/url.search.params.js"
 	};
 
 	@Reference

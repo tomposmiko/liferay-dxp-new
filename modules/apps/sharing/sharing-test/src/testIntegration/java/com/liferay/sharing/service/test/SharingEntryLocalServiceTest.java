@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.Inject;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
@@ -1012,7 +1013,7 @@ public class SharingEntryLocalServiceTest {
 	@Test(expected = NoSuchEntryException.class)
 	public void testUpdateNonexistingSharingEntry() throws Exception {
 		_sharingEntryLocalService.updateSharingEntry(
-			RandomTestUtil.randomLong(),
+			RandomTestUtil.randomLong(), RandomTestUtil.randomLong(),
 			Arrays.asList(
 				SharingEntryAction.ADD_DISCUSSION, SharingEntryAction.UPDATE,
 				SharingEntryAction.VIEW),
@@ -1039,7 +1040,7 @@ public class SharingEntryLocalServiceTest {
 		Assert.assertNull(sharingEntry.getExpirationDate());
 
 		sharingEntry = _sharingEntryLocalService.updateSharingEntry(
-			sharingEntry.getSharingEntryId(),
+			_fromUser.getUserId(), sharingEntry.getSharingEntryId(),
 			Arrays.asList(SharingEntryAction.UPDATE, SharingEntryAction.VIEW),
 			false, null, serviceContext);
 
@@ -1052,7 +1053,7 @@ public class SharingEntryLocalServiceTest {
 		Date expirationDate = Date.from(instant.plus(2, ChronoUnit.DAYS));
 
 		sharingEntry = _sharingEntryLocalService.updateSharingEntry(
-			sharingEntry.getSharingEntryId(),
+			_fromUser.getUserId(), sharingEntry.getSharingEntryId(),
 			Arrays.asList(
 				SharingEntryAction.ADD_DISCUSSION, SharingEntryAction.VIEW),
 			true, expirationDate, serviceContext);
@@ -1062,7 +1063,7 @@ public class SharingEntryLocalServiceTest {
 		Assert.assertEquals(expirationDate, sharingEntry.getExpirationDate());
 
 		sharingEntry = _sharingEntryLocalService.updateSharingEntry(
-			sharingEntry.getSharingEntryId(),
+			_fromUser.getUserId(), sharingEntry.getSharingEntryId(),
 			Arrays.asList(
 				SharingEntryAction.ADD_DISCUSSION, SharingEntryAction.UPDATE,
 				SharingEntryAction.VIEW),
@@ -1090,8 +1091,8 @@ public class SharingEntryLocalServiceTest {
 			null, serviceContext);
 
 		_sharingEntryLocalService.updateSharingEntry(
-			sharingEntry.getSharingEntryId(), Collections.emptyList(), true,
-			null, serviceContext);
+			_fromUser.getUserId(), sharingEntry.getSharingEntryId(),
+			Collections.emptyList(), true, null, serviceContext);
 	}
 
 	@Test(expected = InvalidSharingEntryExpirationDateException.class)
@@ -1115,7 +1116,7 @@ public class SharingEntryLocalServiceTest {
 		Date expirationDate = Date.from(instant.minus(2, ChronoUnit.DAYS));
 
 		_sharingEntryLocalService.updateSharingEntry(
-			sharingEntry.getSharingEntryId(),
+			_fromUser.getUserId(), sharingEntry.getSharingEntryId(),
 			Arrays.asList(SharingEntryAction.VIEW), true, expirationDate,
 			serviceContext);
 	}
@@ -1137,7 +1138,7 @@ public class SharingEntryLocalServiceTest {
 			null, serviceContext);
 
 		_sharingEntryLocalService.updateSharingEntry(
-			sharingEntry.getSharingEntryId(),
+			_fromUser.getUserId(), sharingEntry.getSharingEntryId(),
 			Arrays.asList(SharingEntryAction.UPDATE), true, null,
 			serviceContext);
 	}
@@ -1164,8 +1165,8 @@ public class SharingEntryLocalServiceTest {
 		sharingEntryActions.add(null);
 
 		_sharingEntryLocalService.updateSharingEntry(
-			sharingEntry.getSharingEntryId(), sharingEntryActions, true, null,
-			serviceContext);
+			_fromUser.getUserId(), sharingEntry.getSharingEntryId(),
+			sharingEntryActions, true, null, serviceContext);
 	}
 
 	@Test(expected = InvalidSharingEntryActionException.class)
@@ -1184,12 +1185,9 @@ public class SharingEntryLocalServiceTest {
 			_group.getGroupId(), true, Arrays.asList(SharingEntryAction.VIEW),
 			null, serviceContext);
 
-		List<SharingEntryAction> sharingEntryActions = new ArrayList<>();
-
-		sharingEntryActions.add(null);
-
 		_sharingEntryLocalService.updateSharingEntry(
-			sharingEntry.getSharingEntryId(), sharingEntryActions, true, null,
+			_fromUser.getUserId(), sharingEntry.getSharingEntryId(),
+			ListUtil.toList((SharingEntryAction[])null), true, null,
 			serviceContext);
 	}
 

@@ -20,6 +20,8 @@ import com.liferay.configuration.admin.web.internal.model.ConfigurationModel;
 import com.liferay.configuration.admin.web.internal.util.ConfigurationEntryRetriever;
 import com.liferay.configuration.admin.web.internal.util.ConfigurationModelRetriever;
 import com.liferay.configuration.admin.web.internal.util.ResourceBundleLoaderProvider;
+import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.model.CompanyConstants;
@@ -144,10 +146,10 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 		addSearchLocalizedTerm(
 			searchQuery, searchContext, Field.DESCRIPTION, false);
 		addSearchLocalizedTerm(searchQuery, searchContext, Field.TITLE, false);
-		addSearchTerm(
+		addSearchLocalizedTerm(
 			searchQuery, searchContext,
 			FieldNames.CONFIGURATION_MODEL_ATTRIBUTE_DESCRIPTION, false);
-		addSearchTerm(
+		addSearchLocalizedTerm(
 			searchQuery, searchContext,
 			FieldNames.CONFIGURATION_MODEL_ATTRIBUTE_NAME, false);
 		addSearchTerm(
@@ -218,17 +220,30 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 			attributeDescriptions.add(attributeDefinition.getDescription());
 		}
 
-		document.addKeyword(
-			FieldNames.CONFIGURATION_MODEL_ATTRIBUTE_NAME,
-			attributeNames.toArray(new String[attributeNames.size()]));
-		document.addText(
-			FieldNames.CONFIGURATION_MODEL_ATTRIBUTE_DESCRIPTION,
-			attributeDescriptions.toArray(
-				new String[attributeDescriptions.size()]));
-
 		ResourceBundleLoader resourceBundleLoader =
 			_resourceBundleLoaderProvider.getResourceBundleLoader(
 				configurationModel.getBundleSymbolicName());
+
+		for (Locale locale : LanguageUtil.getAvailableLocales()) {
+			String fieldNameSuffix = StringBundler.concat(
+				StringPool.UNDERLINE, locale.getLanguage(),
+				StringPool.UNDERLINE, locale.getCountry());
+
+			List<String> descriptionValues = _getLocalizedValues(
+				attributeDescriptions, resourceBundleLoader, locale);
+
+			document.addText(
+				FieldNames.CONFIGURATION_MODEL_ATTRIBUTE_DESCRIPTION +
+					fieldNameSuffix,
+				descriptionValues.toArray(new String[0]));
+
+			List<String> nameValues = _getLocalizedValues(
+				attributeNames, resourceBundleLoader, locale);
+
+			document.addKeyword(
+				FieldNames.CONFIGURATION_MODEL_ATTRIBUTE_NAME + fieldNameSuffix,
+				nameValues.toArray(new String[0]));
+		}
 
 		List<TranslationHelper> translationHelpers = new ArrayList<>(3);
 
@@ -300,19 +315,13 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 		Document document, ResourceBundleLoader resourceBundleLoader,
 		List<TranslationHelper> translationHelpers) {
 
-		ResourceBundle defaultResourceBundle =
-			resourceBundleLoader.loadResourceBundle(LocaleUtil.getDefault());
-
 		for (Locale locale : LanguageUtil.getAvailableLocales()) {
-			ResourceBundle resourceBundle =
-				resourceBundleLoader.loadResourceBundle(locale);
-
 			for (TranslationHelper translationHelper : translationHelpers) {
+				ResourceBundle resourceBundle = _getResourceBundle(
+					locale, resourceBundleLoader);
+
 				if (resourceBundle != null) {
 					translationHelper.accept(resourceBundle, locale);
-				}
-				else if (defaultResourceBundle != null) {
-					translationHelper.accept(defaultResourceBundle, locale);
 				}
 			}
 		}
@@ -321,6 +330,50 @@ public class ConfigurationModelIndexer extends BaseIndexer<ConfigurationModel> {
 			document.addLocalizedText(
 				translationHelper._name, translationHelper._values);
 		}
+	}
+
+	private List<String> _getLocalizedValues(
+		List<String> attributeDescriptions,
+		ResourceBundleLoader resourceBundleLoader, Locale locale) {
+
+		List<String> values = new ArrayList<>(attributeDescriptions.size());
+
+		for (String attributeDescription : attributeDescriptions) {
+			if (Validator.isNull(attributeDescription)) {
+				continue;
+			}
+
+			ResourceBundle resourceBundle = _getResourceBundle(
+				locale, resourceBundleLoader);
+
+			if (resourceBundle == null) {
+				continue;
+			}
+
+			String value = ResourceBundleUtil.getString(
+				resourceBundle, attributeDescription);
+
+			if (Validator.isNull(value)) {
+				continue;
+			}
+
+			values.add(value);
+		}
+
+		return values;
+	}
+
+	private ResourceBundle _getResourceBundle(
+		Locale locale, ResourceBundleLoader resourceBundleLoader) {
+
+		ResourceBundle resourceBundle = resourceBundleLoader.loadResourceBundle(
+			locale);
+
+		if (resourceBundle != null) {
+			return resourceBundle;
+		}
+
+		return resourceBundleLoader.loadResourceBundle(LocaleUtil.getDefault());
 	}
 
 	@Reference

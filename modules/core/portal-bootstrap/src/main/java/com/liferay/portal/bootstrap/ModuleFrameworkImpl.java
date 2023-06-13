@@ -14,10 +14,6 @@
 
 package com.liferay.portal.bootstrap;
 
-import aQute.bnd.header.OSGiHeader;
-import aQute.bnd.header.Parameters;
-import aQute.bnd.version.Version;
-
 import com.liferay.petra.reflect.ReflectionUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
@@ -85,6 +81,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -108,6 +105,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.Version;
 import org.osgi.framework.launch.Framework;
 import org.osgi.framework.launch.FrameworkFactory;
 import org.osgi.framework.startlevel.BundleStartLevel;
@@ -154,17 +152,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			Attributes attributes = manifest.getMainAttributes();
 
-			String bundleSymbolicNameAttributeValue = attributes.getValue(
-				Constants.BUNDLE_SYMBOLICNAME);
-
-			Parameters parameters = OSGiHeader.parseHeader(
-				bundleSymbolicNameAttributeValue);
-
-			Set<String> set = parameters.keySet();
-
-			Iterator<String> iterator = set.iterator();
-
-			String bundleSymbolicName = iterator.next();
+			String bundleSymbolicName = _parseBundleSymbolicName(attributes);
 
 			String bundleVersionAttributeValue = attributes.getValue(
 				Constants.BUNDLE_VERSION);
@@ -173,11 +161,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 				bundleVersionAttributeValue);
 
 			for (Bundle bundle : bundleContext.getBundles()) {
-				Version curBundleVersion = Version.parseVersion(
-					String.valueOf(bundle.getVersion()));
-
 				if (bundleSymbolicName.equals(bundle.getSymbolicName()) &&
-					bundleVersion.equals(curBundleVersion)) {
+					bundleVersion.equals(bundle.getVersion())) {
 
 					return bundle;
 				}
@@ -756,23 +741,17 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		Properties extraProperties = PropsUtil.getProperties(
 			PropsKeys.MODULE_FRAMEWORK_PROPERTIES, true);
 
-		Parameters extraCapabilitiesParameters = OSGiHeader.parseHeader(
-			extraProperties.getProperty(
-				Constants.FRAMEWORK_SYSTEMCAPABILITIES_EXTRA));
+		String extraCapabilities = extraProperties.getProperty(
+			Constants.FRAMEWORK_SYSTEMCAPABILITIES_EXTRA);
 
 		Attributes attributes = _getExtraManifestAttributes();
 
 		String provideCapability = attributes.getValue(
 			Constants.PROVIDE_CAPABILITY);
 
-		Parameters provideCapabilityParameters = new Parameters(
-			provideCapability);
-
-		if (!extraCapabilitiesParameters.isEmpty()) {
-			extraCapabilitiesParameters.putAll(provideCapabilityParameters);
-		}
-		else {
-			extraCapabilitiesParameters = provideCapabilityParameters;
+		if ((extraCapabilities != null) && !extraCapabilities.isEmpty()) {
+			provideCapability = provideCapability.concat(
+				",".concat(extraCapabilities));
 		}
 
 		extraProperties.setProperty(
@@ -1063,17 +1042,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			Attributes attributes = manifest.getMainAttributes();
 
-			String bundleSymbolicNameAttributeValue = attributes.getValue(
-				Constants.BUNDLE_SYMBOLICNAME);
-
-			Parameters parameters = OSGiHeader.parseHeader(
-				bundleSymbolicNameAttributeValue);
-
-			Set<String> set = parameters.keySet();
-
-			Iterator<String> iterator = set.iterator();
-
-			String bundleSymbolicName = iterator.next();
+			String bundleSymbolicName = _parseBundleSymbolicName(attributes);
 
 			String bundleVersionAttributeValue = attributes.getValue(
 				Constants.BUNDLE_VERSION);
@@ -1083,10 +1052,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 			for (Bundle bundle : bundleContext.getBundles()) {
 				if (bundleSymbolicName.equals(bundle.getSymbolicName())) {
-					Version curBundleVersion = Version.parseVersion(
-						String.valueOf(bundle.getVersion()));
-
-					if (bundleVersion.equals(curBundleVersion)) {
+					if (bundleVersion.equals(bundle.getVersion())) {
 						return bundle;
 					}
 
@@ -1218,6 +1184,19 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		return true;
 	}
 
+	private String _parseBundleSymbolicName(Attributes attributes) {
+		String bundleSymbolicName = attributes.getValue(
+			Constants.BUNDLE_SYMBOLICNAME);
+
+		int index = bundleSymbolicName.indexOf(CharPool.SEMICOLON);
+
+		if (index != -1) {
+			bundleSymbolicName = bundleSymbolicName.substring(0, index);
+		}
+
+		return bundleSymbolicName;
+	}
+
 	private void _refreshBundles(List<Bundle> refreshBundles) {
 		FrameworkWiring frameworkWiring = _framework.adapt(
 			FrameworkWiring.class);
@@ -1309,7 +1288,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		ServiceRegistration<?> serviceRegistration =
 			bundleContext.registerService(
-				names.toArray(new String[names.size()]), bean,
+				names.toArray(new String[0]), bean,
 				_getProperties(osgiBeanProperties, beanName));
 
 		if (_log.isDebugEnabled()) {
@@ -1659,8 +1638,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		Bundle fileInstallBundle = null;
 
 		for (Bundle bundle : installedBundles) {
-			if ("org.apache.felix.fileinstall".equals(
-					bundle.getSymbolicName())) {
+			if (Objects.equals(
+					bundle.getSymbolicName(), "org.apache.felix.fileinstall")) {
 
 				fileInstallBundle = bundle;
 

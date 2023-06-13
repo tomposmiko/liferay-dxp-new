@@ -44,13 +44,15 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class SiteNavigationMenuDisplayContext {
 
-	public SiteNavigationMenuDisplayContext(HttpServletRequest request)
+	public SiteNavigationMenuDisplayContext(
+			HttpServletRequest httpServletRequest)
 		throws ConfigurationException {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
@@ -68,7 +70,7 @@ public class SiteNavigationMenuDisplayContext {
 
 		if (displayStyle != null) {
 			PortletDisplayTemplate portletDisplayTemplate =
-				(PortletDisplayTemplate)_request.getAttribute(
+				(PortletDisplayTemplate)_httpServletRequest.getAttribute(
 					WebKeys.PORTLET_DISPLAY_TEMPLATE);
 
 			_ddmTemplateKey = portletDisplayTemplate.getDDMTemplateKey(
@@ -84,7 +86,7 @@ public class SiteNavigationMenuDisplayContext {
 		}
 
 		_displayDepth = ParamUtil.getInteger(
-			_request, "displayDepth",
+			_httpServletRequest, "displayDepth",
 			_siteNavigationMenuPortletInstanceConfiguration.displayDepth());
 
 		return _displayDepth;
@@ -96,7 +98,7 @@ public class SiteNavigationMenuDisplayContext {
 		}
 
 		_displayStyle = ParamUtil.getString(
-			_request, "displayStyle",
+			_httpServletRequest, "displayStyle",
 			_siteNavigationMenuPortletInstanceConfiguration.displayStyle());
 
 		return _displayStyle;
@@ -108,13 +110,14 @@ public class SiteNavigationMenuDisplayContext {
 		}
 
 		_displayStyleGroupId = ParamUtil.getLong(
-			_request, "displayStyleGroupId",
+			_httpServletRequest, "displayStyleGroupId",
 			_siteNavigationMenuPortletInstanceConfiguration.
 				displayStyleGroupId());
 
 		if (_displayStyleGroupId <= 0) {
-			ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-				WebKeys.THEME_DISPLAY);
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)_httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
 
 			_displayStyleGroupId = themeDisplay.getSiteGroupId();
 		}
@@ -131,14 +134,15 @@ public class SiteNavigationMenuDisplayContext {
 			_siteNavigationMenuPortletInstanceConfiguration.expandedLevels();
 
 		_expandedLevels = ParamUtil.getString(
-			_request, "expandedLevels", defaultExpandedLevels);
+			_httpServletRequest, "expandedLevels", defaultExpandedLevels);
 
 		return _expandedLevels;
 	}
 
 	public String getRootMenuItemEventName() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
@@ -160,7 +164,7 @@ public class SiteNavigationMenuDisplayContext {
 		}
 
 		_rootMenuItemId = ParamUtil.getString(
-			_request, "rootMenuItemId", defaultRootMenuItemId);
+			_httpServletRequest, "rootMenuItemId", defaultRootMenuItemId);
 
 		return _rootMenuItemId;
 	}
@@ -174,7 +178,7 @@ public class SiteNavigationMenuDisplayContext {
 			_siteNavigationMenuPortletInstanceConfiguration.rootMenuItemLevel();
 
 		_rootMenuItemLevel = ParamUtil.getInteger(
-			_request, "rootMenuItemLevel", defaultRootMenuItemLevel);
+			_httpServletRequest, "rootMenuItemLevel", defaultRootMenuItemLevel);
 
 		return _rootMenuItemLevel;
 	}
@@ -182,8 +186,9 @@ public class SiteNavigationMenuDisplayContext {
 	public String getRootMenuItemSelectorURL() {
 		String eventName = getRootMenuItemEventName();
 
-		ItemSelector itemSelector = (ItemSelector)_request.getAttribute(
-			SiteNavigationMenuWebKeys.ITEM_SELECTOR);
+		ItemSelector itemSelector =
+			(ItemSelector)_httpServletRequest.getAttribute(
+				SiteNavigationMenuWebKeys.ITEM_SELECTOR);
 
 		ItemSelectorCriterion itemSelectorCriterion =
 			new SiteNavigationMenuItemItemSelectorCriterion();
@@ -192,8 +197,8 @@ public class SiteNavigationMenuDisplayContext {
 			new UUIDItemSelectorReturnType());
 
 		PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(
-			RequestBackedPortletURLFactoryUtil.create(_request), eventName,
-			itemSelectorCriterion);
+			RequestBackedPortletURLFactoryUtil.create(_httpServletRequest),
+			eventName, itemSelectorCriterion);
 
 		return itemSelectorURL.toString();
 	}
@@ -207,14 +212,15 @@ public class SiteNavigationMenuDisplayContext {
 			_siteNavigationMenuPortletInstanceConfiguration.rootMenuItemType();
 
 		_rootMenuItemType = ParamUtil.getString(
-			_request, "rootMenuItemType", defaultRootMenuItemType);
+			_httpServletRequest, "rootMenuItemType", defaultRootMenuItemType);
 
 		return _rootMenuItemType;
 	}
 
 	public long getSelectSiteNavigationMenuId() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		int siteNavigationMenuType = getSiteNavigationMenuType();
 
@@ -271,8 +277,9 @@ public class SiteNavigationMenuDisplayContext {
 	}
 
 	public String getSiteNavigationMenuEventName() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
@@ -285,7 +292,7 @@ public class SiteNavigationMenuDisplayContext {
 		}
 
 		_siteNavigationMenuId = ParamUtil.getLong(
-			_request, "siteNavigationMenuId",
+			_httpServletRequest, "siteNavigationMenuId",
 			_siteNavigationMenuPortletInstanceConfiguration.
 				siteNavigationMenuId());
 
@@ -295,8 +302,9 @@ public class SiteNavigationMenuDisplayContext {
 	public String getSiteNavigationMenuItemSelectorURL() {
 		String eventName = getSiteNavigationMenuEventName();
 
-		ItemSelector itemSelector = (ItemSelector)_request.getAttribute(
-			SiteNavigationMenuWebKeys.ITEM_SELECTOR);
+		ItemSelector itemSelector =
+			(ItemSelector)_httpServletRequest.getAttribute(
+				SiteNavigationMenuWebKeys.ITEM_SELECTOR);
 
 		ItemSelectorCriterion itemSelectorCriterion =
 			new SiteNavigationMenuItemSelectorCriterion();
@@ -305,8 +313,8 @@ public class SiteNavigationMenuDisplayContext {
 			new UUIDItemSelectorReturnType());
 
 		PortletURL itemSelectorURL = itemSelector.getItemSelectorURL(
-			RequestBackedPortletURLFactoryUtil.create(_request), eventName,
-			itemSelectorCriterion);
+			RequestBackedPortletURLFactoryUtil.create(_httpServletRequest),
+			eventName, itemSelectorCriterion);
 
 		return itemSelectorURL.toString();
 	}
@@ -321,7 +329,8 @@ public class SiteNavigationMenuDisplayContext {
 				siteNavigationMenuType();
 
 		_navigationMenuType = ParamUtil.getInteger(
-			_request, "siteNavigationMenuType", siteNavigationMenuType);
+			_httpServletRequest, "siteNavigationMenuType",
+			siteNavigationMenuType);
 
 		return _navigationMenuType;
 	}
@@ -347,7 +356,7 @@ public class SiteNavigationMenuDisplayContext {
 			typeKey = "social-navigation";
 		}
 
-		return LanguageUtil.get(_request, typeKey);
+		return LanguageUtil.get(_httpServletRequest, typeKey);
 	}
 
 	public boolean isPreview() {
@@ -356,7 +365,7 @@ public class SiteNavigationMenuDisplayContext {
 		}
 
 		_preview = ParamUtil.getBoolean(
-			_request, "preview",
+			_httpServletRequest, "preview",
 			_siteNavigationMenuPortletInstanceConfiguration.preview());
 
 		return _preview;
@@ -375,8 +384,9 @@ public class SiteNavigationMenuDisplayContext {
 	}
 
 	private int _getDefaultSelectSiteNavigationMenuType() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		Layout layout = themeDisplay.getLayout();
 
@@ -392,9 +402,9 @@ public class SiteNavigationMenuDisplayContext {
 	private String _displayStyle;
 	private long _displayStyleGroupId;
 	private String _expandedLevels;
+	private final HttpServletRequest _httpServletRequest;
 	private Integer _navigationMenuType;
 	private Boolean _preview;
-	private final HttpServletRequest _request;
 	private String _rootMenuItemId;
 	private Integer _rootMenuItemLevel;
 	private String _rootMenuItemType;

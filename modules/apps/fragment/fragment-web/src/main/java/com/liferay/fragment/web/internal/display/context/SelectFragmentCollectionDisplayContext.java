@@ -42,11 +42,11 @@ public class SelectFragmentCollectionDisplayContext {
 
 	public SelectFragmentCollectionDisplayContext(
 		RenderRequest renderRequest, RenderResponse renderResponse,
-		HttpServletRequest request) {
+		HttpServletRequest httpServletRequest) {
 
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 	}
 
 	public String getEventName() {
@@ -55,7 +55,7 @@ public class SelectFragmentCollectionDisplayContext {
 		}
 
 		_eventName = ParamUtil.getString(
-			_request, "eventName",
+			_httpServletRequest, "eventName",
 			_renderResponse.getNamespace() + "selectFragmentCollection");
 
 		return _eventName;
@@ -66,8 +66,9 @@ public class SelectFragmentCollectionDisplayContext {
 			return _fragmentCollectionsSearchContainer;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		SearchContainer fragmentCollectionsSearchContainer =
 			new SearchContainer(
@@ -179,7 +180,7 @@ public class SelectFragmentCollectionDisplayContext {
 			return _keywords;
 		}
 
-		_keywords = ParamUtil.getString(_request, "keywords");
+		_keywords = ParamUtil.getString(_httpServletRequest, "keywords");
 
 		return _keywords;
 	}
@@ -190,7 +191,7 @@ public class SelectFragmentCollectionDisplayContext {
 		}
 
 		_orderByCol = ParamUtil.getString(
-			_request, "orderByCol", "create-date");
+			_httpServletRequest, "orderByCol", "create-date");
 
 		return _orderByCol;
 	}
@@ -200,7 +201,8 @@ public class SelectFragmentCollectionDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = ParamUtil.getString(_request, "orderByType", "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -215,11 +217,11 @@ public class SelectFragmentCollectionDisplayContext {
 
 	private String _eventName;
 	private SearchContainer _fragmentCollectionsSearchContainer;
+	private final HttpServletRequest _httpServletRequest;
 	private String _keywords;
 	private String _orderByCol;
 	private String _orderByType;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private final HttpServletRequest _request;
 
 }

@@ -11,7 +11,6 @@ classes {
 dependencies {
 	compileInclude group: "com.liferay", name: "javax.servlet.jsp", version: "2.3.3-b02.LIFERAY-PATCHED-8"
 
-	compileOnly group: "com.liferay", name: "com.liferay.osgi.felix.util", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.osgi.util", version: "5.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.concurrent", version: "3.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.lang", version: "3.0.0"

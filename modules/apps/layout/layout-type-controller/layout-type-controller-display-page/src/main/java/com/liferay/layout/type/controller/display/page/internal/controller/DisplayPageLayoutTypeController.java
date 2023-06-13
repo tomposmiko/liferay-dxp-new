@@ -20,6 +20,7 @@ import com.liferay.fragment.renderer.FragmentRendererController;
 import com.liferay.fragment.renderer.FragmentRendererTracker;
 import com.liferay.info.constants.InfoDisplayWebKeys;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
+import com.liferay.info.display.request.attributes.contributor.InfoDisplayRequestAttributesContributor;
 import com.liferay.item.selector.ItemSelector;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
@@ -40,6 +41,8 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.servlet.PipingServletResponse;
+
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -73,23 +76,24 @@ public class DisplayPageLayoutTypeController
 
 	@Override
 	public String includeEditContent(
-		HttpServletRequest request, HttpServletResponse response,
-		Layout layout) {
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse, Layout layout) {
 
 		return StringPool.BLANK;
 	}
 
 	@Override
 	public boolean includeLayoutContent(
-			HttpServletRequest request, HttpServletResponse response,
-			Layout layout)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, Layout layout)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		String layoutMode = ParamUtil.getString(
-			request, "p_l_mode", Constants.VIEW);
+			httpServletRequest, "p_l_mode", Constants.VIEW);
 
 		if (layoutMode.equals(Constants.EDIT) &&
 			!LayoutPermissionUtil.contains(
@@ -100,16 +104,16 @@ public class DisplayPageLayoutTypeController
 		}
 
 		if (layoutMode.equals(Constants.EDIT)) {
-			request.setAttribute(
+			httpServletRequest.setAttribute(
 				ContentPageEditorWebKeys.
 					FRAGMENT_COLLECTION_CONTRIBUTOR_TRACKER,
 				_fragmentCollectionContributorTracker);
 
-			request.setAttribute(
+			httpServletRequest.setAttribute(
 				ContentPageEditorWebKeys.ITEM_SELECTOR, _itemSelector);
 		}
 
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			FragmentActionKeys.FRAGMENT_RENDERER_CONTROLLER,
 			_fragmentRendererController);
 
@@ -126,11 +130,11 @@ public class DisplayPageLayoutTypeController
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
 		ServletResponse servletResponse = createServletResponse(
-			response, unsyncStringWriter);
+			httpServletResponse, unsyncStringWriter);
 
 		String contentType = servletResponse.getContentType();
 
-		String includeServletPath = (String)request.getAttribute(
+		String includeServletPath = (String)httpServletRequest.getAttribute(
 			RequestDispatcher.INCLUDE_SERVLET_PATH);
 
 		try {
@@ -138,38 +142,38 @@ public class DisplayPageLayoutTypeController
 				_fetchLayoutPageTemplateEntry(layout);
 
 			if (layoutPageTemplateEntry != null) {
-				request.setAttribute(
+				httpServletRequest.setAttribute(
 					ContentPageEditorWebKeys.CLASS_NAME,
 					LayoutPageTemplateEntry.class.getName());
 
-				request.setAttribute(
+				httpServletRequest.setAttribute(
 					ContentPageEditorWebKeys.CLASS_PK,
 					layoutPageTemplateEntry.getLayoutPageTemplateEntryId());
 			}
 
-			request.setAttribute(
+			httpServletRequest.setAttribute(
 				FragmentActionKeys.FRAGMENT_RENDERER_TRACKER,
 				_fragmentRendererTracker);
-			request.setAttribute(
+			httpServletRequest.setAttribute(
 				InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR_TRACKER,
 				_infoDisplayContributorTracker);
 
-			addAttributes(request);
+			addAttributes(httpServletRequest);
 
-			requestDispatcher.include(request, servletResponse);
+			requestDispatcher.include(httpServletRequest, servletResponse);
 		}
 		finally {
-			removeAttributes(request);
+			removeAttributes(httpServletRequest);
 
-			request.setAttribute(
+			httpServletRequest.setAttribute(
 				RequestDispatcher.INCLUDE_SERVLET_PATH, includeServletPath);
 		}
 
 		if (contentType != null) {
-			response.setContentType(contentType);
+			httpServletResponse.setContentType(contentType);
 		}
 
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			WebKeys.LAYOUT_CONTENT, unsyncStringWriter.getStringBundler());
 
 		return false;
@@ -206,10 +210,23 @@ public class DisplayPageLayoutTypeController
 	}
 
 	@Override
-	protected ServletResponse createServletResponse(
-		HttpServletResponse response, UnsyncStringWriter unsyncStringWriter) {
+	protected void addAttributes(HttpServletRequest httpServletRequest) {
+		for (InfoDisplayRequestAttributesContributor
+				infoDisplayRequestAttributesContributor :
+					_infoDisplayRequestAttributesContributors) {
 
-		return new PipingServletResponse(response, unsyncStringWriter);
+			infoDisplayRequestAttributesContributor.addAttributes(
+				httpServletRequest);
+		}
+	}
+
+	@Override
+	protected ServletResponse createServletResponse(
+		HttpServletResponse httpServletResponse,
+		UnsyncStringWriter unsyncStringWriter) {
+
+		return new PipingServletResponse(
+			httpServletResponse, unsyncStringWriter);
 	}
 
 	@Override
@@ -272,6 +289,10 @@ public class DisplayPageLayoutTypeController
 
 	@Reference
 	private InfoDisplayContributorTracker _infoDisplayContributorTracker;
+
+	@Reference
+	private volatile List<InfoDisplayRequestAttributesContributor>
+		_infoDisplayRequestAttributesContributors;
 
 	@Reference
 	private ItemSelector _itemSelector;

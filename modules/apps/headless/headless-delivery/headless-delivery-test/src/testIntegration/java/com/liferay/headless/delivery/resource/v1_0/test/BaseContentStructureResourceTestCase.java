@@ -1005,7 +1005,7 @@ public abstract class BaseContentStructureResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected ContentStructure randomContentStructure() {
+	protected ContentStructure randomContentStructure() throws Exception {
 		return new ContentStructure() {
 			{
 				dateCreated = RandomTestUtil.nextDate();
@@ -1018,7 +1018,9 @@ public abstract class BaseContentStructureResourceTestCase {
 		};
 	}
 
-	protected ContentStructure randomIrrelevantContentStructure() {
+	protected ContentStructure randomIrrelevantContentStructure()
+		throws Exception {
+
 		ContentStructure randomIrrelevantContentStructure =
 			randomContentStructure();
 
@@ -1028,7 +1030,7 @@ public abstract class BaseContentStructureResourceTestCase {
 		return randomIrrelevantContentStructure;
 	}
 
-	protected ContentStructure randomPatchContentStructure() {
+	protected ContentStructure randomPatchContentStructure() throws Exception {
 		return randomContentStructure();
 	}
 

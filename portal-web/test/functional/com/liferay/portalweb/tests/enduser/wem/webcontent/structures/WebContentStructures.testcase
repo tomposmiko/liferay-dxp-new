@@ -232,13 +232,15 @@ definition {
 			templateDescription = "Test WC Template Description",
 			templateName = "Test WC Template");
 
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Edit",
-			rowEntry = "Test WC Template");
+		WebContentTemplates.gotoTemplateEllipsisItem(
+			item = "Edit",
+			templateName = "Test WC Template");
 
 		Navigator.gotoBack();
 
 		SiteAdmin.viewPortletTitle(portletTitle = "Templates for Structure: Basic Web Content");
+
+		LexiconEntry.changeDisplayStyle(displayStyle = "table");
 
 		WebContentTemplates.viewTableEntryCP(
 			templateDescription = "Test WC Template Description",

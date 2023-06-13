@@ -110,19 +110,11 @@ definition {
 		property custom.properties = "default.layout.template.id=1_column";
 		property testray.component.names = "Breadcrumb";
 
-		ProductMenu.gotoPortlet(
-			category = "Sites",
-			panel = "Control Panel",
-			portlet = "Sites");
+		JSONGroup.addGroup(groupName = "Site Name");
 
-		Site.addBlankCP(siteName = "Site Name");
-
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			panel = "Site Administration",
-			portlet = "Pages");
-
-		SitePages.addPublicPage(pageName = "Page Name");
+		JSONLayout.addPublicLayout(
+			groupName = "Site Name",
+			layoutName = "Page Name");
 
 		Navigator.gotoSitePage(
 			pageName = "Page Name",
@@ -143,7 +135,7 @@ definition {
 
 		MessageboardsCategory.addSubcategoryToSubcategoryPG(
 			categoryName = "MB Category Name",
-			subCategoryDescription = "MB Subcategory Description",
+			subCategoryDescription = "MB Subcategory Subcategory Description",
 			subCategoryName = "MB Subcategory Name",
 			subCategorySubCategoryName = "MB Subcategory Subcategory Name");
 
@@ -165,7 +157,7 @@ definition {
 
 		MessageboardsCategory.viewSubcategoryFromSubcategoryPG(
 			categoryName = "MB Subcategory Name",
-			subCategoryDescription = "MB Subcategory Description",
+			subCategoryDescription = "MB Subcategory Subcategory Description",
 			subCategoryName = "MB Subcategory Subcategory Name");
 
 		Breadcrumb.viewPG(
@@ -196,7 +188,7 @@ definition {
 
 		MessageboardsCategory.viewSubcategoryFromSubcategoryPG(
 			categoryName = "MB Subcategory Name",
-			subCategoryDescription = "MB Subcategory Description",
+			subCategoryDescription = "MB Subcategory Subcategory Description",
 			subCategoryName = "MB Subcategory Subcategory Name");
 
 		Breadcrumb.viewSpecificPG(
@@ -224,7 +216,7 @@ definition {
 
 		MessageboardsCategory.viewSubcategoryFromSubcategoryPG(
 			categoryName = "MB Subcategory Name",
-			subCategoryDescription = "MB Subcategory Description",
+			subCategoryDescription = "MB Subcategory Subcategory Description",
 			subCategoryName = "MB Subcategory Subcategory Name");
 
 		Breadcrumb.viewPG(

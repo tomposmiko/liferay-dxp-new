@@ -1328,13 +1328,13 @@ public class DDMFormEvaluatorHelperTest extends PowerMockito {
 		Portal portal = Mockito.mock(Portal.class);
 
 		Mockito.when(
-			portal.getUser(_request)
+			portal.getUser(_httpServletRequest)
 		).thenReturn(
 			_user
 		);
 
 		Mockito.when(
-			portal.getCompany(_request)
+			portal.getCompany(_httpServletRequest)
 		).thenReturn(
 			_company
 		);
@@ -1359,10 +1359,11 @@ public class DDMFormEvaluatorHelperTest extends PowerMockito {
 	private Company _company;
 
 	private DDMExpressionFactory _ddmExpressionFactory;
-	private Language _language;
 
 	@Mock
-	private HttpServletRequest _request;
+	private HttpServletRequest _httpServletRequest;
+
+	private Language _language;
 
 	@Mock
 	private Role _role;

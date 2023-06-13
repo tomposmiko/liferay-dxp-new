@@ -14,10 +14,10 @@
 
 package com.liferay.portal.kernel.model;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.annotation.ImplementationClassName;
 import com.liferay.portal.kernel.util.Accessor;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The extended model interface for the Layout service. Represents a row in the &quot;Layout&quot; database table, with each column mapped to a property of this class.
@@ -247,15 +247,16 @@ public interface Layout extends LayoutModel, PersistedModel {
 	 */
 	public Layout getLinkedToLayout();
 
-	public String getRegularURL(javax.servlet.http.HttpServletRequest request)
+	public String getRegularURL(
+			javax.servlet.http.HttpServletRequest httpServletRequest)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public String getResetLayoutURL(
-			javax.servlet.http.HttpServletRequest request)
+			javax.servlet.http.HttpServletRequest httpServletRequest)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public String getResetMaxStateURL(
-			javax.servlet.http.HttpServletRequest request)
+			javax.servlet.http.HttpServletRequest httpServletRequest)
 		throws com.liferay.portal.kernel.exception.PortalException;
 
 	public Group getScopeGroup()
@@ -312,8 +313,8 @@ public interface Layout extends LayoutModel, PersistedModel {
 	public boolean hasSetModifiedDate();
 
 	public boolean includeLayoutContent(
-			javax.servlet.http.HttpServletRequest request,
-			javax.servlet.http.HttpServletResponse response)
+			javax.servlet.http.HttpServletRequest httpServletRequest,
+			javax.servlet.http.HttpServletResponse httpServletResponse)
 		throws Exception;
 
 	public boolean isChildSelected(boolean selectable, Layout layout)
@@ -430,7 +431,8 @@ public interface Layout extends LayoutModel, PersistedModel {
 	public boolean isTypeURL();
 
 	public boolean matches(
-		javax.servlet.http.HttpServletRequest request, String friendlyURL);
+		javax.servlet.http.HttpServletRequest httpServletRequest,
+		String friendlyURL);
 
 	public void setLayoutSet(LayoutSet layoutSet);
 

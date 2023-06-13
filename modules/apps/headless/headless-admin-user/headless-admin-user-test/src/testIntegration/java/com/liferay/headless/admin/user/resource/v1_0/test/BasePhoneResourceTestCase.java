@@ -671,7 +671,7 @@ public abstract class BasePhoneResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected Phone randomPhone() {
+	protected Phone randomPhone() throws Exception {
 		return new Phone() {
 			{
 				extension = RandomTestUtil.randomString();
@@ -683,13 +683,13 @@ public abstract class BasePhoneResourceTestCase {
 		};
 	}
 
-	protected Phone randomIrrelevantPhone() {
+	protected Phone randomIrrelevantPhone() throws Exception {
 		Phone randomIrrelevantPhone = randomPhone();
 
 		return randomIrrelevantPhone;
 	}
 
-	protected Phone randomPatchPhone() {
+	protected Phone randomPatchPhone() throws Exception {
 		return randomPhone();
 	}
 

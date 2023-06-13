@@ -14,15 +14,15 @@
 
 package com.liferay.dynamic.data.mapping.io.exporter;
 
-import aQute.bnd.annotation.ProviderType;
-
 import java.util.Map;
 import java.util.Set;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
- * @author Marcellus Tavares
+ * @author     Marcellus Tavares
  * @deprecated As of Judson (7.1.x), replaced by {@link
- * DDMFormInstanceRecordWriterTracker}
+ *             DDMFormInstanceRecordWriterTracker}
  */
 @Deprecated
 @ProviderType

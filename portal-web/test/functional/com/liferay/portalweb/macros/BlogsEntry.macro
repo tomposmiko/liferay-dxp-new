@@ -51,7 +51,7 @@ definition {
 
 			Click(locator1 = "AlloyEditor#TEXT_FORMATTING_LINK_INPUT_CONFIRM");
 
-			AssertTextEquals(
+			AssertTextEquals.assertPartialText(
 				locator1 = "BlogsEntry#VIDEO_EMBED_HELP_MESSAGE",
 				value1 = "Video playback is disabled during edit mode");
 		}
@@ -650,7 +650,7 @@ definition {
 
 		AssertTextEquals(
 			locator1 = "AssetRelatedAssets#HEADER",
-			value1 = "Related Assets:");
+			value1 = "Related Assets");
 
 		AssertTextEquals(
 			locator1 = "AssetRelatedAssets#ASSET_TITLE",

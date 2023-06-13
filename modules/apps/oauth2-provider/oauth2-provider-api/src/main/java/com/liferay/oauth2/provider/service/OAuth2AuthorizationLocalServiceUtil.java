@@ -14,8 +14,7 @@
 
 package com.liferay.oauth2.provider.service;
 
-import aQute.bnd.annotation.ProviderType;
-
+import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.util.tracker.ServiceTracker;
@@ -42,7 +41,9 @@ public class OAuth2AuthorizationLocalServiceUtil {
 	 */
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addOAuth2Authorization(long, long, String, long,long, String, Date, Date, String, String, String, Date, Date)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addOAuth2Authorization(long, long, String, long,long,
+	 String, Date, Date, String, String, String, Date, Date)}
 	 */
 	@Deprecated
 	public static com.liferay.oauth2.provider.model.OAuth2Authorization

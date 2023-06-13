@@ -401,7 +401,7 @@ public abstract class BaseSelectionResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected Selection randomSelection() {
+	protected Selection randomSelection() throws Exception {
 		return new Selection() {
 			{
 				size = RandomTestUtil.randomLong();
@@ -409,13 +409,13 @@ public abstract class BaseSelectionResourceTestCase {
 		};
 	}
 
-	protected Selection randomIrrelevantSelection() {
+	protected Selection randomIrrelevantSelection() throws Exception {
 		Selection randomIrrelevantSelection = randomSelection();
 
 		return randomIrrelevantSelection;
 	}
 
-	protected Selection randomPatchSelection() {
+	protected Selection randomPatchSelection() throws Exception {
 		return randomSelection();
 	}
 

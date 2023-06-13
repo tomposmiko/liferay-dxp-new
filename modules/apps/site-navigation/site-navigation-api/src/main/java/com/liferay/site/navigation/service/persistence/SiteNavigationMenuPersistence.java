@@ -14,11 +14,11 @@
 
 package com.liferay.site.navigation.service.persistence;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
 import com.liferay.site.navigation.exception.NoSuchMenuException;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The persistence interface for the site navigation menu service.

@@ -31,6 +31,7 @@ import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portlet.layoutsadmin.display.context.GroupDisplayContextHelper;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.portlet.PortletURL;
 
@@ -46,10 +47,11 @@ public class ExportTemplatesToolbarDisplayContext
 	public ExportTemplatesToolbarDisplayContext(
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest request, long liveGroupId, Company company,
-		PortletURL iteratorURL) {
+		HttpServletRequest httpServletRequest, long liveGroupId,
+		Company company, PortletURL iteratorURL) {
 
-		super(liferayPortletRequest, liferayPortletResponse, request);
+		super(
+			liferayPortletRequest, liferayPortletResponse, httpServletRequest);
 
 		searchContainer = _createSearchContainer(
 			liveGroupId, company, iteratorURL);
@@ -130,7 +132,7 @@ public class ExportTemplatesToolbarDisplayContext
 		searchContainer.setOrderByCol("name");
 		searchContainer.setOrderByComparator(
 			new ExportImportConfigurationNameComparator(
-				"asc".equals(getOrderByType())));
+				Objects.equals(getOrderByType(), "asc")));
 		searchContainer.setOrderByType(getOrderByType());
 
 		int exportImportConfigurationType =

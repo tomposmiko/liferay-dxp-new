@@ -185,6 +185,8 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		assertResponseCode(
 			404, invokeGetBlogPostingResponse(blogPosting.getId()));
+
+		assertResponseCode(404, invokeGetBlogPostingResponse(0L));
 	}
 
 	protected BlogPosting testDeleteBlogPosting_addBlogPosting()
@@ -474,6 +476,8 @@ public abstract class BaseBlogPostingResourceTestCase {
 
 		assertResponseCode(
 			404, invokeGetBlogPostingMyRatingResponse(blogPosting.getId()));
+
+		assertResponseCode(404, invokeGetBlogPostingMyRatingResponse(0L));
 	}
 
 	protected BlogPosting testDeleteBlogPostingMyRating_addBlogPosting()
@@ -1793,7 +1797,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected BlogPosting randomBlogPosting() {
+	protected BlogPosting randomBlogPosting() throws Exception {
 		return new BlogPosting() {
 			{
 				alternativeHeadline = RandomTestUtil.randomString();
@@ -1811,7 +1815,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 		};
 	}
 
-	protected BlogPosting randomIrrelevantBlogPosting() {
+	protected BlogPosting randomIrrelevantBlogPosting() throws Exception {
 		BlogPosting randomIrrelevantBlogPosting = randomBlogPosting();
 
 		randomIrrelevantBlogPosting.setSiteId(irrelevantGroup.getGroupId());
@@ -1819,7 +1823,7 @@ public abstract class BaseBlogPostingResourceTestCase {
 		return randomIrrelevantBlogPosting;
 	}
 
-	protected BlogPosting randomPatchBlogPosting() {
+	protected BlogPosting randomPatchBlogPosting() throws Exception {
 		return randomBlogPosting();
 	}
 

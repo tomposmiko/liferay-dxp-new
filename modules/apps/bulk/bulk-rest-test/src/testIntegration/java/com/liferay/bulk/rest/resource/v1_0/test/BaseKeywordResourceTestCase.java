@@ -465,7 +465,7 @@ public abstract class BaseKeywordResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected Keyword randomKeyword() {
+	protected Keyword randomKeyword() throws Exception {
 		return new Keyword() {
 			{
 				name = RandomTestUtil.randomString();
@@ -473,13 +473,13 @@ public abstract class BaseKeywordResourceTestCase {
 		};
 	}
 
-	protected Keyword randomIrrelevantKeyword() {
+	protected Keyword randomIrrelevantKeyword() throws Exception {
 		Keyword randomIrrelevantKeyword = randomKeyword();
 
 		return randomIrrelevantKeyword;
 	}
 
-	protected Keyword randomPatchKeyword() {
+	protected Keyword randomPatchKeyword() throws Exception {
 		return randomKeyword();
 	}
 

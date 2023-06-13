@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.security.permission;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.exception.NoSuchResourceActionException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Portlet;
@@ -25,6 +23,8 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Brian Wing Shun Chan
@@ -40,7 +40,8 @@ public interface ResourceActions {
 	public void checkAction(String name, String actionId)
 		throws NoSuchResourceActionException;
 
-	public String getAction(HttpServletRequest request, String action);
+	public String getAction(
+		HttpServletRequest httpServletRequest, String action);
 
 	public String getAction(Locale locale, String action);
 
@@ -54,7 +55,8 @@ public interface ResourceActions {
 
 	public List<String> getModelPortletResources(String name);
 
-	public String getModelResource(HttpServletRequest request, String name);
+	public String getModelResource(
+		HttpServletRequest httpServletRequest, String name);
 
 	public String getModelResource(Locale locale, String name);
 

@@ -41,22 +41,24 @@ public class DefineObjectsTag3 extends DefineObjectsTag {
 	public int doStartTag() {
 		super.doStartTag();
 
-		HttpServletRequest request =
+		HttpServletRequest httpServletRequest =
 			(HttpServletRequest)pageContext.getRequest();
 
-		String lifecycle = (String)request.getAttribute(
+		String lifecycle = (String)httpServletRequest.getAttribute(
 			PortletRequest.LIFECYCLE_PHASE);
 
-		PortletConfig portletConfig = (PortletConfig)request.getAttribute(
-			JavaConstants.JAVAX_PORTLET_CONFIG);
+		PortletConfig portletConfig =
+			(PortletConfig)httpServletRequest.getAttribute(
+				JavaConstants.JAVAX_PORTLET_CONFIG);
 
 		if (portletConfig != null) {
 			pageContext.setAttribute(
 				"portletContext", portletConfig.getPortletContext());
 		}
 
-		PortletRequest portletRequest = (PortletRequest)request.getAttribute(
-			JavaConstants.JAVAX_PORTLET_REQUEST);
+		PortletRequest portletRequest =
+			(PortletRequest)httpServletRequest.getAttribute(
+				JavaConstants.JAVAX_PORTLET_REQUEST);
 
 		if (portletRequest != null) {
 			if (lifecycle.equals(PortletRequest.ACTION_PHASE)) {
@@ -80,8 +82,7 @@ public class DefineObjectsTag3 extends DefineObjectsTag {
 			List<Locale> locales = Collections.list(
 				portletRequest.getLocales());
 
-			pageContext.setAttribute(
-				"locales", locales.toArray(new Locale[locales.size()]));
+			pageContext.setAttribute("locales", locales.toArray(new Locale[0]));
 
 			pageContext.setAttribute(
 				"portletMode", portletRequest.getPortletMode());
@@ -102,8 +103,9 @@ public class DefineObjectsTag3 extends DefineObjectsTag {
 				"windowState", portletRequest.getWindowState());
 		}
 
-		PortletResponse portletResponse = (PortletResponse)request.getAttribute(
-			JavaConstants.JAVAX_PORTLET_RESPONSE);
+		PortletResponse portletResponse =
+			(PortletResponse)httpServletRequest.getAttribute(
+				JavaConstants.JAVAX_PORTLET_RESPONSE);
 
 		if (portletResponse == null) {
 			return SKIP_BODY;
@@ -113,7 +115,7 @@ public class DefineObjectsTag3 extends DefineObjectsTag {
 			portletRequest, portletResponse);
 
 		if (Validator.isNull(namespace)) {
-			namespace = AUIUtil.getNamespace(request);
+			namespace = AUIUtil.getNamespace(httpServletRequest);
 		}
 
 		pageContext.setAttribute("namespace", namespace);

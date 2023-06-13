@@ -70,10 +70,11 @@ public class TunnelAuthVerifier implements AuthVerifier {
 				_log.debug(ae, ae);
 			}
 
-			HttpServletResponse response = accessControlContext.getResponse();
+			HttpServletResponse httpServletResponse =
+				accessControlContext.getResponse();
 
 			try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(
-					response.getOutputStream())) {
+					httpServletResponse.getOutputStream())) {
 
 				objectOutputStream.writeObject(ae);
 
@@ -90,8 +91,11 @@ public class TunnelAuthVerifier implements AuthVerifier {
 		return authVerifierResult;
 	}
 
-	protected String[] verify(HttpServletRequest request) throws AuthException {
-		String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+	protected String[] verify(HttpServletRequest httpServletRequest)
+		throws AuthException {
+
+		String authorization = httpServletRequest.getHeader(
+			HttpHeaders.AUTHORIZATION);
 
 		if (authorization == null) {
 			return null;
@@ -99,7 +103,8 @@ public class TunnelAuthVerifier implements AuthVerifier {
 
 		String[] credentials = new String[2];
 
-		long userId = TunnelAuthenticationManagerUtil.getUserId(request);
+		long userId = TunnelAuthenticationManagerUtil.getUserId(
+			httpServletRequest);
 
 		credentials[0] = String.valueOf(userId);
 

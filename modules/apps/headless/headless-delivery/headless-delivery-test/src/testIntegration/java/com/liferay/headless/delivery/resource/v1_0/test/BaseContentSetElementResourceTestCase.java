@@ -987,7 +987,7 @@ public abstract class BaseContentSetElementResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected ContentSetElement randomContentSetElement() {
+	protected ContentSetElement randomContentSetElement() throws Exception {
 		return new ContentSetElement() {
 			{
 				contentType = RandomTestUtil.randomString();
@@ -997,14 +997,18 @@ public abstract class BaseContentSetElementResourceTestCase {
 		};
 	}
 
-	protected ContentSetElement randomIrrelevantContentSetElement() {
+	protected ContentSetElement randomIrrelevantContentSetElement()
+		throws Exception {
+
 		ContentSetElement randomIrrelevantContentSetElement =
 			randomContentSetElement();
 
 		return randomIrrelevantContentSetElement;
 	}
 
-	protected ContentSetElement randomPatchContentSetElement() {
+	protected ContentSetElement randomPatchContentSetElement()
+		throws Exception {
+
 		return randomContentSetElement();
 	}
 

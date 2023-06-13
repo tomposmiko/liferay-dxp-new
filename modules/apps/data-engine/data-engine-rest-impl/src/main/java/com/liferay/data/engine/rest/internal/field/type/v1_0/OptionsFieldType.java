@@ -14,77 +14,90 @@
 
 package com.liferay.data.engine.rest.internal.field.type.v1_0;
 
-import com.liferay.data.engine.rest.dto.v1_0.DataDefinitionField;
-import com.liferay.data.engine.rest.internal.field.type.v1_0.util.CustomPropertyUtil;
+import com.liferay.data.engine.rest.internal.field.type.v1_0.util.CustomPropertiesUtil;
+import com.liferay.data.engine.spi.field.type.BaseFieldType;
+import com.liferay.data.engine.spi.field.type.FieldType;
+import com.liferay.data.engine.spi.field.type.SPIDataDefinitionField;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.template.soy.data.SoyDataFactory;
+import com.liferay.portal.kernel.util.MapUtil;
 
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * @author Marcelo Mello
  */
+@Component(
+	immediate = true,
+	property = {
+		"data.engine.field.type.icon=icon-font",
+		"data.engine.field.type.js.module=dynamic-data-mapping-form-field-type/metal/Options/Options.es",
+		"data.engine.field.type.system=true"
+	},
+	service = FieldType.class
+)
 public class OptionsFieldType extends BaseFieldType {
 
-	public OptionsFieldType(
-		DataDefinitionField dataDefinitionField,
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse,
-		SoyDataFactory soyDataFactory) {
-
-		super(
-			dataDefinitionField, httpServletRequest, httpServletResponse,
-			soyDataFactory);
-	}
-
 	@Override
-	public DataDefinitionField deserialize(JSONObject jsonObject)
+	public SPIDataDefinitionField deserialize(JSONObject jsonObject)
 		throws Exception {
 
-		DataDefinitionField dataDefinitionField = super.deserialize(jsonObject);
+		SPIDataDefinitionField spiDataDefinitionField = super.deserialize(
+			jsonObject);
 
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "allowEmptyOptions",
-				jsonObject.getBoolean("allowEmptyOptions")));
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "value",
-				jsonObject.getString("value")));
+		Map<String, Object> customProperties =
+			spiDataDefinitionField.getCustomProperties();
 
-		return dataDefinitionField;
+		customProperties.put(
+			"allowEmptyOptions", jsonObject.getBoolean("allowEmptyOptions"));
+		customProperties.put("value", jsonObject.getString("value"));
+
+		return spiDataDefinitionField;
 	}
 
 	@Override
-	public JSONObject toJSONObject() throws Exception {
-		JSONObject jsonObject = super.toJSONObject();
+	public String getName() {
+		return "options";
+	}
+
+	@Override
+	public JSONObject toJSONObject(
+			SPIDataDefinitionField spiDataDefinitionField)
+		throws Exception {
+
+		JSONObject jsonObject = super.toJSONObject(spiDataDefinitionField);
 
 		return jsonObject.put(
 			"allowEmptyOptions",
-			CustomPropertyUtil.getBoolean(
-				dataDefinitionField.getCustomProperties(), "allowEmptyOptions",
-				false)
+			MapUtil.getBoolean(
+				spiDataDefinitionField.getCustomProperties(),
+				"allowEmptyOptions", false)
 		).put(
 			"value",
-			CustomPropertyUtil.getDataFieldOptions(
-				dataDefinitionField.getCustomProperties(), "value")
+			CustomPropertiesUtil.getDataFieldOptions(
+				spiDataDefinitionField.getCustomProperties(), "value")
 		);
 	}
 
 	@Override
-	protected void addContext(Map<String, Object> context) {
+	protected void includeContext(
+		Map<String, Object> context, HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse,
+		SPIDataDefinitionField spiDataDefinitionField) {
+
 		context.put(
 			"allowEmptyOptions",
-			CustomPropertyUtil.getBoolean(
-				dataDefinitionField.getCustomProperties(), "allowEmptyOptions",
-				false));
+			MapUtil.getBoolean(
+				spiDataDefinitionField.getCustomProperties(),
+				"allowEmptyOptions", false));
 		context.put(
 			"value",
-			CustomPropertyUtil.getDataFieldOptions(
-				dataDefinitionField.getCustomProperties(), "value"));
+			CustomPropertiesUtil.getDataFieldOptions(
+				spiDataDefinitionField.getCustomProperties(), "value"));
 	}
 
 }

@@ -43,7 +43,7 @@ public class SocialUserStatisticsConfigurationAction
 	extends BaseJSPSettingsConfigurationAction {
 
 	@Override
-	public String getJspPath(HttpServletRequest request) {
+	public String getJspPath(HttpServletRequest httpServletRequest) {
 		return "/configuration.jsp";
 	}
 
@@ -78,8 +78,7 @@ public class SocialUserStatisticsConfigurationAction
 			}
 		}
 
-		setPreference(
-			actionRequest, key, values.toArray(new String[values.size()]));
+		setPreference(actionRequest, key, values.toArray(new String[0]));
 	}
 
 }

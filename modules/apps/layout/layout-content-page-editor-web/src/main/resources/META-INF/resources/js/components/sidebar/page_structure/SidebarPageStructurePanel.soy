@@ -72,7 +72,6 @@
 				{sp}justify-content-between
 				{sp}my-1
 				{sp}p-1
-				{sp}rounded
 
 				{if $node.active}
 					{sp}active
@@ -144,7 +143,7 @@
 		{/let}
 
 		<svg class="lexicon-icon lexicon-icon-angle-{$angleDirection}">
-			<use xlink:href="{$spritemap}#angle-{$angleDirection}"></use>
+			<use xlink:href="{$spritemap ?: ''}#angle-{$angleDirection}"></use>
 		</svg>
 	</span>
 {/template}
@@ -235,7 +234,7 @@
 		type="button"
 	>
 		<svg class="lexicon-icon lexicon-icon-times-circle">
-			<use xlink:href="{$spritemap}#times-circle"></use>
+			<use xlink:href="{$spritemap ?: ''}#times-circle"></use>
 		</svg>
 	</button>
 {/template}

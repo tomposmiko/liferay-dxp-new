@@ -171,7 +171,7 @@ List<LayoutRevision> rootLayoutRevisions = LayoutRevisionLocalServiceUtil.getChi
 	</c:if>
 </div>
 
-<aui:script>
+<script>
 	function <portlet:namespace />selectRevision(layoutRevisionId, layoutSetBranchId) {
 		AUI.$.ajax(
 			themeDisplay.getPathMain() + '/portal/update_layout',
@@ -193,26 +193,41 @@ List<LayoutRevision> rootLayoutRevisions = LayoutRevisionLocalServiceUtil.getChi
 			}
 		);
 	}
-</aui:script>
 
-<aui:script sandbox="<%= true %>">
-	var variationsSelector = $('#<portlet:namespace />variationsSelector');
+	(function() {
+		var layoutBranchesContainers = document.querySelectorAll('.layout-variation-container');
+		var variationsSelector = document.getElementById('<portlet:namespace />variationsSelector');
 
-	var layoutBranchesContainer = $('.layout-variation-container');
+		if (layoutBranchesContainers && variationsSelector) {
+			variationsSelector.addEventListener(
+				'change',
+				function() {
+					var variation = variationsSelector.value;
 
-	variationsSelector.on(
-		'change',
-		function() {
-			var variation = variationsSelector.val();
+					if (variation === 'all') {
+						Array.prototype.forEach.call(
+							layoutBranchesContainers,
+							function(layoutBranchesContainer) {
+								layoutBranchesContainer.classList.remove('hide');
+							}
+						);
+					}
+					else {
+						Array.prototype.forEach.call(
+							layoutBranchesContainers,
+							function(layoutBranchesContainer) {
+								layoutBranchesContainer.classList.add('hide');
+							}
+						);
 
-			if (variation == 'all') {
-				layoutBranchesContainer.removeClass('hide');
-			}
-			else {
-				layoutBranchesContainer.addClass('hide');
+						var variationElement = document.getElementById('<portlet:namespace />' + variation);
 
-				$('#<portlet:namespace />' + variation).removeClass('hide');
-			}
+						if (variationElement) {
+							variationElement.classList.remove('hide');
+						}
+					}
+				}
+			);
 		}
-	);
-</aui:script>
+})();
+</script>

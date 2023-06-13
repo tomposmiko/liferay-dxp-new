@@ -6,17 +6,18 @@
 {template .render}
 	{@param? availableLanguages: ?}
 	{@param? defaultLanguageId: string}
+	{@param? fragmentEntryLinks: ?}
 	{@param? languageId: string}
 	{@param? spritemap: string}
 	{@param? translationStatus: [
 		languageValues: list<[
 			languageId: string,
-			values: list<string>
+			values: list<?>
 		]>,
-		translationKeys: list<string>
+		translationKeys: list<?>
 	]}
 
-	<div class="dropdown lfr-icon-menu">
+	<div class="dropdown lfr-icon-menu" data-fragment-entry-links="{$fragmentEntryLinks}">
 		<button
 			class="btn btn-outline-light fragments-editor-toolbar__translation-status-button"
 			data-toggle="dropdown"
@@ -35,7 +36,7 @@
 			{/if}
 		</button>
 
-		{if $availableLanguages and $defaultLanguageId and $languageId and $spritemap and $translationStatus}
+		{if $availableLanguages and $defaultLanguageId and $languageId and $translationStatus}
 			<div class="dropdown-menu dropdown-menu-indicator-end fragments-editor-toolbar__translation-status-list">
 				{call .translationStatusItem}
 					{param isCurrent: $defaultLanguageId == $languageId /}
@@ -43,7 +44,7 @@
 					{param languageIcon: $availableLanguages[$defaultLanguageId].languageIcon /}
 					{param languageId: $defaultLanguageId /}
 					{param languageLabel: $availableLanguages[$defaultLanguageId].languageLabel /}
-					{param spritemap: $spritemap /}
+					{param spritemap: $spritemap ?: '' /}
 				{/call}
 
 				{foreach $languageTranslationStatus in $translationStatus.languageValues}
@@ -54,7 +55,7 @@
 							{param languageIcon: $availableLanguages[$languageTranslationStatus.languageId].languageIcon /}
 							{param languageId: $languageTranslationStatus.languageId /}
 							{param languageLabel: $availableLanguages[$languageTranslationStatus.languageId].languageLabel /}
-							{param spritemap: $spritemap /}
+							{param spritemap: $spritemap ?: '' /}
 							{param translatedValues: length($languageTranslationStatus.values) /}
 							{param translationKeys: length($translationStatus.translationKeys) /}
 						{/call}

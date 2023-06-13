@@ -193,6 +193,8 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 			404,
 			invokeGetKnowledgeBaseArticleResponse(
 				knowledgeBaseArticle.getId()));
+
+		assertResponseCode(404, invokeGetKnowledgeBaseArticleResponse(0L));
 	}
 
 	protected KnowledgeBaseArticle
@@ -526,6 +528,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 			404,
 			invokeGetKnowledgeBaseArticleMyRatingResponse(
 				knowledgeBaseArticle.getId()));
+
+		assertResponseCode(
+			404, invokeGetKnowledgeBaseArticleMyRatingResponse(0L));
 	}
 
 	protected KnowledgeBaseArticle
@@ -2865,7 +2870,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected KnowledgeBaseArticle randomKnowledgeBaseArticle() {
+	protected KnowledgeBaseArticle randomKnowledgeBaseArticle()
+		throws Exception {
+
 		return new KnowledgeBaseArticle() {
 			{
 				articleBody = RandomTestUtil.randomString();
@@ -2882,7 +2889,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		};
 	}
 
-	protected KnowledgeBaseArticle randomIrrelevantKnowledgeBaseArticle() {
+	protected KnowledgeBaseArticle randomIrrelevantKnowledgeBaseArticle()
+		throws Exception {
+
 		KnowledgeBaseArticle randomIrrelevantKnowledgeBaseArticle =
 			randomKnowledgeBaseArticle();
 
@@ -2892,7 +2901,9 @@ public abstract class BaseKnowledgeBaseArticleResourceTestCase {
 		return randomIrrelevantKnowledgeBaseArticle;
 	}
 
-	protected KnowledgeBaseArticle randomPatchKnowledgeBaseArticle() {
+	protected KnowledgeBaseArticle randomPatchKnowledgeBaseArticle()
+		throws Exception {
+
 		return randomKnowledgeBaseArticle();
 	}
 

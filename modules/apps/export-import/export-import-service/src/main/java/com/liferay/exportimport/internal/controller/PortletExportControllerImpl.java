@@ -14,8 +14,6 @@
 
 package com.liferay.exportimport.internal.controller;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.asset.kernel.model.AssetLink;
 import com.liferay.asset.kernel.model.adapter.StagedAssetLink;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
@@ -110,6 +108,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.time.StopWatch;
 
+import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -994,23 +993,6 @@ public class PortletExportControllerImpl implements PortletExportController {
 		ZipWriter zipWriter = portletDataContext.getZipWriter();
 
 		return zipWriter.getFile();
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void exportPortlet(
-			PortletDataContext portletDataContext, Layout layout,
-			Element parentElement, boolean exportPermissions,
-			boolean exportPortletArchivedSetups, boolean exportPortletData,
-			boolean exportPortletSetup, boolean exportPortletUserPreferences)
-		throws Exception {
-
-		exportPortlet(
-			portletDataContext, layout.getPlid(), parentElement,
-			exportPermissions, exportPortletArchivedSetups, exportPortletData,
-			exportPortletSetup, exportPortletUserPreferences);
 	}
 
 	protected void exportPortletPreference(

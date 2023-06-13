@@ -1,4 +1,4 @@
-import {CLEAR_DROP_TARGET, MOVE_ROW, UPDATE_TRANSLATION_STATUS} from '../actions/actions.es';
+import {CLEAR_DROP_TARGET, MOVE_ROW} from '../actions/actions.es';
 import {DEFAULT_COMPONENT_ROW_CONFIG, DEFAULT_SECTION_ROW_CONFIG} from './rowConstants';
 import {disableSavingChangesStatusAction, enableSavingChangesStatusAction, updateLastSaveDateAction} from '../actions/saveChanges.es';
 import {FRAGMENTS_EDITOR_DRAGGING_CLASS, FRAGMENTS_EDITOR_ROW_TYPES} from './constants';
@@ -112,7 +112,7 @@ function moveItem(store, moveItemAction, moveItemPayload) {
  * @param {number} direction
  * @param {number} rowIndex
  * @param {{}} store
- * @param {array} structure
+ * @param {Array} structure
  * @review
  */
 function moveRow(direction, rowIndex, store, structure) {
@@ -226,7 +226,7 @@ function setIn(object, keyPath, value) {
  * Updater receives the previous value or defaultValue and returns a new value.
  * @param {Array|Object} object Original object that will be copied
  * @param {Array<string>} keyPath Array of strings used for reaching the deep property
- * @param {(value: *) => *} updater Update function
+ * @param {function} updater Update function
  * @param {*} [defaultValue] Default value to be sent to updater function if
  *  there is no existing value
  * @return {Object}
@@ -286,11 +286,6 @@ function updateRow(store, updateAction, payload) {
 					type: updateAction
 				}
 			)
-		)
-		.dispatch(
-			{
-				type: UPDATE_TRANSLATION_STATUS
-			}
 		)
 		.dispatch(updateLastSaveDateAction())
 		.dispatch(disableSavingChangesStatusAction());

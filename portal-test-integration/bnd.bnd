@@ -1,12 +1,11 @@
 Bundle-Name: ${manifest.bundle.name}
 Bundle-SymbolicName: ${manifest.bundle.symbolic.name}
-Bundle-Version: 6.0.2
+Bundle-Version: 6.0.6
 Export-Package:\
 	com.liferay.portal.lar.test,\
 	com.liferay.portal.module.framework.test,\
 	com.liferay.portal.osgi.util.test,\
 	com.liferay.portal.search.test,\
-	com.liferay.portal.service.permission.test,\
 	com.liferay.portal.service.test,\
 	com.liferay.portal.test.log,\
 	com.liferay.portal.test.mail,\
@@ -35,3 +34,4 @@ Include-Resource:\
 	@${project.dir}/../lib/portal/httpmime.jar,\
 	@${project.dir}/../lib/portal/juniversalchardet.jar,\
 	@${project.dir}/../lib/portal/poi.jar
+-include ../common.bnd

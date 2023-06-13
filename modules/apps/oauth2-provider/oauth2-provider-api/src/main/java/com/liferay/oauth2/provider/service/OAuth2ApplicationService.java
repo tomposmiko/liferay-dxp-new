@@ -14,8 +14,6 @@
 
 package com.liferay.oauth2.provider.service;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -32,6 +30,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import java.io.InputStream;
 
 import java.util.List;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides the remote service interface for OAuth2Application. Methods of this
@@ -56,6 +56,19 @@ public interface OAuth2ApplicationService extends BaseService {
 	 *
 	 * Never modify or reference this interface directly. Always use {@link OAuth2ApplicationServiceUtil} to access the o auth2 application remote service. Add custom service methods to <code>com.liferay.oauth2.provider.service.impl.OAuth2ApplicationServiceImpl</code> and rerun ServiceBuilder to automatically copy the method declarations to this interface.
 	 */
+	public OAuth2Application addOAuth2Application(
+			List<GrantType> allowedGrantTypesList, long clientCredentialUserId,
+			String clientId, int clientProfile, String clientSecret,
+			String description, List<String> featuresList, String homePageURL,
+			long iconFileEntryId, String name, String privacyPolicyURL,
+			List<String> redirectURIsList, List<String> scopeAliasesList,
+			ServiceContext serviceContext)
+		throws PortalException;
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), since 7.2, unused
+	 */
+	@Deprecated
 	public OAuth2Application addOAuth2Application(
 			List<GrantType> allowedGrantTypesList, String clientId,
 			int clientProfile, String clientSecret, String description,
@@ -100,6 +113,19 @@ public interface OAuth2ApplicationService extends BaseService {
 			long oAuth2ApplicationId, InputStream inputStream)
 		throws PortalException;
 
+	public OAuth2Application updateOAuth2Application(
+			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
+			long clientCredentialUserId, String clientId, int clientProfile,
+			String clientSecret, String description, List<String> featuresList,
+			String homePageURL, long iconFileEntryId, String name,
+			String privacyPolicyURL, List<String> redirectURIsList,
+			long auth2ApplicationScopeAliasesId, ServiceContext serviceContext)
+		throws PortalException;
+
+	/**
+	 * @deprecated As of Mueller (7.2.x), since 7.2, unused
+	 */
+	@Deprecated
 	public OAuth2Application updateOAuth2Application(
 			long oAuth2ApplicationId, List<GrantType> allowedGrantTypesList,
 			String clientId, int clientProfile, String clientSecret,

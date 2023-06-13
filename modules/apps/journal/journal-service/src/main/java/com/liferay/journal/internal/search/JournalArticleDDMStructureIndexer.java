@@ -59,7 +59,7 @@ public class JournalArticleDDMStructureIndexer implements DDMStructureIndexer {
 		throws SearchException {
 
 		try {
-			final Indexer<JournalArticle> indexer =
+			Indexer<JournalArticle> indexer =
 				indexerRegistry.nullSafeGetIndexer(JournalArticle.class);
 
 			if (_indexStatusManager.isIndexReadOnly() ||
@@ -68,8 +68,7 @@ public class JournalArticleDDMStructureIndexer implements DDMStructureIndexer {
 				return;
 			}
 
-			final String[] ddmStructureKeys =
-				new String[ddmStructureIds.size()];
+			String[] ddmStructureKeys = new String[ddmStructureIds.size()];
 
 			for (int i = 0; i < ddmStructureIds.size(); i++) {
 				long ddmStructureId = ddmStructureIds.get(i);
@@ -80,7 +79,7 @@ public class JournalArticleDDMStructureIndexer implements DDMStructureIndexer {
 				ddmStructureKeys[i] = ddmStructure.getStructureKey();
 			}
 
-			final ActionableDynamicQuery actionableDynamicQuery =
+			ActionableDynamicQuery actionableDynamicQuery =
 				journalArticleResourceLocalService.getActionableDynamicQuery();
 
 			actionableDynamicQuery.setAddCriteriaMethod(

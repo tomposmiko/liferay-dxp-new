@@ -14,13 +14,17 @@
 
 package com.liferay.oauth2.provider.client.test;
 
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.oauth2.provider.test.internal.TestApplication;
 import com.liferay.oauth2.provider.test.internal.TestHeadHandlingApplication;
-import com.liferay.oauth2.provider.test.internal.activator.BaseTestPreparatorBundleActivator;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.test.log.CaptureAppender;
+import com.liferay.portal.test.log.Log4JLoggerTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,27 +36,26 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
+import org.apache.log4j.Level;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.osgi.framework.BundleActivator;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@RunAsClient
 @RunWith(Arquillian.class)
 public class HttpMethodApplicationClientTest extends BaseClientTestCase {
 
-	@Deployment
-	public static Archive<?> getArchive() throws Exception {
-		return BaseClientTestCase.getArchive(
-			MethodApplicationTestPreparatorBundleActivator.class);
-	}
+	@ClassRule
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new LiferayIntegrationTestRule();
 
 	@Test
 	public void test() throws Exception {
@@ -71,16 +74,21 @@ public class HttpMethodApplicationClientTest extends BaseClientTestCase {
 		builder = authorize(
 			webTarget.request(), getToken("oauthTestApplicationBefore"));
 
-		response = builder.get();
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					"portal_web.docroot.errors.code_jsp", Level.WARN)) {
 
-		Assert.assertEquals(403, response.getStatus());
+			response = builder.get();
 
-		builder = authorize(
-			webTarget.request(), getToken("oauthTestApplicationWrong"));
+			Assert.assertEquals(403, response.getStatus());
 
-		response = builder.get();
+			builder = authorize(
+				webTarget.request(), getToken("oauthTestApplicationWrong"));
 
-		Assert.assertEquals(403, response.getStatus());
+			response = builder.get();
+
+			Assert.assertEquals(403, response.getStatus());
+		}
 	}
 
 	@Test
@@ -166,6 +174,11 @@ public class HttpMethodApplicationClientTest extends BaseClientTestCase {
 				Collections.singletonList("everything"));
 		}
 
+	}
+
+	@Override
+	protected BundleActivator getBundleActivator() {
+		return new MethodApplicationTestPreparatorBundleActivator();
 	}
 
 }

@@ -28,8 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 public class ServiceContextFunction
 	implements Function<String, ServiceContext> {
 
-	public ServiceContextFunction(HttpServletRequest request) {
-		_request = request;
+	public ServiceContextFunction(HttpServletRequest httpServletRequest) {
+		_httpServletRequest = httpServletRequest;
 
 		_portletRequest = null;
 	}
@@ -37,7 +37,7 @@ public class ServiceContextFunction
 	public ServiceContextFunction(PortletRequest portletRequest) {
 		_portletRequest = portletRequest;
 
-		_request = null;
+		_httpServletRequest = null;
 	}
 
 	@Override
@@ -48,14 +48,15 @@ public class ServiceContextFunction
 					className, _portletRequest);
 			}
 
-			return ServiceContextFactory.getInstance(className, _request);
+			return ServiceContextFactory.getInstance(
+				className, _httpServletRequest);
 		}
 		catch (PortalException pe) {
 			throw new RuntimeException(pe);
 		}
 	}
 
+	private final HttpServletRequest _httpServletRequest;
 	private final PortletRequest _portletRequest;
-	private final HttpServletRequest _request;
 
 }

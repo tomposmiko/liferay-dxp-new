@@ -14,12 +14,16 @@
 
 package com.liferay.oauth2.provider.client.test;
 
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.oauth2.provider.test.internal.TestAnnotatedApplication;
-import com.liferay.oauth2.provider.test.internal.activator.BaseTestPreparatorBundleActivator;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.test.log.CaptureAppender;
+import com.liferay.portal.test.log.Log4JLoggerTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Dictionary;
 
@@ -30,27 +34,26 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
+import org.apache.log4j.Level;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.osgi.framework.BundleActivator;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@RunAsClient
 @RunWith(Arquillian.class)
 public class TokenExpeditionTest extends BaseClientTestCase {
 
-	@Deployment
-	public static Archive<?> getArchive() throws Exception {
-		return BaseClientTestCase.getArchive(
-			TokenExpeditionTestPreparatorBundleActivator.class);
-	}
+	@ClassRule
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new LiferayIntegrationTestRule();
 
 	@Test
 	public void test() throws Exception {
@@ -64,50 +67,61 @@ public class TokenExpeditionTest extends BaseClientTestCase {
 		formData.add("client_secret", "");
 		formData.add("grant_type", "client_credentials");
 
-		String errorString = parseError(
-			invocationBuilder.post(Entity.form(formData)));
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					"com.liferay.oauth2.provider.rest.internal.endpoint." +
+						"liferay.LiferayOAuthDataProvider",
+					Level.WARN)) {
 
-		Assert.assertEquals("invalid_client", errorString);
+			String errorString = parseError(
+				invocationBuilder.post(Entity.form(formData)));
 
-		formData = new MultivaluedHashMap<>();
+			Assert.assertEquals("invalid_client", errorString);
 
-		formData.add("client_id", "");
-		formData.add("client_secret", "wrong");
-		formData.add("grant_type", "client_credentials");
+			formData = new MultivaluedHashMap<>();
 
-		errorString = parseError(invocationBuilder.post(Entity.form(formData)));
+			formData.add("client_id", "");
+			formData.add("client_secret", "wrong");
+			formData.add("grant_type", "client_credentials");
 
-		Assert.assertEquals("invalid_client", errorString);
+			errorString = parseError(
+				invocationBuilder.post(Entity.form(formData)));
 
-		formData = new MultivaluedHashMap<>();
+			Assert.assertEquals("invalid_client", errorString);
 
-		formData.add("client_id", "oauthTestApplication");
-		formData.add("client_secret", "");
-		formData.add("grant_type", "client_credentials");
+			formData = new MultivaluedHashMap<>();
 
-		errorString = parseError(invocationBuilder.post(Entity.form(formData)));
+			formData.add("client_id", "oauthTestApplication");
+			formData.add("client_secret", "");
+			formData.add("grant_type", "client_credentials");
 
-		Assert.assertEquals("invalid_client", errorString);
+			errorString = parseError(
+				invocationBuilder.post(Entity.form(formData)));
 
-		formData = new MultivaluedHashMap<>();
+			Assert.assertEquals("invalid_client", errorString);
 
-		formData.add("client_id", "oauthTestApplication");
-		formData.add("client_secret", "wrong");
-		formData.add("grant_type", "client_credentials");
+			formData = new MultivaluedHashMap<>();
 
-		errorString = parseError(invocationBuilder.post(Entity.form(formData)));
+			formData.add("client_id", "oauthTestApplication");
+			formData.add("client_secret", "wrong");
+			formData.add("grant_type", "client_credentials");
 
-		Assert.assertEquals("invalid_client", errorString);
+			errorString = parseError(
+				invocationBuilder.post(Entity.form(formData)));
 
-		formData = new MultivaluedHashMap<>();
+			Assert.assertEquals("invalid_client", errorString);
 
-		formData.add("client_id", "wrong");
-		formData.add("client_secret", "oauthTestApplicationSecret");
-		formData.add("grant_type", "client_credentials");
+			formData = new MultivaluedHashMap<>();
 
-		errorString = parseError(invocationBuilder.post(Entity.form(formData)));
+			formData.add("client_id", "wrong");
+			formData.add("client_secret", "oauthTestApplicationSecret");
+			formData.add("grant_type", "client_credentials");
 
-		Assert.assertEquals("invalid_client", errorString);
+			errorString = parseError(
+				invocationBuilder.post(Entity.form(formData)));
+
+			Assert.assertEquals("invalid_client", errorString);
+		}
 
 		formData = new MultivaluedHashMap<>();
 
@@ -130,18 +144,23 @@ public class TokenExpeditionTest extends BaseClientTestCase {
 			"Authorization", "Bearer "
 		);
 
-		Response response = invocationBuilder.get();
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					"portal_web.docroot.errors.code_jsp", Level.WARN)) {
 
-		Assert.assertEquals(403, response.getStatus());
+			Response response = invocationBuilder.get();
 
-		invocationBuilder = webTarget.request(
-		).header(
-			"Authorization", "Bearer wrong"
-		);
+			Assert.assertEquals(403, response.getStatus());
 
-		response = invocationBuilder.get();
+			invocationBuilder = webTarget.request(
+			).header(
+				"Authorization", "Bearer wrong"
+			);
 
-		Assert.assertEquals(403, response.getStatus());
+			response = invocationBuilder.get();
+
+			Assert.assertEquals(403, response.getStatus());
+		}
 	}
 
 	public static class TokenExpeditionTestPreparatorBundleActivator
@@ -165,6 +184,11 @@ public class TokenExpeditionTest extends BaseClientTestCase {
 				defaultCompanyId, user, "oauthTestApplication");
 		}
 
+	}
+
+	@Override
+	protected BundleActivator getBundleActivator() {
+		return new TokenExpeditionTestPreparatorBundleActivator();
 	}
 
 }

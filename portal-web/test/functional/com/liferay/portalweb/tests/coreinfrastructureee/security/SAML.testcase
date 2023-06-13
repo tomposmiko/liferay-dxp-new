@@ -585,6 +585,7 @@ definition {
 		// AssertConsoleTextPresent(value1 = "Validation failure: Failed to resolve both a data and a key encryption credential");
 	}
 
+	@ignore = "true"
 	@priority = "4"
 	test ConfigureSAMLToImportUsersFromLDAP {
 		property apacheds.enabled = "true";
@@ -675,34 +676,28 @@ definition {
 
 		User.logoutPG(specificURL = "http://www.able.com:9080");
 
-		// Workaround for LPS-94445
-
-		/*User.loginPG(
+		User.loginPG(
 			password = "test",
 			specificURL = "http://www.able.com:9080",
-			userEmailAddress = "ldapuseremail@liferay.com"
-		);
+			userEmailAddress = "ldapuseremail@liferay.com");
 
 		User.logoutPG(specificURL = "http://www.able.com:9080");
 
 		User.loginPG(
 			password = "test",
 			specificURL = "http://www.able.com:9080",
-			userEmailAddress = "test@liferay.com"
-		);
+			userEmailAddress = "test@liferay.com");
 
 		ProductMenu.gotoPortlet(
 			category = "Users",
 			panel = "Control Panel",
-			portlet = "Users and Organizations"
-		);
+			portlet = "Users and Organizations");
 
 		User.viewCP(
 			userEmailAddress = "ldapuseremail@liferay.com",
 			userFirstName = "ldapusergivenname",
 			userLastName = "ldapusersn",
-			userScreenName = "ldapusercn"
-		);*/
+			userScreenName = "ldapusercn");
 	}
 
 	@priority = "4"

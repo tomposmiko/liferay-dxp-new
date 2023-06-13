@@ -14,8 +14,6 @@
 
 package com.liferay.exportimport.changeset.taglib.servlet.taglib;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.exportimport.changeset.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -24,6 +22,8 @@ import com.liferay.taglib.util.IncludeTag;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Akos Thurzo
@@ -80,16 +80,16 @@ public class ExportImportEntityManagementBarButtonTag extends IncludeTag {
 	}
 
 	@Override
-	protected void setAttributes(HttpServletRequest request) {
-		request.setAttribute(
+	protected void setAttributes(HttpServletRequest httpServletRequest) {
+		httpServletRequest.setAttribute(
 			"liferay-export-import-changeset:" +
 				"export-import-entity-management-bar-button:cmd",
 			_cmd);
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			"liferay-export-import-changeset:" +
 				"export-import-entity-management-bar-button:searchContainerId",
 			_searchContainerId);
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			"liferay-export-import-changeset:" +
 				"export-import-entity-management-bar-button:" +
 					"searchContainerMappingId",

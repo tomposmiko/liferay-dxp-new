@@ -51,19 +51,21 @@ import javax.servlet.http.HttpServletRequest;
 public class JournalContentSearchDisplayContext {
 
 	public JournalContentSearchDisplayContext(
-		HttpServletRequest request, LiferayPortletRequest liferayPortletRequest,
+		HttpServletRequest httpServletRequest,
+		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
 		JournalContentSearchPortletInstanceConfiguration
 			journalContentSearchPortletInstanceConfiguration) {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
 		_journalContentSearchPortletInstanceConfiguration =
 			journalContentSearchPortletInstanceConfiguration;
 
-		_summaryBuilderFactory = (SummaryBuilderFactory)request.getAttribute(
-			JournalContentSearchWebKeys.SUMMARY_BUILDER_FACTORY);
+		_summaryBuilderFactory =
+			(SummaryBuilderFactory)httpServletRequest.getAttribute(
+				JournalContentSearchWebKeys.SUMMARY_BUILDER_FACTORY);
 	}
 
 	public Hits getHits() throws Exception {
@@ -75,7 +77,7 @@ public class JournalContentSearchDisplayContext {
 			JournalArticle.class);
 
 		SearchContext searchContext = SearchContextFactory.getInstance(
-			_request);
+			_httpServletRequest);
 
 		searchContext.setGroupIds(null);
 		searchContext.setKeywords(getKeywords());
@@ -97,10 +99,12 @@ public class JournalContentSearchDisplayContext {
 		}
 
 		String defaultKeywords =
-			LanguageUtil.get(_request, "search") + StringPool.TRIPLE_PERIOD;
+			LanguageUtil.get(_httpServletRequest, "search") +
+				StringPool.TRIPLE_PERIOD;
 
 		_keywords = StringUtil.unquote(
-			ParamUtil.getString(_request, "keywords", defaultKeywords));
+			ParamUtil.getString(
+				_httpServletRequest, "keywords", defaultKeywords));
 
 		return _keywords;
 	}
@@ -110,8 +114,9 @@ public class JournalContentSearchDisplayContext {
 			return _searchContainer;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		Layout layout = themeDisplay.getLayout();
 
@@ -121,14 +126,15 @@ public class JournalContentSearchDisplayContext {
 		renderURL.setParameter("keywords", getKeywords());
 
 		String originalKeywords = ParamUtil.getString(
-			_request, "keywords", getKeywords());
+			_httpServletRequest, "keywords", getKeywords());
 
 		_searchContainer = new SearchContainer(
 			_liferayPortletRequest, null, null,
 			SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA,
 			renderURL, null,
 			LanguageUtil.format(
-				_request, "no-pages-were-found-that-matched-the-keywords-x",
+				_httpServletRequest,
+				"no-pages-were-found-that-matched-the-keywords-x",
 				"<strong>" + HtmlUtil.escape(originalKeywords) + "</strong>",
 				false));
 
@@ -150,8 +156,9 @@ public class JournalContentSearchDisplayContext {
 	}
 
 	public Summary getSummary(Document document) throws Exception {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		Indexer<JournalArticle> indexer = IndexerRegistryUtil.getIndexer(
 			JournalArticle.class);
@@ -174,12 +181,12 @@ public class JournalContentSearchDisplayContext {
 	}
 
 	private Hits _hits;
+	private final HttpServletRequest _httpServletRequest;
 	private final JournalContentSearchPortletInstanceConfiguration
 		_journalContentSearchPortletInstanceConfiguration;
 	private String _keywords;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
-	private final HttpServletRequest _request;
 	private SearchContainer _searchContainer;
 	private final SummaryBuilderFactory _summaryBuilderFactory;
 

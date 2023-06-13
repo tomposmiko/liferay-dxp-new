@@ -14,13 +14,13 @@
 
 package com.liferay.registry;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.registry.dependency.ServiceDependencyManager;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Raymond Augé
@@ -31,6 +31,10 @@ public interface Registry {
 	public <S, R> R callService(Class<S> serviceClass, Function<S, R> function);
 
 	public <S, R> R callService(String className, Function<S, R> function);
+
+	public <T> ServiceReference<T>[] getAllServiceReferences(
+			String className, String filterString)
+		throws Exception;
 
 	public Filter getFilter(String filterString) throws RuntimeException;
 

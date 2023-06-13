@@ -28,10 +28,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class ActionUtil {
 
-	public static UserGroup getUserGroup(HttpServletRequest request)
+	public static UserGroup getUserGroup(HttpServletRequest httpServletRequest)
 		throws Exception {
 
-		long userGroupId = ParamUtil.getLong(request, "userGroupId");
+		long userGroupId = ParamUtil.getLong(httpServletRequest, "userGroupId");
 
 		UserGroup userGroup = null;
 
@@ -45,10 +45,10 @@ public class ActionUtil {
 	public static UserGroup getUserGroup(PortletRequest portletRequest)
 		throws Exception {
 
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			portletRequest);
+		HttpServletRequest httpServletRequest =
+			PortalUtil.getHttpServletRequest(portletRequest);
 
-		return getUserGroup(request);
+		return getUserGroup(httpServletRequest);
 	}
 
 }

@@ -32,11 +32,12 @@ import javax.servlet.http.HttpSession;
 public class SessionIdServletRequest extends HttpServletRequestWrapper {
 
 	public SessionIdServletRequest(
-		HttpServletRequest request, HttpServletResponse response) {
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse) {
 
-		super(request);
+		super(httpServletRequest);
 
-		_response = response;
+		_httpServletResponse = httpServletResponse;
 	}
 
 	@Override
@@ -88,7 +89,8 @@ public class SessionIdServletRequest extends HttpServletRequestWrapper {
 		}
 
 		CookieKeys.addCookie(
-			(HttpServletRequest)super.getRequest(), _response, cookie);
+			(HttpServletRequest)super.getRequest(), _httpServletResponse,
+			cookie);
 
 		setAttribute(_JESSIONID_ALREADY_SET, Boolean.TRUE);
 	}
@@ -101,6 +103,6 @@ public class SessionIdServletRequest extends HttpServletRequestWrapper {
 	private static final Log _log = LogFactoryUtil.getLog(
 		SessionIdServletRequest.class);
 
-	private final HttpServletResponse _response;
+	private final HttpServletResponse _httpServletResponse;
 
 }

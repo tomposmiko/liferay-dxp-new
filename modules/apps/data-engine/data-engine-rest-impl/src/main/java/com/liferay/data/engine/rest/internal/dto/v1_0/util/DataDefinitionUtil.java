@@ -17,6 +17,7 @@ package com.liferay.data.engine.rest.internal.dto.v1_0.util;
 import com.liferay.data.engine.rest.dto.v1_0.DataDefinition;
 import com.liferay.data.engine.rest.dto.v1_0.DataDefinitionField;
 import com.liferay.data.engine.rest.dto.v1_0.DataDefinitionRule;
+import com.liferay.data.engine.spi.field.type.util.LocalizedValueUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -46,10 +47,10 @@ public class DataDefinitionUtil {
 					DataDefinitionRule.class);
 				dateCreated = ddmStructure.getCreateDate();
 				dateModified = ddmStructure.getModifiedDate();
-				description = LocalizedValueUtil.toLocalizedValues(
+				description = LocalizedValueUtil.toStringObjectMap(
 					ddmStructure.getDescriptionMap());
 				id = ddmStructure.getStructureId();
-				name = LocalizedValueUtil.toLocalizedValues(
+				name = LocalizedValueUtil.toStringObjectMap(
 					ddmStructure.getNameMap());
 				siteId = ddmStructure.getGroupId();
 				storageType = ddmStructure.getStorageType();

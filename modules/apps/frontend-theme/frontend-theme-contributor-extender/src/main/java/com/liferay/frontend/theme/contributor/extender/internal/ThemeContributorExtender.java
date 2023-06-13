@@ -14,136 +14,142 @@
 
 package com.liferay.frontend.theme.contributor.extender.internal;
 
-import com.liferay.osgi.felix.util.AbstractExtender;
+import com.liferay.frontend.theme.contributor.extender.BundleWebResources;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.servlet.PortalWebResourceConstants;
+import com.liferay.portal.kernel.servlet.PortalWebResources;
 import com.liferay.portal.kernel.util.GetterUtil;
-
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import com.liferay.portal.kernel.util.MapUtil;
 
 import java.net.URL;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.felix.utils.extender.Extension;
-import org.apache.felix.utils.log.Logger;
-
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import javax.servlet.ServletContext;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Michael Bradford
  */
 @Component(immediate = true, service = {})
-public class ThemeContributorExtender extends AbstractExtender {
-
-	@Activate
-	protected void activate(BundleContext bundleContext) throws Exception {
-		_logger = new Logger(bundleContext);
-
-		start(bundleContext);
-	}
-
-	@Deactivate
-	protected void deactivate(BundleContext bundleContext) throws Exception {
-		stop(bundleContext);
-	}
+public class ThemeContributorExtender
+	implements ServiceTrackerCustomizer
+		<ServletContext, Collection<ServiceRegistration<?>>> {
 
 	@Override
-	protected void debug(Bundle bundle, String s) {
-		_logger.log(
-			Logger.LOG_DEBUG, StringBundler.concat("[", bundle, "] ", s));
-	}
+	public Collection<ServiceRegistration<?>> addingService(
+		ServiceReference<ServletContext> serviceReference) {
 
-	@Override
-	protected Extension doCreateExtension(Bundle bundle) throws Exception {
-		String type = _getProperty(
-			bundle, "Liferay-Theme-Contributor-Type", "themeContributorType");
-
-		if (type == null) {
-			return null;
-		}
-
-		BundleWebResourcesImpl bundleWebResources = _scanForResources(bundle);
-
-		if (bundleWebResources == null) {
-			return null;
-		}
-
-		int themeContributorWeight = GetterUtil.getInteger(
-			_getProperty(
-				bundle, "Liferay-Theme-Contributor-Weight",
-				"themeContributorWeight"));
-
-		return new ThemeContributorExtension(
-			bundle, bundleWebResources, themeContributorWeight);
-	}
-
-	@Override
-	protected void error(String s, Throwable t) {
-		_logger.log(Logger.LOG_ERROR, s, t);
-	}
-
-	@Override
-	protected void warn(Bundle bundle, String s, Throwable t) {
-		_logger.log(
-			Logger.LOG_WARNING, StringBundler.concat("[", bundle, "] ", s), t);
-	}
-
-	private String _getProperty(
-		Bundle bundle, String headerName, String jsonName) {
+		Bundle bundle = serviceReference.getBundle();
 
 		Dictionary<String, String> headers = bundle.getHeaders(
 			StringPool.BLANK);
 
-		String type = headers.get(headerName);
+		String type = headers.get("Liferay-Theme-Contributor-Type");
 
 		if (type == null) {
-			URL entryURL = bundle.getEntry("/package.json");
-
-			if (entryURL != null) {
-				try (Reader reader = new InputStreamReader(
-						entryURL.openStream())) {
-
-					JSONTokener jsonTokener = new JSONTokener(reader);
-
-					JSONObject packageJSONObject = new JSONObject(jsonTokener);
-
-					JSONObject liferayThemeJSONObject =
-						packageJSONObject.optJSONObject("liferayTheme");
-
-					if (liferayThemeJSONObject != null) {
-						type = liferayThemeJSONObject.getString(jsonName);
-					}
-				}
-				catch (IOException ioe) {
-					throw new RuntimeException(ioe);
-				}
-			}
+			return null;
 		}
 
-		return type;
+		Map.Entry<List<String>, List<String>> entry = _scanBundleWebResources(
+			bundle);
+
+		if (entry == null) {
+			return null;
+		}
+
+		int themeContributorWeight = GetterUtil.getInteger(
+			headers.get("Liferay-Theme-Contributor-Weight"));
+
+		Collection<ServiceRegistration<?>> serviceRegistrations =
+			new ArrayList<>();
+
+		ServletContext servletContext = _bundleContext.getService(
+			serviceReference);
+
+		serviceRegistrations.add(
+			_bundleContext.registerService(
+				PortalWebResources.class.getName(),
+				new ThemeContributorPortalWebResources(bundle, servletContext),
+				null));
+
+		serviceRegistrations.add(
+			_bundleContext.registerService(
+				BundleWebResources.class,
+				new BundleWebResourcesImpl(
+					servletContext.getContextPath(), entry.getKey(),
+					entry.getValue()),
+				MapUtil.singletonDictionary(
+					"service.ranking", themeContributorWeight)));
+
+		return serviceRegistrations;
 	}
 
-	private BundleWebResourcesImpl _scanForResources(Bundle bundle) {
-		final List<String> cssResourcePaths = new ArrayList<>();
-		final List<String> jsResourcePaths = new ArrayList<>();
+	@Override
+	public void modifiedService(
+		ServiceReference<ServletContext> serviceReference,
+		Collection<ServiceRegistration<?>> service) {
+	}
+
+	@Override
+	public void removedService(
+		ServiceReference<ServletContext> serviceReference,
+		Collection<ServiceRegistration<?>> serviceRegistrations) {
+
+		for (ServiceRegistration<?> serviceRegistration :
+				serviceRegistrations) {
+
+			serviceRegistration.unregister();
+		}
+
+		_bundleContext.ungetService(serviceReference);
+	}
+
+	@Activate
+	protected void activate(BundleContext bundleContext)
+		throws InvalidSyntaxException {
+
+		_bundleContext = bundleContext;
+		_serviceTracker = new ServiceTracker<>(
+			bundleContext,
+			bundleContext.createFilter(
+				StringBundler.concat(
+					"(&(objectClass=", ServletContext.class.getName(),
+					")(osgi.web.symbolicname=*))")),
+			this);
+
+		_serviceTracker.open();
+	}
+
+	@Deactivate
+	protected void deactivate() {
+		_serviceTracker.close();
+	}
+
+	private static Map.Entry<List<String>, List<String>>
+		_scanBundleWebResources(Bundle bundle) {
+
+		List<String> cssResourcePaths = new ArrayList<>();
 
 		Enumeration<URL> cssEntries = bundle.findEntries(
 			"/META-INF/resources", "*.css", true);
-		Enumeration<URL> jsEntries = bundle.findEntries(
-			"/META-INF/resources", "*.js", true);
 
 		if (cssEntries != null) {
 			while (cssEntries.hasMoreElements()) {
@@ -151,7 +157,7 @@ public class ThemeContributorExtender extends AbstractExtender {
 
 				String path = url.getFile();
 
-				path = path.replace("/META-INF/resources", "");
+				path = path.substring("/META-INF/resources".length());
 
 				int index = path.lastIndexOf('/');
 
@@ -163,13 +169,19 @@ public class ThemeContributorExtender extends AbstractExtender {
 			}
 		}
 
+		List<String> jsResourcePaths = new ArrayList<>();
+
+		Enumeration<URL> jsEntries = bundle.findEntries(
+			"/META-INF/resources", "*.js", true);
+
 		if (jsEntries != null) {
 			while (jsEntries.hasMoreElements()) {
 				URL url = jsEntries.nextElement();
 
 				String path = url.getFile();
 
-				jsResourcePaths.add(path.replace("/META-INF/resources", ""));
+				jsResourcePaths.add(
+					path.substring("/META-INF/resources".length()));
 			}
 		}
 
@@ -177,9 +189,47 @@ public class ThemeContributorExtender extends AbstractExtender {
 			return null;
 		}
 
-		return new BundleWebResourcesImpl(cssResourcePaths, jsResourcePaths);
+		return new AbstractMap.SimpleImmutableEntry<>(
+			cssResourcePaths, jsResourcePaths);
 	}
 
-	private Logger _logger;
+	private BundleContext _bundleContext;
+	private ServiceTracker<ServletContext, Collection<ServiceRegistration<?>>>
+		_serviceTracker;
+
+	private static class ThemeContributorPortalWebResources
+		implements PortalWebResources {
+
+		@Override
+		public String getContextPath() {
+			return _servletContext.getContextPath();
+		}
+
+		@Override
+		public long getLastModified() {
+			return _bundle.getLastModified();
+		}
+
+		@Override
+		public String getResourceType() {
+			return PortalWebResourceConstants.RESOURCE_TYPE_THEME_CONTRIBUTOR;
+		}
+
+		@Override
+		public ServletContext getServletContext() {
+			return _servletContext;
+		}
+
+		private ThemeContributorPortalWebResources(
+			Bundle bundle, ServletContext servletContext) {
+
+			_bundle = bundle;
+			_servletContext = servletContext;
+		}
+
+		private final Bundle _bundle;
+		private final ServletContext _servletContext;
+
+	}
 
 }

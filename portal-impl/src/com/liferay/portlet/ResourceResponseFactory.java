@@ -14,8 +14,6 @@
 
 package com.liferay.portlet;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.portlet.LiferayResourceResponse;
 import com.liferay.portlet.internal.ResourceRequestImpl;
 import com.liferay.portlet.internal.ResourceResponseImpl;
@@ -25,6 +23,8 @@ import javax.portlet.filter.ResourceRequestWrapper;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
  * @author Brian Wing Shun Chan
  * @author Neil Griffin
@@ -33,7 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 public class ResourceResponseFactory {
 
 	public static LiferayResourceResponse create(
-		ResourceRequest resourceRequest, HttpServletResponse response) {
+		ResourceRequest resourceRequest,
+		HttpServletResponse httpServletResponse) {
 
 		while (resourceRequest instanceof ResourceRequestWrapper) {
 			ResourceRequestWrapper resourceRequestWrapper =
@@ -45,7 +46,7 @@ public class ResourceResponseFactory {
 		ResourceResponseImpl resourceResponseImpl = new ResourceResponseImpl();
 
 		resourceResponseImpl.init(
-			(ResourceRequestImpl)resourceRequest, response);
+			(ResourceRequestImpl)resourceRequest, httpServletResponse);
 
 		return resourceResponseImpl;
 	}

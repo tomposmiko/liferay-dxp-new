@@ -18,6 +18,8 @@ import com.liferay.osgi.util.BundleUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.servlet.ServletContextClassLoaderPool;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -39,8 +41,6 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.felix.utils.log.Logger;
-
 import org.osgi.framework.Bundle;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.http.context.ServletContextHelper;
@@ -52,14 +52,13 @@ public class CustomServletContextHelper
 	extends ServletContextHelper implements ServletContextListener {
 
 	public CustomServletContextHelper(
-		Bundle bundle, Logger logger,
+		Bundle bundle,
 		List<WebResourceCollectionDefinition>
 			webResourceCollectionDefinitions) {
 
 		super(bundle);
 
 		_bundle = bundle;
-		_logger = logger;
 		_webResourceCollectionDefinitions = webResourceCollectionDefinitions;
 
 		Class<?> clazz = getClass();
@@ -122,8 +121,7 @@ public class CustomServletContextHelper
 				}
 			}
 			catch (IOException ioe) {
-				_logger.log(
-					Logger.LOG_ERROR,
+				_log.error(
 					StringBundler.concat(
 						"Unable to get resource name ", name, " on bundle ",
 						_bundle),
@@ -140,15 +138,17 @@ public class CustomServletContextHelper
 
 	@Override
 	public boolean handleSecurity(
-		HttpServletRequest request, HttpServletResponse response) {
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse) {
 
-		if ((request.getDispatcherType() != DispatcherType.ASYNC) &&
-			(request.getDispatcherType() != DispatcherType.REQUEST)) {
+		if ((httpServletRequest.getDispatcherType() != DispatcherType.ASYNC) &&
+			(httpServletRequest.getDispatcherType() !=
+				DispatcherType.REQUEST)) {
 
 			return true;
 		}
 
-		String path = request.getPathInfo();
+		String path = httpServletRequest.getPathInfo();
 
 		if (path == null) {
 			return true;
@@ -161,7 +161,8 @@ public class CustomServletContextHelper
 		if (path.startsWith("/META-INF/") || path.startsWith("/OSGI-INF/") ||
 			path.startsWith("/OSGI-OPT/") || path.startsWith("/WEB-INF/")) {
 
-			return sendErrorForbidden(request, response, path);
+			return sendErrorForbidden(
+				httpServletRequest, httpServletResponse, path);
 		}
 
 		if (ListUtil.isEmpty(_webResourceCollectionDefinitions)) {
@@ -238,7 +239,7 @@ public class CustomServletContextHelper
 					webResourceCollectionDefinition.getHttpMethods();
 
 				if (ListUtil.isNotEmpty(httpMethods) &&
-					!httpMethods.contains(request.getMethod())) {
+					!httpMethods.contains(httpServletRequest.getMethod())) {
 
 					forbidden = false;
 				}
@@ -247,14 +248,16 @@ public class CustomServletContextHelper
 					webResourceCollectionDefinition.getHttpMethodExceptions();
 
 				if (ListUtil.isNotEmpty(httpMethodExceptions) &&
-					httpMethodExceptions.contains(request.getMethod())) {
+					httpMethodExceptions.contains(
+						httpServletRequest.getMethod())) {
 
 					forbidden = false;
 				}
 			}
 
 			if (forbidden) {
-				return sendErrorForbidden(request, response, path);
+				return sendErrorForbidden(
+					httpServletRequest, httpServletResponse, path);
 			}
 		}
 
@@ -267,27 +270,32 @@ public class CustomServletContextHelper
 	}
 
 	protected boolean sendErrorForbidden(
-		HttpServletRequest request, HttpServletResponse response, String path) {
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse, String path) {
 
 		try {
-			ServletContext servletContext = request.getServletContext();
+			ServletContext servletContext =
+				httpServletRequest.getServletContext();
 
 			servletContext.log(
 				StringBundler.concat(
 					"[WAB ERROR] Attempt to load illegal path ", path, " in ",
 					toString()));
 
-			response.sendError(HttpServletResponse.SC_FORBIDDEN, path);
+			httpServletResponse.sendError(
+				HttpServletResponse.SC_FORBIDDEN, path);
 		}
 		catch (IOException ioe) {
-			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
 		}
 
 		return false;
 	}
 
+	private static final Log _log = LogFactoryUtil.getLog(
+		CustomServletContextHelper.class);
+
 	private final Bundle _bundle;
-	private final Logger _logger;
 	private ServletContext _servletContext;
 	private final String _string;
 	private final List<WebResourceCollectionDefinition>

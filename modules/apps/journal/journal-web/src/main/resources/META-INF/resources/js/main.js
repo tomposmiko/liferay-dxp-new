@@ -1,6 +1,7 @@
 AUI.add(
 	'liferay-portlet-journal',
 	function(A) {
+		var Do = A.Do;
 		var Lang = A.Lang;
 
 		var SELECTOR_ACTION_NAME = '#javax-portlet-action';
@@ -109,6 +110,8 @@ AUI.add(
 							instance._updateLocalizableInput('descriptionMapAsXML', defaultLanguageId, selectedLanguageId);
 
 							instance._updateLocalizableInput('titleMapAsXML', defaultLanguageId, selectedLanguageId);
+
+							instance._updateLanguageIdInput(selectedLanguageId);
 						}
 					},
 
@@ -147,6 +150,16 @@ AUI.add(
 						submitForm(form);
 					},
 
+					_updateLanguageIdInput: function(selectedLanguageId) {
+						var instance = this;
+
+						var form = instance._getPrincipalForm();
+
+						var languageIdInput = instance._getByName(form, 'languageId');
+
+						languageIdInput.val(selectedLanguageId);
+					},
+
 					_updateLocalizableInput: function(componentId, defaultLanguageId, selectedLanguageId) {
 						var instance = this;
 
@@ -158,9 +171,22 @@ AUI.add(
 							if (inputSelectedValue === '') {
 								var inputDefaultValue = inputComponent.getValue(defaultLanguageId);
 
-								inputComponent.updateInputLanguage(inputDefaultValue);
+								// LPS-92493
+
+								var eventHandle = Do.before(
+									function() {
+										return new Do.Prevent('Update input language has to be called only when we update a translation');
+									},
+									inputComponent,
+									'updateInputLanguage',
+									inputComponent
+								);
 
 								inputComponent.selectFlag(selectedLanguageId);
+
+								inputComponent.updateInput(inputDefaultValue);
+
+								eventHandle.detach();
 							}
 						}
 					},

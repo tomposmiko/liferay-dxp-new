@@ -494,16 +494,16 @@ public abstract class BaseFormStructureResourceTestCase {
 				continue;
 			}
 
-			if (Objects.equals("name", additionalAssertFieldName)) {
-				if (formStructure.getName() == null) {
+			if (Objects.equals("formSuccessPage", additionalAssertFieldName)) {
+				if (formStructure.getFormSuccessPage() == null) {
 					valid = false;
 				}
 
 				continue;
 			}
 
-			if (Objects.equals("successPage", additionalAssertFieldName)) {
-				if (formStructure.getSuccessPage() == null) {
+			if (Objects.equals("name", additionalAssertFieldName)) {
+				if (formStructure.getName() == null) {
 					valid = false;
 				}
 
@@ -623,6 +623,17 @@ public abstract class BaseFormStructureResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("formSuccessPage", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						formStructure1.getFormSuccessPage(),
+						formStructure2.getFormSuccessPage())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("id", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						formStructure1.getId(), formStructure2.getId())) {
@@ -636,17 +647,6 @@ public abstract class BaseFormStructureResourceTestCase {
 			if (Objects.equals("name", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						formStructure1.getName(), formStructure2.getName())) {
-
-					return false;
-				}
-
-				continue;
-			}
-
-			if (Objects.equals("successPage", additionalAssertFieldName)) {
-				if (!Objects.deepEquals(
-						formStructure1.getSuccessPage(),
-						formStructure2.getSuccessPage())) {
 
 					return false;
 				}
@@ -796,6 +796,11 @@ public abstract class BaseFormStructureResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("formSuccessPage")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("id")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -814,16 +819,11 @@ public abstract class BaseFormStructureResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
-		if (entityFieldName.equals("successPage")) {
-			throw new IllegalArgumentException(
-				"Invalid entity field " + entityFieldName);
-		}
-
 		throw new IllegalArgumentException(
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected FormStructure randomFormStructure() {
+	protected FormStructure randomFormStructure() throws Exception {
 		return new FormStructure() {
 			{
 				dateCreated = RandomTestUtil.nextDate();
@@ -836,7 +836,7 @@ public abstract class BaseFormStructureResourceTestCase {
 		};
 	}
 
-	protected FormStructure randomIrrelevantFormStructure() {
+	protected FormStructure randomIrrelevantFormStructure() throws Exception {
 		FormStructure randomIrrelevantFormStructure = randomFormStructure();
 
 		randomIrrelevantFormStructure.setSiteId(irrelevantGroup.getGroupId());
@@ -844,7 +844,7 @@ public abstract class BaseFormStructureResourceTestCase {
 		return randomIrrelevantFormStructure;
 	}
 
-	protected FormStructure randomPatchFormStructure() {
+	protected FormStructure randomPatchFormStructure() throws Exception {
 		return randomFormStructure();
 	}
 

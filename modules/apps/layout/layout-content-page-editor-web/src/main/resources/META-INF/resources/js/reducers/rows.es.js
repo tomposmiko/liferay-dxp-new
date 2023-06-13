@@ -8,7 +8,7 @@ import {removeFragmentEntryLinks, updatePageEditorLayoutData} from '../utils/Fra
 /**
  * @param {object} state
  * @param {object} action
- * @param {[]} action.layoutColumns
+ * @param {Array} action.layoutColumns
  * @param {string} action.type
  * @return {object}
  * @review
@@ -172,7 +172,7 @@ function removeRowReducer(state, action) {
 /**
  * @param {object} state
  * @param {object} action
- * @param {[]} action.columns
+ * @param {Array} action.columns
  * @param {string} action.rowId
  * @param {string} action.type
  * @return {object}
@@ -229,7 +229,7 @@ const updateRowColumnsReducer = (state, action) => new Promise(
 );
 
 /**
- * @param {!object} state
+ * @param {object} state
  * @param {object} action
  * @param {number} action.numberOfColumns
  * @param {string} action.rowId

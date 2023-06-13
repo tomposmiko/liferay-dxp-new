@@ -69,32 +69,33 @@ public class SharingUserAutocompleteMVCResourceCommand
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		HttpServletRequest request = _portal.getHttpServletRequest(
+		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
 			resourceRequest);
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		if (!themeDisplay.isSignedIn()) {
 			throw new PrincipalException.MustBeAuthenticated(
 				themeDisplay.getUserId());
 		}
 
-		JSONArray usersJSONArray = _getUsersJSONArray(request);
+		JSONArray usersJSONArray = _getUsersJSONArray(httpServletRequest);
 
-		HttpServletResponse response = _portal.getHttpServletResponse(
-			resourceResponse);
+		HttpServletResponse httpServletResponse =
+			_portal.getHttpServletResponse(resourceResponse);
 
-		response.setContentType(ContentTypes.APPLICATION_JSON);
+		httpServletResponse.setContentType(ContentTypes.APPLICATION_JSON);
 
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse, usersJSONArray);
 	}
 
 	private List<User> _getUsers(
-		HttpServletRequest request, ThemeDisplay themeDisplay) {
+		HttpServletRequest httpServletRequest, ThemeDisplay themeDisplay) {
 
-		String query = ParamUtil.getString(request, "query");
+		String query = ParamUtil.getString(httpServletRequest, "query");
 
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
@@ -117,15 +118,16 @@ public class SharingUserAutocompleteMVCResourceCommand
 			new UserScreenNameComparator());
 	}
 
-	private JSONArray _getUsersJSONArray(HttpServletRequest request)
+	private JSONArray _getUsersJSONArray(HttpServletRequest httpServletRequest)
 		throws PortalException {
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
-		for (User user : _getUsers(request, themeDisplay)) {
+		for (User user : _getUsers(httpServletRequest, themeDisplay)) {
 			if (user.isDefaultUser() ||
 				(themeDisplay.getUserId() == user.getUserId())) {
 

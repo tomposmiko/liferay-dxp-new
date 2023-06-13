@@ -66,7 +66,6 @@ import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionListener;
 import javax.servlet.jsp.JspFactory;
 
-import org.apache.felix.utils.log.Logger;
 import org.apache.jasper.runtime.JspFactoryImpl;
 import org.apache.jasper.runtime.TagHandlerPool;
 
@@ -181,11 +180,9 @@ public class JspServlet extends HttpServlet {
 
 		bundles.add(_utilTaglibBundle);
 
-		_logger = new Logger(_bundle.getBundleContext());
-
 		collectTaglibProviderBundles(bundles);
 
-		_allParticipatingBundles = bundles.toArray(new Bundle[bundles.size()]);
+		_allParticipatingBundles = bundles.toArray(new Bundle[0]);
 
 		_jspBundleClassloader = new JspBundleClassloader(
 			_allParticipatingBundles);
@@ -281,7 +278,8 @@ public class JspServlet extends HttpServlet {
 
 	@Override
 	public void service(
-			HttpServletRequest request, HttpServletResponse response)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
 		throws IOException, ServletException {
 
 		Thread currentThread = Thread.currentThread();
@@ -292,11 +290,11 @@ public class JspServlet extends HttpServlet {
 			currentThread.setContextClassLoader(_jspBundleClassloader);
 
 			if (_logVerbosityLevelDebug) {
-				String path = (String)request.getAttribute(
+				String path = (String)httpServletRequest.getAttribute(
 					RequestDispatcher.INCLUDE_SERVLET_PATH);
 
 				if (path != null) {
-					String pathInfo = (String)request.getAttribute(
+					String pathInfo = (String)httpServletRequest.getAttribute(
 						RequestDispatcher.INCLUDE_PATH_INFO);
 
 					if (pathInfo != null) {
@@ -304,9 +302,9 @@ public class JspServlet extends HttpServlet {
 					}
 				}
 				else {
-					path = request.getServletPath();
+					path = httpServletRequest.getServletPath();
 
-					String pathInfo = request.getPathInfo();
+					String pathInfo = httpServletRequest.getPathInfo();
 
 					if (pathInfo != null) {
 						path += pathInfo;
@@ -318,7 +316,7 @@ public class JspServlet extends HttpServlet {
 						"[JSP DEBUG] ", _bundle, " invoking ", path));
 			}
 
-			_jspServlet.service(request, response);
+			_jspServlet.service(httpServletRequest, httpServletResponse);
 		}
 		finally {
 			currentThread.setContextClassLoader(contextClassLoader);
@@ -394,7 +392,7 @@ public class JspServlet extends HttpServlet {
 					"servlet listener interfaces");
 		}
 
-		return classNames.toArray(new String[classNames.size()]);
+		return classNames.toArray(new String[0]);
 	}
 
 	private static final String _DIR_NAME_RESOURCES = "/META-INF/resources";
@@ -418,7 +416,6 @@ public class JspServlet extends HttpServlet {
 	private JspBundleClassloader _jspBundleClassloader;
 	private final HttpServlet _jspServlet =
 		new org.apache.jasper.servlet.JspServlet();
-	private Logger _logger;
 	private boolean _logVerbosityLevelDebug;
 	private final List<ServiceRegistration<?>> _serviceRegistrations =
 		new CopyOnWriteArrayList<>();

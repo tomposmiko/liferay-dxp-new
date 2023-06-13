@@ -51,10 +51,11 @@ import javax.servlet.http.HttpServletRequest;
 public class OrphanPortletsDisplayContext {
 
 	public OrphanPortletsDisplayContext(
-		HttpServletRequest request, LiferayPortletRequest liferayPortletRequest,
+		HttpServletRequest httpServletRequest,
+		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse) {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
 	}
@@ -64,7 +65,7 @@ public class OrphanPortletsDisplayContext {
 			return _backURL;
 		}
 
-		_backURL = ParamUtil.getString(_request, "backURL");
+		_backURL = ParamUtil.getString(_httpServletRequest, "backURL");
 
 		return _backURL;
 	}
@@ -143,8 +144,8 @@ public class OrphanPortletsDisplayContext {
 			orphanPortlets.add(portlet);
 		}
 
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			_liferayPortletRequest);
+		HttpServletRequest httpServletRequest =
+			PortalUtil.getHttpServletRequest(_liferayPortletRequest);
 
 		boolean orderByAsc = false;
 
@@ -154,8 +155,8 @@ public class OrphanPortletsDisplayContext {
 
 		PortletTitleComparator portletTitleComparator =
 			new PortletTitleComparator(
-				request.getServletContext(), themeDisplay.getLocale(),
-				orderByAsc);
+				httpServletRequest.getServletContext(),
+				themeDisplay.getLocale(), orderByAsc);
 
 		orphanPortlets = ListUtil.sort(orphanPortlets, portletTitleComparator);
 
@@ -227,29 +228,30 @@ public class OrphanPortletsDisplayContext {
 	}
 
 	public String getStatus(Portlet portlet) {
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			_liferayPortletRequest);
+		HttpServletRequest httpServletRequest =
+			PortalUtil.getHttpServletRequest(_liferayPortletRequest);
 
 		if (!portlet.isActive()) {
-			return LanguageUtil.get(request, "inactive");
+			return LanguageUtil.get(httpServletRequest, "inactive");
 		}
 		else if (!portlet.isReady()) {
-			return LanguageUtil.format(request, "is-not-ready", "portlet");
+			return LanguageUtil.format(
+				httpServletRequest, "is-not-ready", "portlet");
 		}
 		else if (portlet.isUndeployedPortlet()) {
-			return LanguageUtil.get(request, "undeployed");
+			return LanguageUtil.get(httpServletRequest, "undeployed");
 		}
 
-		return LanguageUtil.get(request, "active");
+		return LanguageUtil.get(httpServletRequest, "active");
 	}
 
 	private String _backURL;
 	private String _displayStyle;
+	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private String _orderByType;
 	private SearchContainer _orphanPortletsSearchContainer;
-	private final HttpServletRequest _request;
 	private Layout _selLayout;
 	private Long _selPlid;
 

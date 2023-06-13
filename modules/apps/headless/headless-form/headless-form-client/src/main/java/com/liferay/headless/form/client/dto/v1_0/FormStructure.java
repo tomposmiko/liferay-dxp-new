@@ -155,6 +155,28 @@ public class FormStructure {
 
 	protected FormPage[] formPages;
 
+	public FormSuccessPage getFormSuccessPage() {
+		return formSuccessPage;
+	}
+
+	public void setFormSuccessPage(FormSuccessPage formSuccessPage) {
+		this.formSuccessPage = formSuccessPage;
+	}
+
+	public void setFormSuccessPage(
+		UnsafeSupplier<FormSuccessPage, Exception>
+			formSuccessPageUnsafeSupplier) {
+
+		try {
+			formSuccessPage = formSuccessPageUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected FormSuccessPage formSuccessPage;
+
 	public Long getId() {
 		return id;
 	}
@@ -213,27 +235,6 @@ public class FormStructure {
 	}
 
 	protected Long siteId;
-
-	public SuccessPage getSuccessPage() {
-		return successPage;
-	}
-
-	public void setSuccessPage(SuccessPage successPage) {
-		this.successPage = successPage;
-	}
-
-	public void setSuccessPage(
-		UnsafeSupplier<SuccessPage, Exception> successPageUnsafeSupplier) {
-
-		try {
-			successPage = successPageUnsafeSupplier.get();
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	protected SuccessPage successPage;
 
 	@Override
 	public boolean equals(Object object) {

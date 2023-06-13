@@ -32,6 +32,7 @@ import com.liferay.taglib.util.TagResourceBundleUtil;
 
 import java.io.IOException;
 
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import javax.servlet.ServletException;
@@ -57,7 +58,8 @@ public class IconTag extends BaseIconTag {
 	@Deprecated
 	public static String doTag(
 			String cssClass, String image, String markupView,
-			HttpServletRequest request, HttpServletResponse response)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
 		throws IOException, ServletException {
 
 		IconTag iconTag = new IconTag();
@@ -70,8 +72,9 @@ public class IconTag extends BaseIconTag {
 
 		try {
 			iconTag.doTag(
-				request,
-				new PipingServletResponse(response, unsyncStringWriter));
+				httpServletRequest,
+				new PipingServletResponse(
+					httpServletResponse, unsyncStringWriter));
 		}
 		catch (JspException je) {
 			throw new ServletException(je);
@@ -142,25 +145,26 @@ public class IconTag extends BaseIconTag {
 	}
 
 	@Override
-	protected void setAttributes(HttpServletRequest request) {
+	protected void setAttributes(HttpServletRequest httpServletRequest) {
 		if (getSrc() == null) {
-			String src = (String)request.getAttribute("aui:icon:src:ext");
+			String src = (String)httpServletRequest.getAttribute(
+				"aui:icon:src:ext");
 
 			if (Validator.isNotNull(src)) {
 				setSrc(src);
 			}
 
-			request.removeAttribute("aui:icon:src:ext");
+			httpServletRequest.removeAttribute("aui:icon:src:ext");
 		}
 
-		super.setAttributes(request);
+		super.setAttributes(httpServletRequest);
 	}
 
 	private void _processIconContent(PageContext pageContext) {
 		JspWriter jspWriter = pageContext.getOut();
 
 		try {
-			if ("lexicon".equals(getMarkupView())) {
+			if (Objects.equals(getMarkupView(), "lexicon")) {
 				jspWriter.write("<svg class=\"lexicon-icon lexicon-icon-");
 				jspWriter.write(GetterUtil.getString(getImage()));
 				jspWriter.write(

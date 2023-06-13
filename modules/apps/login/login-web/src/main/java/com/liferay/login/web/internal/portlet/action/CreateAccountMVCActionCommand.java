@@ -113,10 +113,10 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		HttpServletRequest request = _portal.getHttpServletRequest(
+		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
 			actionRequest);
 
-		HttpSession session = request.getSession();
+		HttpSession session = httpServletRequest.getSession();
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -192,11 +192,11 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 
 			if (user.getStatus() == WorkflowConstants.STATUS_APPROVED) {
 				SessionMessages.add(
-					request, "userAdded", user.getEmailAddress());
+					httpServletRequest, "userAdded", user.getEmailAddress());
 			}
 			else {
 				SessionMessages.add(
-					request, "userPending", user.getEmailAddress());
+					httpServletRequest, "userPending", user.getEmailAddress());
 			}
 		}
 
@@ -394,22 +394,23 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 			login = user.getEmailAddress();
 		}
 
-		HttpServletRequest request = _portal.getHttpServletRequest(
+		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
 			actionRequest);
 
 		String redirect = _portal.escapeRedirect(
 			ParamUtil.getString(actionRequest, "redirect"));
 
 		if (Validator.isNotNull(redirect)) {
-			HttpServletResponse response = _portal.getHttpServletResponse(
-				actionResponse);
+			HttpServletResponse httpServletResponse =
+				_portal.getHttpServletResponse(actionResponse);
 
 			_authenticatedSessionManager.login(
-				request, response, login, password, false, null);
+				httpServletRequest, httpServletResponse, login, password, false,
+				null);
 		}
 		else {
 			PortletURL loginURL = LoginUtil.getLoginURL(
-				request, themeDisplay.getPlid());
+				httpServletRequest, themeDisplay.getPlid());
 
 			loginURL.setParameter("login", login);
 
@@ -440,8 +441,9 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 			ActionRequest actionRequest, ActionResponse actionResponse)
 		throws Exception {
 
-		HttpServletRequest request = _portal.getOriginalServletRequest(
-			_portal.getHttpServletRequest(actionRequest));
+		HttpServletRequest httpServletRequest =
+			_portal.getOriginalServletRequest(
+				_portal.getHttpServletRequest(actionRequest));
 
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
@@ -454,7 +456,7 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 		String emailAddress = ParamUtil.getString(
 			actionRequest, "emailAddress");
 
-		HttpSession session = request.getSession();
+		HttpSession session = httpServletRequest.getSession();
 
 		long facebookId = GetterUtil.getLong(
 			session.getAttribute(WebKeys.FACEBOOK_INCOMPLETE_USER_ID));
@@ -526,10 +528,12 @@ public class CreateAccountMVCActionCommand extends BaseMVCActionCommand {
 		// Session messages
 
 		if (user.getStatus() == WorkflowConstants.STATUS_APPROVED) {
-			SessionMessages.add(request, "userAdded", user.getEmailAddress());
+			SessionMessages.add(
+				httpServletRequest, "userAdded", user.getEmailAddress());
 		}
 		else {
-			SessionMessages.add(request, "userPending", user.getEmailAddress());
+			SessionMessages.add(
+				httpServletRequest, "userPending", user.getEmailAddress());
 		}
 
 		// Send redirect

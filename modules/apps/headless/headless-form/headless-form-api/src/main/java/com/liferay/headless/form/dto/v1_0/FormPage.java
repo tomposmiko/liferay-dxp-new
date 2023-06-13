@@ -45,21 +45,21 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "FormPage")
 public class FormPage {
 
-	@Schema(description = "https://www.schema.org/FormField")
-	public Field[] getFields() {
-		return fields;
+	@Schema
+	public FormField[] getFormFields() {
+		return formFields;
 	}
 
-	public void setFields(Field[] fields) {
-		this.fields = fields;
+	public void setFormFields(FormField[] formFields) {
+		this.formFields = formFields;
 	}
 
 	@JsonIgnore
-	public void setFields(
-		UnsafeSupplier<Field[], Exception> fieldsUnsafeSupplier) {
+	public void setFormFields(
+		UnsafeSupplier<FormField[], Exception> formFieldsUnsafeSupplier) {
 
 		try {
-			fields = fieldsUnsafeSupplier.get();
+			formFields = formFieldsUnsafeSupplier.get();
 		}
 		catch (RuntimeException re) {
 			throw re;
@@ -71,7 +71,7 @@ public class FormPage {
 
 	@GraphQLField
 	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
-	protected Field[] fields;
+	protected FormField[] formFields;
 
 	@Schema
 	public String getHeadline() {
@@ -180,19 +180,19 @@ public class FormPage {
 
 		sb.append("{");
 
-		if (fields != null) {
+		if (formFields != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"fields\": ");
+			sb.append("\"formFields\": ");
 
 			sb.append("[");
 
-			for (int i = 0; i < fields.length; i++) {
-				sb.append(String.valueOf(fields[i]));
+			for (int i = 0; i < formFields.length; i++) {
+				sb.append(String.valueOf(formFields[i]));
 
-				if ((i + 1) < fields.length) {
+				if ((i + 1) < formFields.length) {
 					sb.append(", ");
 				}
 			}

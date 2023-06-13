@@ -37,14 +37,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class DLFileShortcutTrashRenderer extends BaseTrashRenderer {
 
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	public DLFileShortcutTrashRenderer(DLFileShortcut dlFileShortcut) {
-		this(dlFileShortcut, null);
-	}
-
 	public DLFileShortcutTrashRenderer(
 		DLFileShortcut dlFileShortcut, TrashHelper trashHelper) {
 
@@ -86,8 +78,8 @@ public class DLFileShortcutTrashRenderer extends BaseTrashRenderer {
 
 	@Override
 	public boolean include(
-			HttpServletRequest request, HttpServletResponse response,
-			String template)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, String template)
 		throws Exception {
 
 		TrashHandler trashHandler = TrashHandlerRegistryUtil.getTrashHandler(
@@ -96,7 +88,8 @@ public class DLFileShortcutTrashRenderer extends BaseTrashRenderer {
 		TrashRenderer trashRenderer = trashHandler.getTrashRenderer(
 			_dlFileShortcut.getToFileEntryId());
 
-		return trashRenderer.include(request, response, template);
+		return trashRenderer.include(
+			httpServletRequest, httpServletResponse, template);
 	}
 
 	private final DLFileShortcut _dlFileShortcut;

@@ -27,15 +27,15 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class MBRequestHelper extends BaseRequestHelper {
 
-	public MBRequestHelper(HttpServletRequest request) {
-		super(request);
+	public MBRequestHelper(HttpServletRequest httpServletRequest) {
+		super(httpServletRequest);
 	}
 
 	public MBCategory getCategory() {
 		if (_category == null) {
-			HttpServletRequest request = getRequest();
+			HttpServletRequest httpServletRequest = getRequest();
 
-			_category = (MBCategory)request.getAttribute(
+			_category = (MBCategory)httpServletRequest.getAttribute(
 				WebKeys.MESSAGE_BOARDS_CATEGORY);
 		}
 

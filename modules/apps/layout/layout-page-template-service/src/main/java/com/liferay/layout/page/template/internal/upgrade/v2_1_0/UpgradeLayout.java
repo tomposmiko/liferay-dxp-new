@@ -120,13 +120,13 @@ public class UpgradeLayout extends UpgradeProcess {
 						fragmentEntryLink);
 
 					_fragmentEntryLinkLocalService.addFragmentEntryLink(
-						draftLayout.getUserId(), draftLayout.getGroupId(),
+						draftLayout.getUserId(), draftLayout.getGroupId(), 0,
 						fragmentEntryLink.getFragmentEntryId(),
 						PortalUtil.getClassNameId(Layout.class),
 						draftLayout.getPlid(), fragmentEntryLink.getCss(),
 						fragmentEntryLink.getHtml(), fragmentEntryLink.getJs(),
-						fragmentEntryLink.getEditableValues(),
-						fragmentEntryLink.getPosition(), serviceContext);
+						fragmentEntryLink.getEditableValues(), StringPool.BLANK,
+						fragmentEntryLink.getPosition(), null, serviceContext);
 				}
 			}
 

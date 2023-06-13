@@ -164,6 +164,16 @@ public class FormStructureSerDes {
 			sb.append("]");
 		}
 
+		if (formStructure.getFormSuccessPage() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"formSuccessPage\": ");
+
+			sb.append(String.valueOf(formStructure.getFormSuccessPage()));
+		}
+
 		if (formStructure.getId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -196,16 +206,6 @@ public class FormStructureSerDes {
 			sb.append("\"siteId\": ");
 
 			sb.append(formStructure.getSiteId());
-		}
-
-		if (formStructure.getSuccessPage() != null) {
-			if (sb.length() > 1) {
-				sb.append(", ");
-			}
-
-			sb.append("\"successPage\": ");
-
-			sb.append(String.valueOf(formStructure.getSuccessPage()));
 		}
 
 		sb.append("}");
@@ -269,6 +269,15 @@ public class FormStructureSerDes {
 			map.put("formPages", String.valueOf(formStructure.getFormPages()));
 		}
 
+		if (formStructure.getFormSuccessPage() == null) {
+			map.put("formSuccessPage", null);
+		}
+		else {
+			map.put(
+				"formSuccessPage",
+				String.valueOf(formStructure.getFormSuccessPage()));
+		}
+
 		if (formStructure.getId() == null) {
 			map.put("id", null);
 		}
@@ -288,14 +297,6 @@ public class FormStructureSerDes {
 		}
 		else {
 			map.put("siteId", String.valueOf(formStructure.getSiteId()));
-		}
-
-		if (formStructure.getSuccessPage() == null) {
-			map.put("successPage", null);
-		}
-		else {
-			map.put(
-				"successPage", String.valueOf(formStructure.getSuccessPage()));
 		}
 
 		return map;
@@ -395,6 +396,13 @@ public class FormStructureSerDes {
 						));
 				}
 			}
+			else if (Objects.equals(jsonParserFieldName, "formSuccessPage")) {
+				if (jsonParserFieldValue != null) {
+					formStructure.setFormSuccessPage(
+						FormSuccessPageSerDes.toDTO(
+							(String)jsonParserFieldValue));
+				}
+			}
 			else if (Objects.equals(jsonParserFieldName, "id")) {
 				if (jsonParserFieldValue != null) {
 					formStructure.setId(
@@ -410,12 +418,6 @@ public class FormStructureSerDes {
 				if (jsonParserFieldValue != null) {
 					formStructure.setSiteId(
 						Long.valueOf((String)jsonParserFieldValue));
-				}
-			}
-			else if (Objects.equals(jsonParserFieldName, "successPage")) {
-				if (jsonParserFieldValue != null) {
-					formStructure.setSuccessPage(
-						SuccessPageSerDes.toDTO((String)jsonParserFieldValue));
 				}
 			}
 			else {

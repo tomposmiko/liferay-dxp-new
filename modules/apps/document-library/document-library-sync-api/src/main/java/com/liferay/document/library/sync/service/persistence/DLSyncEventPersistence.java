@@ -14,11 +14,11 @@
 
 package com.liferay.document.library.sync.service.persistence;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.document.library.sync.exception.NoSuchEventException;
 import com.liferay.document.library.sync.model.DLSyncEvent;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The persistence interface for the dl sync event service.

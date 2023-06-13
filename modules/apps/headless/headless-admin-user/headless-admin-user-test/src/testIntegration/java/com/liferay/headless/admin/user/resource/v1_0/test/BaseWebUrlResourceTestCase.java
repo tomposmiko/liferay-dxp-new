@@ -625,7 +625,7 @@ public abstract class BaseWebUrlResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected WebUrl randomWebUrl() {
+	protected WebUrl randomWebUrl() throws Exception {
 		return new WebUrl() {
 			{
 				id = RandomTestUtil.randomLong();
@@ -635,13 +635,13 @@ public abstract class BaseWebUrlResourceTestCase {
 		};
 	}
 
-	protected WebUrl randomIrrelevantWebUrl() {
+	protected WebUrl randomIrrelevantWebUrl() throws Exception {
 		WebUrl randomIrrelevantWebUrl = randomWebUrl();
 
 		return randomIrrelevantWebUrl;
 	}
 
-	protected WebUrl randomPatchWebUrl() {
+	protected WebUrl randomPatchWebUrl() throws Exception {
 		return randomWebUrl();
 	}
 

@@ -14,8 +14,6 @@
 
 package com.liferay.oauth2.provider.service;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.oauth2.provider.exception.NoSuchOAuth2AuthorizationException;
 import com.liferay.oauth2.provider.model.OAuth2Authorization;
 import com.liferay.oauth2.provider.model.OAuth2ScopeGrant;
@@ -40,6 +38,8 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides the local service interface for OAuth2Authorization. Methods of this
@@ -66,7 +66,9 @@ public interface OAuth2AuthorizationLocalService
 	 */
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addOAuth2Authorization(long, long, String, long,long, String, Date, Date, String, String, String, Date, Date)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addOAuth2Authorization(long, long, String, long,long,
+	 String, Date, Date, String, String, String, Date, Date)}
 	 */
 	@Deprecated
 	public OAuth2Authorization addOAuth2Authorization(

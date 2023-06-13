@@ -14,10 +14,16 @@
 
 package com.liferay.oauth2.provider.client.test;
 
-import com.liferay.oauth2.provider.test.internal.activator.BaseTestPreparatorBundleActivator;
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.portal.json.JSONObjectImpl;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.test.log.CaptureAppender;
+import com.liferay.portal.test.log.Log4JLoggerTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Collections;
 
@@ -28,29 +34,26 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.codehaus.jettison.json.JSONObject;
-
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
+import org.apache.log4j.Level;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import org.osgi.framework.BundleActivator;
 
 /**
  * @author Carlos Sierra Andrés
  */
-@RunAsClient
 @RunWith(Arquillian.class)
 public class JsonWebServiceTest extends BaseClientTestCase {
 
-	@Deployment
-	public static Archive<?> getArchive() throws Exception {
-		return BaseClientTestCase.getArchive(
-			JsonWebServiceTestPreparatorBundleActivator.class);
-	}
+	@ClassRule
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new LiferayIntegrationTestRule();
 
 	@Test
 	public void test() throws Exception {
@@ -63,11 +66,16 @@ public class JsonWebServiceTest extends BaseClientTestCase {
 
 		formData.putSingle("virtualHost", "testcompany.xyz");
 
-		Assert.assertEquals(
-			403,
-			invocationBuilder.post(
-				Entity.form(formData)
-			).getStatus());
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					"portal_web.docroot.errors.code_jsp", Level.WARN)) {
+
+			Assert.assertEquals(
+				403,
+				invocationBuilder.post(
+					Entity.form(formData)
+				).getStatus());
+		}
 
 		String tokenString = getToken(
 			"oauthTestApplicationRO", null,
@@ -78,7 +86,7 @@ public class JsonWebServiceTest extends BaseClientTestCase {
 
 		Response response = invocationBuilder.post(Entity.form(formData));
 
-		JSONObject jsonObject = new JSONObject(
+		JSONObject jsonObject = new JSONObjectImpl(
 			response.readEntity(String.class));
 
 		Assert.assertEquals("testcompany", jsonObject.getString("webId"));
@@ -94,9 +102,14 @@ public class JsonWebServiceTest extends BaseClientTestCase {
 		formData.putSingle("name", "'aName'");
 		formData.putSingle("regionCode", "'aRegionCode'");
 
-		response = invocationBuilder.post(Entity.form(formData));
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					"portal_web.docroot.errors.code_jsp", Level.WARN)) {
 
-		Assert.assertEquals(403, response.getStatus());
+			response = invocationBuilder.post(Entity.form(formData));
+
+			Assert.assertEquals(403, response.getStatus());
+		}
 
 		invocationBuilder = authorize(
 			webTarget.request(),
@@ -132,6 +145,11 @@ public class JsonWebServiceTest extends BaseClientTestCase {
 				Collections.singletonList("everything"));
 		}
 
+	}
+
+	@Override
+	protected BundleActivator getBundleActivator() {
+		return new JsonWebServiceTestPreparatorBundleActivator();
 	}
 
 }

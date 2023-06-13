@@ -24,6 +24,7 @@ import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.fragment.service.FragmentEntryLocalService;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -105,15 +106,17 @@ public class AddFragmentEntryLinkMVCActionCommand extends BaseMVCActionCommand {
 					serviceContext.getScopeGroupId(), 0,
 					fragmentEntry.getFragmentEntryId(), classNameId, classPK,
 					fragmentEntry.getCss(), fragmentEntry.getHtml(),
-					fragmentEntry.getJs(), null, 0, contributedRendererKey,
-					serviceContext);
+					fragmentEntry.getJs(), null, StringPool.BLANK, 0,
+					contributedRendererKey, serviceContext);
 		}
 		else {
 			fragmentEntryLink =
 				_fragmentEntryLinkLocalService.addFragmentEntryLink(
 					serviceContext.getUserId(),
 					serviceContext.getScopeGroupId(), 0, 0, classNameId,
-					classPK, fragmentEntryKey, serviceContext);
+					classPK, StringPool.BLANK, StringPool.BLANK,
+					StringPool.BLANK, StringPool.BLANK, StringPool.BLANK, 0,
+					fragmentEntryKey, serviceContext);
 		}
 
 		long segmentsExperienceId = ParamUtil.getLong(

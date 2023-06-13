@@ -143,6 +143,18 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 			nameMap, titleMap, descriptionMap, keywordsMap, robotsMap, type,
 			hidden, friendlyURLMap, !deleteLogo, iconBytes, serviceContext);
 
+		Layout draftLayout = _layoutLocalService.fetchLayout(
+			_portal.getClassNameId(Layout.class), layout.getPlid());
+
+		if (draftLayout != null) {
+			_layoutService.updateLayout(
+				groupId, privateLayout, draftLayout.getLayoutId(),
+				draftLayout.getParentLayoutId(), nameMap, titleMap,
+				descriptionMap, keywordsMap, robotsMap, type,
+				draftLayout.isHidden(), draftLayout.getFriendlyURLMap(),
+				!deleteLogo, iconBytes, serviceContext);
+		}
+
 		themeDisplay.clearLayoutFriendlyURL(layout);
 
 		UnicodeProperties layoutTypeSettingsProperties =
@@ -205,13 +217,13 @@ public class EditLayoutMVCActionCommand extends BaseMVCActionCommand {
 				layoutTypeSettingsProperties.toString());
 		}
 
-		HttpServletResponse response = _portal.getHttpServletResponse(
-			actionResponse);
+		HttpServletResponse httpServletResponse =
+			_portal.getHttpServletResponse(actionResponse);
 
 		EventsProcessorUtil.process(
 			PropsKeys.LAYOUT_CONFIGURATION_ACTION_UPDATE,
 			layoutTypePortlet.getConfigurationActionUpdate(),
-			uploadPortletRequest, response);
+			uploadPortletRequest, httpServletResponse);
 
 		_actionUtil.updateLookAndFeel(
 			actionRequest, themeDisplay.getCompanyId(), liveGroupId,

@@ -229,10 +229,14 @@ String referringPortletResource = ParamUtil.getString(request, "referringPortlet
 							value="<%= curArticle.getDisplayDate() %>"
 						/>
 
+						<%
+						DDMStructure ddmStructure = curArticle.getDDMStructure();
+						%>
+
 						<liferay-ui:search-container-column-text
 							cssClass="table-cell-expand-smallest table-cell-minw-100"
 							name="type"
-							value="<%= HtmlUtil.escape(title) %>"
+							value="<%= HtmlUtil.escape(ddmStructure.getName(locale)) %>"
 						/>
 
 						<liferay-ui:search-container-column-text>

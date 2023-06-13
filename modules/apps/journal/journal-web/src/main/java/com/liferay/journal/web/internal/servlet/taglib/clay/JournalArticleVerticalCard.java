@@ -67,7 +67,7 @@ public class JournalArticleVerticalCard extends BaseVerticalCard {
 		_trashHelper = trashHelper;
 
 		_article = (JournalArticle)baseModel;
-		_request = PortalUtil.getHttpServletRequest(renderRequest);
+		_httpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 	}
 
 	@Override
@@ -109,7 +109,7 @@ public class JournalArticleVerticalCard extends BaseVerticalCard {
 			}
 
 			String referringPortletResource = ParamUtil.getString(
-				_request, "referringPortletResource");
+				_httpServletRequest, "referringPortletResource");
 
 			PortletURL editArticleURL = _renderResponse.createRenderURL();
 
@@ -179,10 +179,11 @@ public class JournalArticleVerticalCard extends BaseVerticalCard {
 		Date createDate = _article.getModifiedDate();
 
 		String modifiedDateDescription = LanguageUtil.getTimeDescription(
-			_request, System.currentTimeMillis() - createDate.getTime(), true);
+			_httpServletRequest,
+			System.currentTimeMillis() - createDate.getTime(), true);
 
 		return LanguageUtil.format(
-			_request, "modified-x-ago", modifiedDateDescription);
+			_httpServletRequest, "modified-x-ago", modifiedDateDescription);
 	}
 
 	@Override
@@ -202,8 +203,8 @@ public class JournalArticleVerticalCard extends BaseVerticalCard {
 	private final JournalArticle _article;
 	private final AssetDisplayPageFriendlyURLProvider
 		_assetDisplayPageFriendlyURLProvider;
+	private final HttpServletRequest _httpServletRequest;
 	private final RenderResponse _renderResponse;
-	private final HttpServletRequest _request;
 	private final TrashHelper _trashHelper;
 
 }

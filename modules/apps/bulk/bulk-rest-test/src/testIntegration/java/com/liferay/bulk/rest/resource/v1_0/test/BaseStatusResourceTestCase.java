@@ -377,7 +377,7 @@ public abstract class BaseStatusResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected Status randomStatus() {
+	protected Status randomStatus() throws Exception {
 		return new Status() {
 			{
 				actionInProgress = RandomTestUtil.randomBoolean();
@@ -385,13 +385,13 @@ public abstract class BaseStatusResourceTestCase {
 		};
 	}
 
-	protected Status randomIrrelevantStatus() {
+	protected Status randomIrrelevantStatus() throws Exception {
 		Status randomIrrelevantStatus = randomStatus();
 
 		return randomIrrelevantStatus;
 	}
 
-	protected Status randomPatchStatus() {
+	protected Status randomPatchStatus() throws Exception {
 		return randomStatus();
 	}
 

@@ -14,8 +14,6 @@
 
 package com.liferay.portal.service.http;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.LayoutServiceUtil;
@@ -25,6 +23,8 @@ import java.rmi.RemoteException;
 
 import java.util.Locale;
 import java.util.Map;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides the SOAP utility for the
@@ -1124,8 +1124,7 @@ public class LayoutServiceSoap {
 	 * @param groupId the primary key of the group
 	 * @param privateLayout whether the layout is private to the group
 	 * @param layoutId the layout ID of the layout
-	 * @param parentLayoutId the layout ID to be assigned to the parent
-	 layout
+	 * @param parentLayoutId the layout ID to be assigned to the parent layout
 	 * @return the matching layout
 	 * @throws PortalException if a portal exception occurred
 	 */

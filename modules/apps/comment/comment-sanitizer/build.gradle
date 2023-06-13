@@ -7,7 +7,6 @@ dependencies {
 	compileInclude group: "com.googlecode.owasp-java-html-sanitizer", name: "owasp-java-html-sanitizer", version: "r239"
 	compileInclude group: "org.checkerframework", name: "checker-qual", version: "2.5.2"
 
-	compileOnly group: "biz.aQute.bnd", name: "biz.aQute.bndlib", version: "3.1.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "3.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.impl", version: "4.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "4.0.0"

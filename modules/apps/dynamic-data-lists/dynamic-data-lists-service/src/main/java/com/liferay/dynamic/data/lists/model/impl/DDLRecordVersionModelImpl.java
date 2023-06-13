@@ -14,8 +14,6 @@
 
 package com.liferay.dynamic.data.lists.model.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.dynamic.data.lists.model.DDLRecordVersion;
 import com.liferay.dynamic.data.lists.model.DDLRecordVersionModel;
 import com.liferay.dynamic.data.lists.model.DDLRecordVersionSoap;
@@ -48,6 +46,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The base model implementation for the DDLRecordVersion service. Represents a row in the &quot;DDLRecordVersion&quot; database table, with each column mapped to a property of this class.
@@ -124,21 +124,6 @@ public class DDLRecordVersionModelImpl
 
 	public static final String TX_MANAGER = "liferayTransactionManager";
 
-	public static final boolean ENTITY_CACHE_ENABLED = GetterUtil.getBoolean(
-		com.liferay.dynamic.data.lists.service.util.ServiceProps.get(
-			"value.object.entity.cache.enabled.com.liferay.dynamic.data.lists.model.DDLRecordVersion"),
-		true);
-
-	public static final boolean FINDER_CACHE_ENABLED = GetterUtil.getBoolean(
-		com.liferay.dynamic.data.lists.service.util.ServiceProps.get(
-			"value.object.finder.cache.enabled.com.liferay.dynamic.data.lists.model.DDLRecordVersion"),
-		true);
-
-	public static final boolean COLUMN_BITMASK_ENABLED = GetterUtil.getBoolean(
-		com.liferay.dynamic.data.lists.service.util.ServiceProps.get(
-			"value.object.column.bitmask.enabled.com.liferay.dynamic.data.lists.model.DDLRecordVersion"),
-		true);
-
 	public static final long RECORDID_COLUMN_BITMASK = 1L;
 
 	public static final long RECORDSETID_COLUMN_BITMASK = 2L;
@@ -152,6 +137,14 @@ public class DDLRecordVersionModelImpl
 	public static final long VERSION_COLUMN_BITMASK = 32L;
 
 	public static final long RECORDVERSIONID_COLUMN_BITMASK = 64L;
+
+	public static void setEntityCacheEnabled(boolean entityCacheEnabled) {
+		_entityCacheEnabled = entityCacheEnabled;
+	}
+
+	public static void setFinderCacheEnabled(boolean finderCacheEnabled) {
+		_finderCacheEnabled = finderCacheEnabled;
+	}
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -209,10 +202,6 @@ public class DDLRecordVersionModelImpl
 
 		return models;
 	}
-
-	public static final long LOCK_EXPIRATION_TIME = GetterUtil.getLong(
-		com.liferay.dynamic.data.lists.service.util.ServiceProps.get(
-			"lock.expiration.time.com.liferay.dynamic.data.lists.model.DDLRecordVersion"));
 
 	public DDLRecordVersionModelImpl() {
 	}
@@ -898,12 +887,12 @@ public class DDLRecordVersionModelImpl
 
 	@Override
 	public boolean isEntityCacheEnabled() {
-		return ENTITY_CACHE_ENABLED;
+		return _entityCacheEnabled;
 	}
 
 	@Override
 	public boolean isFinderCacheEnabled() {
-		return FINDER_CACHE_ENABLED;
+		return _finderCacheEnabled;
 	}
 
 	@Override
@@ -1087,6 +1076,8 @@ public class DDLRecordVersionModelImpl
 	private static final Class<?>[] _escapedModelInterfaces = new Class[] {
 		DDLRecordVersion.class, ModelWrapper.class
 	};
+	private static boolean _entityCacheEnabled;
+	private static boolean _finderCacheEnabled;
 
 	private long _mvccVersion;
 	private long _recordVersionId;

@@ -45,16 +45,16 @@ public class MBBannedUsersManagementToolbarDisplayContext {
 	public MBBannedUsersManagementToolbarDisplayContext(
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest request) {
+		HttpServletRequest httpServletRequest) {
 
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 
 		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
 			liferayPortletRequest);
 
-		_themeDisplay = (ThemeDisplay)_request.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -66,7 +66,8 @@ public class MBBannedUsersManagementToolbarDisplayContext {
 						dropdownItem.putData("action", "unbanUser");
 						dropdownItem.setIcon("unlock");
 						dropdownItem.setLabel(
-							LanguageUtil.get(_request, "unban-user"));
+							LanguageUtil.get(
+								_httpServletRequest, "unban-user"));
 
 						dropdownItem.setQuickAction(true);
 					});
@@ -93,7 +94,8 @@ public class MBBannedUsersManagementToolbarDisplayContext {
 	}
 
 	public String getDisplayStyle() {
-		String displayStyle = ParamUtil.getString(_request, "displayStyle");
+		String displayStyle = ParamUtil.getString(
+			_httpServletRequest, "displayStyle");
 
 		if (Validator.isNull(displayStyle)) {
 			displayStyle = _portalPreferences.getValue(
@@ -105,17 +107,17 @@ public class MBBannedUsersManagementToolbarDisplayContext {
 				MBPortletKeys.MESSAGE_BOARDS, "banned-users-display-style",
 				displayStyle);
 
-			_request.setAttribute(
+			_httpServletRequest.setAttribute(
 				WebKeys.SINGLE_PAGE_APPLICATION_CLEAR_CACHE, Boolean.TRUE);
 		}
 
 		return displayStyle;
 	}
 
+	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private final PortalPreferences _portalPreferences;
-	private final HttpServletRequest _request;
 	private final ThemeDisplay _themeDisplay;
 
 }

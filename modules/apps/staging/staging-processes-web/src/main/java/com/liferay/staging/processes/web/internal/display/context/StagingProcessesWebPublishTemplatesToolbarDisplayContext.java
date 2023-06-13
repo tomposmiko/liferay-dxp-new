@@ -32,6 +32,7 @@ import com.liferay.staging.processes.web.internal.search.PublishConfigurationDis
 import com.liferay.staging.processes.web.internal.search.PublishConfigurationSearchTerms;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.portlet.PortletURL;
 
@@ -48,10 +49,11 @@ public class StagingProcessesWebPublishTemplatesToolbarDisplayContext
 	public StagingProcessesWebPublishTemplatesToolbarDisplayContext(
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest request, PageContext pageContext,
+		HttpServletRequest httpServletRequest, PageContext pageContext,
 		PortletURL iteratorURL) {
 
-		super(liferayPortletRequest, liferayPortletResponse, request);
+		super(
+			liferayPortletRequest, liferayPortletResponse, httpServletRequest);
 
 		long companyId = PortalUtil.getCompanyId(liferayPortletRequest);
 		long groupId = (long)pageContext.getAttribute("groupId");
@@ -132,7 +134,7 @@ public class StagingProcessesWebPublishTemplatesToolbarDisplayContext
 		searchContainer.setOrderByCol("name");
 		searchContainer.setOrderByComparator(
 			new ExportImportConfigurationNameComparator(
-				"asc".equals(getOrderByType())));
+				Objects.equals(getOrderByType(), "asc")));
 		searchContainer.setOrderByType(getOrderByType());
 
 		int exportImportConfigurationType =

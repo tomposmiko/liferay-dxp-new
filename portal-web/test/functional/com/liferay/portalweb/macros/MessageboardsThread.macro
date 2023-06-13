@@ -161,6 +161,8 @@ definition {
 			locator1 = "TextInput#FILE",
 			value1 = "${mbThreadAttachment}");
 
+		AssertElementPresent(locator1 = "MessageBoardsEditMessage#ATTACHMENTS_SAVED_STATUS");
+
 		Button.clickPublish();
 
 		AssertElementPresent(
@@ -693,7 +695,7 @@ definition {
 	}
 
 	macro restoreMBAttachmentCP {
-		Click(locator1 = "MessageBoardsRemovedAttachments#REMOVED_ATTACHMENT_LINK");
+		Click(locator1 = "Link#MOVE_TO_RECYCLING_BIN");
 
 		IFrame.selectModalFrame();
 

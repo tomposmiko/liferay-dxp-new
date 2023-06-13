@@ -5,8 +5,7 @@ module.exports = {
 	mode: 'production',
 	output: {
 		filename: 'odata-parser.js',
-		library: 'oDataParser',
-		libraryTarget: 'window',
-		path: path.resolve('./src/main/resources/META-INF/resources/js/libs/')
+		libraryTarget: 'commonjs',
+		path: path.resolve('./classes/META-INF/resources/js/libs')
 	}
 };

@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portlet.usersadmin.search.GroupSearch;
@@ -43,12 +44,13 @@ public class ChildSitesItemSelectorViewDisplayContext
 	extends BaseItemSelectorViewDisplayContext {
 
 	public ChildSitesItemSelectorViewDisplayContext(
-		HttpServletRequest request, AssetPublisherHelper assetPublisherHelper,
+		HttpServletRequest httpServletRequest,
+		AssetPublisherHelper assetPublisherHelper,
 		SiteItemSelectorCriterion siteItemSelectorCriterion,
 		String itemSelectedEventName, PortletURL portletURL) {
 
 		super(
-			request, assetPublisherHelper, siteItemSelectorCriterion,
+			httpServletRequest, assetPublisherHelper, siteItemSelectorCriterion,
 			itemSelectedEventName, portletURL);
 	}
 
@@ -109,11 +111,8 @@ public class ChildSitesItemSelectorViewDisplayContext
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		List<Group> parentGroups = new ArrayList<>();
-
-		parentGroups.add(themeDisplay.getSiteGroup());
-
-		_groupParams.put("groupsTree", parentGroups);
+		_groupParams.put(
+			"groupsTree", ListUtil.toList(themeDisplay.getSiteGroup()));
 
 		_groupParams.put("site", Boolean.TRUE);
 

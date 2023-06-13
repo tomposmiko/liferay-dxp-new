@@ -423,8 +423,7 @@ public class SiteMembershipsPortlet extends MVCPortlet {
 			}
 		}
 
-		return ArrayUtil.toArray(
-			filteredUserIds.toArray(new Long[filteredUserIds.size()]));
+		return ArrayUtil.toArray(filteredUserIds.toArray(new Long[0]));
 	}
 
 	private long[] _filterRemoveUserIds(long groupId, long[] userIds) {
@@ -436,21 +435,21 @@ public class SiteMembershipsPortlet extends MVCPortlet {
 			}
 		}
 
-		return ArrayUtil.toArray(
-			filteredUserIds.toArray(new Long[filteredUserIds.size()]));
+		return ArrayUtil.toArray(filteredUserIds.toArray(new Long[0]));
 	}
 
 	private Group _getGroup(
 		PortletRequest portletRequest, PortletResponse portletResponse) {
 
-		HttpServletRequest request = _portal.getHttpServletRequest(
+		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
 			portletRequest);
 
 		LiferayPortletResponse liferayPortletResponse =
 			_portal.getLiferayPortletResponse(portletResponse);
 
 		SiteMembershipsDisplayContext siteMembershipsDisplayContext =
-			new SiteMembershipsDisplayContext(request, liferayPortletResponse);
+			new SiteMembershipsDisplayContext(
+				httpServletRequest, liferayPortletResponse);
 
 		return siteMembershipsDisplayContext.getGroup();
 	}

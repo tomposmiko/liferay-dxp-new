@@ -29,13 +29,15 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class SiteNavigationBreadcrumbDisplayContext {
 
-	public SiteNavigationBreadcrumbDisplayContext(HttpServletRequest request)
+	public SiteNavigationBreadcrumbDisplayContext(
+			HttpServletRequest httpServletRequest)
 		throws ConfigurationException {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
@@ -53,7 +55,7 @@ public class SiteNavigationBreadcrumbDisplayContext {
 
 		if (displayStyle != null) {
 			PortletDisplayTemplate portletDisplayTemplate =
-				(PortletDisplayTemplate)_request.getAttribute(
+				(PortletDisplayTemplate)_httpServletRequest.getAttribute(
 					WebKeys.PORTLET_DISPLAY_TEMPLATE);
 
 			_ddmTemplateKey = portletDisplayTemplate.getDDMTemplateKey(
@@ -69,7 +71,7 @@ public class SiteNavigationBreadcrumbDisplayContext {
 		}
 
 		_displayStyle = ParamUtil.getString(
-			_request, "displayStyle",
+			_httpServletRequest, "displayStyle",
 			_siteNavigationBreadcrumbPortletInstanceConfiguration.
 				displayStyle());
 
@@ -86,13 +88,14 @@ public class SiteNavigationBreadcrumbDisplayContext {
 				displayStyleGroupId();
 
 		_displayStyleGroupId = ParamUtil.getLong(
-			_request, "displayStyleGroupId",
+			_httpServletRequest, "displayStyleGroupId",
 			_siteNavigationBreadcrumbPortletInstanceConfiguration.
 				displayStyleGroupId());
 
 		if (_displayStyleGroupId <= 0) {
-			ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-				WebKeys.THEME_DISPLAY);
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)_httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
 
 			_displayStyleGroupId = themeDisplay.getSiteGroupId();
 		}
@@ -105,7 +108,8 @@ public class SiteNavigationBreadcrumbDisplayContext {
 			return _portletResource;
 		}
 
-		_portletResource = ParamUtil.getString(_request, "portletResource");
+		_portletResource = ParamUtil.getString(
+			_httpServletRequest, "portletResource");
 
 		return _portletResource;
 	}
@@ -116,7 +120,7 @@ public class SiteNavigationBreadcrumbDisplayContext {
 		}
 
 		_showCurrentGroup = ParamUtil.getBoolean(
-			_request, "showCurrentGroup",
+			_httpServletRequest, "showCurrentGroup",
 			_siteNavigationBreadcrumbPortletInstanceConfiguration.
 				showCurrentGroup());
 
@@ -129,7 +133,7 @@ public class SiteNavigationBreadcrumbDisplayContext {
 		}
 
 		_showGuestGroup = ParamUtil.getBoolean(
-			_request, "showGuestGroup",
+			_httpServletRequest, "showGuestGroup",
 			_siteNavigationBreadcrumbPortletInstanceConfiguration.
 				showGuestGroup());
 
@@ -142,7 +146,7 @@ public class SiteNavigationBreadcrumbDisplayContext {
 		}
 
 		_showLayout = ParamUtil.getBoolean(
-			_request, "showLayout",
+			_httpServletRequest, "showLayout",
 			_siteNavigationBreadcrumbPortletInstanceConfiguration.showLayout());
 
 		return _showLayout;
@@ -154,7 +158,7 @@ public class SiteNavigationBreadcrumbDisplayContext {
 		}
 
 		_showParentGroups = ParamUtil.getBoolean(
-			_request, "showParentGroups",
+			_httpServletRequest, "showParentGroups",
 			_siteNavigationBreadcrumbPortletInstanceConfiguration.
 				showParentGroups());
 
@@ -167,7 +171,7 @@ public class SiteNavigationBreadcrumbDisplayContext {
 		}
 
 		_showPortletBreadcrumb = ParamUtil.getBoolean(
-			_request, "showPortletBreadcrumb",
+			_httpServletRequest, "showPortletBreadcrumb",
 			_siteNavigationBreadcrumbPortletInstanceConfiguration.
 				showPortletBreadcrumb());
 
@@ -177,8 +181,8 @@ public class SiteNavigationBreadcrumbDisplayContext {
 	private String _ddmTemplateKey;
 	private String _displayStyle;
 	private long _displayStyleGroupId;
+	private final HttpServletRequest _httpServletRequest;
 	private String _portletResource;
-	private final HttpServletRequest _request;
 	private Boolean _showCurrentGroup;
 	private Boolean _showGuestGroup;
 	private Boolean _showLayout;

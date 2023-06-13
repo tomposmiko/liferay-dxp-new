@@ -227,7 +227,9 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getFileEntryControlPanelLink(PortletRequest, long)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getFileEntryControlPanelLink(
+	 *             PortletRequest, long)}
 	 */
 	@Deprecated
 	@Override
@@ -248,7 +250,9 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getFolderControlPanelLink(PortletRequest, long)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getFolderControlPanelLink(
+	 *             PortletRequest, long)}
 	 */
 	@Deprecated
 	@Override
@@ -276,7 +280,9 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getDownloadURL(FileEntry, FileVersion, ThemeDisplay, String)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getDownloadURL(
+	 *             FileEntry, FileVersion, ThemeDisplay, String)}
 	 */
 	@Deprecated
 	@Override
@@ -289,7 +295,10 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getDownloadURL(FileEntry, FileVersion, ThemeDisplay, String, boolean, boolean)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getDownloadURL(
+	 *             FileEntry, FileVersion, ThemeDisplay, String, boolean,
+	 *             boolean)}
 	 */
 	@Deprecated
 	@Override
@@ -522,7 +531,9 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getImagePreviewURL(FileEntry, FileVersion, ThemeDisplay)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getImagePreviewURL(
+	 *             FileEntry, FileVersion, ThemeDisplay)}
 	 */
 	@Deprecated
 	@Override
@@ -535,7 +546,10 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getImagePreviewURL(FileEntry, FileVersion, ThemeDisplay, String, boolean, boolean)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getImagePreviewURL(
+	 *             FileEntry, FileVersion, ThemeDisplay, String, boolean,
+	 *             boolean)}
 	 */
 	@Deprecated
 	@Override
@@ -569,7 +583,9 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getImagePreviewURL(FileEntry, FileVersion, ThemeDisplay)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getImagePreviewURL(
+	 *             FileEntry, FileVersion, ThemeDisplay)}
 	 */
 	@Deprecated
 	@Override
@@ -582,7 +598,9 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getPreviewURL(FileEntry, FileVersion, ThemeDisplay, String)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getPreviewURL(
+	 *             FileEntry, FileVersion, ThemeDisplay, String)}
 	 */
 	@Deprecated
 	@Override
@@ -595,7 +613,10 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getPreviewURL(FileEntry, FileVersion, ThemeDisplay, String, boolean, boolean)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getPreviewURL(
+	 *             FileEntry, FileVersion, ThemeDisplay, String, boolean,
+	 *             boolean)}
 	 */
 	@Deprecated
 	@Override
@@ -784,7 +805,9 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getThumbnailSrc(FileEntry, FileVersion, ThemeDisplay)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getThumbnailSrc(
+	 *             FileEntry, FileVersion, ThemeDisplay)}
 	 */
 	@Deprecated
 	@Override
@@ -812,7 +835,9 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getThumbnailSrc(FileEntry, ThemeDisplay)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getThumbnailSrc(
+	 *             FileEntry, ThemeDisplay)}
 	 */
 	@Deprecated
 	@Override
@@ -916,7 +941,9 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getWebDavURL(ThemeDisplay, Folder, FileEntry)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getWebDavURL(
+	 *             ThemeDisplay, Folder, FileEntry)}
 	 */
 	@Deprecated
 	@Override
@@ -928,7 +955,9 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getWebDavURL(ThemeDisplay, Folder, FileEntry, boolean)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getWebDavURL(
+	 *             ThemeDisplay, Folder, FileEntry, boolean)}
 	 */
 	@Deprecated
 	@Override
@@ -942,7 +971,9 @@ public class DLImpl implements DL {
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getWebDavURL(ThemeDisplay, Folder, FileEntry, boolean, boolean)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.document.library.util.DLURLHelper#FileEntryURLHelper#getWebDavURL(
+	 *             ThemeDisplay, Folder, FileEntry, boolean, boolean)}
 	 */
 	@Deprecated
 	@Override
@@ -1202,10 +1233,10 @@ public class DLImpl implements DL {
 			return entryURL;
 		}
 
-		HttpServletRequest request = serviceContext.getRequest();
+		HttpServletRequest httpServletRequest = serviceContext.getRequest();
 		ThemeDisplay themeDisplay = serviceContext.getThemeDisplay();
 
-		if ((request == null) || (themeDisplay == null)) {
+		if ((httpServletRequest == null) || (themeDisplay == null)) {
 			return StringPool.BLANK;
 		}
 
@@ -1235,11 +1266,12 @@ public class DLImpl implements DL {
 			(plid == LayoutConstants.DEFAULT_PLID)) {
 
 			portletURL = PortalUtil.getControlPanelPortletURL(
-				request, portletId, PortletRequest.RENDER_PHASE);
+				httpServletRequest, portletId, PortletRequest.RENDER_PHASE);
 		}
 		else {
 			portletURL = PortletURLFactoryUtil.create(
-				request, portletId, plid, PortletRequest.RENDER_PHASE);
+				httpServletRequest, portletId, plid,
+				PortletRequest.RENDER_PHASE);
 		}
 
 		portletURL.setParameter(

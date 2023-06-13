@@ -52,11 +52,11 @@ public class BlogImagesManagementToolbarDisplayContext {
 	public BlogImagesManagementToolbarDisplayContext(
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest request, PortletURL currentURLObj) {
+		HttpServletRequest httpServletRequest, PortletURL currentURLObj) {
 
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_currentURLObj = currentURLObj;
 
 		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
@@ -71,7 +71,7 @@ public class BlogImagesManagementToolbarDisplayContext {
 						dropdownItem.putData("action", "deleteImages");
 						dropdownItem.setIcon("times-circle");
 						dropdownItem.setLabel(
-							LanguageUtil.get(_request, "delete"));
+							LanguageUtil.get(_httpServletRequest, "delete"));
 						dropdownItem.setQuickAction(true);
 					});
 			}
@@ -83,8 +83,9 @@ public class BlogImagesManagementToolbarDisplayContext {
 
 		List<String> availableActionDropdownItems = new ArrayList<>();
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
@@ -99,7 +100,8 @@ public class BlogImagesManagementToolbarDisplayContext {
 	}
 
 	public String getDisplayStyle() {
-		String displayStyle = ParamUtil.getString(_request, "displayStyle");
+		String displayStyle = ParamUtil.getString(
+			_httpServletRequest, "displayStyle");
 
 		if (Validator.isNull(displayStyle)) {
 			displayStyle = _portalPreferences.getValue(
@@ -110,7 +112,7 @@ public class BlogImagesManagementToolbarDisplayContext {
 				BlogsPortletKeys.BLOGS_ADMIN, "images-display-style",
 				displayStyle);
 
-			_request.setAttribute(
+			_httpServletRequest.setAttribute(
 				WebKeys.SINGLE_PAGE_APPLICATION_CLEAR_CACHE, Boolean.TRUE);
 		}
 
@@ -125,18 +127,18 @@ public class BlogImagesManagementToolbarDisplayContext {
 						dropdownGroupItem.setDropdownItems(
 							_getOrderByDropdownItems());
 						dropdownGroupItem.setLabel(
-							LanguageUtil.get(_request, "order-by"));
+							LanguageUtil.get(_httpServletRequest, "order-by"));
 					});
 			}
 		};
 	}
 
 	public String getOrderByCol() {
-		return ParamUtil.getString(_request, "orderByCol", "title");
+		return ParamUtil.getString(_httpServletRequest, "orderByCol", "title");
 	}
 
 	public String getOrderByType() {
-		return ParamUtil.getString(_request, "orderByType", "desc");
+		return ParamUtil.getString(_httpServletRequest, "orderByType", "desc");
 	}
 
 	public String getSearchActionURL() {
@@ -167,7 +169,7 @@ public class BlogImagesManagementToolbarDisplayContext {
 		portletURL.setParameter("navigation", "images");
 
 		int delta = ParamUtil.getInteger(
-			_request, SearchContainer.DEFAULT_DELTA_PARAM);
+			_httpServletRequest, SearchContainer.DEFAULT_DELTA_PARAM);
 
 		if (delta > 0) {
 			portletURL.setParameter("delta", String.valueOf(delta));
@@ -177,13 +179,13 @@ public class BlogImagesManagementToolbarDisplayContext {
 		portletURL.setParameter("orderByType", getOrderByType());
 
 		int cur = ParamUtil.getInteger(
-			_request, SearchContainer.DEFAULT_CUR_PARAM);
+			_httpServletRequest, SearchContainer.DEFAULT_CUR_PARAM);
 
 		if (cur > 0) {
 			portletURL.setParameter("cur", String.valueOf(cur));
 		}
 
-		String keywords = ParamUtil.getString(_request, "keywords");
+		String keywords = ParamUtil.getString(_httpServletRequest, "keywords");
 
 		if (Validator.isNotNull(keywords)) {
 			portletURL.setParameter("keywords", keywords);
@@ -204,7 +206,7 @@ public class BlogImagesManagementToolbarDisplayContext {
 
 		sortingURL.setParameter(SearchContainer.DEFAULT_CUR_PARAM, "0");
 
-		String keywords = ParamUtil.getString(_request, "keywords");
+		String keywords = ParamUtil.getString(_httpServletRequest, "keywords");
 
 		if (Validator.isNotNull(keywords)) {
 			sortingURL.setParameter("keywords", keywords);
@@ -218,29 +220,31 @@ public class BlogImagesManagementToolbarDisplayContext {
 			{
 				add(
 					dropdownItem -> {
-						dropdownItem.setActive("title".equals(getOrderByCol()));
+						dropdownItem.setActive(
+							Objects.equals(getOrderByCol(), "title"));
 						dropdownItem.setHref(
 							_getCurrentSortingURL(), "orderByCol", "title");
 						dropdownItem.setLabel(
-							LanguageUtil.get(_request, "title"));
+							LanguageUtil.get(_httpServletRequest, "title"));
 					});
 
 				add(
 					dropdownItem -> {
-						dropdownItem.setActive("size".equals(getOrderByCol()));
+						dropdownItem.setActive(
+							Objects.equals(getOrderByCol(), "size"));
 						dropdownItem.setHref(
 							_getCurrentSortingURL(), "orderByCol", "size");
 						dropdownItem.setLabel(
-							LanguageUtil.get(_request, "size"));
+							LanguageUtil.get(_httpServletRequest, "size"));
 					});
 			}
 		};
 	}
 
 	private final PortletURL _currentURLObj;
+	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private final PortalPreferences _portalPreferences;
-	private final HttpServletRequest _request;
 
 }

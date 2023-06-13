@@ -888,6 +888,19 @@ public class ClusterSchedulerEngine
 
 					Trigger oldTrigger = schedulerResponse.getTrigger();
 
+					if (oldTrigger == null) {
+						if (_log.isInfoEnabled()) {
+							_log.info(
+								StringBundler.concat(
+									"Skip scheduling memory clustered job ",
+									schedulerResponse,
+									" with a null trigger. It may have been ",
+									"unscheduled or already finished."));
+						}
+
+						continue;
+					}
+
 					Date startDate = oldTrigger.getFireDateAfter(new Date());
 
 					Trigger newTrigger = _triggerFactory.createTrigger(

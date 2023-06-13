@@ -50,7 +50,7 @@ public class SiteVerticalCard implements VerticalCard {
 		_groupUsersCount = groupUsersCount;
 
 		_group = (Group)baseModel;
-		_request = PortalUtil.getHttpServletRequest(renderRequest);
+		_httpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 		_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
@@ -102,7 +102,8 @@ public class SiteVerticalCard implements VerticalCard {
 
 	@Override
 	public String getSubtitle() {
-		return LanguageUtil.get(_request, "members") + ": " + _groupUsersCount;
+		return LanguageUtil.get(_httpServletRequest, "members") + ": " +
+			_groupUsersCount;
 	}
 
 	@Override
@@ -124,9 +125,9 @@ public class SiteVerticalCard implements VerticalCard {
 
 	private final Group _group;
 	private final int _groupUsersCount;
+	private final HttpServletRequest _httpServletRequest;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private final HttpServletRequest _request;
 	private final String _tabs1;
 	private final ThemeDisplay _themeDisplay;
 

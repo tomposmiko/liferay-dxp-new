@@ -14,9 +14,9 @@
 
 package com.liferay.portal.instances.service;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.service.ServiceWrapper;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link PortalInstancesLocalService}.
@@ -42,8 +42,10 @@ public class PortalInstancesLocalServiceWrapper
 	}
 
 	@Override
-	public long getCompanyId(javax.servlet.http.HttpServletRequest request) {
-		return _portalInstancesLocalService.getCompanyId(request);
+	public long getCompanyId(
+		javax.servlet.http.HttpServletRequest httpServletRequest) {
+
+		return _portalInstancesLocalService.getCompanyId(httpServletRequest);
 	}
 
 	@Override

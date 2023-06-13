@@ -100,8 +100,8 @@ public class SharingEntryLocalServiceImpl
 		}
 
 		return sharingEntryLocalService.updateSharingEntry(
-			sharingEntry.getSharingEntryId(), sharingEntryActions, shareable,
-			expirationDate, serviceContext);
+			userId, sharingEntry.getSharingEntryId(), sharingEntryActions,
+			shareable, expirationDate, serviceContext);
 	}
 
 	/**
@@ -323,14 +323,14 @@ public class SharingEntryLocalServiceImpl
 	}
 
 	/**
-	 * Returns the sharing entry for the resource shared with the user or null
-	 * if there's none. The class name ID and class primary key identify the
-	 * resource's type and instance, respectively.
+	 * Returns the sharing entry for the resource shared with the user or
+	 * <code>null</code> if there's none. The class name ID and class primary
+	 * key identify the resource's type and instance, respectively.
 	 *
 	 * @param  toUserId the user's ID
 	 * @param  classNameId the resource's class name ID
 	 * @param  classPK the class primary key of the resource
-	 * @return the sharing entry or null if none
+	 * @return the sharing entry or <code>null</code> if none
 	 * @review
 	 */
 	@Override
@@ -363,8 +363,8 @@ public class SharingEntryLocalServiceImpl
 	}
 
 	/**
-	 * Returns the number of sharing entries for the type of resource shared
-	 * by the user. The class name ID identifies the resource type.
+	 * Returns the number of sharing entries for the type of resource shared by
+	 * the user. The class name ID identifies the resource type.
 	 *
 	 * @param  fromUserId the user's ID
 	 * @param  classNameId the class name ID of the resources
@@ -627,6 +627,41 @@ public class SharingEntryLocalServiceImpl
 	/**
 	 * Updates the sharing entry in the database.
 	 *
+	 * @param      sharingEntryId the primary key of the sharing entry
+	 * @param      sharingEntryActions the sharing entry actions
+	 * @param      shareable whether the user the resource is shared with can
+	 *             also share it
+	 * @param      expirationDate the date when the sharing entry expires
+	 * @param      serviceContext the service context
+	 * @return     the sharing entry
+	 * @throws     PortalException if the sharing entry does not exist, if the
+	 *             sharing entry actions are invalid (e.g., empty, don't contain
+	 *             {@code SharingEntryAction#VIEW}, or contain a {@code null}
+	 *             value), or if the expiration date is a past value
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 *             com.liferay.sharing.service.SharingEntryLocalService#
+	 *             updateSharingEntry(long, long, Collection, boolean, Date,
+	 *             ServiceContext)}
+	 * @review
+	 */
+	@Deprecated
+	@Override
+	public SharingEntry updateSharingEntry(
+			long sharingEntryId,
+			Collection<SharingEntryAction> sharingEntryActions,
+			boolean shareable, Date expirationDate,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		return updateSharingEntry(
+			serviceContext.getUserId(), sharingEntryId, sharingEntryActions,
+			shareable, expirationDate, serviceContext);
+	}
+
+	/**
+	 * Updates the sharing entry in the database.
+	 *
+	 * @param  userId the primary key of the user updating the sharing entry
 	 * @param  sharingEntryId the primary key of the sharing entry
 	 * @param  sharingEntryActions the sharing entry actions
 	 * @param  shareable whether the user the resource is shared with can also
@@ -638,10 +673,11 @@ public class SharingEntryLocalServiceImpl
 	 *         sharing entry actions are invalid (e.g., empty, don't contain
 	 *         {@code SharingEntryAction#VIEW}, or contain a {@code null}
 	 *         value), or if the expiration date is a past value
+	 * @review
 	 */
 	@Override
 	public SharingEntry updateSharingEntry(
-			long sharingEntryId,
+			long userId, long sharingEntryId,
 			Collection<SharingEntryAction> sharingEntryActions,
 			boolean shareable, Date expirationDate,
 			ServiceContext serviceContext)
@@ -654,6 +690,7 @@ public class SharingEntryLocalServiceImpl
 
 		_validateExpirationDate(expirationDate);
 
+		sharingEntry.setUserId(userId);
 		sharingEntry.setShareable(shareable);
 		sharingEntry.setExpirationDate(expirationDate);
 

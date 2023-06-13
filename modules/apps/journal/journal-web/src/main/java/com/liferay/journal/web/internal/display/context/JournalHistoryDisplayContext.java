@@ -48,7 +48,7 @@ public class JournalHistoryDisplayContext {
 		_renderResponse = renderResponse;
 		_article = article;
 
-		_request = PortalUtil.getHttpServletRequest(renderRequest);
+		_httpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 	}
 
 	public SearchContainer getArticleSearchContainer() {
@@ -108,7 +108,7 @@ public class JournalHistoryDisplayContext {
 						navigationItem.setActive(true);
 						navigationItem.setHref(StringPool.BLANK);
 						navigationItem.setLabel(
-							LanguageUtil.get(_request, "versions"));
+							LanguageUtil.get(_httpServletRequest, "versions"));
 					});
 			}
 		};
@@ -178,12 +178,12 @@ public class JournalHistoryDisplayContext {
 	private final JournalArticle _article;
 	private String _backURL;
 	private String _displayStyle;
+	private final HttpServletRequest _httpServletRequest;
 	private String _orderByCol;
 	private String _orderByType;
 	private String _redirect;
 	private String _referringPortletResource;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private final HttpServletRequest _request;
 
 }

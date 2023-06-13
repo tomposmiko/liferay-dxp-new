@@ -46,7 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
 
 /**
- * @author Antonio Pol
+ * @author     Antonio Pol
  * @deprecated As of Mueller (7.2.x)
  */
 @Deprecated
@@ -215,12 +215,12 @@ public class AssetTagsSelectorTag extends IncludeTag {
 	}
 
 	@Override
-	protected void setAttributes(HttpServletRequest request) {
-		request.setAttribute(
+	protected void setAttributes(HttpServletRequest httpServletRequest) {
+		httpServletRequest.setAttribute(
 			"liferay-asset:asset-tags-selector:context", _getContext());
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			"liferay-asset:asset-tags-selector:inputName", _getInputName());
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			"liferay-asset:asset-tags-selector:tagNames", getTagNames());
 	}
 

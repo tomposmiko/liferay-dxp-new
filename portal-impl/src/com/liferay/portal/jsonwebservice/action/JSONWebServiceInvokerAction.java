@@ -57,14 +57,14 @@ import jodd.util.NameValue;
  */
 public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 
-	public JSONWebServiceInvokerAction(HttpServletRequest request) {
-		_request = request;
+	public JSONWebServiceInvokerAction(HttpServletRequest httpServletRequest) {
+		_httpServletRequest = httpServletRequest;
 
-		String command = request.getParameter(Constants.CMD);
+		String command = httpServletRequest.getParameter(Constants.CMD);
 
 		if (command == null) {
 			try {
-				command = ServletUtil.readRequestBody(request);
+				command = ServletUtil.readRequestBody(httpServletRequest);
 			}
 			catch (IOException ioe) {
 				throw new IllegalArgumentException(ioe);
@@ -373,7 +373,7 @@ public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 	private Object _executeStatement(Statement statement) throws Exception {
 		JSONWebServiceAction jsonWebServiceAction =
 			JSONWebServiceActionsManagerUtil.getJSONWebServiceAction(
-				_request, statement.getMethod(), null,
+				_httpServletRequest, statement.getMethod(), null,
 				statement.getParameterMap());
 
 		Object result = jsonWebServiceAction.invoke();
@@ -656,8 +656,8 @@ public class JSONWebServiceInvokerAction implements JSONWebServiceAction {
 	private static final JsonSerializer _jsonSerializer = new JsonSerializer();
 
 	private final String _command;
+	private final HttpServletRequest _httpServletRequest;
 	private List<String> _includes;
-	private final HttpServletRequest _request;
 	private final List<Statement> _statements = new ArrayList<>();
 
 	private static class Flag extends NameValue<String, String> {

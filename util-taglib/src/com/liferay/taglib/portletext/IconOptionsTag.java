@@ -128,35 +128,36 @@ public class IconOptionsTag extends IconTag {
 	}
 
 	@Override
-	protected void setAttributes(HttpServletRequest request) {
-		super.setAttributes(request);
+	protected void setAttributes(HttpServletRequest httpServletRequest) {
+		super.setAttributes(httpServletRequest);
 
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			"liferay-ui:icon-options:portletConfigurationIcons",
 			getPortletConfigurationIcons());
-		request.setAttribute("liferay-ui:icon:direction", _direction);
-		request.setAttribute(
+		httpServletRequest.setAttribute(
+			"liferay-ui:icon:direction", _direction);
+		httpServletRequest.setAttribute(
 			"liferay-ui:icon:showArrow", String.valueOf(_showArrow));
 	}
 
 	private void _processPortletConfigurationIcons(PageContext pageContext) {
 		try {
-			HttpServletRequest request =
+			HttpServletRequest httpServletRequest =
 				(HttpServletRequest)pageContext.getRequest();
 
 			PortletRequest portletRequest =
-				(PortletRequest)request.getAttribute(
+				(PortletRequest)httpServletRequest.getAttribute(
 					JavaConstants.JAVAX_PORTLET_REQUEST);
 
 			PortletResponse portletResponse =
-				(PortletResponse)request.getAttribute(
+				(PortletResponse)httpServletRequest.getAttribute(
 					JavaConstants.JAVAX_PORTLET_RESPONSE);
 
 			for (PortletConfigurationIcon portletConfigurationIcon :
 					_portletConfigurationIcons) {
 
 				boolean include = portletConfigurationIcon.include(
-					request,
+					httpServletRequest,
 					PipingServletResponse.createPipingServletResponse(
 						pageContext));
 

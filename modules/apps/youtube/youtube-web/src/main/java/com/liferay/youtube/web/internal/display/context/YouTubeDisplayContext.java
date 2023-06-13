@@ -32,16 +32,17 @@ import javax.servlet.http.HttpServletRequest;
 public class YouTubeDisplayContext {
 
 	public YouTubeDisplayContext(
-		HttpServletRequest request, PortletPreferences portletPreferences) {
+		HttpServletRequest httpServletRequest,
+		PortletPreferences portletPreferences) {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_portletPreferences = portletPreferences;
 	}
 
 	public String getEmbedURL() {
 		StringBundler sb = new StringBundler(12);
 
-		sb.append(HttpUtil.getProtocol(_request));
+		sb.append(HttpUtil.getProtocol(_httpServletRequest));
 		sb.append("://www.youtube.com/embed/");
 		sb.append(getId());
 		sb.append("?wmode=transparent");
@@ -112,7 +113,7 @@ public class YouTubeDisplayContext {
 	public String getImageURL() {
 		StringBundler sb = new StringBundler(4);
 
-		sb.append(HttpUtil.getProtocol(_request));
+		sb.append(HttpUtil.getProtocol(_httpServletRequest));
 		sb.append("://img.youtube.com/vi/");
 		sb.append(getId());
 		sb.append("/0.jpg");
@@ -152,8 +153,8 @@ public class YouTubeDisplayContext {
 	}
 
 	public String getWatchURL() {
-		return HttpUtil.getProtocol(_request) + "://www.youtube.com/watch?v=" +
-			getId();
+		return HttpUtil.getProtocol(_httpServletRequest) +
+			"://www.youtube.com/watch?v=" + getId();
 	}
 
 	public String getWidth() {
@@ -256,11 +257,11 @@ public class YouTubeDisplayContext {
 	private Boolean _closedCaptioning;
 	private Boolean _enableKeyboardControls;
 	private String _height;
+	private final HttpServletRequest _httpServletRequest;
 	private String _id;
 	private Boolean _loop;
 	private final PortletPreferences _portletPreferences;
 	private String _presetSize;
-	private final HttpServletRequest _request;
 	private Boolean _showThumbnail;
 	private String _startTime;
 	private String _url;

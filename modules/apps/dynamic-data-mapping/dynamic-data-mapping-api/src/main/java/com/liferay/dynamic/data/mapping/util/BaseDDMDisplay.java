@@ -14,8 +14,6 @@
 
 package com.liferay.dynamic.data.mapping.util;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
@@ -55,6 +53,7 @@ import javax.portlet.PortletURL;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
@@ -236,18 +235,19 @@ public abstract class BaseDDMDisplay implements DDMDisplay {
 			ThemeDisplay themeDisplay, boolean includeAncestorTemplates)
 		throws Exception {
 
-		HttpServletRequest request = themeDisplay.getRequest();
+		HttpServletRequest httpServletRequest = themeDisplay.getRequest();
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
 		long groupId = themeDisplay.getScopeGroupId();
 
 		String refererPortletName = ParamUtil.getString(
-			request, portletDisplay.getNamespace() + "refererPortletName");
+			httpServletRequest,
+			portletDisplay.getNamespace() + "refererPortletName");
 
 		if (Validator.isNotNull(refererPortletName)) {
 			groupId = PortalUtil.getScopeGroupId(
-				request, refererPortletName, true);
+				httpServletRequest, refererPortletName, true);
 		}
 
 		if (includeAncestorTemplates) {

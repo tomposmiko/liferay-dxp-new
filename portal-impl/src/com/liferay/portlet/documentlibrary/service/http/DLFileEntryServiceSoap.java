@@ -14,14 +14,14 @@
 
 package com.liferay.portlet.documentlibrary.service.http;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.document.library.kernel.service.DLFileEntryServiceUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 
 import java.rmi.RemoteException;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides the SOAP utility for the
@@ -85,7 +85,9 @@ public class DLFileEntryServiceSoap {
 	}
 
 	/**
-	 * @deprecated As of Judson (7.1.x), replaced by {@link #checkInFileEntry(long, DLVersionNumberIncrease, String, ServiceContext)}
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 #checkInFileEntry(long, DLVersionNumberIncrease, String,
+	 ServiceContext)}
 	 */
 	@Deprecated
 	public static void checkInFileEntry(

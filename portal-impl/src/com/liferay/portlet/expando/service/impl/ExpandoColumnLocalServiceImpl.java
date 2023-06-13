@@ -215,7 +215,7 @@ public class ExpandoColumnLocalServiceImpl
 		long tableId, Collection<String> names) {
 
 		return expandoColumnPersistence.findByT_N(
-			tableId, names.toArray(new String[names.size()]));
+			tableId, names.toArray(new String[0]));
 	}
 
 	@Override
@@ -245,7 +245,7 @@ public class ExpandoColumnLocalServiceImpl
 		}
 
 		return expandoColumnPersistence.findByT_N(
-			table.getTableId(), names.toArray(new String[names.size()]));
+			table.getTableId(), names.toArray(new String[0]));
 	}
 
 	@Override
@@ -509,6 +509,9 @@ public class ExpandoColumnLocalServiceImpl
 		}
 		else if (type == ExpandoColumnConstants.FLOAT_ARRAY) {
 			value.setFloatArray((float[])defaultData);
+		}
+		else if (type == ExpandoColumnConstants.GEOLOCATION) {
+			value.setGeolocationJSONObject((JSONObject)defaultData);
 		}
 		else if (type == ExpandoColumnConstants.INTEGER) {
 			value.setInteger((Integer)defaultData);

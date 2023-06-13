@@ -58,7 +58,7 @@ public class TransformUtil {
 
 		List<R> list = transformToList(array, unsafeFunction);
 
-		return list.toArray((R[])Array.newInstance(clazz, list.size()));
+		return list.toArray((R[])Array.newInstance(clazz, 0));
 	}
 
 	public static <T, R> R[] transformToArray(
@@ -67,7 +67,7 @@ public class TransformUtil {
 
 		List<R> list = transform(collection, unsafeFunction);
 
-		return list.toArray((R[])Array.newInstance(clazz, list.size()));
+		return list.toArray((R[])Array.newInstance(clazz, 0));
 	}
 
 	public static <T, R> List<R> transformToList(

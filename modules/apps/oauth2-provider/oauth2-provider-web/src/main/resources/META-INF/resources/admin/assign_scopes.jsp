@@ -49,7 +49,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 						</li>
 					</ul>
 
-					<div class="tab-content">
+					<div class="hidden tab-content" id="<portlet:namespace />navScopeTypesTabContents">
 						<div aria-labelledby="navResourceScopesTab" class="active fade show tab-pane" id="<portlet:namespace />navResourceScopes" role="tabpanel">
 							<%@ include file="/admin/assign_scopes_tab1.jspf" %>
 						</div>
@@ -80,6 +80,8 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 			if (A.all('#<portlet:namespace />navGlobalScopes .panel').size() > 0) {
 				A.one('#<portlet:namespace />navScopeTypes').toggleClass('hidden', false);
 			}
+
+			A.one('#<portlet:namespace />navScopeTypesTabContents').toggleClass('hidden', false);
 
 			var handle;
 
@@ -244,7 +246,7 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 							slave.attr('checked', false);
 						}
 
-						if (slave.attr('name')) {
+						if (slave.attr('name') == '<portlet:namespace />scopeAliases') {
 							slave.attr('disabled', false);
 						}
 					}
@@ -304,6 +306,23 @@ AssignScopesDisplayContext assignScopesDisplayContext = (AssignScopesDisplayCont
 					document.<portlet:namespace/>fm.submit();
 				}
 			);
+
+			A.all('#<portlet:namespace />appsAccordion .panel').filter(
+				function() {
+					return this.one('input:checked');
+				}
+			).each(
+				function() {
+
+					var panelHeaderElement = this.one('*[data-toggle="collapse"]');
+
+					panelHeaderElement.attr('aria-expanded', 'true')
+					panelHeaderElement.removeClass('collapsed');
+
+					var panelBodyElement = this.one('.collapse');
+
+					panelBodyElement.addClass('show');
+				});
 		}
 	);
 </aui:script>

@@ -14,8 +14,7 @@
 
 package com.liferay.portal.instances.service;
 
-import aQute.bnd.annotation.ProviderType;
-
+import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.util.tracker.ServiceTracker;
@@ -45,9 +44,9 @@ public class PortalInstancesLocalServiceUtil {
 	}
 
 	public static long getCompanyId(
-		javax.servlet.http.HttpServletRequest request) {
+		javax.servlet.http.HttpServletRequest httpServletRequest) {
 
-		return getService().getCompanyId(request);
+		return getService().getCompanyId(httpServletRequest);
 	}
 
 	public static long[] getCompanyIds() {

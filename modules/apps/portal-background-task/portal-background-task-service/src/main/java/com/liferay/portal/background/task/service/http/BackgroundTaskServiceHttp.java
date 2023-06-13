@@ -14,8 +14,6 @@
 
 package com.liferay.portal.background.task.service.http;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.background.task.service.BackgroundTaskServiceUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -23,6 +21,8 @@ import com.liferay.portal.kernel.security.auth.HttpPrincipal;
 import com.liferay.portal.kernel.service.http.TunnelUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides the HTTP utility for the
@@ -56,7 +56,7 @@ public class BackgroundTaskServiceHttp {
 
 	public static int getBackgroundTasksCount(
 		HttpPrincipal httpPrincipal, long groupId, String taskExecutorClassName,
-		String completed) {
+		boolean completed) {
 
 		try {
 			MethodKey methodKey = new MethodKey(
@@ -85,13 +85,44 @@ public class BackgroundTaskServiceHttp {
 		}
 	}
 
+	public static int getBackgroundTasksCount(
+		HttpPrincipal httpPrincipal, long groupId, String name,
+		String taskExecutorClassName) {
+
+		try {
+			MethodKey methodKey = new MethodKey(
+				BackgroundTaskServiceUtil.class, "getBackgroundTasksCount",
+				_getBackgroundTasksCountParameterTypes1);
+
+			MethodHandler methodHandler = new MethodHandler(
+				methodKey, groupId, name, taskExecutorClassName);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				throw new com.liferay.portal.kernel.exception.SystemException(
+					e);
+			}
+
+			return ((Integer)returnObj).intValue();
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
 	public static String getBackgroundTaskStatusJSON(
 		HttpPrincipal httpPrincipal, long backgroundTaskId) {
 
 		try {
 			MethodKey methodKey = new MethodKey(
 				BackgroundTaskServiceUtil.class, "getBackgroundTaskStatusJSON",
-				_getBackgroundTaskStatusJSONParameterTypes1);
+				_getBackgroundTaskStatusJSONParameterTypes2);
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, backgroundTaskId);
@@ -119,8 +150,10 @@ public class BackgroundTaskServiceHttp {
 		BackgroundTaskServiceHttp.class);
 
 	private static final Class<?>[] _getBackgroundTasksCountParameterTypes0 =
+		new Class[] {long.class, String.class, boolean.class};
+	private static final Class<?>[] _getBackgroundTasksCountParameterTypes1 =
 		new Class[] {long.class, String.class, String.class};
 	private static final Class<?>[]
-		_getBackgroundTaskStatusJSONParameterTypes1 = new Class[] {long.class};
+		_getBackgroundTaskStatusJSONParameterTypes2 = new Class[] {long.class};
 
 }

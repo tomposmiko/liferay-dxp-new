@@ -33,8 +33,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class DDMWebRequestHelper extends BaseRequestHelper {
 
-	public DDMWebRequestHelper(HttpServletRequest request) {
-		super(request);
+	public DDMWebRequestHelper(HttpServletRequest httpServletRequest) {
+		super(httpServletRequest);
 	}
 
 	public DDMGroupServiceConfiguration getDDMGroupServiceConfiguration() {
@@ -69,12 +69,12 @@ public class DDMWebRequestHelper extends BaseRequestHelper {
 		throws ConfigurationException {
 
 		if (Validator.isNotNull(getPortletResource())) {
-			HttpServletRequest request = getRequest();
+			HttpServletRequest httpServletRequest = getRequest();
 
 			return (T)ConfigurationProviderUtil.getConfiguration(
 				clazz,
 				new ParameterMapSettingsLocator(
-					request.getParameterMap(),
+					httpServletRequest.getParameterMap(),
 					new GroupServiceSettingsLocator(
 						getSiteGroupId(), DDMConstants.SERVICE_NAME)));
 		}

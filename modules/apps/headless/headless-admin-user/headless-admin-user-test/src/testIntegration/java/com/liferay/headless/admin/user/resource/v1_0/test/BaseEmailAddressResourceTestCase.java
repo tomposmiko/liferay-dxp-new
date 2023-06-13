@@ -693,7 +693,7 @@ public abstract class BaseEmailAddressResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected EmailAddress randomEmailAddress() {
+	protected EmailAddress randomEmailAddress() throws Exception {
 		return new EmailAddress() {
 			{
 				emailAddress = RandomTestUtil.randomString();
@@ -704,13 +704,13 @@ public abstract class BaseEmailAddressResourceTestCase {
 		};
 	}
 
-	protected EmailAddress randomIrrelevantEmailAddress() {
+	protected EmailAddress randomIrrelevantEmailAddress() throws Exception {
 		EmailAddress randomIrrelevantEmailAddress = randomEmailAddress();
 
 		return randomIrrelevantEmailAddress;
 	}
 
-	protected EmailAddress randomPatchEmailAddress() {
+	protected EmailAddress randomPatchEmailAddress() throws Exception {
 		return randomEmailAddress();
 	}
 

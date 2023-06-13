@@ -85,10 +85,12 @@ public class ViewAuthorizationRequestMVCRenderCommand
 		ThemeDisplay themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		HttpServletRequest request = _portal.getOriginalServletRequest(
-			_portal.getHttpServletRequest(renderRequest));
+		HttpServletRequest httpServletRequest =
+			_portal.getOriginalServletRequest(
+				_portal.getHttpServletRequest(renderRequest));
 
-		Map<String, String> oAuth2Parameters = getOAuth2Parameters(request);
+		Map<String, String> oAuth2Parameters = getOAuth2Parameters(
+			httpServletRequest);
 
 		String error = oAuth2Parameters.get("error");
 
@@ -174,11 +176,11 @@ public class ViewAuthorizationRequestMVCRenderCommand
 	}
 
 	protected Map<String, String> getOAuth2Parameters(
-		HttpServletRequest request) {
+		HttpServletRequest httpServletRequest) {
 
 		Map<String, String> oAuth2Parameters = new HashMap<>();
 
-		Enumeration<String> names = request.getParameterNames();
+		Enumeration<String> names = httpServletRequest.getParameterNames();
 
 		while (names.hasMoreElements()) {
 			String name = names.nextElement();
@@ -186,7 +188,7 @@ public class ViewAuthorizationRequestMVCRenderCommand
 			if (name.startsWith("oauth2_")) {
 				oAuth2Parameters.put(
 					name.substring("oauth2_".length()),
-					ParamUtil.getString(request, name));
+					ParamUtil.getString(httpServletRequest, name));
 			}
 		}
 

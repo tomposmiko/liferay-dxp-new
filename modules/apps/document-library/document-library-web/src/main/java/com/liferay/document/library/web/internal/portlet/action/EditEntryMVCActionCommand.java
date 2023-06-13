@@ -30,7 +30,6 @@ import com.liferay.document.library.kernel.model.DLVersionNumberIncrease;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.kernel.service.DLTrashService;
 import com.liferay.petra.reflect.ReflectionUtil;
-import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.lock.DuplicateLockException;
 import com.liferay.portal.kernel.model.TrashedModel;
@@ -103,12 +102,18 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 		long[] fileEntryIds = ParamUtil.getLongValues(
 			actionRequest, "rowIdsFileEntry");
 
+		DLVersionNumberIncrease dlVersionNumberIncrease =
+			DLVersionNumberIncrease.valueOf(
+				ParamUtil.getString(actionRequest, "versionIncrease"),
+				DLVersionNumberIncrease.MINOR);
+		String changeLog = ParamUtil.getString(actionRequest, "changeLog");
+
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
 
 		for (long fileEntryId : fileEntryIds) {
 			_dlAppService.checkInFileEntry(
-				fileEntryId, DLVersionNumberIncrease.MINOR, StringPool.BLANK,
+				fileEntryId, dlVersionNumberIncrease, changeLog,
 				serviceContext);
 		}
 
@@ -123,8 +128,8 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 
 			if (!ArrayUtil.contains(fileEntryIds, toFileEntryId)) {
 				_dlAppService.checkInFileEntry(
-					toFileEntryId, DLVersionNumberIncrease.MINOR,
-					StringPool.BLANK, serviceContext);
+					toFileEntryId, dlVersionNumberIncrease, changeLog,
+					serviceContext);
 			}
 		}
 	}
@@ -256,14 +261,14 @@ public class EditEntryMVCActionCommand extends BaseMVCActionCommand {
 			   SourceFileNameException e) {
 
 			if (e instanceof DuplicateFileEntryException) {
-				HttpServletResponse response = _portal.getHttpServletResponse(
-					actionResponse);
+				HttpServletResponse httpServletResponse =
+					_portal.getHttpServletResponse(actionResponse);
 
-				response.setStatus(
+				httpServletResponse.setStatus(
 					ServletResponseConstants.SC_DUPLICATE_FILE_EXCEPTION);
 			}
 
-			SessionErrors.add(actionRequest, e.getClass());
+			SessionErrors.add(actionRequest, e.getClass(), e);
 		}
 		catch (AssetCategoryException | AssetTagException |
 			   InvalidFolderException e) {

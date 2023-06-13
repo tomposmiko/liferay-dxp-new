@@ -39,9 +39,8 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
- * @author Michael C. Han
- * @author Shinn Lok
- *
+ * @author     Michael C. Han
+ * @author     Shinn Lok
  * @deprecated As of Mueller (7.2.x), with no direct replacement
  */
 @Deprecated
@@ -101,9 +100,7 @@ public class VerifyAuditedModel extends VerifyProcess {
 		Collection<VerifiableAuditedModel> verifiableAuditedModels =
 			verifiableAuditedModelsMap.values();
 
-		verify(
-			verifiableAuditedModels.toArray(
-				new VerifiableAuditedModel[verifiableAuditedModels.size()]));
+		verify(verifiableAuditedModels.toArray(new VerifiableAuditedModel[0]));
 	}
 
 	protected Object[] getAuditedModelArray(

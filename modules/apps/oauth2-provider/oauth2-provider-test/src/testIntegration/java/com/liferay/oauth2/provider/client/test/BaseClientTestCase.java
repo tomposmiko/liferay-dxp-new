@@ -14,8 +14,11 @@
 
 package com.liferay.oauth2.provider.client.test;
 
-import com.liferay.oauth2.provider.test.util.OAuth2ProviderTestUtil;
 import com.liferay.petra.string.CharPool;
+import com.liferay.portal.json.JSONObjectImpl;
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.Digester;
@@ -23,14 +26,12 @@ import com.liferay.portal.kernel.util.DigesterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.util.DigesterImpl;
-import com.liferay.portal.util.HttpImpl;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -46,48 +47,57 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.ext.RuntimeDelegate;
 
-import org.apache.cxf.jaxrs.provider.json.JSONProvider;
+import org.apache.cxf.jaxrs.client.spec.ClientBuilderImpl;
+import org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl;
 
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-
-import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.Archive;
-
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * @author Carlos Sierra Andrés
  */
 public abstract class BaseClientTestCase {
 
-	public static Archive<?> getArchive(
-			Class<? extends BundleActivator> bundleActivatorClass)
-		throws Exception {
-
-		return OAuth2ProviderTestUtil.getArchive(bundleActivatorClass);
-	}
-
 	@BeforeClass
-	public static void setUpClass() {
-		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+	public static void setUpClass() throws Exception {
+		_originalRestrictedHeaderSet = ReflectionTestUtil.getFieldValue(
+			Class.forName("sun.net.www.protocol.http.HttpURLConnection"),
+			"restrictedHeaderSet");
 
-		HttpUtil httpUtil = new HttpUtil();
+		_restrictedHeaderSet = new HashSet<>(_originalRestrictedHeaderSet);
 
-		httpUtil.setHttp(new HttpImpl());
-
-		DigesterUtil digesterUtil = new DigesterUtil();
-
-		digesterUtil.setDigester(new DigesterImpl());
+		_originalRestrictedHeaderSet.clear();
 	}
 
-	protected static Client getClient() {
-		Client client = ClientBuilder.newClient();
+	@AfterClass
+	public static void tearDownClass() {
+		_originalRestrictedHeaderSet.addAll(_restrictedHeaderSet);
+	}
 
-		return client.register(JSONProvider.class);
+	@Before
+	public void setUp() throws Exception {
+		_bundleActivator = getBundleActivator();
+
+		Bundle bundle = FrameworkUtil.getBundle(BaseClientTestCase.class);
+
+		_bundleContext = bundle.getBundleContext();
+
+		_bundleActivator.start(_bundleContext);
+	}
+
+	@After
+	public void tearDown() throws Exception {
+		_bundleActivator.stop(_bundleContext);
 	}
 
 	protected Invocation.Builder authorize(
@@ -242,6 +252,8 @@ public abstract class BaseClientTestCase {
 		return webTarget.path("authorize");
 	}
 
+	protected abstract BundleActivator getBundleActivator();
+
 	protected Response getClientCredentialsResponse(
 		String clientId, Invocation.Builder invocationBuilder) {
 
@@ -386,9 +398,7 @@ public abstract class BaseClientTestCase {
 	}
 
 	protected WebTarget getJsonWebTarget(String... paths) {
-		Client client = getClient();
-
-		WebTarget webTarget = client.target(_getPortalURL());
+		WebTarget webTarget = getWebTarget();
 
 		webTarget = webTarget.path("api");
 		webTarget = webTarget.path("jsonws");
@@ -401,9 +411,7 @@ public abstract class BaseClientTestCase {
 	}
 
 	protected WebTarget getLoginWebTarget() {
-		Client client = getClient();
-
-		WebTarget webTarget = client.target(_getPortalURL());
+		WebTarget webTarget = getWebTarget();
 
 		webTarget = webTarget.path("c");
 		webTarget = webTarget.path("portal");
@@ -413,9 +421,7 @@ public abstract class BaseClientTestCase {
 	}
 
 	protected WebTarget getOAuth2WebTarget() {
-		Client client = getClient();
-
-		WebTarget webTarget = client.target(_getPortalURL());
+		WebTarget webTarget = getWebTarget();
 
 		webTarget = webTarget.path("o");
 		webTarget = webTarget.path("oauth2");
@@ -424,9 +430,7 @@ public abstract class BaseClientTestCase {
 	}
 
 	protected WebTarget getPortalWebTarget() {
-		Client client = getClient();
-
-		WebTarget webTarget = client.target(_getPortalURL());
+		WebTarget webTarget = getWebTarget();
 
 		webTarget = webTarget.path("web");
 		webTarget = webTarget.path("guest");
@@ -500,10 +504,20 @@ public abstract class BaseClientTestCase {
 		return webTarget.path("token");
 	}
 
-	protected WebTarget getWebTarget(String... paths) {
-		Client client = getClient();
+	protected WebTarget getWebTarget() {
+		ClientBuilder clientBuilder = new ClientBuilderImpl();
 
-		WebTarget target = client.target(_getPortalURL());
+		Client client = clientBuilder.build();
+
+		RuntimeDelegate runtimeDelegate = new RuntimeDelegateImpl();
+
+		UriBuilder uriBuilder = runtimeDelegate.createUriBuilder();
+
+		return client.target(uriBuilder.uri("http://localhost:8080"));
+	}
+
+	protected WebTarget getWebTarget(String... paths) {
+		WebTarget target = getWebTarget();
 
 		target = target.path("o");
 		target = target.path("oauth2-test");
@@ -560,20 +574,14 @@ public abstract class BaseClientTestCase {
 	protected String parseJsonField(Response response, String fieldName) {
 		JSONObject jsonObject = parseJSONObject(response);
 
-		try {
-			return jsonObject.getString(fieldName);
-		}
-		catch (JSONException jsone) {
-			throw new IllegalArgumentException(
-				"The token service returned " + jsonObject.toString());
-		}
+		return jsonObject.getString(fieldName);
 	}
 
 	protected JSONObject parseJSONObject(Response response) {
 		String json = response.readEntity(String.class);
 
 		try {
-			return new JSONObject(json);
+			return new JSONObjectImpl(json);
 		}
 		catch (JSONException jsone) {
 			throw new IllegalArgumentException(
@@ -599,19 +607,12 @@ public abstract class BaseClientTestCase {
 		return parseJsonField(response, "access_token");
 	}
 
-	private URI _getPortalURL() {
-		try {
-			return _url.toURI();
-		}
-		catch (URISyntaxException urise) {
-			throw new RuntimeException(urise);
-		}
-	}
-
+	private static Set<String> _originalRestrictedHeaderSet;
 	private static final Pattern _pAuthTokenPattern = Pattern.compile(
 		"Liferay.authToken\\s*=\\s*(['\"])(((?!\\1).)*)\\1;");
+	private static Set<String> _restrictedHeaderSet;
 
-	@ArquillianResource
-	private URL _url;
+	private BundleActivator _bundleActivator;
+	private BundleContext _bundleContext;
 
 }

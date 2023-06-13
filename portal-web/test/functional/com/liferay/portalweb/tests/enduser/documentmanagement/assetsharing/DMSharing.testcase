@@ -450,7 +450,7 @@ definition {
 			locator1 = "DocumentsAndMediaShare#EMAIL_VIEW_DOCUMENT_BUTTON",
 			value1 = "View Document");
 
-		SelectWindow(locator1 = "title=- Liferay");
+		SelectWindow(locator1 = "title=- ${siteName}");
 
 		DMDocumentSharing.viewDocumentViaSharedAssets(
 			assetSharingPermission = "View",
@@ -803,7 +803,9 @@ definition {
 
 		var key_dmDocumentTitle = "DM Document Title";
 
-		AssertElementNotPresent(locator1 = "DocumentsAndMediaShare#SHARED_ASSETS_DOCUMENT_OPTIONS");
+		Click(locator1 = "DocumentsAndMediaShare#SHARED_ASSETS_DOCUMENT_OPTIONS");
+
+		MenuItem.viewNotPresent(menuItem = "Share");
 
 		Navigator.gotoPage(pageName = "Documents and Media Page");
 

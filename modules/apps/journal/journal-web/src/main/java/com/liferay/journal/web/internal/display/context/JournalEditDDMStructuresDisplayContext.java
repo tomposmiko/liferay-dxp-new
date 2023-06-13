@@ -48,11 +48,13 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class JournalEditDDMStructuresDisplayContext {
 
-	public JournalEditDDMStructuresDisplayContext(HttpServletRequest request) {
-		_request = request;
+	public JournalEditDDMStructuresDisplayContext(
+		HttpServletRequest httpServletRequest) {
+
+		_httpServletRequest = httpServletRequest;
 
 		_journalWebConfiguration =
-			(JournalWebConfiguration)request.getAttribute(
+			(JournalWebConfiguration)httpServletRequest.getAttribute(
 				JournalWebConfiguration.class.getName());
 	}
 
@@ -77,8 +79,7 @@ public class JournalEditDDMStructuresDisplayContext {
 
 		Set<Locale> ddmFormAvailableLocales = ddmForm.getAvailableLocales();
 
-		return ddmFormAvailableLocales.toArray(
-			new Locale[ddmFormAvailableLocales.size()]);
+		return ddmFormAvailableLocales.toArray(new Locale[0]);
 	}
 
 	public String getAvailableLocalesJSONArrayString() {
@@ -122,7 +123,8 @@ public class JournalEditDDMStructuresDisplayContext {
 			return _ddmStructureId;
 		}
 
-		_ddmStructureId = ParamUtil.getLong(_request, "ddmStructureId");
+		_ddmStructureId = ParamUtil.getLong(
+			_httpServletRequest, "ddmStructureId");
 
 		return _ddmStructureId;
 	}
@@ -145,8 +147,9 @@ public class JournalEditDDMStructuresDisplayContext {
 	}
 
 	public String getLocalesMap() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		JSONObject localesMapJSONObject = JSONFactoryUtil.createJSONObject();
 
@@ -177,7 +180,8 @@ public class JournalEditDDMStructuresDisplayContext {
 		}
 
 		_parentDDMStructureId = ParamUtil.getLong(
-			_request, "parentDDMStructureId", defaultParentDDMStructureId);
+			_httpServletRequest, "parentDDMStructureId",
+			defaultParentDDMStructureId);
 
 		return _parentDDMStructureId;
 	}
@@ -192,8 +196,9 @@ public class JournalEditDDMStructuresDisplayContext {
 				getParentDDMStructureId());
 
 		if (parentDDMStructure != null) {
-			ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-				WebKeys.THEME_DISPLAY);
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)_httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
 
 			_parentDDMStructureName = parentDDMStructure.getName(
 				themeDisplay.getLocale());
@@ -207,13 +212,13 @@ public class JournalEditDDMStructuresDisplayContext {
 			DDMStructure ddmStructure = getDDMStructure();
 
 			_script = BeanParamUtil.getString(
-				ddmStructure.getLatestStructureVersion(), _request,
+				ddmStructure.getLatestStructureVersion(), _httpServletRequest,
 				"definition");
 
 			return _script;
 		}
 
-		_script = ParamUtil.getString(_request, "definition");
+		_script = ParamUtil.getString(_httpServletRequest, "definition");
 
 		return _script;
 	}
@@ -243,10 +248,10 @@ public class JournalEditDDMStructuresDisplayContext {
 
 	private DDMStructure _ddmStructure;
 	private Long _ddmStructureId;
+	private final HttpServletRequest _httpServletRequest;
 	private final JournalWebConfiguration _journalWebConfiguration;
 	private Long _parentDDMStructureId;
 	private String _parentDDMStructureName;
-	private final HttpServletRequest _request;
 	private String _script;
 
 }

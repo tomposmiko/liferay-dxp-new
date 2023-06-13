@@ -14,13 +14,15 @@
 
 package com.liferay.data.engine.rest.internal.field.type.v1_0;
 
-import com.liferay.data.engine.rest.dto.v1_0.DataDefinitionField;
-import com.liferay.data.engine.rest.internal.dto.v1_0.util.LocalizedValueUtil;
-import com.liferay.data.engine.rest.internal.field.type.v1_0.util.CustomPropertyUtil;
+import com.liferay.data.engine.rest.internal.field.type.v1_0.util.CustomPropertiesUtil;
 import com.liferay.data.engine.rest.internal.field.type.v1_0.util.DataFieldOptionUtil;
+import com.liferay.data.engine.spi.field.type.BaseFieldType;
+import com.liferay.data.engine.spi.field.type.FieldType;
+import com.liferay.data.engine.spi.field.type.SPIDataDefinitionField;
+import com.liferay.data.engine.spi.field.type.util.LocalizedValueUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.template.soy.data.SoyDataFactory;
+import com.liferay.portal.kernel.util.MapUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,103 +30,122 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * @author Gabriel Albuquerque
  */
+@Component(
+	immediate = true,
+	property = {
+		"data.engine.field.type.data.domain=list",
+		"data.engine.field.type.description=select-field-type-description",
+		"data.engine.field.type.display.order:Integer=3",
+		"data.engine.field.type.group=basic",
+		"data.engine.field.type.icon=list",
+		"data.engine.field.type.js.module=dynamic-data-mapping-form-field-type/metal/Select/Select.es",
+		"data.engine.field.type.label=select-field-type-label"
+	},
+	service = FieldType.class
+)
 public class SelectFieldType extends BaseFieldType {
 
-	public SelectFieldType(
-		DataDefinitionField dataDefinitionField,
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse,
-		SoyDataFactory soyDataFactory) {
-
-		super(
-			dataDefinitionField, httpServletRequest, httpServletResponse,
-			soyDataFactory);
-	}
-
 	@Override
-	public DataDefinitionField deserialize(JSONObject jsonObject)
+	public SPIDataDefinitionField deserialize(JSONObject jsonObject)
 		throws Exception {
 
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "dataSourceType",
-				jsonObject.getString("dataSourceType")));
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "multiple",
-				jsonObject.getBoolean("multiple")));
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "options",
-				DataFieldOptionUtil.toDataFieldOptions(
-					jsonObject.getJSONObject("options"))));
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "predefinedValue",
-				LocalizedValueUtil.toLocalizedValues(
-					jsonObject.getJSONObject("predefinedValue"))));
+		SPIDataDefinitionField spiDataDefinitionField = super.deserialize(
+			jsonObject);
 
-		return dataDefinitionField;
+		Map<String, Object> customProperties =
+			spiDataDefinitionField.getCustomProperties();
+
+		customProperties.put(
+			"dataSourceType", jsonObject.getString("dataSourceType"));
+		customProperties.put("multiple", jsonObject.getBoolean("multiple"));
+		customProperties.put(
+			"options",
+			DataFieldOptionUtil.toDataFieldOptions(
+				jsonObject.getJSONObject("options")));
+		customProperties.put(
+			"predefinedValue",
+			LocalizedValueUtil.toLocalizedValues(
+				jsonObject.getJSONObject("predefinedValue")));
+
+		return spiDataDefinitionField;
 	}
 
 	@Override
-	public JSONObject toJSONObject() throws Exception {
-		JSONObject jsonObject = super.toJSONObject();
+	public String getName() {
+		return "select";
+	}
+
+	@Override
+	public JSONObject toJSONObject(
+			SPIDataDefinitionField spiDataDefinitionField)
+		throws Exception {
+
+		JSONObject jsonObject = super.toJSONObject(spiDataDefinitionField);
 
 		return jsonObject.put(
 			"dataSourceType",
-			CustomPropertyUtil.getString(
-				dataDefinitionField.getCustomProperties(), "dataSourceType")
+			MapUtil.getString(
+				spiDataDefinitionField.getCustomProperties(), "dataSourceType")
 		).put(
 			"multiple",
-			CustomPropertyUtil.getBoolean(
-				dataDefinitionField.getCustomProperties(), "multiple", false)
+			MapUtil.getBoolean(
+				spiDataDefinitionField.getCustomProperties(), "multiple", false)
 		).put(
 			"options",
 			DataFieldOptionUtil.toJSONObject(
-				CustomPropertyUtil.getDataFieldOptions(
-					dataDefinitionField.getCustomProperties(), "options"))
+				CustomPropertiesUtil.getDataFieldOptions(
+					spiDataDefinitionField.getCustomProperties(), "options"))
 		).put(
 			"predefinedValue",
-			CustomPropertyUtil.getLocalizedValue(
-				dataDefinitionField.getCustomProperties(), "predefinedValue")
+			CustomPropertiesUtil.getMap(
+				spiDataDefinitionField.getCustomProperties(), "predefinedValue")
 		);
 	}
 
 	@Override
-	protected void addContext(Map<String, Object> context) {
+	protected void includeContext(
+		Map<String, Object> context, HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse,
+		SPIDataDefinitionField spiDataDefinitionField) {
+
 		context.put(
 			"dataSourceType",
-			CustomPropertyUtil.getString(
-				dataDefinitionField.getCustomProperties(), "dataSourceType"));
+			MapUtil.getString(
+				spiDataDefinitionField.getCustomProperties(),
+				"dataSourceType"));
 		context.put(
 			"multiple",
-			CustomPropertyUtil.getBoolean(
-				dataDefinitionField.getCustomProperties(), "multiple", false));
+			MapUtil.getBoolean(
+				spiDataDefinitionField.getCustomProperties(), "multiple",
+				false));
 		context.put(
 			"options",
 			DataFieldOptionUtil.toDataFieldOptions(
-				CustomPropertyUtil.getDataFieldOptions(
-					dataDefinitionField.getCustomProperties(), "options"),
+				CustomPropertiesUtil.getDataFieldOptions(
+					spiDataDefinitionField.getCustomProperties(), "options"),
 				LanguageUtil.getLanguageId(httpServletRequest)));
 		context.put(
 			"predefinedValue",
-			LocalizedValueUtil.getLocalizedValue(
-				httpServletRequest.getLocale(),
-				CustomPropertyUtil.getLocalizedValue(
-					dataDefinitionField.getCustomProperties(),
-					"predefinedValue")));
-		context.put("strings", _getLanguageTerms());
+			MapUtil.getString(
+				CustomPropertiesUtil.getMap(
+					spiDataDefinitionField.getCustomProperties(),
+					"predefinedValue"),
+				LanguageUtil.getLanguageId(httpServletRequest)));
+		context.put("strings", _getLanguageTerms(httpServletRequest));
 		context.put(
 			"value",
-			CustomPropertyUtil.getValues(
-				dataDefinitionField.getCustomProperties(), "value"));
+			CustomPropertiesUtil.getValues(
+				spiDataDefinitionField.getCustomProperties(), "value"));
 	}
 
-	private Map<String, String> _getLanguageTerms() {
+	private Map<String, String> _getLanguageTerms(
+		HttpServletRequest httpServletRequest) {
+
 		Map<String, String> languageTerms = new HashMap<>();
 
 		languageTerms.put(

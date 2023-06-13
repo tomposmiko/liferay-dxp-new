@@ -14,17 +14,21 @@
 
 package com.liferay.oauth2.provider.client.test;
 
+import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.oauth2.provider.constants.GrantType;
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationLocalService;
 import com.liferay.oauth2.provider.service.OAuth2ApplicationScopeAliasesLocalService;
 import com.liferay.oauth2.provider.test.internal.TestRunnablePostHandlingApplication;
-import com.liferay.oauth2.provider.test.internal.activator.BaseTestPreparatorBundleActivator;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.PortalUtil;
+import com.liferay.portal.test.log.CaptureAppender;
+import com.liferay.portal.test.log.Log4JLoggerTestUtil;
+import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.util.Collections;
 import java.util.Dictionary;
@@ -35,29 +39,27 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
+import org.apache.log4j.Level;
 
 import org.junit.Assert;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.osgi.framework.BundleActivator;
 import org.osgi.framework.ServiceReference;
 
 /**
  * @author Stian Sigvartsen
  */
-@RunAsClient
 @RunWith(Arquillian.class)
 public class TOCTOUTest extends BaseClientTestCase {
 
-	@Deployment
-	public static Archive<?> getDeployment() throws Exception {
-		return BaseClientTestCase.getArchive(
-			SecurityTestPreparatorBundleActivator.class);
-	}
+	@ClassRule
+	@Rule
+	public static final AggregateTestRule aggregateTestRule =
+		new LiferayIntegrationTestRule();
 
 	/**
 	 * OAUTH2-101 / OAUTH2-102
@@ -93,8 +95,12 @@ public class TOCTOUTest extends BaseClientTestCase {
 		Invocation.Builder webTarget2InvocationBuilder = authorize(
 			webTarget2.request(), token);
 
-		try {
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					"portal_web.docroot.errors.code_jsp", Level.WARN)) {
+
 			webTarget2InvocationBuilder.get(String.class);
+
 			Assert.fail(
 				"Expected request GET /annotated2 to fail through admin & " +
 					"end-user TOCTOU protection");
@@ -116,8 +122,12 @@ public class TOCTOUTest extends BaseClientTestCase {
 
 		webTarget2InvocationBuilder = authorize(webTarget2.request(), token);
 
-		try {
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					"portal_web.docroot.errors.code_jsp", Level.WARN)) {
+
 			webTarget2InvocationBuilder.get(String.class);
+
 			Assert.fail(
 				"Expected request GET /annotated2 to fail through admin " +
 					"TOCTOU protection");
@@ -135,8 +145,12 @@ public class TOCTOUTest extends BaseClientTestCase {
 		// Fail to use the token from [4] on JAX-RS app 2 (end-user TOCTOU
 		// protection when OAuth2 app scope assignment grows)
 
-		try {
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					"portal_web.docroot.errors.code_jsp", Level.WARN)) {
+
 			webTarget2InvocationBuilder.get(String.class);
+
 			Assert.fail(
 				"Expected request GET /annotated2 to fail through end-user " +
 					"TOCTOU protection");
@@ -245,6 +259,11 @@ public class TOCTOUTest extends BaseClientTestCase {
 			updateOAuth2ApplicationScopeAliases(oAuth2Application);
 		}
 
+	}
+
+	@Override
+	protected BundleActivator getBundleActivator() {
+		return new SecurityTestPreparatorBundleActivator();
 	}
 
 }

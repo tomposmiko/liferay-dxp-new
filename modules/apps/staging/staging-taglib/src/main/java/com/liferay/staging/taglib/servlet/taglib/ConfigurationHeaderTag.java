@@ -14,14 +14,14 @@
 
 package com.liferay.staging.taglib.servlet.taglib;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.staging.taglib.internal.servlet.ServletContextUtil;
 import com.liferay.taglib.util.IncludeTag;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Levente Hudák
@@ -68,11 +68,11 @@ public class ConfigurationHeaderTag extends IncludeTag {
 	}
 
 	@Override
-	protected void setAttributes(HttpServletRequest request) {
-		request.setAttribute(
+	protected void setAttributes(HttpServletRequest httpServletRequest) {
+		httpServletRequest.setAttribute(
 			"liferay-staging:configuration-header:exportImportConfiguration",
 			_exportImportConfiguration);
-		request.setAttribute(
+		httpServletRequest.setAttribute(
 			"liferay-staging:configuration-header:label", _label);
 	}
 

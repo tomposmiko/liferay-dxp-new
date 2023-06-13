@@ -12,3 +12,13 @@ a129b1de7f18d344dcd314fa15ed4b0815691c58^..a8a3b5f7de3932cf874db426d117f5435cf2c
 # Bundle Version 4.0.2
 #
 a8a3b5f7de3932cf874db426d117f5435cf2c7cc^..166c6002eede71071f8ab71ceeafdcbfbe27b49c=LPS-88218
+
+#
+# Bundle Version 4.0.5
+#
+166c6002eede71071f8ab71ceeafdcbfbe27b49c^..ff71eba6faa706a1c5d3ad4df23328ad14bd6eae=LPS-84119
+
+#
+# Bundle Version 4.0.6
+#
+ff71eba6faa706a1c5d3ad4df23328ad14bd6eae^..13f787bac8993650bff4b8068010a811b3a57962=LPS-84119 LPS-94624 LPS-95284

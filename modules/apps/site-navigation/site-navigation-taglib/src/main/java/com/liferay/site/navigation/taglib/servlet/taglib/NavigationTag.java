@@ -112,7 +112,7 @@ public class NavigationTag extends IncludeTag {
 			_log.error(e, e);
 		}
 
-		HttpServletResponse response =
+		HttpServletResponse httpServletResponse =
 			(HttpServletResponse)pageContext.getResponse();
 
 		Map<String, Object> contextObjects = new HashMap<>();
@@ -125,7 +125,7 @@ public class NavigationTag extends IncludeTag {
 		contextObjects.put("rootLayoutType", _rootLayoutType);
 
 		String result = portletDisplayTemplate.renderDDMTemplate(
-			request, response, portletDisplayDDMTemplate, navItems,
+			request, httpServletResponse, portletDisplayDDMTemplate, navItems,
 			contextObjects);
 
 		JspWriter jspWriter = pageContext.getOut();
@@ -188,10 +188,11 @@ public class NavigationTag extends IncludeTag {
 		_rootLayoutUuid = null;
 	}
 
-	protected List<NavItem> getBranchNavItems(HttpServletRequest request)
+	protected List<NavItem> getBranchNavItems(
+			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
-		return NavItemUtil.getBranchNavItems(request);
+		return NavItemUtil.getBranchNavItems(httpServletRequest);
 	}
 
 	protected String getDisplayStyle() {
@@ -232,7 +233,7 @@ public class NavigationTag extends IncludeTag {
 	}
 
 	@Override
-	protected void setAttributes(HttpServletRequest request) {
+	protected void setAttributes(HttpServletRequest httpServletRequest) {
 	}
 
 	private static final String _PAGE = "/navigation/page.jsp";

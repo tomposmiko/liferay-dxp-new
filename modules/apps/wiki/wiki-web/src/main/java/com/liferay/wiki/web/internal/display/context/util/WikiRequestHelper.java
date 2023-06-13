@@ -36,8 +36,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class WikiRequestHelper extends BaseStrutsRequestHelper {
 
-	public WikiRequestHelper(HttpServletRequest request) {
-		super(request);
+	public WikiRequestHelper(HttpServletRequest httpServletRequest) {
+		super(httpServletRequest);
 	}
 
 	public long getCategoryId() {
@@ -83,9 +83,10 @@ public class WikiRequestHelper extends BaseStrutsRequestHelper {
 
 	public WikiPage getWikiPage() {
 		if (_wikiPage == null) {
-			HttpServletRequest request = getRequest();
+			HttpServletRequest httpServletRequest = getRequest();
 
-			_wikiPage = (WikiPage)request.getAttribute(WikiWebKeys.WIKI_PAGE);
+			_wikiPage = (WikiPage)httpServletRequest.getAttribute(
+				WikiWebKeys.WIKI_PAGE);
 		}
 
 		return _wikiPage;

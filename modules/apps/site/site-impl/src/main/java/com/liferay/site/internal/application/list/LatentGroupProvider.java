@@ -35,9 +35,10 @@ import org.osgi.service.component.annotations.Reference;
 public class LatentGroupProvider implements GroupProvider {
 
 	@Override
-	public Group getGroup(HttpServletRequest request) {
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+	public Group getGroup(HttpServletRequest httpServletRequest) {
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		Group group = themeDisplay.getScopeGroup();
 
@@ -45,12 +46,13 @@ public class LatentGroupProvider implements GroupProvider {
 			return group;
 		}
 
-		HttpServletRequest originalRequest = _portal.getOriginalServletRequest(
-			request);
+		HttpServletRequest originalHttpServletRequest =
+			_portal.getOriginalServletRequest(httpServletRequest);
 
 		long groupId = GetterUtil.getLong(
 			SessionClicks.get(
-				originalRequest.getSession(), _KEY_LATENT_GROUP, null));
+				originalHttpServletRequest.getSession(), _KEY_LATENT_GROUP,
+				null));
 
 		if (groupId > 0) {
 			return _groupLocalService.fetchGroup(groupId);
@@ -60,12 +62,12 @@ public class LatentGroupProvider implements GroupProvider {
 	}
 
 	@Override
-	public void setGroup(HttpServletRequest request, Group group) {
-		HttpServletRequest originalRequest = _portal.getOriginalServletRequest(
-			request);
+	public void setGroup(HttpServletRequest httpServletRequest, Group group) {
+		HttpServletRequest originalHttpServletRequest =
+			_portal.getOriginalServletRequest(httpServletRequest);
 
 		SessionClicks.put(
-			originalRequest.getSession(), _KEY_LATENT_GROUP,
+			originalHttpServletRequest.getSession(), _KEY_LATENT_GROUP,
 			String.valueOf(group.getGroupId()));
 	}
 

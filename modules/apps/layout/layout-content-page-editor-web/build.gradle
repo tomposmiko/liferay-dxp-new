@@ -2,8 +2,9 @@ dependencies {
 	compileInclude group: "com.liferay", name: "org.jsoup", version: "1.10.2.LIFERAY-PATCHED-3"
 
 	compileOnly group: "com.liferay", name: "com.liferay.asset.api", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.asset.info.display.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.dynamic.data.mapping.api", version: "5.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.fragment.api", version: "2.2.0"
+	compileOnly group: "com.liferay", name: "com.liferay.fragment.api", version: "2.4.0"
 	compileOnly group: "com.liferay", name: "com.liferay.frontend.editor.taglib", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.frontend.taglib", version: "4.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.frontend.taglib.soy", version: "3.0.0"

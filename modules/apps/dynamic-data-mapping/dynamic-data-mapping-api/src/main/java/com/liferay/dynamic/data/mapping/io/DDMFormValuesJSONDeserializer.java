@@ -14,15 +14,16 @@
 
 package com.liferay.dynamic.data.mapping.io;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.dynamic.data.mapping.model.DDMForm;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.portal.kernel.exception.PortalException;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
- * @author Marcellus Tavares
- * @deprecated As of Judson (7.1.x), replaced by {@link DDMFormValuesDeserializer}
+ * @author     Marcellus Tavares
+ * @deprecated As of Judson (7.1.x), replaced by {@link
+ *             DDMFormValuesDeserializer}
  */
 @Deprecated
 @ProviderType

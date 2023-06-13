@@ -14,12 +14,11 @@
 
 package com.liferay.exportimport.internal.lar;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.exportimport.kernel.lar.ExportImportProcessCallbackRegistry;
 
 import java.util.concurrent.Callable;
 
+import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -38,7 +37,6 @@ public class ExportImportProcessCallbackRegistryImpl
 	@Deprecated
 	@Override
 	public void registerCallback(Callable<?> callable) {
-		ExportImportProcessCallbackUtil.registerCallback(callable);
 	}
 
 	@Override

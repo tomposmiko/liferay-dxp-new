@@ -38,8 +38,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class BufferCacheServletResponse extends MetaInfoCacheServletResponse {
 
-	public BufferCacheServletResponse(HttpServletResponse response) {
-		super(response);
+	public BufferCacheServletResponse(HttpServletResponse httpServletResponse) {
+		super(httpServletResponse);
 	}
 
 	/**
@@ -299,13 +299,14 @@ public class BufferCacheServletResponse extends MetaInfoCacheServletResponse {
 	public void outputBuffer() throws IOException {
 		_flushInternalBuffer();
 
-		HttpServletResponse response = (HttpServletResponse)getResponse();
+		HttpServletResponse httpServletResponse =
+			(HttpServletResponse)getResponse();
 
 		if ((_byteBuffer != null) || calledGetOutputStream) {
-			ServletResponseUtil.write(response, getByteBuffer());
+			ServletResponseUtil.write(httpServletResponse, getByteBuffer());
 		}
 		else if ((_charBuffer != null) || calledGetWriter) {
-			ServletResponseUtil.write(response, getCharBuffer());
+			ServletResponseUtil.write(httpServletResponse, getCharBuffer());
 		}
 	}
 

@@ -637,8 +637,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 			}
 		}
 
-		return filteredLayoutReferences.toArray(
-			new LayoutReference[filteredLayoutReferences.size()]);
+		return filteredLayoutReferences.toArray(new LayoutReference[0]);
 	}
 
 	@Override
@@ -1148,8 +1147,7 @@ public class LayoutServiceImpl extends LayoutServiceBaseImpl {
 	 * @param  groupId the primary key of the group
 	 * @param  privateLayout whether the layout is private to the group
 	 * @param  layoutId the layout ID of the layout
-	 * @param  parentLayoutId the layout ID to be assigned to the parent
-	 *         layout
+	 * @param  parentLayoutId the layout ID to be assigned to the parent layout
 	 * @return the matching layout
 	 * @throws PortalException if a portal exception occurred
 	 */

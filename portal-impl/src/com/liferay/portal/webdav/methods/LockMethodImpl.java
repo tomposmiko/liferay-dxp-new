@@ -63,13 +63,14 @@ public class LockMethodImpl implements Method {
 			return HttpServletResponse.SC_METHOD_NOT_ALLOWED;
 		}
 
-		HttpServletRequest request = webDAVRequest.getHttpServletRequest();
+		HttpServletRequest httpServletRequest =
+			webDAVRequest.getHttpServletRequest();
 
 		Lock lock = null;
 		Status status = null;
 
 		String lockUuid = webDAVRequest.getLockUuid();
-		long timeout = WebDAVUtil.getTimeout(request);
+		long timeout = WebDAVUtil.getTimeout(httpServletRequest);
 
 		if (Validator.isNull(lockUuid)) {
 
@@ -77,7 +78,7 @@ public class LockMethodImpl implements Method {
 
 			String owner = null;
 			String xml = new String(
-				FileUtil.getBytes(request.getInputStream()));
+				FileUtil.getBytes(httpServletRequest.getInputStream()));
 
 			if (Validator.isNotNull(xml)) {
 				if (_log.isDebugEnabled()) {
@@ -153,7 +154,7 @@ public class LockMethodImpl implements Method {
 			return status.getCode();
 		}
 
-		long depth = WebDAVUtil.getDepth(request);
+		long depth = WebDAVUtil.getDepth(httpServletRequest);
 
 		String xml = getResponseXML(lock, depth);
 
@@ -161,21 +162,22 @@ public class LockMethodImpl implements Method {
 			_log.debug("Response XML\n" + xml);
 		}
 
-		HttpServletResponse response = webDAVRequest.getHttpServletResponse();
+		HttpServletResponse httpServletResponse =
+			webDAVRequest.getHttpServletResponse();
 
 		String lockToken = StringBundler.concat(
 			"<", WebDAVUtil.TOKEN_PREFIX, lock.getUuid(), ">");
 
-		response.setContentType(ContentTypes.TEXT_XML_UTF8);
-		response.setHeader("Lock-Token", lockToken);
-		response.setStatus(status.getCode());
+		httpServletResponse.setContentType(ContentTypes.TEXT_XML_UTF8);
+		httpServletResponse.setHeader("Lock-Token", lockToken);
+		httpServletResponse.setStatus(status.getCode());
 
 		if (_log.isDebugEnabled()) {
 			_log.debug("Returning lock token " + lockToken);
 		}
 
 		try {
-			ServletResponseUtil.write(response, xml);
+			ServletResponseUtil.write(httpServletResponse, xml);
 		}
 		catch (Exception e) {
 			if (_log.isWarnEnabled()) {

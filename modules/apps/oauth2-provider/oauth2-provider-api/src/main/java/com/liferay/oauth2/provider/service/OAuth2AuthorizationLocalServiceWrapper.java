@@ -14,9 +14,9 @@
 
 package com.liferay.oauth2.provider.service;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.service.ServiceWrapper;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link OAuth2AuthorizationLocalService}.
@@ -37,7 +37,9 @@ public class OAuth2AuthorizationLocalServiceWrapper
 	}
 
 	/**
-	 * @deprecated As of Mueller (7.2.x), replaced by {@link #addOAuth2Authorization(long, long, String, long,long, String, Date, Date, String, String, String, Date, Date)}
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addOAuth2Authorization(long, long, String, long,long,
+	 String, Date, Date, String, String, String, Date, Date)}
 	 */
 	@Deprecated
 	@Override

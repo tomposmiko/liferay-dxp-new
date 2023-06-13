@@ -30,10 +30,10 @@ import javax.servlet.http.HttpServletRequest;
 public class PublishTemplatesDisplayContext {
 
 	public PublishTemplatesDisplayContext(
-		RenderResponse renderResponse, HttpServletRequest request) {
+		RenderResponse renderResponse, HttpServletRequest httpServletRequest) {
 
 		_renderResponse = renderResponse;
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 	}
 
 	public List<NavigationItem> getNavigationItems() {
@@ -47,13 +47,14 @@ public class PublishTemplatesDisplayContext {
 							"mvcRenderCommandName",
 							"viewPublishConfigurations");
 						navigationItem.setLabel(
-							LanguageUtil.get(_request, "publish-templates"));
+							LanguageUtil.get(
+								_httpServletRequest, "publish-templates"));
 					});
 			}
 		};
 	}
 
+	private final HttpServletRequest _httpServletRequest;
 	private final RenderResponse _renderResponse;
-	private final HttpServletRequest _request;
 
 }

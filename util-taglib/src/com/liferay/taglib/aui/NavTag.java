@@ -169,10 +169,10 @@ public class NavTag extends BaseNavTag implements BodyTag {
 	}
 
 	@Override
-	protected void setAttributes(HttpServletRequest request) {
-		super.setAttributes(request);
+	protected void setAttributes(HttpServletRequest httpServletRequest) {
+		super.setAttributes(httpServletRequest);
 
-		setNamespacedAttribute(request, "id", _getNamespacedId());
+		setNamespacedAttribute(httpServletRequest, "id", _getNamespacedId());
 	}
 
 	private String _getNamespacedId() {
@@ -182,16 +182,18 @@ public class NavTag extends BaseNavTag implements BodyTag {
 
 		_namespacedId = getId();
 
-		HttpServletRequest request =
+		HttpServletRequest httpServletRequest =
 			(HttpServletRequest)pageContext.getRequest();
 
 		if (Validator.isNull(_namespacedId)) {
 			_namespacedId = PortalUtil.getUniqueElementId(
-				request, StringPool.BLANK, AUIUtil.normalizeId("navTag"));
+				httpServletRequest, StringPool.BLANK,
+				AUIUtil.normalizeId("navTag"));
 		}
 
-		PortletResponse portletResponse = (PortletResponse)request.getAttribute(
-			JavaConstants.JAVAX_PORTLET_RESPONSE);
+		PortletResponse portletResponse =
+			(PortletResponse)httpServletRequest.getAttribute(
+				JavaConstants.JAVAX_PORTLET_RESPONSE);
 
 		if ((portletResponse != null) && getUseNamespace()) {
 			_namespacedId = portletResponse.getNamespace() + _namespacedId;

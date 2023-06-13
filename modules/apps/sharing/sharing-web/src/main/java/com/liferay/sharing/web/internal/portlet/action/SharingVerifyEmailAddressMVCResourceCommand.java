@@ -57,26 +57,28 @@ public class SharingVerifyEmailAddressMVCResourceCommand
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws Exception {
 
-		HttpServletRequest request = _portal.getHttpServletRequest(
+		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
 			resourceRequest);
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		if (!themeDisplay.isSignedIn()) {
 			throw new PrincipalException.MustBeAuthenticated(
 				themeDisplay.getUserId());
 		}
 
-		String emailAddress = ParamUtil.getString(request, "emailAddress");
+		String emailAddress = ParamUtil.getString(
+			httpServletRequest, "emailAddress");
 
 		User user = _userLocalService.fetchUserByEmailAddress(
 			themeDisplay.getCompanyId(), emailAddress);
 
-		HttpServletResponse response = _portal.getHttpServletResponse(
-			resourceResponse);
+		HttpServletResponse httpServletResponse =
+			_portal.getHttpServletResponse(resourceResponse);
 
-		response.setContentType(ContentTypes.APPLICATION_JSON);
+		httpServletResponse.setContentType(ContentTypes.APPLICATION_JSON);
 
 		JSONObject jsonObject = JSONUtil.put("userExists", user != null);
 

@@ -74,6 +74,7 @@ import com.liferay.journal.util.JournalHelper;
 import com.liferay.journal.web.asset.model.JournalArticleAssetRenderer;
 import com.liferay.journal.web.configuration.JournalWebConfiguration;
 import com.liferay.journal.web.internal.portlet.action.ActionUtil;
+import com.liferay.journal.web.internal.util.JournalDDMTemplateUtil;
 import com.liferay.journal.web.util.JournalPortletUtil;
 import com.liferay.journal.web.util.JournalUtil;
 import com.liferay.petra.string.StringBundler;
@@ -479,6 +480,9 @@ public class JournalPortlet extends MVCPortlet {
 		if (Objects.equals(path, "/edit_ddm_template.jsp")) {
 			renderRequest.setAttribute(
 				DDMTemplateHelper.class.getName(), _ddmTemplateHelper);
+			renderRequest.setAttribute(
+				JournalDDMTemplateUtil.class.getName(),
+				_journalDDMTemplateUtil);
 		}
 
 		renderRequest.setAttribute(
@@ -529,11 +533,11 @@ public class JournalPortlet extends MVCPortlet {
 		String resourceID = GetterUtil.getString(
 			resourceRequest.getResourceID());
 
-		HttpServletRequest request = _portal.getHttpServletRequest(
+		HttpServletRequest httpServletRequest = _portal.getHttpServletRequest(
 			resourceRequest);
 
-		HttpServletResponse response = _portal.getHttpServletResponse(
-			resourceResponse);
+		HttpServletResponse httpServletResponse =
+			_portal.getHttpServletResponse(resourceResponse);
 
 		if (resourceID.equals("compareVersions")) {
 			ThemeDisplay themeDisplay =
@@ -565,7 +569,8 @@ public class JournalPortlet extends MVCPortlet {
 			}
 			catch (Exception e) {
 				try {
-					_portal.sendError(e, request, response);
+					_portal.sendError(
+						e, httpServletRequest, httpServletResponse);
 				}
 				catch (ServletException se) {
 				}
@@ -743,11 +748,11 @@ public class JournalPortlet extends MVCPortlet {
 
 		String content = _journalConverter.getContent(ddmStructure, fields);
 
-		if ((classNameId == JournalArticleConstants.CLASSNAME_ID_DEFAULT) &&
-			_isEmpty(titleMap)) {
+		Locale articleDefaultLocale = LocaleUtil.fromLanguageId(
+			LocalizationUtil.getDefaultLanguageId(content));
 
-			Locale articleDefaultLocale = LocaleUtil.fromLanguageId(
-				LocalizationUtil.getDefaultLanguageId(content));
+		if ((classNameId == JournalArticleConstants.CLASSNAME_ID_DEFAULT) &&
+			!_hasDefaultLocale(titleMap, articleDefaultLocale)) {
 
 			titleMap.put(
 				articleDefaultLocale,
@@ -1341,6 +1346,8 @@ public class JournalPortlet extends MVCPortlet {
 		String referringPortletResource = ParamUtil.getString(
 			actionRequest, "referringPortletResource");
 
+		String languageId = ParamUtil.getString(actionRequest, "languageId");
+
 		PortletURL portletURL = PortletURLFactoryUtil.create(
 			actionRequest, JournalPortletKeys.JOURNAL,
 			PortletRequest.RENDER_PHASE);
@@ -1359,6 +1366,11 @@ public class JournalPortlet extends MVCPortlet {
 		portletURL.setParameter("articleId", article.getArticleId());
 		portletURL.setParameter(
 			"version", String.valueOf(article.getVersion()));
+
+		if (Validator.isNotNull(languageId)) {
+			portletURL.setParameter("languageId", languageId);
+		}
+
 		portletURL.setWindowState(actionRequest.getWindowState());
 
 		return portletURL.toString();
@@ -1548,15 +1560,13 @@ public class JournalPortlet extends MVCPortlet {
 			portletResource, articleId, true);
 	}
 
-	private boolean _isEmpty(Map<Locale, String> map) {
+	private boolean _hasDefaultLocale(Map<Locale, String> map, Locale locale) {
 		if (MapUtil.isEmpty(map)) {
-			return true;
+			return false;
 		}
 
-		for (String value : map.values()) {
-			if (Validator.isNotNull(value)) {
-				return false;
-			}
+		if (Validator.isNull(map.get(locale))) {
+			return false;
 		}
 
 		return true;
@@ -1598,6 +1608,9 @@ public class JournalPortlet extends MVCPortlet {
 
 	@Reference
 	private JournalConverter _journalConverter;
+
+	@Reference
+	private JournalDDMTemplateUtil _journalDDMTemplateUtil;
 
 	@Reference
 	private JournalFeedService _journalFeedService;

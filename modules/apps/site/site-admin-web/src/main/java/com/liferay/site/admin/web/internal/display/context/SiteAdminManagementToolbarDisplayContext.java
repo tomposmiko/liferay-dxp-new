@@ -46,12 +46,12 @@ public class SiteAdminManagementToolbarDisplayContext
 	public SiteAdminManagementToolbarDisplayContext(
 			LiferayPortletRequest liferayPortletRequest,
 			LiferayPortletResponse liferayPortletResponse,
-			HttpServletRequest request,
+			HttpServletRequest httpServletRequest,
 			SiteAdminDisplayContext siteAdminDisplayContext)
 		throws PortalException {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, request,
+			liferayPortletRequest, liferayPortletResponse, httpServletRequest,
 			siteAdminDisplayContext.getSearchContainer());
 
 		_siteAdminDisplayContext = siteAdminDisplayContext;
@@ -102,10 +102,18 @@ public class SiteAdminManagementToolbarDisplayContext
 		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
+		if (!PortalPermissionUtil.contains(
+				themeDisplay.getPermissionChecker(),
+				ActionKeys.ADD_COMMUNITY)) {
+
+			return null;
+		}
+
 		try {
 			PortletURL addSiteURL = liferayPortletResponse.createRenderURL();
 
-			addSiteURL.setParameter("mvcPath", "/select_site_initializer.jsp");
+			addSiteURL.setParameter(
+				"mvcRenderCommandName", "/site/select_site_initializer");
 			addSiteURL.setParameter("redirect", themeDisplay.getURLCurrent());
 
 			Group group = _siteAdminDisplayContext.getGroup();

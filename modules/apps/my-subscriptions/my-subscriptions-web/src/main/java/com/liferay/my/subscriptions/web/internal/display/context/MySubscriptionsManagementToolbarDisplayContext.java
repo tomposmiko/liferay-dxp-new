@@ -31,10 +31,10 @@ import javax.servlet.http.HttpServletRequest;
 public class MySubscriptionsManagementToolbarDisplayContext {
 
 	public MySubscriptionsManagementToolbarDisplayContext(
-		HttpServletRequest request,
+		HttpServletRequest httpServletRequest,
 		LiferayPortletResponse liferayPortletResponse, User user) {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
 		_user = user;
 
@@ -50,7 +50,8 @@ public class MySubscriptionsManagementToolbarDisplayContext {
 						dropdownItem.putData("action", "unsubscribe");
 						dropdownItem.setIcon("times");
 						dropdownItem.setLabel(
-							LanguageUtil.get(_request, "unsubscribe"));
+							LanguageUtil.get(
+								_httpServletRequest, "unsubscribe"));
 						dropdownItem.setQuickAction(true);
 					});
 			}
@@ -77,8 +78,8 @@ public class MySubscriptionsManagementToolbarDisplayContext {
 		return false;
 	}
 
+	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
-	private final HttpServletRequest _request;
 	private final int _totalItems;
 	private final User _user;
 

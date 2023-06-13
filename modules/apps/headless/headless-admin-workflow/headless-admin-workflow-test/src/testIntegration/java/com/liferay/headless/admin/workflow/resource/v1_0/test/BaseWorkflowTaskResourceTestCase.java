@@ -1264,7 +1264,7 @@ public abstract class BaseWorkflowTaskResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected WorkflowTask randomWorkflowTask() {
+	protected WorkflowTask randomWorkflowTask() throws Exception {
 		return new WorkflowTask() {
 			{
 				completed = RandomTestUtil.randomBoolean();
@@ -1279,13 +1279,13 @@ public abstract class BaseWorkflowTaskResourceTestCase {
 		};
 	}
 
-	protected WorkflowTask randomIrrelevantWorkflowTask() {
+	protected WorkflowTask randomIrrelevantWorkflowTask() throws Exception {
 		WorkflowTask randomIrrelevantWorkflowTask = randomWorkflowTask();
 
 		return randomIrrelevantWorkflowTask;
 	}
 
-	protected WorkflowTask randomPatchWorkflowTask() {
+	protected WorkflowTask randomPatchWorkflowTask() throws Exception {
 		return randomWorkflowTask();
 	}
 

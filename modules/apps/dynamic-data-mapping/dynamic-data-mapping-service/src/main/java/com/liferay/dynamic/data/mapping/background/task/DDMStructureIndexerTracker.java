@@ -43,7 +43,9 @@ public class DDMStructureIndexerTracker {
 
 		if (serviceWrapper == null) {
 			if (_log.isDebugEnabled()) {
-				_log.debug("DDMStructureIndexer not found, for: " + className);
+				_log.debug(
+					"No dynamic data mapping structure indexer exists for " +
+						className);
 			}
 
 			return null;

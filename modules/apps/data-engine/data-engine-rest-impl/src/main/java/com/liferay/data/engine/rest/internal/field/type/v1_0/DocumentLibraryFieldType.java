@@ -14,8 +14,10 @@
 
 package com.liferay.data.engine.rest.internal.field.type.v1_0;
 
-import com.liferay.data.engine.rest.dto.v1_0.DataDefinitionField;
-import com.liferay.data.engine.rest.internal.field.type.v1_0.util.CustomPropertyUtil;
+import com.liferay.data.engine.rest.internal.field.type.v1_0.util.CustomPropertiesUtil;
+import com.liferay.data.engine.spi.field.type.BaseFieldType;
+import com.liferay.data.engine.spi.field.type.FieldType;
+import com.liferay.data.engine.spi.field.type.SPIDataDefinitionField;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -31,12 +33,12 @@ import com.liferay.portal.kernel.security.auth.AuthTokenUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.AggregateResourceBundle;
 import com.liferay.portal.kernel.util.Html;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.URLCodec;
 import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.template.soy.data.SoyDataFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,108 +49,123 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * @author Marcela Cunha
  */
+@Component(
+	immediate = true,
+	property = {
+		"data.engine.field.type.description=document-library-field-type-description",
+		"data.engine.field.type.display.order:Integer=9",
+		"data.engine.field.type.group=customized",
+		"data.engine.field.type.icon=upload",
+		"data.engine.field.type.js.module=dynamic-data-mapping-form-field-type/metal/DocumentLibrary/DocumentLibrary.es",
+		"data.engine.field.type.label=document-library-field-type-label"
+	},
+	service = FieldType.class
+)
 public class DocumentLibraryFieldType extends BaseFieldType {
 
-	public DocumentLibraryFieldType(
-		DataDefinitionField dataDefinitionField, DLAppService dlAppService,
-		Html html, HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, Portal portal,
-		SoyDataFactory soyDataFactory) {
-
-		super(
-			dataDefinitionField, httpServletRequest, httpServletResponse,
-			soyDataFactory);
-
-		_dlAppService = dlAppService;
-		_html = html;
-		_portal = portal;
-	}
-
 	@Override
-	public DataDefinitionField deserialize(JSONObject jsonObject)
+	public SPIDataDefinitionField deserialize(JSONObject jsonObject)
 		throws Exception {
 
-		DataDefinitionField dataDefinitionField = super.deserialize(jsonObject);
+		SPIDataDefinitionField spiDataDefinitionField = super.deserialize(
+			jsonObject);
 
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "groupId",
-				jsonObject.getLong("groupId")));
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(),
-				"itemSelectorAuthToken",
-				jsonObject.getString("itemSelectorAuthToken")));
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "lexiconIconsPath",
-				jsonObject.getString("lexiconIconsPath")));
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "strings",
-				CustomPropertyUtil.toMap(jsonObject.getJSONObject("strings"))));
+		Map<String, Object> customProperties =
+			spiDataDefinitionField.getCustomProperties();
 
-		return dataDefinitionField;
+		customProperties.put("groupId", jsonObject.getLong("groupId"));
+		customProperties.put(
+			"itemSelectorAuthToken",
+			jsonObject.getString("itemSelectorAuthToken"));
+		customProperties.put(
+			"lexiconIconsPath", jsonObject.getString("lexiconIconsPath"));
+		customProperties.put(
+			"strings",
+			CustomPropertiesUtil.toMap(jsonObject.getJSONObject("strings")));
+
+		return spiDataDefinitionField;
 	}
 
 	@Override
-	public JSONObject toJSONObject() throws Exception {
-		JSONObject jsonObject = super.toJSONObject();
+	public String getName() {
+		return "document_library";
+	}
+
+	@Override
+	public JSONObject toJSONObject(
+			SPIDataDefinitionField spiDataDefinitionField)
+		throws Exception {
+
+		JSONObject jsonObject = super.toJSONObject(spiDataDefinitionField);
 
 		return jsonObject.put(
 			"groupId",
-			CustomPropertyUtil.getLong(
-				dataDefinitionField.getCustomProperties(), "groupId")
+			MapUtil.getLong(
+				spiDataDefinitionField.getCustomProperties(), "groupId")
 		).put(
 			"itemSelectorAuthToken",
-			CustomPropertyUtil.getString(
-				dataDefinitionField.getCustomProperties(),
+			MapUtil.getString(
+				spiDataDefinitionField.getCustomProperties(),
 				"itemSelectorAuthToken")
 		).put(
 			"lexiconIconsPath",
-			CustomPropertyUtil.getString(
-				dataDefinitionField.getCustomProperties(), "lexiconIconsPath")
+			MapUtil.getString(
+				spiDataDefinitionField.getCustomProperties(),
+				"lexiconIconsPath")
 		).put(
 			"strings",
-			CustomPropertyUtil.toJSONObject(
-				CustomPropertyUtil.getMap(
-					dataDefinitionField.getCustomProperties(), "strings"))
+			CustomPropertiesUtil.toJSONObject(
+				CustomPropertiesUtil.getMap(
+					spiDataDefinitionField.getCustomProperties(), "strings"))
 		);
 	}
 
 	@Override
-	protected void addContext(Map<String, Object> context) {
+	protected void includeContext(
+		Map<String, Object> context, HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse,
+		SPIDataDefinitionField spiDataDefinitionField) {
+
 		if (!StringUtils.isEmpty(
-				CustomPropertyUtil.getString(
-					dataDefinitionField.getCustomProperties(), "value"))) {
+				MapUtil.getString(
+					spiDataDefinitionField.getCustomProperties(), "value"))) {
 
 			JSONObject valueJSONObject = _toJSONObject(
-				CustomPropertyUtil.getString(
-					dataDefinitionField.getCustomProperties(), "value"));
+				CustomPropertiesUtil.getString(
+					spiDataDefinitionField.getCustomProperties(), "value"));
 
 			if ((valueJSONObject != null) && (valueJSONObject.length() > 0)) {
 				FileEntry fileEntry = _getFileEntry(valueJSONObject);
 
 				context.put("fileEntryTitle", _getFileEntryTitle(fileEntry));
-				context.put("fileEntryURL", _getFileEntryURL(fileEntry));
+				context.put(
+					"fileEntryURL",
+					_getFileEntryURL(fileEntry, httpServletRequest));
 			}
 		}
 
 		context.put(
 			"groupId",
-			CustomPropertyUtil.getLong(
-				dataDefinitionField.getCustomProperties(), "groupId"));
-		context.put("itemSelectorAuthToken", _getItemSelectorAuthToken());
-		context.put("lexiconIconsPath", _getLexiconIconsPath());
-		context.put("strings", _getStrings());
+			MapUtil.getLong(
+				spiDataDefinitionField.getCustomProperties(), "groupId"));
+		context.put(
+			"itemSelectorAuthToken",
+			_getItemSelectorAuthToken(httpServletRequest));
+		context.put(
+			"lexiconIconsPath", _getLexiconIconsPath(httpServletRequest));
+		context.put("strings", _getStrings(httpServletRequest));
 		context.put(
 			"value",
 			JSONFactoryUtil.looseDeserialize(
-				CustomPropertyUtil.getString(
-					dataDefinitionField.getCustomProperties(), "value", "{}")));
+				MapUtil.getString(
+					spiDataDefinitionField.getCustomProperties(), "value",
+					"{}")));
 	}
 
 	private FileEntry _getFileEntry(JSONObject valueJSONObject) {
@@ -172,7 +189,9 @@ public class DocumentLibraryFieldType extends BaseFieldType {
 		return _html.escape(fileEntry.getTitle());
 	}
 
-	private String _getFileEntryURL(FileEntry fileEntry) {
+	private String _getFileEntryURL(
+		FileEntry fileEntry, HttpServletRequest httpServletRequest) {
+
 		if (fileEntry == null) {
 			return StringPool.BLANK;
 		}
@@ -198,7 +217,9 @@ public class DocumentLibraryFieldType extends BaseFieldType {
 		return _html.escape(sb.toString());
 	}
 
-	private String _getItemSelectorAuthToken() {
+	private String _getItemSelectorAuthToken(
+		HttpServletRequest httpServletRequest) {
+
 		ThemeDisplay themeDisplay =
 			(ThemeDisplay)httpServletRequest.getAttribute(
 				WebKeys.THEME_DISPLAY);
@@ -220,7 +241,7 @@ public class DocumentLibraryFieldType extends BaseFieldType {
 		return StringPool.BLANK;
 	}
 
-	private String _getLexiconIconsPath() {
+	private String _getLexiconIconsPath(HttpServletRequest httpServletRequest) {
 		StringBundler sb = new StringBundler(3);
 
 		ThemeDisplay themeDisplay =
@@ -235,7 +256,9 @@ public class DocumentLibraryFieldType extends BaseFieldType {
 		return sb.toString();
 	}
 
-	private Map<String, String> _getStrings() {
+	private Map<String, String> _getStrings(
+		HttpServletRequest httpServletRequest) {
+
 		Map<String, String> values = new HashMap<>();
 
 		ThemeDisplay themeDisplay =
@@ -268,8 +291,13 @@ public class DocumentLibraryFieldType extends BaseFieldType {
 	private static final Log _log = LogFactoryUtil.getLog(
 		DocumentLibraryFieldType.class);
 
-	private final DLAppService _dlAppService;
-	private final Html _html;
-	private final Portal _portal;
+	@Reference
+	private DLAppService _dlAppService;
+
+	@Reference
+	private Html _html;
+
+	@Reference
+	private Portal _portal;
 
 }

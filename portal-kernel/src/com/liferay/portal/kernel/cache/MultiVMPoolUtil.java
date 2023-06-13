@@ -14,16 +14,16 @@
 
 package com.liferay.portal.kernel.cache;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.spring.osgi.OSGiBeanProperties;
 import com.liferay.portal.kernel.util.ServiceProxyFactory;
 
 import java.io.Serializable;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
- * @author Brian Wing Shun Chan
- * @author Michael Young
+ * @author     Brian Wing Shun Chan
+ * @author     Michael Young
  * @deprecated As of Judson (7.1.x), with no direct replacement
  */
 @Deprecated

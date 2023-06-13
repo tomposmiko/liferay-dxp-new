@@ -1961,7 +1961,7 @@ public abstract class BaseUserAccountResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected UserAccount randomUserAccount() {
+	protected UserAccount randomUserAccount() throws Exception {
 		return new UserAccount() {
 			{
 				additionalName = RandomTestUtil.randomString();
@@ -1984,13 +1984,13 @@ public abstract class BaseUserAccountResourceTestCase {
 		};
 	}
 
-	protected UserAccount randomIrrelevantUserAccount() {
+	protected UserAccount randomIrrelevantUserAccount() throws Exception {
 		UserAccount randomIrrelevantUserAccount = randomUserAccount();
 
 		return randomIrrelevantUserAccount;
 	}
 
-	protected UserAccount randomPatchUserAccount() {
+	protected UserAccount randomPatchUserAccount() throws Exception {
 		return randomUserAccount();
 	}
 

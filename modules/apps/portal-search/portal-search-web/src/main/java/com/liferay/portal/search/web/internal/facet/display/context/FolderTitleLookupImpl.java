@@ -34,10 +34,10 @@ import javax.servlet.http.HttpServletRequest;
 public class FolderTitleLookupImpl implements FolderTitleLookup {
 
 	public FolderTitleLookupImpl(
-		FolderSearcher folderSearcher, HttpServletRequest request) {
+		FolderSearcher folderSearcher, HttpServletRequest httpServletRequest) {
 
 		_folderSearcher = folderSearcher;
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class FolderTitleLookupImpl implements FolderTitleLookup {
 
 	protected SearchContext getSearchContext(long curFolderId) {
 		SearchContext searchContext = SearchContextFactory.getInstance(
-			_request);
+			_httpServletRequest);
 
 		searchContext.setFolderIds(new long[] {curFolderId});
 		searchContext.setGroupIds(new long[0]);
@@ -103,6 +103,6 @@ public class FolderTitleLookupImpl implements FolderTitleLookup {
 	}
 
 	private final FolderSearcher _folderSearcher;
-	private final HttpServletRequest _request;
+	private final HttpServletRequest _httpServletRequest;
 
 }

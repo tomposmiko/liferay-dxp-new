@@ -93,12 +93,12 @@ public class WorkflowDefinitionLinkDisplayContext {
 			renderRequest);
 		_liferayPortletResponse = PortalUtil.getLiferayPortletResponse(
 			renderResponse);
-		_request = PortalUtil.getHttpServletRequest(renderRequest);
+		_httpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 		_workflowDefinitionLinkRequestHelper =
 			new WorkflowDefinitionLinkRequestHelper(renderRequest);
 
 		_portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(
-			_request);
+			_httpServletRequest);
 
 		_resourceBundleLoader = resourceBundleLoader;
 	}
@@ -156,7 +156,9 @@ public class WorkflowDefinitionLinkDisplayContext {
 			title);
 	}
 
-	public DropdownItemList getFilterOptions(HttpServletRequest request) {
+	public DropdownItemList getFilterOptions(
+		HttpServletRequest httpServletRequest) {
+
 		return new DropdownItemList() {
 			{
 				addGroup(
@@ -167,12 +169,14 @@ public class WorkflowDefinitionLinkDisplayContext {
 									add(
 										_getOrderByDropdownItem(
 											"resource",
-											_getCurrentOrder(request)));
+											_getCurrentOrder(
+												httpServletRequest)));
 
 									add(
 										_getOrderByDropdownItem(
 											"workflow",
-											_getCurrentOrder(request)));
+											_getCurrentOrder(
+												httpServletRequest)));
 								}
 							});
 						dropdownGroupItem.setLabel(
@@ -201,7 +205,7 @@ public class WorkflowDefinitionLinkDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = ParamUtil.getString(_request, "orderByCol");
+		_orderByCol = ParamUtil.getString(_httpServletRequest, "orderByCol");
 
 		if (Validator.isNull(_orderByCol)) {
 			_orderByCol = _portalPreferences.getValue(
@@ -209,7 +213,8 @@ public class WorkflowDefinitionLinkDisplayContext {
 				"definition-link-order-by-col", "resource");
 		}
 		else {
-			boolean saveOrderBy = ParamUtil.getBoolean(_request, "saveOrderBy");
+			boolean saveOrderBy = ParamUtil.getBoolean(
+				_httpServletRequest, "saveOrderBy");
 
 			if (saveOrderBy) {
 				_portalPreferences.setValue(
@@ -226,7 +231,7 @@ public class WorkflowDefinitionLinkDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = ParamUtil.getString(_request, "orderByType");
+		_orderByType = ParamUtil.getString(_httpServletRequest, "orderByType");
 
 		if (Validator.isNull(_orderByType)) {
 			_orderByType = _portalPreferences.getValue(
@@ -234,7 +239,8 @@ public class WorkflowDefinitionLinkDisplayContext {
 				"definition-link-order-by-type", "asc");
 		}
 		else {
-			boolean saveOrderBy = ParamUtil.getBoolean(_request, "saveOrderBy");
+			boolean saveOrderBy = ParamUtil.getBoolean(
+				_httpServletRequest, "saveOrderBy");
 
 			if (saveOrderBy) {
 				_portalPreferences.setValue(
@@ -254,20 +260,20 @@ public class WorkflowDefinitionLinkDisplayContext {
 			"tab", WorkflowWebKeys.WORKFLOW_TAB_DEFINITION_LINK);
 		portletURL.setParameter("tabs1", "default-configuration");
 
-		String delta = ParamUtil.getString(_request, "delta");
+		String delta = ParamUtil.getString(_httpServletRequest, "delta");
 
 		if (Validator.isNotNull(delta)) {
 			portletURL.setParameter("delta", delta);
 		}
 
-		String keywords = ParamUtil.getString(_request, "keywords");
+		String keywords = ParamUtil.getString(_httpServletRequest, "keywords");
 
 		if (Validator.isNotNull(keywords)) {
 			portletURL.setParameter("keywords", keywords);
 		}
 
 		String orderByType = ParamUtil.getString(
-			_request, "orderByType", "asc");
+			_httpServletRequest, "orderByType", "asc");
 
 		portletURL.setParameter("orderByType", orderByType);
 
@@ -413,7 +419,7 @@ public class WorkflowDefinitionLinkDisplayContext {
 		portletURL.setParameter("orderByCol", getOrderByCol());
 
 		String orderByType = ParamUtil.getString(
-			_request, "orderByType", "asc");
+			_httpServletRequest, "orderByType", "asc");
 
 		portletURL.setParameter(
 			"orderByType", Objects.equals(orderByType, "asc") ? "desc" : "asc");
@@ -508,8 +514,8 @@ public class WorkflowDefinitionLinkDisplayContext {
 		return false;
 	}
 
-	public boolean showStripeMessage(HttpServletRequest request) {
-		HttpSession httpSession = request.getSession(false);
+	public boolean showStripeMessage(HttpServletRequest httpServletRequest) {
+		HttpSession httpSession = httpServletRequest.getSession(false);
 
 		String showDefinitionLinkInfo = SessionClicks.get(
 			httpSession, "show_definition_link_info", StringPool.BLANK);
@@ -670,8 +676,9 @@ public class WorkflowDefinitionLinkDisplayContext {
 		return ListUtil.filter(workflowHandlers, WorkflowHandler::isVisible);
 	}
 
-	private String _getCurrentOrder(HttpServletRequest request) {
-		return ParamUtil.getString(request, "orderByCol", "resource");
+	private String _getCurrentOrder(HttpServletRequest httpServletRequest) {
+		return ParamUtil.getString(
+			httpServletRequest, "orderByCol", "resource");
 	}
 
 	private UnsafeConsumer<DropdownItem, Exception> _getOrderByDropdownItem(
@@ -690,12 +697,12 @@ public class WorkflowDefinitionLinkDisplayContext {
 	private static final Log _log = LogFactoryUtil.getLog(
 		WorkflowDefinitionLinkDisplayContext.class);
 
+	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private String _orderByCol;
 	private String _orderByType;
 	private final PortalPreferences _portalPreferences;
-	private final HttpServletRequest _request;
 	private final ResourceBundleLoader _resourceBundleLoader;
 	private final WorkflowDefinitionLinkLocalService
 		_workflowDefinitionLinkLocalService;

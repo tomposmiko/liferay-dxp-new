@@ -141,25 +141,27 @@ public class FieldsetTag extends BaseFieldsetTag {
 	}
 
 	@Override
-	protected void setAttributes(HttpServletRequest request) {
+	protected void setAttributes(HttpServletRequest httpServletRequest) {
 		if (Validator.isNull(getId()) && Validator.isNotNull(getLabel()) &&
 			getCollapsible()) {
 
 			String id = PortalUtil.getUniqueElementId(
-				request, _getNamespace(), AUIUtil.normalizeId(getLabel()));
+				httpServletRequest, _getNamespace(),
+				AUIUtil.normalizeId(getLabel()));
 
 			setId(_getNamespace() + id);
 		}
 
-		super.setAttributes(request);
+		super.setAttributes(httpServletRequest);
 	}
 
 	private String _getNamespace() {
-		HttpServletRequest request =
+		HttpServletRequest httpServletRequest =
 			(HttpServletRequest)pageContext.getRequest();
 
-		PortletResponse portletResponse = (PortletResponse)request.getAttribute(
-			JavaConstants.JAVAX_PORTLET_RESPONSE);
+		PortletResponse portletResponse =
+			(PortletResponse)httpServletRequest.getAttribute(
+				JavaConstants.JAVAX_PORTLET_RESPONSE);
 
 		if (portletResponse != null) {
 			return portletResponse.getNamespace();

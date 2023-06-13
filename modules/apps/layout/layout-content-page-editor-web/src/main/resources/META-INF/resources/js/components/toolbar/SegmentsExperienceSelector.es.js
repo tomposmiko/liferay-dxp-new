@@ -12,10 +12,11 @@ const DISMISS_ALERT_ANIMATION_WAIT = 500;
 /**
  * Tells if a priority an `obj2`
  * has higher, equal or lower priority
- * than `obj1`
+ * than `obj1`.
+ * Return values can be 1, 0, or -1
  * @param {object} obj1
  * @param {object} obj2
- * @returns {1|0|-1}
+ * @returns {number}
  * @review
  */
 function comparePriority(obj1, obj2) {

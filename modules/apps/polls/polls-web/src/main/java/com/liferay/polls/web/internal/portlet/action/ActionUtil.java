@@ -29,10 +29,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class ActionUtil {
 
-	public static void getQuestion(HttpServletRequest request)
+	public static void getQuestion(HttpServletRequest httpServletRequest)
 		throws Exception {
 
-		long questionId = ParamUtil.getLong(request, "questionId");
+		long questionId = ParamUtil.getLong(httpServletRequest, "questionId");
 
 		PollsQuestion question = null;
 
@@ -40,16 +40,16 @@ public class ActionUtil {
 			question = PollsQuestionServiceUtil.getQuestion(questionId);
 		}
 
-		request.setAttribute(PollsWebKeys.POLLS_QUESTION, question);
+		httpServletRequest.setAttribute(PollsWebKeys.POLLS_QUESTION, question);
 	}
 
 	public static void getQuestion(PortletRequest portletRequest)
 		throws Exception {
 
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			portletRequest);
+		HttpServletRequest httpServletRequest =
+			PortalUtil.getHttpServletRequest(portletRequest);
 
-		getQuestion(request);
+		getQuestion(httpServletRequest);
 	}
 
 }

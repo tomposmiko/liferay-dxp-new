@@ -37,15 +37,16 @@ import javax.servlet.http.HttpServletRequest;
 public class RSSDisplayContext {
 
 	public RSSDisplayContext(
-			HttpServletRequest request,
+			HttpServletRequest httpServletRequest,
 			RSSWebCacheConfiguration rssWebCacheConfiguration)
 		throws ConfigurationException {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_rssWebCacheConfiguration = rssWebCacheConfiguration;
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
@@ -63,8 +64,9 @@ public class RSSDisplayContext {
 			_rssPortletInstanceConfiguration.displayStyleGroupId();
 
 		if (_displayStyleGroupId <= 0) {
-			ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-				WebKeys.THEME_DISPLAY);
+			ThemeDisplay themeDisplay =
+				(ThemeDisplay)_httpServletRequest.getAttribute(
+					WebKeys.THEME_DISPLAY);
 
 			_displayStyleGroupId = themeDisplay.getScopeGroupId();
 		}
@@ -101,8 +103,9 @@ public class RSSDisplayContext {
 	}
 
 	public boolean isShowConfigurationLink() throws PortalException {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
@@ -112,7 +115,7 @@ public class RSSDisplayContext {
 	}
 
 	private long _displayStyleGroupId;
-	private final HttpServletRequest _request;
+	private final HttpServletRequest _httpServletRequest;
 	private final RSSPortletInstanceConfiguration
 		_rssPortletInstanceConfiguration;
 	private final RSSWebCacheConfiguration _rssWebCacheConfiguration;

@@ -51,17 +51,18 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 	public KBSuggestionListManagementToolbarDisplayContext(
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest request, SearchContainer searchContainer) {
+		HttpServletRequest httpServletRequest,
+		SearchContainer searchContainer) {
 
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_searchContainer = searchContainer;
 
 		_currentURLObj = PortletURLUtil.getCurrent(
 			_liferayPortletRequest, _liferayPortletResponse);
 
-		_themeDisplay = (ThemeDisplay)_request.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -73,7 +74,7 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 						dropdownItem.putData("action", "deleteKBComments");
 						dropdownItem.setIcon("times-circle");
 						dropdownItem.setLabel(
-							LanguageUtil.get(_request, "delete"));
+							LanguageUtil.get(_httpServletRequest, "delete"));
 						dropdownItem.setQuickAction(true);
 					});
 			}
@@ -113,7 +114,8 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 						dropdownGroupItem.setDropdownItems(
 							_getFilterNavigationDropdownItems());
 						dropdownGroupItem.setLabel(
-							LanguageUtil.get(_request, "filter-by-navigation"));
+							LanguageUtil.get(
+								_httpServletRequest, "filter-by-navigation"));
 					});
 
 				addGroup(
@@ -121,7 +123,7 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 						dropdownGroupItem.setDropdownItems(
 							_getOrderByDropdownItems());
 						dropdownGroupItem.setLabel(
-							LanguageUtil.get(_request, "order-by"));
+							LanguageUtil.get(_httpServletRequest, "order-by"));
 					});
 			}
 		};
@@ -146,7 +148,8 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 
 							labelItem.setCloseable(true);
 							labelItem.setLabel(
-								LanguageUtil.get(_request, navigation));
+								LanguageUtil.get(
+									_httpServletRequest, navigation));
 						});
 				}
 			}
@@ -219,7 +222,8 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 							dropdownItem.setHref(
 								navigationURL, "navigation", navigationKey);
 							dropdownItem.setLabel(
-								LanguageUtil.get(_request, navigationKey));
+								LanguageUtil.get(
+									_httpServletRequest, navigationKey));
 						});
 				}
 			}
@@ -227,7 +231,7 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 	}
 
 	private String _getNavigation() {
-		return ParamUtil.getString(_request, "navigation", "all");
+		return ParamUtil.getString(_httpServletRequest, "navigation", "all");
 	}
 
 	private String _getOrderByCol() {
@@ -262,7 +266,8 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 								_getCurrentSortingURL(), "orderByCol",
 								orderByColEntry.getValue());
 							dropdownItem.setLabel(
-								LanguageUtil.get(_request, orderByCol));
+								LanguageUtil.get(
+									_httpServletRequest, orderByCol));
 						});
 				}
 			}
@@ -270,9 +275,9 @@ public class KBSuggestionListManagementToolbarDisplayContext {
 	}
 
 	private final PortletURL _currentURLObj;
+	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
-	private final HttpServletRequest _request;
 	private final SearchContainer _searchContainer;
 	private final ThemeDisplay _themeDisplay;
 

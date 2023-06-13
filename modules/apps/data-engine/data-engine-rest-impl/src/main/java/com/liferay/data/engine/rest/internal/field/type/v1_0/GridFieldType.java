@@ -14,91 +14,111 @@
 
 package com.liferay.data.engine.rest.internal.field.type.v1_0;
 
-import com.liferay.data.engine.rest.dto.v1_0.DataDefinitionField;
-import com.liferay.data.engine.rest.internal.field.type.v1_0.util.CustomPropertyUtil;
+import com.liferay.data.engine.rest.internal.field.type.v1_0.util.CustomPropertiesUtil;
 import com.liferay.data.engine.rest.internal.field.type.v1_0.util.DataFieldOptionUtil;
+import com.liferay.data.engine.spi.field.type.BaseFieldType;
+import com.liferay.data.engine.spi.field.type.FieldType;
+import com.liferay.data.engine.spi.field.type.SPIDataDefinitionField;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.template.soy.data.SoyDataFactory;
 
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * @author Gabriel Albuquerque
  */
+@Component(
+	immediate = true,
+	property = {
+		"data.engine.field.type.data.domain=list",
+		"data.engine.field.type.description=grid-field-type-description",
+		"data.engine.field.type.display.order:Integer=7",
+		"data.engine.field.type.group=basic",
+		"data.engine.field.type.icon=table2",
+		"data.engine.field.type.js.module=dynamic-data-mapping-form-field-type/metal/Grid/Grid.es",
+		"data.engine.field.type.label=grid-field-type-label"
+	},
+	service = FieldType.class
+)
 public class GridFieldType extends BaseFieldType {
 
-	public GridFieldType(
-		DataDefinitionField dataDefinitionField,
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse,
-		SoyDataFactory soyDataFactory) {
-
-		super(
-			dataDefinitionField, httpServletRequest, httpServletResponse,
-			soyDataFactory);
-	}
-
 	@Override
-	public DataDefinitionField deserialize(JSONObject jsonObject)
+	public SPIDataDefinitionField deserialize(JSONObject jsonObject)
 		throws Exception {
 
-		DataDefinitionField dataDefinitionField = super.deserialize(jsonObject);
+		SPIDataDefinitionField spiDataDefinitionField = super.deserialize(
+			jsonObject);
 
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "columns",
-				DataFieldOptionUtil.toDataFieldOptions(
-					jsonObject.getJSONObject("columns"))));
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "rows",
-				DataFieldOptionUtil.toDataFieldOptions(
-					jsonObject.getJSONObject("rows"))));
+		Map<String, Object> customProperties =
+			spiDataDefinitionField.getCustomProperties();
 
-		return dataDefinitionField;
+		customProperties.put(
+			"columns",
+			DataFieldOptionUtil.toDataFieldOptions(
+				jsonObject.getJSONObject("columns")));
+		customProperties.put(
+			"rows",
+			DataFieldOptionUtil.toDataFieldOptions(
+				jsonObject.getJSONObject("rows")));
+
+		return spiDataDefinitionField;
 	}
 
 	@Override
-	public JSONObject toJSONObject() throws Exception {
-		JSONObject jsonObject = super.toJSONObject();
+	public String getName() {
+		return "grid";
+	}
+
+	@Override
+	public JSONObject toJSONObject(
+			SPIDataDefinitionField spiDataDefinitionField)
+		throws Exception {
+
+		JSONObject jsonObject = super.toJSONObject(spiDataDefinitionField);
 
 		return jsonObject.put(
 			"columns",
 			DataFieldOptionUtil.toJSONObject(
-				CustomPropertyUtil.getDataFieldOptions(
-					dataDefinitionField.getCustomProperties(), "columns"))
+				CustomPropertiesUtil.getDataFieldOptions(
+					spiDataDefinitionField.getCustomProperties(), "columns"))
 		).put(
 			"rows",
 			DataFieldOptionUtil.toJSONObject(
-				CustomPropertyUtil.getDataFieldOptions(
-					dataDefinitionField.getCustomProperties(), "rows"))
+				CustomPropertiesUtil.getDataFieldOptions(
+					spiDataDefinitionField.getCustomProperties(), "rows"))
 		);
 	}
 
 	@Override
-	protected void addContext(Map<String, Object> context) {
+	protected void includeContext(
+		Map<String, Object> context, HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse,
+		SPIDataDefinitionField spiDataDefinitionField) {
+
 		context.put(
 			"columns",
 			DataFieldOptionUtil.toDataFieldOptions(
-				CustomPropertyUtil.getDataFieldOptions(
-					dataDefinitionField.getCustomProperties(), "columns"),
+				CustomPropertiesUtil.getDataFieldOptions(
+					spiDataDefinitionField.getCustomProperties(), "columns"),
 				LanguageUtil.getLanguageId(httpServletRequest)));
 		context.put(
 			"rows",
 			DataFieldOptionUtil.toDataFieldOptions(
-				CustomPropertyUtil.getDataFieldOptions(
-					dataDefinitionField.getCustomProperties(), "rows"),
+				CustomPropertiesUtil.getDataFieldOptions(
+					spiDataDefinitionField.getCustomProperties(), "rows"),
 				LanguageUtil.getLanguageId(httpServletRequest)));
 		context.put(
 			"value",
 			JSONFactoryUtil.looseDeserialize(
-				CustomPropertyUtil.getString(
-					dataDefinitionField.getCustomProperties(), "value", "{}")));
+				CustomPropertiesUtil.getString(
+					spiDataDefinitionField.getCustomProperties(), "value",
+					"{}")));
 	}
 
 }

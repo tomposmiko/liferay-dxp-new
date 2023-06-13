@@ -588,6 +588,8 @@ public abstract class BaseDocumentResourceTestCase {
 		assertResponseCode(204, invokeDeleteDocumentResponse(document.getId()));
 
 		assertResponseCode(404, invokeGetDocumentResponse(document.getId()));
+
+		assertResponseCode(404, invokeGetDocumentResponse(0L));
 	}
 
 	protected Document testDeleteDocument_addDocument() throws Exception {
@@ -830,6 +832,8 @@ public abstract class BaseDocumentResourceTestCase {
 
 		assertResponseCode(
 			404, invokeGetDocumentMyRatingResponse(document.getId()));
+
+		assertResponseCode(404, invokeGetDocumentMyRatingResponse(0L));
 	}
 
 	protected Document testDeleteDocumentMyRating_addDocument()
@@ -2064,7 +2068,7 @@ public abstract class BaseDocumentResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected Document randomDocument() {
+	protected Document randomDocument() throws Exception {
 		return new Document() {
 			{
 				contentUrl = RandomTestUtil.randomString();
@@ -2081,13 +2085,13 @@ public abstract class BaseDocumentResourceTestCase {
 		};
 	}
 
-	protected Document randomIrrelevantDocument() {
+	protected Document randomIrrelevantDocument() throws Exception {
 		Document randomIrrelevantDocument = randomDocument();
 
 		return randomIrrelevantDocument;
 	}
 
-	protected Document randomPatchDocument() {
+	protected Document randomPatchDocument() throws Exception {
 		return randomDocument();
 	}
 

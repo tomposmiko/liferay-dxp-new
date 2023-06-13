@@ -40,22 +40,24 @@ import javax.servlet.jsp.JspWriter;
 public class MetaTagsTag extends IncludeTag {
 
 	public static void doTag(
-			ServletContext servletContext, HttpServletRequest request,
-			HttpServletResponse response)
+			ServletContext servletContext,
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
 		throws Exception {
 
-		doTag(_PAGE, servletContext, request, response);
+		doTag(_PAGE, servletContext, httpServletRequest, httpServletResponse);
 	}
 
 	public static void doTag(
 			String page, ServletContext servletContext,
-			HttpServletRequest request, HttpServletResponse response)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
 		throws Exception {
 
 		RequestDispatcher requestDispatcher =
 			servletContext.getRequestDispatcher(page);
 
-		requestDispatcher.include(request, response);
+		requestDispatcher.include(httpServletRequest, httpServletResponse);
 	}
 
 	@Override
@@ -65,11 +67,12 @@ public class MetaTagsTag extends IncludeTag {
 
 	@Override
 	protected int processEndTag() throws Exception {
-		HttpServletRequest request =
+		HttpServletRequest httpServletRequest =
 			(HttpServletRequest)pageContext.getRequest();
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		if (themeDisplay == null) {
 			return EVAL_PAGE;
@@ -81,7 +84,8 @@ public class MetaTagsTag extends IncludeTag {
 			return EVAL_PAGE;
 		}
 
-		String currentLanguageId = LanguageUtil.getLanguageId(request);
+		String currentLanguageId = LanguageUtil.getLanguageId(
+			httpServletRequest);
 		String defaultLanguageId = LocaleUtil.toLanguageId(
 			LocaleUtil.getSiteDefault());
 
@@ -114,7 +118,7 @@ public class MetaTagsTag extends IncludeTag {
 		}
 
 		ListMergeable<String> pageDescriptionListMergeable =
-			(ListMergeable<String>)request.getAttribute(
+			(ListMergeable<String>)httpServletRequest.getAttribute(
 				WebKeys.PAGE_DESCRIPTION);
 
 		if (pageDescriptionListMergeable != null) {
@@ -152,7 +156,8 @@ public class MetaTagsTag extends IncludeTag {
 		}
 
 		ListMergeable<String> pageKeywordsListMergeable =
-			(ListMergeable<String>)request.getAttribute(WebKeys.PAGE_KEYWORDS);
+			(ListMergeable<String>)httpServletRequest.getAttribute(
+				WebKeys.PAGE_KEYWORDS);
 
 		if (pageKeywordsListMergeable != null) {
 			if (Validator.isNotNull(metaKeywords)) {

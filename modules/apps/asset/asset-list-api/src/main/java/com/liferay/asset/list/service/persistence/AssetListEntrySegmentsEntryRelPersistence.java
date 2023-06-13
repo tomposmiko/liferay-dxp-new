@@ -14,11 +14,11 @@
 
 package com.liferay.asset.list.service.persistence;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.asset.list.exception.NoSuchEntrySegmentsEntryRelException;
 import com.liferay.asset.list.model.AssetListEntrySegmentsEntryRel;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The persistence interface for the asset list entry segments entry rel service.

@@ -14,8 +14,6 @@
 
 package com.liferay.portal.search.engine.adapter.index;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.SetUtil;
@@ -23,6 +21,8 @@ import com.liferay.portal.kernel.util.SetUtil;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Michael C. Han
@@ -82,7 +82,7 @@ public class AnalyzeIndexRequest implements IndexRequest<AnalyzeIndexResponse> {
 			return StringPool.EMPTY_ARRAY;
 		}
 
-		return _attributes.toArray(new String[_attributes.size()]);
+		return _attributes.toArray(new String[0]);
 	}
 
 	public Set<String> getCharFilters() {

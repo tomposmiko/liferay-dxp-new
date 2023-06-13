@@ -49,10 +49,10 @@ import javax.servlet.http.HttpServletRequest;
 public class SelectUserGroupManagementToolbarDisplayContext {
 
 	public SelectUserGroupManagementToolbarDisplayContext(
-		HttpServletRequest request, RenderRequest renderRequest,
+		HttpServletRequest httpServletRequest, RenderRequest renderRequest,
 		RenderResponse renderResponse) {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 	}
@@ -78,12 +78,13 @@ public class SelectUserGroupManagementToolbarDisplayContext {
 		}
 
 		String eventName = ParamUtil.getString(
-			_request, "eventName",
+			_httpServletRequest, "eventName",
 			_renderResponse.getNamespace() + "selectUserGroup");
 
 		portletURL.setParameter("eventName", eventName);
 
-		String[] keywords = ParamUtil.getStringValues(_request, "keywords");
+		String[] keywords = ParamUtil.getStringValues(
+			_httpServletRequest, "keywords");
 
 		if (ArrayUtil.isNotEmpty(keywords)) {
 			portletURL.setParameter("keywords", keywords[keywords.length - 1]);
@@ -109,8 +110,9 @@ public class SelectUserGroupManagementToolbarDisplayContext {
 		UserGroupSearch userGroupSearch = new UserGroupSearch(
 			_renderRequest, getPortletURL());
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		UserGroupDisplayTerms searchTerms =
 			(UserGroupDisplayTerms)userGroupSearch.getSearchTerms();
@@ -161,7 +163,7 @@ public class SelectUserGroupManagementToolbarDisplayContext {
 
 	private User _getSelectedUser() {
 		try {
-			return PortalUtil.getSelectedUser(_request);
+			return PortalUtil.getSelectedUser(_httpServletRequest);
 		}
 		catch (PortalException pe) {
 			_log.error(pe, pe);
@@ -173,9 +175,9 @@ public class SelectUserGroupManagementToolbarDisplayContext {
 	private static final Log _log = LogFactoryUtil.getLog(
 		SelectUserGroupManagementToolbarDisplayContext.class);
 
+	private final HttpServletRequest _httpServletRequest;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private final HttpServletRequest _request;
 	private UserGroupSearch _userGroupSearch;
 
 }

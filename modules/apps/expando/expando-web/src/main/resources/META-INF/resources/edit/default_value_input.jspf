@@ -99,6 +99,75 @@
 			</div>
 		</aui:field-wrapper>
 	</c:when>
+	<c:when test="<%= propertyDisplayType.equals(ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE_GEOLOCATION) %>">
+
+		<%
+		String name = "defaultValue";
+
+		Serializable value = "{\"latitude\": 0, \"longitude\": 0}";
+
+		if (defaultValue != null) {
+			value = defaultValue;
+		}
+		%>
+
+		<div id="<portlet:namespace />CoordinatesContainer">
+			<div class="glyphicon glyphicon-map-marker" id="<portlet:namespace /><%= name %>Location">
+			</div>
+
+			<%
+			JSONObject geolocationJSONObject = JSONFactoryUtil.createJSONObject(value.toString());
+			%>
+
+			<liferay-map:map-display
+				geolocation="<%= true %>"
+				latitude='<%= geolocationJSONObject.getDouble("latitude", 0) %>'
+				longitude='<%= geolocationJSONObject.getDouble("longitude", 0) %>'
+				name="<%= name %>"
+			/>
+		</div>
+
+		<aui:script require="map-common/js/MapBase.es as MapBase">
+			var geolocationField = {
+				init: function() {
+					Liferay.MapBase.get(
+						"<portlet:namespace /><%= name %>",
+						function(map) {
+							map.on('positionChange', geolocationField.onPositionChange, geolocationField);
+						}
+					);
+				},
+				onPositionChange: function(event) {
+					var inputName = "<portlet:namespace /><%= name %>";
+					var inputNode = document.querySelector('[name="' + inputName + '"]');
+
+					var location = event.newVal.location;
+
+					if (inputNode) {
+						inputNode.setAttribute(
+							'value',
+							JSON.stringify(
+								{
+									latitude: location.lat,
+									longitude: location.lng
+								}
+							)
+						);
+					}
+
+					var locationNode = document.getElementById(inputName + 'Location');
+
+					if (locationNode) {
+						locationNode.innerHTML = event.newVal.address;
+					}
+				}
+			};
+
+			geolocationField.init();
+		</aui:script>
+
+		<aui:input name="<%= name %>" type="hidden" value="<%= HtmlUtil.escape(value.toString()) %>" />
+	</c:when>
 	<c:otherwise>
 		<c:if test="<%= propertyDisplayType.equals(ExpandoColumnConstants.PROPERTY_DISPLAY_TYPE_INPUT_FIELD) %>">
 			<aui:select disabled="<%= expandoColumn != null %>" label="data-type" name="dataType" onChange="setDataType(false)" value="<%= ExpandoColumnConstants.getDataType(type) %>">

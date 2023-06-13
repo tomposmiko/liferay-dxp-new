@@ -14,10 +14,10 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
-import com.liferay.asset.kernel.model.AssetEntry;
-import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.asset.info.display.contributor.util.ContentAccessor;
 import com.liferay.info.display.contributor.InfoDisplayContributor;
 import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
+import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -71,10 +71,12 @@ public class GetAssetFieldValueMVCResourceCommand
 
 		long classPK = ParamUtil.getLong(resourceRequest, "classPK");
 
-		AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
-			classNameId, classPK);
+		InfoDisplayObjectProvider infoDisplayObjectProvider =
+			infoDisplayContributor.getInfoDisplayObjectProvider(classPK);
 
-		if (assetEntry == null) {
+		Object object = infoDisplayObjectProvider.getDisplayObject();
+
+		if (object == null) {
 			JSONPortletResponseUtil.writeJSON(
 				resourceRequest, resourceResponse,
 				JSONFactoryUtil.createJSONObject());
@@ -93,18 +95,22 @@ public class GetAssetFieldValueMVCResourceCommand
 			"classPK", classPK
 		).put(
 			"fieldId", fieldId
-		).put(
-			"fieldValue",
-			infoDisplayContributor.getInfoDisplayFieldValue(
-				assetEntry, fieldId, themeDisplay.getLocale())
 		);
+
+		Object fieldValue = infoDisplayContributor.getInfoDisplayFieldValue(
+			object, fieldId, themeDisplay.getLocale());
+
+		if (fieldValue instanceof ContentAccessor) {
+			ContentAccessor contentAccessor = (ContentAccessor)fieldValue;
+
+			fieldValue = contentAccessor.getContent();
+		}
+
+		jsonObject.put("fieldValue", fieldValue);
 
 		JSONPortletResponseUtil.writeJSON(
 			resourceRequest, resourceResponse, jsonObject);
 	}
-
-	@Reference
-	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
 	private InfoDisplayContributorTracker _infoDisplayContributorTracker;

@@ -14,9 +14,9 @@
 
 package com.liferay.portal.kernel.aop;
 
-import aQute.bnd.annotation.ProviderType;
-
 import java.lang.reflect.Method;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Immutable AOP method invocation to by used by {@link ChainableMethodAdvice}
@@ -29,8 +29,8 @@ public interface AopMethodInvocation {
 
 	/**
 	 * @return The cached context object defined in {@link
-	 *         ChainableMethodAdvice#createMethodContext(
-	 *         Class, Method, java.util.Map)}
+	 *         ChainableMethodAdvice#createMethodContext(Class, Method,
+	 *         java.util.Map)}
 	 */
 	public <T> T getAdviceMethodContext();
 
@@ -45,7 +45,7 @@ public interface AopMethodInvocation {
 	public Object getThis();
 
 	/**
-	 * @param arguments the arguments to use when invoking the method
+	 * @param  arguments the arguments to use when invoking the method
 	 * @return result of the underlying invocation chain
 	 */
 	public Object proceed(Object[] arguments) throws Throwable;

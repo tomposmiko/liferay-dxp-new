@@ -9,5 +9,5 @@
 		"checkFormat": "liferay-npm-scripts lint",
 		"format": "liferay-npm-scripts format"
 	},
-	"version": "5.0.5"
+	"version": "5.0.9"
 }

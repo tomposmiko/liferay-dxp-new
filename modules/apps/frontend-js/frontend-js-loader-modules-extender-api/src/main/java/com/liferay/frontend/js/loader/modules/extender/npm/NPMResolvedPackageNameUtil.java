@@ -33,15 +33,16 @@ public class NPMResolvedPackageNameUtil {
 	 *
 	 * The current portlet is inferred from the portletResource parameter or
 	 * the {@link ServletContext} associated to the given request.
-	 * @param request
+	 *
+	 * @param  httpServletRequest
 	 * @return
 	 * @review
 	 */
-	public static String get(HttpServletRequest request) {
-		ServletContext servletContext = request.getServletContext();
+	public static String get(HttpServletRequest httpServletRequest) {
+		ServletContext servletContext = httpServletRequest.getServletContext();
 
 		String portletResource = ParamUtil.getString(
-			request, "portletResource");
+			httpServletRequest, "portletResource");
 
 		if (Validator.isNotNull(portletResource)) {
 			PortletBag portletBag = PortletBagPool.get(
@@ -58,7 +59,8 @@ public class NPMResolvedPackageNameUtil {
 	/**
 	 * Get the NPM resolved package name associated to the bundle containing the
 	 * given servlet context.
-	 * @param servletContext
+	 *
+	 * @param  servletContext
 	 * @return
 	 * @review
 	 */

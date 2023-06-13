@@ -30,8 +30,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class AnnouncementsRequestHelper extends BaseRequestHelper {
 
-	public AnnouncementsRequestHelper(HttpServletRequest request) {
-		super(request);
+	public AnnouncementsRequestHelper(HttpServletRequest httpServletRequest) {
+		super(httpServletRequest);
 	}
 
 	public PortletPreferences getPortletPreferences() {
@@ -39,10 +39,11 @@ public class AnnouncementsRequestHelper extends BaseRequestHelper {
 			return _portletPreferences;
 		}
 
-		HttpServletRequest request = getRequest();
+		HttpServletRequest httpServletRequest = getRequest();
 
-		PortletRequest portletRequest = (PortletRequest)request.getAttribute(
-			JavaConstants.JAVAX_PORTLET_REQUEST);
+		PortletRequest portletRequest =
+			(PortletRequest)httpServletRequest.getAttribute(
+				JavaConstants.JAVAX_PORTLET_REQUEST);
 
 		_portletPreferences = portletRequest.getPreferences();
 

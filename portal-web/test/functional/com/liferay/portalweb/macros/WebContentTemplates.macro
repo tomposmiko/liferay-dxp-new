@@ -60,41 +60,6 @@ definition {
 		}
 	}
 
-	@summary = "Helper function to select template language 'templateLanguage' to read the template in"
-	macro _inputTemplateLanguage {
-		if ("${templateLanguage}" == "vm") {
-			Select(
-				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
-				value1 = "Velocity (.vm)");
-		}
-		else if ("${templateLanguage}" == "xsl") {
-			Select(
-				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
-				value1 = "Extensible Stylesheet Language (.xsl)");
-		}
-		else {
-			Select(
-				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
-				value1 = "FreeMarker (.ftl)");
-		}
-
-		if ("${templateLanguage}" == "vm") {
-			AssertSelectedLabel(
-				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
-				value1 = "Velocity (.vm)");
-		}
-		else if ("${templateLanguage}" == "xsl") {
-			AssertSelectedLabel(
-				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
-				value1 = "Extensible Stylesheet Language (.xsl)");
-		}
-		else {
-			AssertSelectedLabel(
-				locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
-				value1 = "FreeMarker (.ftl)");
-		}
-	}
-
 	@summary = "Click on the add button to add a template named '${templateName}' for structure '${structureName}', input most basic fields and then save the template"
 	macro addCP {
 		LexiconEntry.gotoAdd();
@@ -127,9 +92,9 @@ definition {
 
 	@summary = "Give the roles '${roles}' permissions to view the template '${templateName}'"
 	macro addRoleViewPermissions {
-		LexiconEntry.gotoEntryMenuItem(
-			menuItem = "Permissions",
-			rowEntry = "${templateName}");
+		WebContentTemplates.gotoTemplateEllipsisItem(
+			item = "Permissions",
+			templateName = "${templateName}");
 
 		SelectFrame(locator1 = "IFrame#DIALOG");
 
@@ -144,7 +109,7 @@ definition {
 	macro deleteCP {
 		var key_ddlTemplateName = "${templateName}";
 
-		Click(locator1 = "DDMSelectTemplate#TEMPLATE_TABLE_ELLIPSIS");
+		Click(locator1 = "Icon#VERTICAL_ELLIPSIS_BUTTON");
 
 		MenuItem.clickNoError(menuItem = "Delete");
 
@@ -181,8 +146,6 @@ definition {
 
 		WebContentTemplates._inputDescription(templateDescription = "${templateDescription}");
 
-		WebContentTemplates._inputTemplateLanguage(templateLanguage = "${templateLanguage}");
-
 		if (isSet(imageSourceURL)) {
 			WebContent.addFeaturedImageFromURL(imageSourceURL = "${imageSourceURL}");
 		}
@@ -211,18 +174,14 @@ definition {
 			locator1 = "TextInput#NAME",
 			value1 = "${templateName}");
 
-		PortletEntry.changeLocale(
-			fieldName = "Name",
-			locale = "${locale}");
+		PortletEntry.changeLocale(locale = "${locale}");
 
 		Type.clickAtType(
 			locator1 = "TextInput#NAME",
 			value1 = "${localization1Name}");
 
 		if (isSet(locale2)) {
-			PortletEntry.changeLocale(
-				fieldName = "Name",
-				locale = "${locale2}");
+			PortletEntry.changeLocale(locale = "${locale2}");
 
 			Type.clickAtType(
 				locator1 = "TextInput#NAME",
@@ -232,9 +191,9 @@ definition {
 
 	@summary = "Modify template"
 	macro modifyTemplate {
-		LexiconCard.clickEllipsisItem(
-			card = "${templatePreviousName}",
-			item = "Edit");
+		WebContentTemplates.gotoTemplateEllipsisItem(
+			item = "Edit",
+			templateName = "${templatePreviousName}");
 
 		WebContentTemplates.inputTemplateAddScreenFields(
 			imageSourceURL = "${imageSourceURL}",
@@ -342,18 +301,18 @@ definition {
 			}
 
 			if ("${templateLanguage}" == "vm") {
-				AssertSelectedLabel(
-					locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
+				AssertTextEquals.assertPartialText(
+					locator1 = "DDMEditTemplate#DETAILS_LANGUAGE",
 					value1 = "Velocity (.vm)");
 			}
 			else if ("${templateLanguage}" == "xsl") {
-				AssertSelectedLabel(
-					locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
+				AssertTextEquals.assertPartialText(
+					locator1 = "DDMEditTemplate#DETAILS_LANGUAGE",
 					value1 = "Extensible Stylesheet Language (.xsl)");
 			}
 			else {
-				AssertSelectedLabel(
-					locator1 = "DDMEditTemplate#DETAILS_LANGUAGE_SELECT",
+				AssertTextEquals.assertPartialText(
+					locator1 = "DDMEditTemplate#DETAILS_LANGUAGE",
 					value1 = "FreeMarker (.ftl)");
 			}
 

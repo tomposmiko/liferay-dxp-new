@@ -14,8 +14,6 @@
 
 package com.liferay.portlet;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.portlet.LiferayHeaderResponse;
 import com.liferay.portlet.internal.HeaderRequestImpl;
 import com.liferay.portlet.internal.HeaderResponseImpl;
@@ -25,6 +23,8 @@ import javax.portlet.filter.HeaderRequestWrapper;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
  * @author Neil Griffin
  */
@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 public class HeaderResponseFactory {
 
 	public static LiferayHeaderResponse create(
-		HeaderRequest headerRequest, HttpServletResponse response) {
+		HeaderRequest headerRequest, HttpServletResponse httpServletResponse) {
 
 		while (headerRequest instanceof HeaderRequestWrapper) {
 			headerRequest = ((HeaderRequestWrapper)headerRequest).getRequest();
@@ -40,7 +40,8 @@ public class HeaderResponseFactory {
 
 		HeaderResponseImpl headerResponseImpl = new HeaderResponseImpl();
 
-		headerResponseImpl.init((HeaderRequestImpl)headerRequest, response);
+		headerResponseImpl.init(
+			(HeaderRequestImpl)headerRequest, httpServletResponse);
 
 		return headerResponseImpl;
 	}

@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.portlet;
 
-import aQute.bnd.annotation.ProviderType;
-
 import java.io.Serializable;
 
 import java.util.Set;
@@ -23,6 +21,8 @@ import java.util.function.BiConsumer;
 
 import javax.portlet.PortletURL;
 import javax.portlet.ResourceURL;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Represents a URL pointing to a portlet.
@@ -50,13 +50,10 @@ public interface LiferayPortletURL
 	public String getLifecycle();
 
 	/**
-	 * @deprecated As of Judson (7.1.x), replaced by
-	 * {@link javax.portlet.PortletParameters#getValue(String)}
-	 *
-	 * Returns the first value of the URL parameter.
-	 *
-	 * @param  name the name of the URL parameter
-	 * @return the first value of the URL parameter
+	 * @param      name the name of the URL parameter
+	 * @return     the first value of the URL parameter
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 *             javax.portlet.PortletParameters#getValue(String)}
 	 */
 	@Deprecated
 	public String getParameter(String name);
@@ -255,34 +252,29 @@ public interface LiferayPortletURL
 	public void setLifecycle(String lifecycle);
 
 	/**
-	 * @deprecated As of Judson (7.1.x), replaced by
-	 * {@link javax.portlet.MutablePortletParameters#setValue(String, String)}
-	 *
-	 * Sets the URL parameter to the value.
-	 *
-	 * @param name the name of the URL parameter
-	 * @param value the value of the URL parameter
-	 * @param append whether the new value should be appended to any existing
-	 *        values for the parameter. If <code>append</code> is
-	 *        <code>false</code> any existing values will be overwritten with
-	 *        the new value.
+	 * @param      name the name of the URL parameter
+	 * @param      value the value of the URL parameter
+	 * @param      append whether the new value should be appended to any
+	 *             existing values for the parameter. If <code>append</code> is
+	 *             <code>false</code> any existing values will be overwritten
+	 *             with the new value.
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 *             javax.portlet.MutablePortletParameters#setValue(String,
+	 *             String)}  Sets the URL parameter to the value
 	 */
 	@Deprecated
 	public void setParameter(String name, String value, boolean append);
 
 	/**
-	 * @deprecated As of Judson (7.1.x), replaced by
-	 * {@link javax.portlet.MutablePortletParameters#setValues(String,
-	 * String...)}
-	 *
-	 * Sets the URL parameter the values.
-	 *
-	 * @param name the name of the URL parameter
-	 * @param values the values of the URL parameter
-	 * @param append whether the new values should be appended to any existing
-	 *        values for the parameter. If <code>append</code> is
-	 *        <code>false</code> any existing values will be overwritten with
-	 *        the new values.
+	 * @param      name the name of the URL parameter
+	 * @param      values the values of the URL parameter
+	 * @param      append whether the new values should be appended to any
+	 *             existing values for the parameter. If <code>append</code> is
+	 *             <code>false</code> any existing values will be overwritten
+	 *             with the new values.
+	 * @deprecated As of Judson (7.1.x), replaced by {@link
+	 *             javax.portlet.MutablePortletParameters#setValues(String,
+	 *             String...)}  Sets the URL parameter the values
 	 */
 	@Deprecated
 	public void setParameter(String name, String[] values, boolean append);

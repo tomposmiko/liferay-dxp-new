@@ -86,7 +86,7 @@ public class LayoutExceptionRequestHandler {
 				themeDisplay.getRequest(), "an-unexpected-error-occurred");
 		}
 
-		JSONObject jsonObject = JSONUtil.put("error", errorMessage);
+		JSONObject jsonObject = JSONUtil.put("errorMessage", errorMessage);
 
 		JSONPortletResponseUtil.writeJSON(
 			actionRequest, actionResponse, jsonObject);

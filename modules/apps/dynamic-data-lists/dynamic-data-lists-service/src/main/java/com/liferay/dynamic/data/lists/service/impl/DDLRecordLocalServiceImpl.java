@@ -23,6 +23,7 @@ import com.liferay.dynamic.data.lists.model.DDLRecordConstants;
 import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.lists.model.DDLRecordSetConstants;
 import com.liferay.dynamic.data.lists.model.DDLRecordVersion;
+import com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService;
 import com.liferay.dynamic.data.lists.service.base.DDLRecordLocalServiceBaseImpl;
 import com.liferay.dynamic.data.lists.util.DDL;
 import com.liferay.dynamic.data.mapping.exception.StorageException;
@@ -38,6 +39,7 @@ import com.liferay.dynamic.data.mapping.util.FieldsToDDMFormValuesConverter;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -65,7 +67,6 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.io.Serializable;
 
@@ -77,6 +78,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * Provides the local service for accessing, adding, deleting, and updating
  * dynamic data lists (DDL) records.
@@ -84,6 +88,10 @@ import java.util.Objects;
  * @author Marcellus Tavares
  * @author Eduardo Lundgren
  */
+@Component(
+	property = "model.class.name=com.liferay.dynamic.data.lists.model.DDLRecord",
+	service = AopService.class
+)
 public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 	/**
@@ -511,7 +519,7 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 	public DDLRecordVersion getLatestRecordVersion(long recordId)
 		throws PortalException {
 
-		return ddlRecordVersionLocalService.getLatestRecordVersion(recordId);
+		return _ddlRecordVersionLocalService.getLatestRecordVersion(recordId);
 	}
 
 	@Override
@@ -642,7 +650,7 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 	/**
 	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService#getRecordVersion(
+	 *             DDLRecordVersionLocalService#getRecordVersion(
 	 *             long)}
 	 */
 	@Deprecated
@@ -656,7 +664,7 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 	/**
 	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService#getRecordVersion(
+	 *             DDLRecordVersionLocalService#getRecordVersion(
 	 *             long, String)}
 	 */
 	@Deprecated
@@ -670,7 +678,7 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 	/**
 	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService#getRecordVersions(
+	 *             DDLRecordVersionLocalService#getRecordVersions(
 	 *             long, int, int, OrderByComparator)}
 	 */
 	@Deprecated
@@ -686,7 +694,7 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 	/**
 	 * @deprecated As of Wilberforce (7.0.x), replaced by {@link
-	 *             com.liferay.dynamic.data.lists.service.DDLRecordVersionLocalService#getRecordVersionsCount(
+	 *             DDLRecordVersionLocalService#getRecordVersionsCount(
 	 *             long)}
 	 */
 	@Deprecated
@@ -713,7 +721,7 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 		throws PortalException {
 
 		DDLRecordVersion recordVersion =
-			ddlRecordVersionLocalService.getRecordVersion(recordId, version);
+			_ddlRecordVersionLocalService.getRecordVersion(recordId, version);
 
 		if (!recordVersion.isApproved()) {
 			return;
@@ -1464,22 +1472,22 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 		}
 	}
 
-	@ServiceReference(type = DDM.class)
+	@Reference
 	protected DDM ddm;
 
-	@ServiceReference(type = DDMFormValuesToFieldsConverter.class)
+	@Reference
 	protected DDMFormValuesToFieldsConverter ddmFormValuesToFieldsConverter;
 
-	@ServiceReference(type = DDMStructureLocalService.class)
+	@Reference
 	protected DDMStructureLocalService ddmStructureLocalService;
 
-	@ServiceReference(type = FieldsToDDMFormValuesConverter.class)
+	@Reference
 	protected FieldsToDDMFormValuesConverter fieldsToDDMFormValuesConverter;
 
-	@ServiceReference(type = IndexerRegistry.class)
+	@Reference
 	protected IndexerRegistry indexerRegistry;
 
-	@ServiceReference(type = StorageEngine.class)
+	@Reference
 	protected StorageEngine storageEngine;
 
 	private List<Serializable> _getSerializableValues(Serializable value) {
@@ -1559,5 +1567,8 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DDLRecordLocalServiceImpl.class);
+
+	@Reference
+	private DDLRecordVersionLocalService _ddlRecordVersionLocalService;
 
 }

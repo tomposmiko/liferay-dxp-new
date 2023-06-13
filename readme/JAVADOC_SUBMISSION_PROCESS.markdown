@@ -111,10 +111,10 @@ gate keeper. If you're editing Javadoc for `liferay-portal`, send your edits to
 
 **Note:** Sending reference documentation updates in a project managed in a
 Github subrepo should be sent to the subrepo, not `liferay-portal`. For example,
-although the APIO architect project is available in `liferay-portal`
-[here](https://github.com/liferay/liferay-portal/blob/master/modules/apps/apio-architect),
+although the POSHI Runner project is available in `liferay-portal`
+[here](https://github.com/liferay/liferay-portal/tree/master/modules/test/poshi-runner),
 any changes should be sent to its subrepo
-[here](https://github.com/liferay/com-liferay-apio-architect). You can check
+[here](https://github.com/liferay/com-liferay-poshi-runner). You can check
 whether a module project is managed in an external subrepo by checking if it
 contains a `.gitrepo` file. If the file exists and contains the `mode = pull`
 declaration, changes should be submitted to the subrepo.

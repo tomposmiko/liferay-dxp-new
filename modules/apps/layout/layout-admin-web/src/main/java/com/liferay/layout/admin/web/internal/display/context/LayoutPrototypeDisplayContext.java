@@ -41,11 +41,11 @@ public class LayoutPrototypeDisplayContext {
 
 	public LayoutPrototypeDisplayContext(
 		RenderRequest renderRequest, RenderResponse renderResponse,
-		HttpServletRequest request) {
+		HttpServletRequest httpServletRequest) {
 
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 	}
 
 	public Boolean getActive() {
@@ -69,7 +69,7 @@ public class LayoutPrototypeDisplayContext {
 		}
 
 		_orderByCol = ParamUtil.getString(
-			_request, "orderByCol", "create-date");
+			_httpServletRequest, "orderByCol", "create-date");
 
 		return _orderByCol;
 	}
@@ -79,7 +79,8 @@ public class LayoutPrototypeDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = ParamUtil.getString(_request, "orderByType", "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -109,8 +110,9 @@ public class LayoutPrototypeDisplayContext {
 	}
 
 	public SearchContainer getSearchContainer() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		SearchContainer searchContainer = new SearchContainer(
 			_renderRequest, _renderResponse.createRenderURL(), null,
@@ -157,16 +159,17 @@ public class LayoutPrototypeDisplayContext {
 			return _navigation;
 		}
 
-		_navigation = ParamUtil.getString(_request, "navigation", "all");
+		_navigation = ParamUtil.getString(
+			_httpServletRequest, "navigation", "all");
 
 		return _navigation;
 	}
 
+	private final HttpServletRequest _httpServletRequest;
 	private String _navigation;
 	private String _orderByCol;
 	private String _orderByType;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private final HttpServletRequest _request;
 
 }

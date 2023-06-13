@@ -40,6 +40,7 @@ import com.liferay.portal.template.TemplateContextHelper;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
@@ -52,18 +53,21 @@ import org.osgi.framework.FrameworkUtil;
  */
 public class JournalEditDDMTemplateDisplayContext {
 
-	public JournalEditDDMTemplateDisplayContext(HttpServletRequest request) {
-		_request = request;
+	public JournalEditDDMTemplateDisplayContext(
+		HttpServletRequest httpServletRequest) {
 
-		_ddmTemplateHelper = (DDMTemplateHelper)_request.getAttribute(
-			DDMTemplateHelper.class.getName());
+		_httpServletRequest = httpServletRequest;
+
+		_ddmTemplateHelper =
+			(DDMTemplateHelper)_httpServletRequest.getAttribute(
+				DDMTemplateHelper.class.getName());
 
 		_journalFileUploadsConfiguration =
-			(JournalFileUploadsConfiguration)_request.getAttribute(
+			(JournalFileUploadsConfiguration)_httpServletRequest.getAttribute(
 				JournalFileUploadsConfiguration.class.getName());
 
 		_journalWebConfiguration =
-			(JournalWebConfiguration)_request.getAttribute(
+			(JournalWebConfiguration)_httpServletRequest.getAttribute(
 				JournalWebConfiguration.class.getName());
 	}
 
@@ -72,7 +76,8 @@ public class JournalEditDDMTemplateDisplayContext {
 	}
 
 	public String getAutocompleteJSON() throws Exception {
-		return _ddmTemplateHelper.getAutocompleteJSON(_request, getLanguage());
+		return _ddmTemplateHelper.getAutocompleteJSON(
+			_httpServletRequest, getLanguage());
 	}
 
 	public long getClassPK() {
@@ -80,7 +85,8 @@ public class JournalEditDDMTemplateDisplayContext {
 			return _classPK;
 		}
 
-		_classPK = BeanParamUtil.getLong(getDDMTemplate(), _request, "classPK");
+		_classPK = BeanParamUtil.getLong(
+			getDDMTemplate(), _httpServletRequest, "classPK");
 
 		return _classPK;
 	}
@@ -123,9 +129,22 @@ public class JournalEditDDMTemplateDisplayContext {
 			return _ddmTemplateId;
 		}
 
-		_ddmTemplateId = ParamUtil.getLong(_request, "ddmTemplateId");
+		_ddmTemplateId = ParamUtil.getLong(
+			_httpServletRequest, "ddmTemplateId");
 
 		return _ddmTemplateId;
+	}
+
+	public String getEditorMode() {
+		if (Objects.equals(getLanguage(), "ftl")) {
+			return "ftl";
+		}
+
+		if (Objects.equals(getLanguage(), "xsl")) {
+			return "xml";
+		}
+
+		return "velocity";
 	}
 
 	public long getGroupId() {
@@ -133,11 +152,12 @@ public class JournalEditDDMTemplateDisplayContext {
 			return _groupId;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		_groupId = BeanParamUtil.getLong(
-			getDDMTemplate(), _request, "groupId",
+			getDDMTemplate(), _httpServletRequest, "groupId",
 			themeDisplay.getScopeGroupId());
 
 		return _groupId;
@@ -149,7 +169,7 @@ public class JournalEditDDMTemplateDisplayContext {
 		}
 
 		_language = BeanParamUtil.getString(
-			getDDMTemplate(), _request, "language",
+			getDDMTemplate(), _httpServletRequest, "language",
 			TemplateConstants.LANG_TYPE_FTL);
 
 		return _language;
@@ -160,7 +180,7 @@ public class JournalEditDDMTemplateDisplayContext {
 			return _redirect;
 		}
 
-		_redirect = ParamUtil.getString(_request, "redirect");
+		_redirect = ParamUtil.getString(_httpServletRequest, "redirect");
 
 		return _redirect;
 	}
@@ -171,10 +191,11 @@ public class JournalEditDDMTemplateDisplayContext {
 		}
 
 		_language = BeanParamUtil.getString(
-			getDDMTemplate(), _request, "language",
+			getDDMTemplate(), _httpServletRequest, "language",
 			TemplateConstants.LANG_TYPE_FTL);
 
-		_script = BeanParamUtil.getString(getDDMTemplate(), _request, "script");
+		_script = BeanParamUtil.getString(
+			getDDMTemplate(), _httpServletRequest, "script");
 
 		if (Validator.isNull(_script)) {
 			TemplateHandler templateHandler =
@@ -184,7 +205,8 @@ public class JournalEditDDMTemplateDisplayContext {
 			_script = templateHandler.getTemplatesHelpContent(_language);
 		}
 
-		String scriptContent = ParamUtil.getString(_request, "scriptContent");
+		String scriptContent = ParamUtil.getString(
+			_httpServletRequest, "scriptContent");
 
 		if (Validator.isNotNull(scriptContent)) {
 			_script = scriptContent;
@@ -206,7 +228,8 @@ public class JournalEditDDMTemplateDisplayContext {
 			return _smallImageSource;
 		}
 
-		_smallImageSource = ParamUtil.getString(_request, "smallImageSource");
+		_smallImageSource = ParamUtil.getString(
+			_httpServletRequest, "smallImageSource");
 
 		if (Validator.isNotNull(_smallImageSource)) {
 			return _smallImageSource;
@@ -228,8 +251,9 @@ public class JournalEditDDMTemplateDisplayContext {
 	}
 
 	public ResourceBundle getTemplateHandlerResourceBundle() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		TemplateHandler templateHandler =
 			TemplateHandlerRegistryUtil.getTemplateHandler(
@@ -255,8 +279,9 @@ public class JournalEditDDMTemplateDisplayContext {
 	public Collection<TemplateVariableGroup> getTemplateVariableGroups()
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		Map<String, TemplateVariableGroup> templateVariableGroups =
 			TemplateContextHelper.getTemplateVariableGroups(
@@ -267,8 +292,9 @@ public class JournalEditDDMTemplateDisplayContext {
 	}
 
 	public String getTitle() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		DDMStructure ddmStructure = getDDMStructure();
 
@@ -282,7 +308,7 @@ public class JournalEditDDMTemplateDisplayContext {
 
 		if (ddmStructure != null) {
 			return LanguageUtil.format(
-				_request, "new-template-for-structure-x",
+				_httpServletRequest, "new-template-for-structure-x",
 				ddmStructure.getName(themeDisplay.getLocale()), false);
 		}
 
@@ -290,7 +316,7 @@ public class JournalEditDDMTemplateDisplayContext {
 			return ddmTemplate.getName(themeDisplay.getLocale());
 		}
 
-		return LanguageUtil.get(_request, "new-template");
+		return LanguageUtil.get(_httpServletRequest, "new-template");
 	}
 
 	public String[] imageExtensions() {
@@ -307,7 +333,7 @@ public class JournalEditDDMTemplateDisplayContext {
 		}
 
 		_cacheable = BeanParamUtil.getBoolean(
-			getDDMTemplate(), _request, "cacheable", true);
+			getDDMTemplate(), _httpServletRequest, "cacheable", true);
 
 		return _cacheable;
 	}
@@ -318,7 +344,7 @@ public class JournalEditDDMTemplateDisplayContext {
 		}
 
 		_smallImage = BeanParamUtil.getBoolean(
-			getDDMTemplate(), _request, "smallImage");
+			getDDMTemplate(), _httpServletRequest, "smallImage");
 
 		return _smallImage;
 	}
@@ -334,12 +360,12 @@ public class JournalEditDDMTemplateDisplayContext {
 	private final DDMTemplateHelper _ddmTemplateHelper;
 	private Long _ddmTemplateId;
 	private Long _groupId;
+	private final HttpServletRequest _httpServletRequest;
 	private final JournalFileUploadsConfiguration
 		_journalFileUploadsConfiguration;
 	private final JournalWebConfiguration _journalWebConfiguration;
 	private String _language;
 	private String _redirect;
-	private final HttpServletRequest _request;
 	private String _script;
 	private Boolean _smallImage;
 	private String _smallImageSource;

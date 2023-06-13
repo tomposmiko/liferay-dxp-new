@@ -16,9 +16,12 @@ class TestComponent extends Component {
 		initialValue: ''
 	}
 
-	state = {
-		value: this.props.initialValue
-	};
+	constructor(props) {
+		super(props);
+		this.state = {
+			value: props.initialValue
+		};
+	}
 
 	_handleChange = value => this.setState({value});
 

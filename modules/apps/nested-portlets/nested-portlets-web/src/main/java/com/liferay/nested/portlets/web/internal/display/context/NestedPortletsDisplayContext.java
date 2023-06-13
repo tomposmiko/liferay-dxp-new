@@ -38,13 +38,14 @@ import javax.servlet.http.HttpServletRequestWrapper;
  */
 public class NestedPortletsDisplayContext {
 
-	public NestedPortletsDisplayContext(HttpServletRequest request)
+	public NestedPortletsDisplayContext(HttpServletRequest httpServletRequest)
 		throws ConfigurationException {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		PortletDisplay portletDisplay = themeDisplay.getPortletDisplay();
 
@@ -57,22 +58,25 @@ public class NestedPortletsDisplayContext {
 	 * @see com.liferay.portal.util.PortalImpl#getOriginalServletRequest
 	 */
 	public HttpServletRequest getLastForwardRequest() {
-		HttpServletRequest currentRequest = _request;
+		HttpServletRequest currentHttpServletRequest = _httpServletRequest;
 		HttpServletRequestWrapper currentRequestWrapper = null;
-		HttpServletRequest originalRequest = null;
-		HttpServletRequest nextRequest = null;
+		HttpServletRequest originalHttpServletRequest = null;
+		HttpServletRequest nextHttpServletRequest = null;
 
-		while (currentRequest instanceof HttpServletRequestWrapper) {
-			if (currentRequest instanceof PersistentHttpServletRequestWrapper) {
+		while (currentHttpServletRequest instanceof HttpServletRequestWrapper) {
+			if (currentHttpServletRequest instanceof
+					PersistentHttpServletRequestWrapper) {
+
 				PersistentHttpServletRequestWrapper
 					persistentHttpServletRequestWrapper =
-						(PersistentHttpServletRequestWrapper)currentRequest;
+						(PersistentHttpServletRequestWrapper)
+							currentHttpServletRequest;
 
 				persistentHttpServletRequestWrapper =
 					persistentHttpServletRequestWrapper.clone();
 
-				if (originalRequest == null) {
-					originalRequest =
+				if (originalHttpServletRequest == null) {
+					originalHttpServletRequest =
 						persistentHttpServletRequestWrapper.clone();
 				}
 
@@ -85,32 +89,33 @@ public class NestedPortletsDisplayContext {
 			}
 
 			HttpServletRequestWrapper httpServletRequestWrapper =
-				(HttpServletRequestWrapper)currentRequest;
+				(HttpServletRequestWrapper)currentHttpServletRequest;
 
-			nextRequest =
+			nextHttpServletRequest =
 				(HttpServletRequest)httpServletRequestWrapper.getRequest();
 
-			if ((currentRequest.getDispatcherType() ==
+			if ((currentHttpServletRequest.getDispatcherType() ==
 					DispatcherType.FORWARD) &&
-				(nextRequest.getDispatcherType() == DispatcherType.REQUEST)) {
+				(nextHttpServletRequest.getDispatcherType() ==
+					DispatcherType.REQUEST)) {
 
 				break;
 			}
 
-			currentRequest = nextRequest;
+			currentHttpServletRequest = nextHttpServletRequest;
 		}
 
 		if ((currentRequestWrapper != null) &&
-			!_isVirtualHostRequest(nextRequest)) {
+			!_isVirtualHostRequest(nextHttpServletRequest)) {
 
-			currentRequestWrapper.setRequest(currentRequest);
+			currentRequestWrapper.setRequest(currentHttpServletRequest);
 		}
 
-		if (originalRequest != null) {
-			return originalRequest;
+		if (originalHttpServletRequest != null) {
+			return originalHttpServletRequest;
 		}
 
-		return currentRequest;
+		return currentHttpServletRequest;
 	}
 
 	public String getLayoutTemplateId() {
@@ -125,8 +130,9 @@ public class NestedPortletsDisplayContext {
 	}
 
 	public List<LayoutTemplate> getLayoutTemplates() {
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		List<LayoutTemplate> layoutTemplates =
 			LayoutTemplateLocalServiceUtil.getLayoutTemplates(
@@ -150,8 +156,10 @@ public class NestedPortletsDisplayContext {
 				layoutTemplatesUnsupported());
 	}
 
-	private boolean _isVirtualHostRequest(HttpServletRequest request) {
-		LayoutSet layoutSet = (LayoutSet)request.getAttribute(
+	private boolean _isVirtualHostRequest(
+		HttpServletRequest httpServletRequest) {
+
+		LayoutSet layoutSet = (LayoutSet)httpServletRequest.getAttribute(
 			WebKeys.VIRTUAL_HOST_LAYOUT_SET);
 
 		if ((layoutSet != null) &&
@@ -163,9 +171,9 @@ public class NestedPortletsDisplayContext {
 		return false;
 	}
 
+	private final HttpServletRequest _httpServletRequest;
 	private String _layoutTemplateId;
 	private final NestedPortletsPortletInstanceConfiguration
 		_nestedPortletsPortletInstanceConfiguration;
-	private final HttpServletRequest _request;
 
 }

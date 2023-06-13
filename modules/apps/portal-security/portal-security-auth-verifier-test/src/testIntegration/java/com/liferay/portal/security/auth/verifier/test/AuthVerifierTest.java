@@ -20,6 +20,8 @@ import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.test.log.CaptureAppender;
+import com.liferay.portal.test.log.Log4JLoggerTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.IOException;
@@ -37,6 +39,8 @@ import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Level;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -200,7 +204,11 @@ public class AuthVerifierTest {
 			"http://localhost:8080/o/auth-verifier-guest-allowed-false-test" +
 				"/guestAllowed");
 
-		try (InputStream inputStream = url.openStream()) {
+		try (CaptureAppender captureAppender =
+				Log4JLoggerTestUtil.configureLog4JLogger(
+					"portal_web.docroot.errors.code_jsp", Level.WARN);
+			InputStream inputStream = url.openStream()) {
+
 			Assert.fail();
 		}
 		catch (IOException ioe) {
@@ -270,10 +278,11 @@ public class AuthVerifierTest {
 
 		@Override
 		protected void doGet(
-				HttpServletRequest request, HttpServletResponse response)
+				HttpServletRequest httpServletRequest,
+				HttpServletResponse httpServletResponse)
 			throws IOException {
 
-			PrintWriter printWriter = response.getWriter();
+			PrintWriter printWriter = httpServletResponse.getWriter();
 
 			printWriter.write("guest-allowed");
 		}
@@ -284,10 +293,11 @@ public class AuthVerifierTest {
 
 		@Override
 		protected void doGet(
-				HttpServletRequest request, HttpServletResponse response)
+				HttpServletRequest httpServletRequest,
+				HttpServletResponse httpServletResponse)
 			throws IOException {
 
-			PrintWriter printWriter = response.getWriter();
+			PrintWriter printWriter = httpServletResponse.getWriter();
 
 			printWriter.write(
 				String.valueOf(AccessControlThreadLocal.isRemoteAccess()));
@@ -299,12 +309,13 @@ public class AuthVerifierTest {
 
 		@Override
 		protected void doGet(
-				HttpServletRequest request, HttpServletResponse response)
+				HttpServletRequest httpServletRequest,
+				HttpServletResponse httpServletResponse)
 			throws IOException {
 
-			PrintWriter printWriter = response.getWriter();
+			PrintWriter printWriter = httpServletResponse.getWriter();
 
-			String remoteUser = request.getRemoteUser();
+			String remoteUser = httpServletRequest.getRemoteUser();
 
 			if (Validator.isNull(remoteUser)) {
 				printWriter.write("no-remote-user");

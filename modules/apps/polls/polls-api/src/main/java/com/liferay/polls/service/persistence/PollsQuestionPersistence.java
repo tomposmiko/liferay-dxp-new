@@ -14,11 +14,11 @@
 
 package com.liferay.polls.service.persistence;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.polls.exception.NoSuchQuestionException;
 import com.liferay.polls.model.PollsQuestion;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The persistence interface for the polls question service.

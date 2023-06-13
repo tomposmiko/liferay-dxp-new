@@ -40,14 +40,18 @@ public class ModelPermissionsFactory {
 
 	public static final String MODEL_PERMISSIONS_PREFIX = "modelPermissions";
 
-	public static ModelPermissions create(HttpServletRequest request) {
-		return _createModelPermissions(request.getParameterMap(), null);
+	public static ModelPermissions create(
+		HttpServletRequest httpServletRequest) {
+
+		return _createModelPermissions(
+			httpServletRequest.getParameterMap(), null);
 	}
 
 	public static ModelPermissions create(
-		HttpServletRequest request, String className) {
+		HttpServletRequest httpServletRequest, String className) {
 
-		return _createModelPermissions(request.getParameterMap(), className);
+		return _createModelPermissions(
+			httpServletRequest.getParameterMap(), className);
 	}
 
 	public static ModelPermissions create(
@@ -132,16 +136,14 @@ public class ModelPermissionsFactory {
 
 		modelPermissions.addRolePermissions(
 			RoleConstants.PLACEHOLDER_DEFAULT_GROUP_ROLE,
-			modelResourceGroupDefaultActions.toArray(
-				new String[modelResourceGroupDefaultActions.size()]));
+			modelResourceGroupDefaultActions.toArray(new String[0]));
 
 		List<String> modelResourceGuestDefaultActions =
 			ResourceActionsUtil.getModelResourceGuestDefaultActions(className);
 
 		modelPermissions.addRolePermissions(
 			RoleConstants.GUEST,
-			modelResourceGuestDefaultActions.toArray(
-				new String[modelResourceGuestDefaultActions.size()]));
+			modelResourceGuestDefaultActions.toArray(new String[0]));
 
 		return modelPermissions;
 	}

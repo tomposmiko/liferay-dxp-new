@@ -1,6 +1,6 @@
 Bundle-Name: Liferay Dynamic Data Lists Service
 Bundle-SymbolicName: com.liferay.dynamic.data.lists.service
-Bundle-Version: 3.0.5
+Bundle-Version: 3.0.7
 Import-Package:\
 	!org.apache.poi.hssf.usermodel.*,\
 	!org.apache.poi.ss.usermodel.*,\
@@ -8,4 +8,5 @@ Import-Package:\
 	*
 Liferay-Require-SchemaVersion: 2.1.0
 Liferay-Service: true
+-dsannotations-options: inherit
 -includeresource: @poi-[0-9]*.jar

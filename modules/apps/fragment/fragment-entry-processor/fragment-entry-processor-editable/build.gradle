@@ -3,7 +3,8 @@ dependencies {
 
 	compileOnly group: "com.liferay", name: "com.liferay.asset.api", version: "2.1.0"
 	compileOnly group: "com.liferay", name: "com.liferay.asset.info.display.api", version: "1.0.0"
-	compileOnly group: "com.liferay", name: "com.liferay.fragment.api", version: "2.3.0"
+	compileOnly group: "com.liferay", name: "com.liferay.fragment.api", version: "2.4.0"
+	compileOnly group: "com.liferay", name: "com.liferay.fragment.entry.processor.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.info.api", version: "1.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.petra.string", version: "3.0.0"
 	compileOnly group: "com.liferay.portal", name: "com.liferay.portal.kernel", version: "4.1.0"

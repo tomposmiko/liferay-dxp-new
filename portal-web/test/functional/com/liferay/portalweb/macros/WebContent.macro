@@ -143,7 +143,9 @@ definition {
 	}
 
 	macro addLocalizedPGViaWCD {
-		WebContentNavigator.gotoAddPGViaWCD(structureName = "${localizedBasicWebContent}");
+		WebContentNavigator.gotoAddPGViaWCD(
+			portletNameTranslation = "${portletNameTranslation}",
+			structureName = "${localizedBasicWebContent}");
 
 		WebContent.addCP(
 			webContentContent = "${webContentContent}",
@@ -214,6 +216,12 @@ definition {
 		WebContent.addCP(
 			webContentContent = "${webContentContent}",
 			webContentTitle = "${webContentTitle}");
+
+		if (isSet(templateName)) {
+			WebContent.selectTemplateCP(
+				structureName = "Basic Web Content",
+				templateName = "${templateName}");
+		}
 
 		Button.clickPublish();
 	}
@@ -1290,9 +1298,7 @@ definition {
 	}
 
 	macro viewAvailableLanguagesPGViaWCD {
-		Click(
-			key_fieldName = "${fieldName}",
-			locator1 = "Button#LOCALIZATION");
+		Click(locator1 = "Button#LOCALIZATION_GENERIC");
 
 		AssertElementPresent(
 			key_locale = StringUtil.replace("${locale1}", "-", "_"),
@@ -1834,9 +1840,7 @@ definition {
 			fieldName = "TextBox",
 			fieldValue = "${webContentTextBox}");
 
-		PortletEntry.changeLocale(
-			fieldName = "Title",
-			locale = "es-ES");
+		PortletEntry.changeLocale(locale = "es-ES");
 
 		AssertTextEquals(
 			locator1 = "TextInput#TITLE",

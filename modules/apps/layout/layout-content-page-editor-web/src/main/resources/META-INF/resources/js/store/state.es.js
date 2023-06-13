@@ -285,7 +285,7 @@ const INITIAL_STATE = {
 	 * List of layoutData related to segmentsExperiences
 	 * @default ''
 	 * @review
-	 * @type {!array}
+	 * @type {!Array}
 	 */
 	layoutDataList: Config
 		.arrayOf(
@@ -501,6 +501,16 @@ const INITIAL_STATE = {
 				structure: []
 			}
 		),
+
+	/**
+	 * Current layout look&feel url
+	 * @default undefined
+	 * @review
+	 * @type {string}
+	 */
+	lookAndFeelURL: Config
+		.string()
+		.value(''),
 
 	/**
 	 * @default []
@@ -766,37 +776,6 @@ const INITIAL_STATE = {
 			Config.string()
 		)
 		.value([]),
-
-	/**
-	 * Translation status
-	 * @default {languageValues: [], translationKeys: []}
-	 * @review
-	 * @type {{languageValues: object[], translationKeys: string[]}}
-	 */
-	translationStatus: Config
-		.shapeOf(
-			{
-				languageValues: Config.arrayOf(
-					Config.shapeOf(
-						{
-							languageId: Config.string(),
-							values: Config.arrayOf(
-								Config.string()
-							)
-						}
-					)
-				),
-				translationKeys: Config.arrayOf(
-					Config.string()
-				)
-			}
-		)
-		.value(
-			{
-				languageValues: [],
-				translationKeys: []
-			}
-		),
 
 	/**
 	 * URL for updating layout data.

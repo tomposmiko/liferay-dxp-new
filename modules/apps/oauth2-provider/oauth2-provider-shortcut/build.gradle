@@ -1,5 +1,5 @@
 dependencies {
-	compileOnly group: "com.liferay", name: "com.liferay.oauth2.provider.api", version: "2.0.0"
+	compileOnly group: "com.liferay", name: "com.liferay.oauth2.provider.api", version: "2.1.0"
 	compileOnly group: "com.liferay", name: "com.liferay.oauth2.provider.scope.api", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.oauth2.provider.scope.liferay.api", version: "2.0.0"
 	compileOnly group: "com.liferay", name: "com.liferay.oauth2.provider.scope.spi", version: "2.0.0"

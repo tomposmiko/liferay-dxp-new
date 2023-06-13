@@ -69,7 +69,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 
 		Map<String, Object> parameters = new HashMap<>();
 
-		HttpServletRequest request =
+		HttpServletRequest httpServletRequest =
 			ddmFormFieldRenderingContext.getHttpServletRequest();
 
 		if (ddmFormFieldRenderingContext.isReadOnly() &&
@@ -83,7 +83,8 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 
 				parameters.put("fileEntryTitle", getFileEntryTitle(fileEntry));
 				parameters.put(
-					"fileEntryURL", getFileEntryURL(request, fileEntry));
+					"fileEntryURL",
+					getFileEntryURL(httpServletRequest, fileEntry));
 			}
 		}
 
@@ -91,8 +92,10 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 			"groupId", ddmFormFieldRenderingContext.getProperty("groupId"));
 
 		parameters.put(
-			"itemSelectorAuthToken", getItemSelectorAuthToken(request));
-		parameters.put("lexiconIconsPath", getLexiconIconsPath(request));
+			"itemSelectorAuthToken",
+			getItemSelectorAuthToken(httpServletRequest));
+		parameters.put(
+			"lexiconIconsPath", getLexiconIconsPath(httpServletRequest));
 
 		Map<String, String> stringsMap = new HashMap<>();
 
@@ -153,7 +156,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 	}
 
 	protected String getFileEntryURL(
-		HttpServletRequest request, FileEntry fileEntry) {
+		HttpServletRequest httpServletRequest, FileEntry fileEntry) {
 
 		if (fileEntry == null) {
 			return StringPool.BLANK;
@@ -161,8 +164,9 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 
 		StringBundler sb = new StringBundler(9);
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		sb.append(themeDisplay.getPathContext());
 
@@ -179,9 +183,12 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		return html.escape(sb.toString());
 	}
 
-	protected String getItemSelectorAuthToken(HttpServletRequest request) {
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+	protected String getItemSelectorAuthToken(
+		HttpServletRequest httpServletRequest) {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		if (themeDisplay == null) {
 			return StringPool.BLANK;
@@ -189,7 +196,7 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 
 		try {
 			return AuthTokenUtil.getToken(
-				request,
+				httpServletRequest,
 				portal.getControlPanelPlid(themeDisplay.getCompanyId()),
 				PortletKeys.ITEM_SELECTOR);
 		}
@@ -200,9 +207,12 @@ public class DocumentLibraryDDMFormFieldTemplateContextContributor
 		return StringPool.BLANK;
 	}
 
-	protected String getLexiconIconsPath(HttpServletRequest request) {
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+	protected String getLexiconIconsPath(
+		HttpServletRequest httpServletRequest) {
+
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		StringBundler sb = new StringBundler(3);
 

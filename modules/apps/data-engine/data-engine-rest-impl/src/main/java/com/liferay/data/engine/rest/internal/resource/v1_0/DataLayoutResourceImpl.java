@@ -19,11 +19,11 @@ import com.liferay.data.engine.rest.dto.v1_0.DataLayoutPermission;
 import com.liferay.data.engine.rest.internal.constants.DataActionKeys;
 import com.liferay.data.engine.rest.internal.constants.DataLayoutConstants;
 import com.liferay.data.engine.rest.internal.dto.v1_0.util.DataLayoutUtil;
-import com.liferay.data.engine.rest.internal.dto.v1_0.util.LocalizedValueUtil;
 import com.liferay.data.engine.rest.internal.model.InternalDataLayout;
 import com.liferay.data.engine.rest.internal.model.InternalDataRecordCollection;
 import com.liferay.data.engine.rest.internal.resource.v1_0.util.DataEnginePermissionUtil;
 import com.liferay.data.engine.rest.resource.v1_0.DataLayoutResource;
+import com.liferay.data.engine.spi.field.type.util.LocalizedValueUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMStructureLayout;
 import com.liferay.dynamic.data.mapping.model.DDMStructureVersion;
@@ -39,7 +39,7 @@ import com.liferay.portal.kernel.service.ResourceLocalService;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
@@ -118,7 +118,7 @@ public class DataLayoutResourceImpl extends BaseDataLayoutResourceImpl {
 			Long dataDefinitionId, DataLayout dataLayout)
 		throws Exception {
 
-		if (ArrayUtil.isEmpty(dataLayout.getName())) {
+		if (MapUtil.isEmpty(dataLayout.getName())) {
 			throw new Exception("Name is required");
 		}
 
@@ -135,8 +135,8 @@ public class DataLayoutResourceImpl extends BaseDataLayoutResourceImpl {
 			_ddmStructureLayoutLocalService.addStructureLayout(
 				PrincipalThreadLocal.getUserId(), ddmStructure.getGroupId(),
 				_getDDMStructureVersionId(dataDefinitionId),
-				LocalizedValueUtil.toLocalizationMap(dataLayout.getName()),
-				LocalizedValueUtil.toLocalizationMap(
+				LocalizedValueUtil.toLocaleStringMap(dataLayout.getName()),
+				LocalizedValueUtil.toLocaleStringMap(
 					dataLayout.getDescription()),
 				DataLayoutUtil.toJSON(dataLayout), serviceContext);
 
@@ -220,7 +220,7 @@ public class DataLayoutResourceImpl extends BaseDataLayoutResourceImpl {
 	public DataLayout putDataLayout(Long dataLayoutId, DataLayout dataLayout)
 		throws Exception {
 
-		if (ArrayUtil.isEmpty(dataLayout.getName())) {
+		if (MapUtil.isEmpty(dataLayout.getName())) {
 			throw new Exception("Name is required");
 		}
 
@@ -232,8 +232,8 @@ public class DataLayoutResourceImpl extends BaseDataLayoutResourceImpl {
 			_ddmStructureLayoutLocalService.updateStructureLayout(
 				dataLayoutId,
 				_getDDMStructureVersionId(dataLayout.getDataDefinitionId()),
-				LocalizedValueUtil.toLocalizationMap(dataLayout.getName()),
-				LocalizedValueUtil.toLocalizationMap(
+				LocalizedValueUtil.toLocaleStringMap(dataLayout.getName()),
+				LocalizedValueUtil.toLocaleStringMap(
 					dataLayout.getDescription()),
 				DataLayoutUtil.toJSON(dataLayout), new ServiceContext()));
 	}
@@ -281,11 +281,11 @@ public class DataLayoutResourceImpl extends BaseDataLayoutResourceImpl {
 		dataLayout.setDataDefinitionId(_getDDMStructureId(ddmStructureLayout));
 		dataLayout.setId(ddmStructureLayout.getStructureLayoutId());
 		dataLayout.setDescription(
-			LocalizedValueUtil.toLocalizedValues(
+			LocalizedValueUtil.toStringObjectMap(
 				ddmStructureLayout.getDescriptionMap()));
 		dataLayout.setDateModified(ddmStructureLayout.getModifiedDate());
 		dataLayout.setName(
-			LocalizedValueUtil.toLocalizedValues(
+			LocalizedValueUtil.toStringObjectMap(
 				ddmStructureLayout.getNameMap()));
 		dataLayout.setUserId(ddmStructureLayout.getUserId());
 

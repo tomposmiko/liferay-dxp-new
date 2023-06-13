@@ -124,7 +124,7 @@ public class SegmentResourceTest extends BaseSegmentResourceTestCase {
 	}
 
 	@Override
-	protected Segment randomSegment() {
+	protected Segment randomSegment() throws Exception {
 		Segment segment = super.randomSegment();
 
 		segment.setActive(true);

@@ -158,9 +158,9 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 	}
 
 	protected String getCompleteRedirectURL(
-		HttpServletRequest request, String redirect) {
+		HttpServletRequest httpServletRequest, String redirect) {
 
-		HttpSession session = request.getSession();
+		HttpSession session = httpServletRequest.getSession();
 
 		Boolean httpsInitial = (Boolean)session.getAttribute(
 			WebKeys.HTTPS_INITIAL);
@@ -171,10 +171,10 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 			!PropsValues.SESSION_ENABLE_PHISHING_PROTECTION &&
 			(httpsInitial != null) && !httpsInitial.booleanValue()) {
 
-			portalURL = _portal.getPortalURL(request, false);
+			portalURL = _portal.getPortalURL(httpServletRequest, false);
 		}
 		else {
-			portalURL = _portal.getPortalURL(request);
+			portalURL = _portal.getPortalURL(httpServletRequest);
 		}
 
 		return portalURL.concat(redirect);
@@ -185,12 +185,13 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 			ActionResponse actionResponse)
 		throws Exception {
 
-		HttpServletRequest request = _portal.getOriginalServletRequest(
-			_portal.getHttpServletRequest(actionRequest));
+		HttpServletRequest httpServletRequest =
+			_portal.getOriginalServletRequest(
+				_portal.getHttpServletRequest(actionRequest));
 
 		if (!themeDisplay.isSignedIn()) {
-			HttpServletResponse response = _portal.getHttpServletResponse(
-				actionResponse);
+			HttpServletResponse httpServletResponse =
+				_portal.getHttpServletResponse(actionResponse);
 
 			String login = ParamUtil.getString(actionRequest, "login");
 			String password = actionRequest.getParameter("password");
@@ -206,7 +207,8 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 			String authType = portletPreferences.getValue("authType", null);
 
 			_authenticatedSessionManager.login(
-				request, response, login, password, rememberMe, authType);
+				httpServletRequest, httpServletResponse, login, password,
+				rememberMe, authType);
 		}
 
 		String redirect = ParamUtil.getString(actionRequest, "redirect");
@@ -236,7 +238,7 @@ public class LoginMVCActionCommand extends BaseMVCActionCommand {
 			if (Validator.isNotNull(redirect) &&
 				!redirect.startsWith(Http.HTTP)) {
 
-				redirect = getCompleteRedirectURL(request, redirect);
+				redirect = getCompleteRedirectURL(httpServletRequest, redirect);
 			}
 		}
 

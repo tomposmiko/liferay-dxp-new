@@ -24,6 +24,8 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.taglib.include.PageInclude;
 import com.liferay.taglib.ui.IconTag;
 
+import java.util.Objects;
+
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletException;
 import javax.portlet.PortletMode;
@@ -50,31 +52,34 @@ public class SignInNavigationPrePageInclude implements PageInclude {
 
 	@Override
 	public void include(PageContext pageContext) throws JspException {
-		HttpServletRequest request =
+		HttpServletRequest httpServletRequest =
 			(HttpServletRequest)pageContext.getRequest();
 
-		String mvcRenderCommandName = request.getParameter(
+		String mvcRenderCommandName = httpServletRequest.getParameter(
 			"mvcRenderCommandName");
 
 		if (Validator.isNull(mvcRenderCommandName) ||
-			"/login/login".equals(mvcRenderCommandName)) {
+			Objects.equals(mvcRenderCommandName, "/login/login")) {
 
 			return;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		String signInURL = themeDisplay.getURLSignIn();
 
-		PortletConfig portletConfig = (PortletConfig)request.getAttribute(
-			JavaConstants.JAVAX_PORTLET_CONFIG);
+		PortletConfig portletConfig =
+			(PortletConfig)httpServletRequest.getAttribute(
+				JavaConstants.JAVAX_PORTLET_CONFIG);
 
 		String portletName = portletConfig.getPortletName();
 
 		if (portletName.equals(PortletKeys.FAST_LOGIN)) {
 			PortletURL fastLoginURL = PortletURLFactoryUtil.create(
-				request, PortletKeys.FAST_LOGIN, PortletRequest.RENDER_PHASE);
+				httpServletRequest, PortletKeys.FAST_LOGIN,
+				PortletRequest.RENDER_PHASE);
 
 			fastLoginURL.setParameter("saveLastPath", Boolean.FALSE.toString());
 			fastLoginURL.setParameter("mvcRenderCommandName", "/login/login");

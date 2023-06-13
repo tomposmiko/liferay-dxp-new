@@ -28,12 +28,12 @@ import javax.servlet.http.HttpSession;
  */
 public class PasswordRetriever {
 
-	public PasswordRetriever(HttpServletRequest request) {
-		if (request == null) {
+	public PasswordRetriever(HttpServletRequest httpServletRequest) {
+		if (httpServletRequest == null) {
 			throw new IllegalStateException("Request is null");
 		}
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 	}
 
 	public String getPassword(long accountId) throws PortalException {
@@ -43,19 +43,19 @@ public class PasswordRetriever {
 			return account.getPasswordDecrypted();
 		}
 
-		HttpSession session = _request.getSession();
+		HttpSession session = _httpServletRequest.getSession();
 
 		return (String)session.getAttribute(encodeKey(accountId));
 	}
 
 	public void removePassword(long accountId) {
-		HttpSession session = _request.getSession();
+		HttpSession session = _httpServletRequest.getSession();
 
 		session.removeAttribute(encodeKey(accountId));
 	}
 
 	public void setPassword(long accountId, String password) {
-		HttpSession session = _request.getSession();
+		HttpSession session = _httpServletRequest.getSession();
 
 		session.setAttribute(encodeKey(accountId), password);
 	}
@@ -69,6 +69,6 @@ public class PasswordRetriever {
 		);
 	}
 
-	private final HttpServletRequest _request;
+	private final HttpServletRequest _httpServletRequest;
 
 }

@@ -16,6 +16,13 @@ describe(
 			() => {
 				const {asFragment} = render(
 					<SegmentEdit
+						availableLocales={{
+							'en_US': ''
+						}}
+						defaultLanguageId="en_US"
+						initialSegmentName={{
+							'en_US': 'Segment title'
+						}}
 						locale="en_US"
 						redirect="/test-url"
 					/>
@@ -32,6 +39,13 @@ describe(
 
 				const {getByTestId} = render(
 					<SegmentEdit
+						availableLocales={{
+							'en_US': ''
+						}}
+						defaultLanguageId="en_US"
+						initialSegmentName={{
+							'en_US': 'Segment title'
+						}}
 						locale="en_US"
 						redirect="/test-url"
 						source={name}
@@ -51,6 +65,13 @@ describe(
 
 				const {getByTestId} = render(
 					<SegmentEdit
+						availableLocales={{
+							'en_US': ''
+						}}
+						defaultLanguageId="en_US"
+						initialSegmentName={{
+							'en_US': 'Segment title'
+						}}
 						locale="en_US"
 						redirect="/test-url"
 						source={name}

@@ -245,6 +245,18 @@ definition {
 				key_position = "1",
 				locator1 = "Fragment#FRAGMENT_IMAGE");
 		}
+
+		task ("Navigate to the content page's 'Edit Mode'") {
+			ContentPages.clickPencil();
+		}
+
+		task ("Assert the Image fragment's image has persisted") {
+			AssertVisible(
+				key_fragmentClass = "image",
+				key_image = "Document_1.png",
+				key_position = "1",
+				locator1 = "Fragment#PAGE_EDITOR_FRAGMENT_IMAGE");
+		}
 	}
 
 	@description = "This is a test for LPS-95042. Liferay should come out of the box with fragments."
@@ -735,7 +747,7 @@ definition {
 
 			AssertTextEquals(
 				locator1 = "PageEditor#CONTENT_PAGE_DISABLED_POPOVER",
-				value1 = "This area is defined by the theme. To change theme settings go to page configuration.");
+				value1 = "This area is defined by the theme. To change theme settings go to the Look and Feel configuration in the sidebar.");
 		}
 
 		task ("Click away from the header so the popover will disappear") {
@@ -751,7 +763,7 @@ definition {
 
 			AssertTextEquals(
 				locator1 = "PageEditor#CONTENT_PAGE_DISABLED_POPOVER",
-				value1 = "This area is defined by the theme. To change theme settings go to page configuration.");
+				value1 = "This area is defined by the theme. To change theme settings go to the Look and Feel configuration in the sidebar.");
 		}
 	}
 }

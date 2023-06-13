@@ -17,10 +17,8 @@ package com.liferay.taglib.util;
 import com.liferay.portal.kernel.util.WebKeys;
 
 /**
- * @author Brian Wing Shun Chan
- * @deprecated As of Mueller (7.2.x), since 7.2, unused
+ * @author     Brian Wing Shun Chan
  */
-@Deprecated
 public class BodyBottomTag extends OutputTag {
 
 	public BodyBottomTag() {

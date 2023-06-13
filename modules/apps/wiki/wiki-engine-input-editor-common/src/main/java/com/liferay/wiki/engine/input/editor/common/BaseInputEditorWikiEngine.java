@@ -61,13 +61,13 @@ public abstract class BaseInputEditorWikiEngine extends BaseWikiEngine {
 			return StringPool.BLANK;
 		}
 
-		HttpServletResponse response =
+		HttpServletResponse httpServletResponse =
 			(HttpServletResponse)pageContext.getResponse();
 
 		UnsyncStringWriter unsyncStringWriter = new UnsyncStringWriter();
 
 		PipingServletResponse pipingServletResponse = new PipingServletResponse(
-			response, unsyncStringWriter);
+			httpServletResponse, unsyncStringWriter);
 
 		ServletContext servletContext = getHelpPageServletContext();
 
@@ -83,10 +83,10 @@ public abstract class BaseInputEditorWikiEngine extends BaseWikiEngine {
 	}
 
 	@Override
-	public String getHelpPageTitle(HttpServletRequest request) {
+	public String getHelpPageTitle(HttpServletRequest httpServletRequest) {
 		return LanguageUtil.format(
-			request, "x-syntax-help", getFormatLabel(request.getLocale()),
-			false);
+			httpServletRequest, "x-syntax-help",
+			getFormatLabel(httpServletRequest.getLocale()), false);
 	}
 
 	@Override

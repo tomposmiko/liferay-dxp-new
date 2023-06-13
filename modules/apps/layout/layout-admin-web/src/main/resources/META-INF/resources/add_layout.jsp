@@ -85,6 +85,8 @@ List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.ge
 	form.addEventListener(
 		'submit',
 		function(event) {
+			event.stopPropagation();
+
 			var formData = new FormData();
 
 			Array.prototype.slice.call(
@@ -131,7 +133,7 @@ List<SiteNavigationMenu> autoSiteNavigationMenus = layoutsAdminDisplayContext.ge
 						new Liferay.Alert(
 							{
 								delay: {
-									hide: 500,
+									hide: 3000,
 									show: 0
 								},
 								duration: 500,

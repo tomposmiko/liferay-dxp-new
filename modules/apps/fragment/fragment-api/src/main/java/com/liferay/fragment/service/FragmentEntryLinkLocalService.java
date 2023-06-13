@@ -14,8 +14,6 @@
 
 package com.liferay.fragment.service;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
@@ -41,6 +39,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import java.io.Serializable;
 
 import java.util.List;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides the local service interface for FragmentEntryLink. Methods of this
@@ -76,12 +76,26 @@ public interface FragmentEntryLinkLocalService
 	public FragmentEntryLink addFragmentEntryLink(
 		FragmentEntryLink fragmentEntryLink);
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntryLink(long, long, long, long, long, long,
+	 String, String, String, String, String, int, String,
+	 ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long originalFragmentEntryLinkId,
 			long fragmentEntryId, long classNameId, long classPK,
 			String rendererKey, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntryLink(long, long, long, long, long, long,
+	 String, String, String, String, String, int, String,
+	 ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long originalFragmentEntryLinkId,
 			long fragmentEntryId, long classNameId, long classPK, String css,
@@ -89,6 +103,13 @@ public interface FragmentEntryLinkLocalService
 			ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntryLink(long, long, long, long, long, long,
+	 String, String, String, String, String, int, String,
+	 ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long originalFragmentEntryLinkId,
 			long fragmentEntryId, long classNameId, long classPK, String css,
@@ -103,6 +124,13 @@ public interface FragmentEntryLinkLocalService
 			int position, String rendererKey, ServiceContext serviceContext)
 		throws PortalException;
 
+	/**
+	 * @deprecated As of Mueller (7.2.x), replaced by {@link
+	 #addFragmentEntryLink(long, long, long, long, long, long,
+	 String, String, String, String, String, int, String,
+	 ServiceContext)}
+	 */
+	@Deprecated
 	public FragmentEntryLink addFragmentEntryLink(
 			long userId, long groupId, long fragmentEntryId, long classNameId,
 			long classPK, String css, String html, String js,

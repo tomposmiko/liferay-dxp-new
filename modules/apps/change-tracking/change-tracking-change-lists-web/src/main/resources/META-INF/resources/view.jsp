@@ -135,16 +135,27 @@ renderResponse.setTitle(title);
 									url="<%= editCollectionURL %>"
 								/>
 
-								<liferay-portlet:renderURL var="publishModalURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-									<liferay-portlet:param name="mvcRenderCommandName" value="/change_lists/publish_modal" />
-									<liferay-portlet:param name="ctCollectionId" value="<%= String.valueOf(curCTCollection.getCtCollectionId()) %>" />
-								</liferay-portlet:renderURL>
+								<c:choose>
+									<c:when test="<%= changeListsDisplayContext.hasCTEntries(curCTCollection.getCtCollectionId()) %>">
+										<liferay-portlet:renderURL var="publishModalURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+											<liferay-portlet:param name="mvcRenderCommandName" value="/change_lists/publish_modal" />
+											<liferay-portlet:param name="ctCollectionId" value="<%= String.valueOf(curCTCollection.getCtCollectionId()) %>" />
+										</liferay-portlet:renderURL>
 
-								<liferay-ui:icon
-									message="publish"
-									onClick='<%= "javascript:" + renderResponse.getNamespace() + "handleClickPublish(\'" + publishModalURL.toString() + "\');" %>'
-									url="#"
-								/>
+										<liferay-ui:icon
+											message="publish"
+											onClick='<%= "javascript:" + renderResponse.getNamespace() + "handleClickPublish(\'" + publishModalURL.toString() + "\');" %>'
+											url="#"
+										/>
+									</c:when>
+									<c:otherwise>
+										<liferay-ui:icon
+											cssClass="disabled"
+											message="publish"
+											url="#"
+										/>
+									</c:otherwise>
+								</c:choose>
 
 								<liferay-portlet:actionURL name="/change_lists/delete_ct_collection" var="deleteCollectionURL">
 									<portlet:param name="ctCollectionId" value="<%= String.valueOf(curCTCollection.getCtCollectionId()) %>" />
@@ -181,7 +192,7 @@ renderResponse.setTitle(title);
 
 					<c:if test="<%= (productionCTCollection != null) && (ctCollectionSearchContainer.getCur() == 1) && Validator.isNull(displayTerms.getKeywords()) %>">
 						<div class="col-sm-4">
-							<div class="border-left-green card select-card-sheet">
+							<div class="<%= changeListsDisplayContext.isChangeListActive(productionCTCollection.getCtCollectionId()) ? "border-left-green" : "border-left-gray" %> card select-card-sheet">
 								<div class="card-row card-row-layout-fixed card-row-padded card-row-valign-top select-card-header">
 									<div class="card-col-content lfr-card-details-column production-details-column">
 										<a href="<%= checkoutProductionURL.toString() %>">
@@ -191,8 +202,6 @@ renderResponse.setTitle(title);
 										</a>
 
 										<div class="select-card-sheet-block">
-											<span class="card-h4"><liferay-ui:message key="description" /></span>
-
 											<div class="card-text" data-qa-id="description">
 												<span class="work-on-production-description"><liferay-ui:message key="your-changes-will-be-added-to-the-live-site-immediately" /></span>
 											</div>
@@ -219,7 +228,7 @@ renderResponse.setTitle(title);
 
 						<c:if test="<%= !production %>">
 							<div class="col-sm-4">
-								<div class="border-left-blue card select-card-sheet">
+								<div class="<%= changeListsDisplayContext.isChangeListActive(curCTCollection.getCtCollectionId()) ? "border-left-blue" : "border-left-gray" %> card select-card-sheet">
 									<div class="card-row card-row-layout-fixed card-row-padded card-row-valign-top select-card-header">
 										<div class="card-col-content lfr-card-details-column">
 											<a href="<%= checkoutCollectionURL.toString() %>">
@@ -230,8 +239,6 @@ renderResponse.setTitle(title);
 
 											<c:if test="<%= Validator.isNotNull(curCTCollection.getDescription()) %>">
 												<div class="select-card-sheet-block">
-													<span class="card-h4"><liferay-ui:message key="description" /></span>
-
 													<div class="card-text" data-qa-id="description">
 														<%= HtmlUtil.escape(curCTCollection.getDescription()) %>
 													</div>
@@ -242,7 +249,7 @@ renderResponse.setTitle(title);
 												<span class="card-h4"><liferay-ui:message key="created-by" /> & <liferay-ui:message key="modified-date" /></span>
 
 												<div class="card-text" data-qa-id="created-by-modified-date">
-													<%= curCTCollection.getUserName() + " - " + curCTCollection.getModifiedDate() %>
+													<%= curCTCollection.getUserName() %> &ndash; <liferay-ui:message arguments="<%= LanguageUtil.getTimeDescription(request, changeListsDisplayContext.getCTCollectionAgeTime(curCTCollection), true) %>" key="x-ago" />
 												</div>
 											</div>
 
@@ -299,16 +306,27 @@ renderResponse.setTitle(title);
 													url="<%= editCollectionURL %>"
 												/>
 
-												<liferay-portlet:renderURL var="publishModalURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
-													<liferay-portlet:param name="mvcRenderCommandName" value="/change_lists/publish_modal" />
-													<liferay-portlet:param name="ctCollectionId" value="<%= String.valueOf(curCTCollection.getCtCollectionId()) %>" />
-												</liferay-portlet:renderURL>
+												<c:choose>
+													<c:when test="<%= changeListsDisplayContext.hasCTEntries(curCTCollection.getCtCollectionId()) %>">
+														<liferay-portlet:renderURL var="publishModalURL" windowState="<%= LiferayWindowState.POP_UP.toString() %>">
+															<liferay-portlet:param name="mvcRenderCommandName" value="/change_lists/publish_modal" />
+															<liferay-portlet:param name="ctCollectionId" value="<%= String.valueOf(curCTCollection.getCtCollectionId()) %>" />
+														</liferay-portlet:renderURL>
 
-												<liferay-ui:icon
-													message="publish"
-													onClick='<%= "javascript:" + renderResponse.getNamespace() + "handleClickPublish(\'" + publishModalURL.toString() + "\');" %>'
-													url="#"
-												/>
+														<liferay-ui:icon
+															message="publish"
+															onClick='<%= "javascript:" + renderResponse.getNamespace() + "handleClickPublish(\'" + publishModalURL.toString() + "\');" %>'
+															url="#"
+														/>
+													</c:when>
+													<c:otherwise>
+														<liferay-ui:icon
+															cssClass="disabled"
+															message="publish"
+															url="#"
+														/>
+													</c:otherwise>
+												</c:choose>
 
 												<liferay-portlet:actionURL name="/change_lists/delete_ct_collection" var="deleteCollectionURL">
 													<portlet:param name="ctCollectionId" value="<%= String.valueOf(curCTCollection.getCtCollectionId()) %>" />

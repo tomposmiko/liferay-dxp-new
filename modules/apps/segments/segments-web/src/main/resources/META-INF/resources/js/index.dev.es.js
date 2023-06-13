@@ -6,6 +6,21 @@ import SegmentEdit from './components/segment_edit/SegmentEdit.es';
 import ThemeContext from './ThemeContext.es';
 
 const altProps = {
+	availableLocales: {
+		ar_SA: 'Arabic (Saudi Arabia)',
+		ca_ES: 'Catalan (Spain)',
+		de_DE: 'German (Germany)',
+		en_US: 'English (United States)',
+		es_ES: 'Spanish (Spain)',
+		fi_FI: 'Finnish (Finland)',
+		fr_FR: 'French (France)',
+		hu_HU: 'Hungarian (Hungary)',
+		ja_JP: 'Japanese (Japan)',
+		nl_NL: 'Dutch (Netherlands)',
+		pt_BR: 'Portuguese (Brazil)',
+		sv_SE: 'Swedish (Sweden)',
+		zh_CN: 'Chinese (China)'
+	},
 	contributors: [
 		{
 			conjunctionId: '',
@@ -20,11 +35,22 @@ const altProps = {
 			initialQuery: '(cookie/any(c:contains(c, \'key1=value1\')))',
 			inputId: '_com_liferay_segments_web_internal_portlet_SegmentsPortlet_criterionFilteruser-organization',
 			propertyKey: 'user-organization'
+		},
+		{
+			conjunctionId: '',
+			conjunctionInputId: '_com_liferay_segments_web_internal_portlet_SegmentsPortlet_criterionConjunctioncontext',
+			initialQuery: '',
+			inputId: '_com_liferay_segments_web_internal_portlet_SegmentsPortlet_criterionFiltercontext',
+			propertyKey: 'context'
 		}
 	],
+	defaultLanguageId: 'en_US',
 	initialMembersCount: 0,
 	initialSegmentActive: false,
-	initialSegmentName: '',
+	initialSegmentName: {
+		'en_US': 'Segment title',
+		'es_ES': 'Título del segmento'
+	},
 	locale: 'en_US',
 	portletNamespace: '_com_liferay_segments_web_internal_portlet_SegmentsPortlet_',
 	propertyGroups: [
@@ -92,7 +118,7 @@ const altProps = {
 				{
 					label: 'Date Modified',
 					name: 'dateModified',
-					type: 'date'
+					type: 'date-time'
 				},
 				{
 					label: 'Email Address',
@@ -184,7 +210,7 @@ const altProps = {
 				{
 					label: 'Date Modified',
 					name: 'dateModified',
-					type: 'date'
+					type: 'date-time'
 				},
 				{
 					label: 'Name',
@@ -222,12 +248,29 @@ const altProps = {
 					type: 'id'
 				},
 				{
+					label: 'Tree Path',
+					name: 'treePath',
+					type: 'string'
+				},
+				{
 					label: 'Type',
 					name: 'type',
 					type: 'string'
 				}
 			],
 			propertyKey: 'user-organization'
+		},
+		{
+			entityName: 'Session',
+			name: 'Context',
+			properties: [
+				{
+					label: 'Local Date',
+					name: 'localDate',
+					type: 'date'
+				}
+			],
+			propertyKey: 'context'
 		}
 	],
 	redirect: 'http://localhost:8080/group/guest/~/control_panel/manage/-/segments/entries?p_p_auth=1EwOzg1e',
@@ -239,6 +282,14 @@ const context = {
 	spritemap: '/o/admin-theme/images/lexicon/icons.svg'
 };
 
+window.Liferay = {
+	Language: {
+		available: {
+			'en_US': 'aosidopaisd',
+			'es_ES': 'aosidopaisd'
+		}
+	}
+};
 ReactDOM.render(
 	<ThemeContext.Provider value={context}>
 		<div className="segments-root">

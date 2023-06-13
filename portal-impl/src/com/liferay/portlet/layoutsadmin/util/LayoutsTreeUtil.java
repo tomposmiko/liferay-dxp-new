@@ -14,12 +14,12 @@
 
 package com.liferay.portlet.layoutsadmin.util;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.model.LayoutSetBranch;
 import com.liferay.portal.kernel.util.ServiceProxyFactory;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Akos Thurzo
@@ -28,80 +28,84 @@ import javax.servlet.http.HttpServletRequest;
 public class LayoutsTreeUtil {
 
 	public static String getLayoutsJSON(
-			HttpServletRequest request, long groupId, boolean privateLayout,
-			long parentLayoutId, boolean incomplete, String treeId)
-		throws Exception {
-
-		return _layoutsTree.getLayoutsJSON(
-			request, groupId, privateLayout, parentLayoutId, incomplete,
-			treeId);
-	}
-
-	public static String getLayoutsJSON(
-			HttpServletRequest request, long groupId, boolean privateLayout,
-			long parentLayoutId, boolean incomplete, String treeId,
-			LayoutSetBranch layoutSetBranch)
-		throws Exception {
-
-		return _layoutsTree.getLayoutsJSON(
-			request, groupId, privateLayout, parentLayoutId, incomplete, treeId,
-			layoutSetBranch);
-	}
-
-	public static String getLayoutsJSON(
-			HttpServletRequest request, long groupId, boolean privateLayout,
-			long layoutId, int max)
-		throws Exception {
-
-		return _layoutsTree.getLayoutsJSON(
-			request, groupId, privateLayout, layoutId, max);
-	}
-
-	public static String getLayoutsJSON(
-			HttpServletRequest request, long groupId, boolean privateLayout,
-			long layoutId, int max, LayoutSetBranch layoutSetBranch)
-		throws Exception {
-
-		return _layoutsTree.getLayoutsJSON(
-			request, groupId, privateLayout, layoutId, max, layoutSetBranch);
-	}
-
-	public static String getLayoutsJSON(
-			HttpServletRequest request, long groupId, boolean privateLayout,
-			long parentLayoutId, long[] expandedLayoutIds, boolean incomplete,
+			HttpServletRequest httpServletRequest, long groupId,
+			boolean privateLayout, long parentLayoutId, boolean incomplete,
 			String treeId)
 		throws Exception {
 
 		return _layoutsTree.getLayoutsJSON(
-			request, groupId, privateLayout, parentLayoutId, expandedLayoutIds,
+			httpServletRequest, groupId, privateLayout, parentLayoutId,
 			incomplete, treeId);
 	}
 
 	public static String getLayoutsJSON(
-			HttpServletRequest request, long groupId, boolean privateLayout,
-			long parentLayoutId, long[] expandedLayoutIds, boolean incomplete,
+			HttpServletRequest httpServletRequest, long groupId,
+			boolean privateLayout, long parentLayoutId, boolean incomplete,
 			String treeId, LayoutSetBranch layoutSetBranch)
 		throws Exception {
 
 		return _layoutsTree.getLayoutsJSON(
-			request, groupId, privateLayout, parentLayoutId, expandedLayoutIds,
+			httpServletRequest, groupId, privateLayout, parentLayoutId,
 			incomplete, treeId, layoutSetBranch);
 	}
 
 	public static String getLayoutsJSON(
-			HttpServletRequest request, long groupId, String treeId)
+			HttpServletRequest httpServletRequest, long groupId,
+			boolean privateLayout, long layoutId, int max)
 		throws Exception {
 
-		return _layoutsTree.getLayoutsJSON(request, groupId, treeId);
+		return _layoutsTree.getLayoutsJSON(
+			httpServletRequest, groupId, privateLayout, layoutId, max);
 	}
 
 	public static String getLayoutsJSON(
-			HttpServletRequest request, long groupId, String treeId,
+			HttpServletRequest httpServletRequest, long groupId,
+			boolean privateLayout, long layoutId, int max,
 			LayoutSetBranch layoutSetBranch)
 		throws Exception {
 
 		return _layoutsTree.getLayoutsJSON(
-			request, groupId, treeId, layoutSetBranch);
+			httpServletRequest, groupId, privateLayout, layoutId, max,
+			layoutSetBranch);
+	}
+
+	public static String getLayoutsJSON(
+			HttpServletRequest httpServletRequest, long groupId,
+			boolean privateLayout, long parentLayoutId,
+			long[] expandedLayoutIds, boolean incomplete, String treeId)
+		throws Exception {
+
+		return _layoutsTree.getLayoutsJSON(
+			httpServletRequest, groupId, privateLayout, parentLayoutId,
+			expandedLayoutIds, incomplete, treeId);
+	}
+
+	public static String getLayoutsJSON(
+			HttpServletRequest httpServletRequest, long groupId,
+			boolean privateLayout, long parentLayoutId,
+			long[] expandedLayoutIds, boolean incomplete, String treeId,
+			LayoutSetBranch layoutSetBranch)
+		throws Exception {
+
+		return _layoutsTree.getLayoutsJSON(
+			httpServletRequest, groupId, privateLayout, parentLayoutId,
+			expandedLayoutIds, incomplete, treeId, layoutSetBranch);
+	}
+
+	public static String getLayoutsJSON(
+			HttpServletRequest httpServletRequest, long groupId, String treeId)
+		throws Exception {
+
+		return _layoutsTree.getLayoutsJSON(httpServletRequest, groupId, treeId);
+	}
+
+	public static String getLayoutsJSON(
+			HttpServletRequest httpServletRequest, long groupId, String treeId,
+			LayoutSetBranch layoutSetBranch)
+		throws Exception {
+
+		return _layoutsTree.getLayoutsJSON(
+			httpServletRequest, groupId, treeId, layoutSetBranch);
 	}
 
 	private static volatile LayoutsTree _layoutsTree =

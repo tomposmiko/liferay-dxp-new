@@ -42,11 +42,11 @@ public class SelectTeamDisplayContext {
 
 	public SelectTeamDisplayContext(
 		RenderRequest renderRequest, RenderResponse renderResponse,
-		HttpServletRequest request) {
+		HttpServletRequest httpServletRequest) {
 
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 	}
 
 	public String getDisplayStyle() {
@@ -54,7 +54,8 @@ public class SelectTeamDisplayContext {
 			return _displayStyle;
 		}
 
-		_displayStyle = ParamUtil.getString(_request, "displayStyle", "list");
+		_displayStyle = ParamUtil.getString(
+			_httpServletRequest, "displayStyle", "list");
 
 		return _displayStyle;
 	}
@@ -65,7 +66,7 @@ public class SelectTeamDisplayContext {
 		}
 
 		_eventName = ParamUtil.getString(
-			_request, "eventName",
+			_httpServletRequest, "eventName",
 			_renderResponse.getNamespace() + "selectTeam");
 
 		return _eventName;
@@ -76,7 +77,7 @@ public class SelectTeamDisplayContext {
 			return _keywords;
 		}
 
-		_keywords = ParamUtil.getString(_request, "keywords");
+		_keywords = ParamUtil.getString(_httpServletRequest, "keywords");
 
 		return _keywords;
 	}
@@ -86,7 +87,8 @@ public class SelectTeamDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = ParamUtil.getString(_request, "orderByCol", "name");
+		_orderByCol = ParamUtil.getString(
+			_httpServletRequest, "orderByCol", "name");
 
 		return _orderByCol;
 	}
@@ -96,7 +98,8 @@ public class SelectTeamDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = ParamUtil.getString(_request, "orderByType", "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -133,8 +136,9 @@ public class SelectTeamDisplayContext {
 			return _teamSearchContainer;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		TeamSearch teamSearchContainer = new TeamSearch(
 			_renderRequest, getPortletURL());
@@ -156,13 +160,13 @@ public class SelectTeamDisplayContext {
 
 		int teamsCount = TeamLocalServiceUtil.searchCount(
 			themeDisplay.getScopeGroupId(), searchTerms.getKeywords(),
-			searchTerms.getDescription(), new LinkedHashMap<>());
+			searchTerms.getKeywords(), new LinkedHashMap<>());
 
 		teamSearchContainer.setTotal(teamsCount);
 
 		List<Team> teams = TeamLocalServiceUtil.search(
 			themeDisplay.getScopeGroupId(), searchTerms.getKeywords(),
-			searchTerms.getDescription(), new LinkedHashMap<>(),
+			searchTerms.getKeywords(), new LinkedHashMap<>(),
 			teamSearchContainer.getStart(), teamSearchContainer.getEnd(),
 			teamSearchContainer.getOrderByComparator());
 
@@ -175,12 +179,12 @@ public class SelectTeamDisplayContext {
 
 	private String _displayStyle;
 	private String _eventName;
+	private final HttpServletRequest _httpServletRequest;
 	private String _keywords;
 	private String _orderByCol;
 	private String _orderByType;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private final HttpServletRequest _request;
 	private SearchContainer _teamSearchContainer;
 
 }

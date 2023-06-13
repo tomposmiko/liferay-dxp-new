@@ -42,6 +42,19 @@ boolean useAssetEntryQuery = Validator.isNotNull(assetTagName);
 PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("mvcRenderCommandName", mvcRenderCommandName);
+
+int cur1 = ParamUtil.getInteger(request, "cur1");
+
+if (cur1 > 0) {
+	portletURL.setParameter("cur1", String.valueOf(cur1));
+}
+
+int cur2 = ParamUtil.getInteger(request, "cur2");
+
+if (cur2 > 0) {
+	portletURL.setParameter("cur2", String.valueOf(cur2));
+}
+
 portletURL.setParameter("mbCategoryId", String.valueOf(categoryId));
 
 String keywords = ParamUtil.getString(request, "keywords");
@@ -375,7 +388,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 					</div>
 
 					<%
-					SearchContainer categoryEntriesSearchContainer = new SearchContainer(renderRequest, null, null, "cur1", 0, mbListDisplayContext.getCategoryEntriesDelta(), portletURL, null, "there-are-no-threads-or-categories");
+					SearchContainer categoryEntriesSearchContainer = new SearchContainer(renderRequest, null, null, "cur1", 0, mbListDisplayContext.getCategoryEntriesDelta(), PortletURLUtil.clone(portletURL, renderResponse), null, "there-are-no-threads-or-categories");
 
 					mbListDisplayContext.setCategoryEntriesDelta(categoryEntriesSearchContainer);
 
@@ -393,7 +406,7 @@ request.setAttribute("view.jsp-viewCategory", Boolean.TRUE.toString());
 					</c:if>
 
 					<%
-					SearchContainer threadEntriesSearchContainer = new SearchContainer(renderRequest, null, null, "cur2", 0, mbListDisplayContext.getThreadEntriesDelta(), portletURL, null, "there-are-no-threads-or-categories");
+					SearchContainer threadEntriesSearchContainer = new SearchContainer(renderRequest, null, null, "cur2", 0, mbListDisplayContext.getThreadEntriesDelta(), PortletURLUtil.clone(portletURL, renderResponse), null, "there-are-no-threads-or-categories");
 
 					mbListDisplayContext.setThreadEntriesDelta(categoryEntriesSearchContainer);
 

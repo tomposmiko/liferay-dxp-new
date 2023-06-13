@@ -35,8 +35,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class SocialActivitiesRequestHelper extends BaseRequestHelper {
 
-	public SocialActivitiesRequestHelper(HttpServletRequest request) {
-		super(request);
+	public SocialActivitiesRequestHelper(
+		HttpServletRequest httpServletRequest) {
+
+		super(httpServletRequest);
 	}
 
 	public int getEnd() {
@@ -150,9 +152,9 @@ public class SocialActivitiesRequestHelper extends BaseRequestHelper {
 			return _portletRequest;
 		}
 
-		HttpServletRequest request = getRequest();
+		HttpServletRequest httpServletRequest = getRequest();
 
-		_portletRequest = (PortletRequest)request.getAttribute(
+		_portletRequest = (PortletRequest)httpServletRequest.getAttribute(
 			JavaConstants.JAVAX_PORTLET_REQUEST);
 
 		return _portletRequest;

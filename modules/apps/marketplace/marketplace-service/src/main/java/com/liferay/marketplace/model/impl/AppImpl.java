@@ -14,8 +14,6 @@
 
 package com.liferay.marketplace.model.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.document.library.kernel.store.DLStoreUtil;
 import com.liferay.document.library.kernel.store.Store;
 import com.liferay.marketplace.internal.bundle.BundleManagerUtil;
@@ -30,6 +28,8 @@ import com.liferay.portal.kernel.util.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Ryan Park
@@ -68,7 +68,7 @@ public class AppImpl extends AppBaseImpl {
 			contextNames.add(module.getContextName());
 		}
 
-		_contextNames = contextNames.toArray(new String[contextNames.size()]);
+		_contextNames = contextNames.toArray(new String[0]);
 
 		return _contextNames;
 	}

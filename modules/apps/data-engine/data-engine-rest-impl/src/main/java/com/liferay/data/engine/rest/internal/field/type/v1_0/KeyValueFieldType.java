@@ -14,12 +14,14 @@
 
 package com.liferay.data.engine.rest.internal.field.type.v1_0;
 
-import com.liferay.data.engine.rest.dto.v1_0.DataDefinitionField;
-import com.liferay.data.engine.rest.internal.dto.v1_0.util.LocalizedValueUtil;
-import com.liferay.data.engine.rest.internal.field.type.v1_0.util.CustomPropertyUtil;
+import com.liferay.data.engine.rest.internal.field.type.v1_0.util.CustomPropertiesUtil;
+import com.liferay.data.engine.spi.field.type.BaseFieldType;
+import com.liferay.data.engine.spi.field.type.FieldType;
+import com.liferay.data.engine.spi.field.type.SPIDataDefinitionField;
+import com.liferay.data.engine.spi.field.type.util.LocalizedValueUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.language.LanguageUtil;
-import com.liferay.portal.template.soy.data.SoyDataFactory;
+import com.liferay.portal.kernel.util.MapUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,89 +29,106 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.osgi.service.component.annotations.Component;
+
 /**
  * @author Gabriel Albuquerque
  */
+@Component(
+	immediate = true,
+	property = {
+		"data.engine.field.type.icon=icon-font",
+		"data.engine.field.type.js.module=dynamic-data-mapping-form-field-type/metal/KeyValue/KeyValue.es",
+		"data.engine.field.type.system=true"
+	},
+	service = FieldType.class
+)
 public class KeyValueFieldType extends BaseFieldType {
 
-	public KeyValueFieldType(
-		DataDefinitionField dataDefinitionField,
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse,
-		SoyDataFactory soyDataFactory) {
-
-		super(
-			dataDefinitionField, httpServletRequest, httpServletResponse,
-			soyDataFactory);
-	}
-
 	@Override
-	public DataDefinitionField deserialize(JSONObject jsonObject)
+	public SPIDataDefinitionField deserialize(JSONObject jsonObject)
 		throws Exception {
 
-		DataDefinitionField dataDefinitionField = super.deserialize(jsonObject);
+		SPIDataDefinitionField spiDataDefinitionField = super.deserialize(
+			jsonObject);
 
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "autoFocus",
-				jsonObject.getBoolean("autoFocus")));
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "placeholder",
-				LocalizedValueUtil.toLocalizedValues(
-					jsonObject.getJSONObject("placeholder"))));
-		dataDefinitionField.setCustomProperties(
-			CustomPropertyUtil.add(
-				dataDefinitionField.getCustomProperties(), "tooltip",
-				LocalizedValueUtil.toLocalizedValues(
-					jsonObject.getJSONObject("tooltip"))));
+		Map<String, Object> customProperties =
+			spiDataDefinitionField.getCustomProperties();
 
-		return dataDefinitionField;
+		customProperties.put("autoFocus", jsonObject.getBoolean("autoFocus"));
+		customProperties.put(
+			"placeholder",
+			LocalizedValueUtil.toLocalizedValues(
+				jsonObject.getJSONObject("placeholder")));
+		customProperties.put(
+			"tooltip",
+			LocalizedValueUtil.toLocalizedValues(
+				jsonObject.getJSONObject("tooltip")));
+
+		return spiDataDefinitionField;
 	}
 
 	@Override
-	public JSONObject toJSONObject() throws Exception {
-		JSONObject jsonObject = super.toJSONObject();
+	public String getName() {
+		return "key_value";
+	}
+
+	@Override
+	public JSONObject toJSONObject(
+			SPIDataDefinitionField spiDataDefinitionField)
+		throws Exception {
+
+		JSONObject jsonObject = super.toJSONObject(spiDataDefinitionField);
 
 		return jsonObject.put(
 			"autoFocus",
-			CustomPropertyUtil.getBoolean(
-				dataDefinitionField.getCustomProperties(), "autoFocus", false)
+			MapUtil.getBoolean(
+				spiDataDefinitionField.getCustomProperties(), "autoFocus",
+				false)
 		).put(
 			"placeholder",
 			LocalizedValueUtil.toJSONObject(
-				CustomPropertyUtil.getLocalizedValue(
-					dataDefinitionField.getCustomProperties(), "placeholder"))
+				CustomPropertiesUtil.getMap(
+					spiDataDefinitionField.getCustomProperties(),
+					"placeholder"))
 		).put(
 			"tooltip",
 			LocalizedValueUtil.toJSONObject(
-				CustomPropertyUtil.getLocalizedValue(
-					dataDefinitionField.getCustomProperties(), "tooltip"))
+				CustomPropertiesUtil.getMap(
+					spiDataDefinitionField.getCustomProperties(), "tooltip"))
 		);
 	}
 
 	@Override
-	protected void addContext(Map<String, Object> context) {
+	protected void includeContext(
+		Map<String, Object> context, HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse,
+		SPIDataDefinitionField spiDataDefinitionField) {
+
 		context.put(
 			"autoFocus",
-			CustomPropertyUtil.getBoolean(
-				dataDefinitionField.getCustomProperties(), "autoFocus", false));
+			MapUtil.getBoolean(
+				spiDataDefinitionField.getCustomProperties(), "autoFocus",
+				false));
 		context.put(
 			"placeholder",
-			LocalizedValueUtil.getLocalizedValue(
-				httpServletRequest.getLocale(),
-				CustomPropertyUtil.getLocalizedValue(
-					dataDefinitionField.getCustomProperties(), "placeholder")));
-		context.put("strings", _getStrings());
+			MapUtil.getString(
+				CustomPropertiesUtil.getMap(
+					spiDataDefinitionField.getCustomProperties(),
+					"placeholder"),
+				LanguageUtil.getLanguageId(httpServletRequest)));
+		context.put("strings", _getStrings(httpServletRequest));
 		context.put(
 			"tooltip",
-			LocalizedValueUtil.getLocalizedValue(
-				httpServletRequest.getLocale(),
-				CustomPropertyUtil.getLocalizedValue(
-					dataDefinitionField.getCustomProperties(), "tooltip")));
+			MapUtil.getString(
+				CustomPropertiesUtil.getMap(
+					spiDataDefinitionField.getCustomProperties(), "tooltip"),
+				LanguageUtil.getLanguageId(httpServletRequest)));
 	}
 
-	private Map<String, String> _getStrings() {
+	private Map<String, String> _getStrings(
+		HttpServletRequest httpServletRequest) {
+
 		Map<String, String> values = new HashMap<>();
 
 		values.put(

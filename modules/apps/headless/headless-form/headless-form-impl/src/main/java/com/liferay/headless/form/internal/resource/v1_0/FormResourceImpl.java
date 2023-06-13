@@ -16,11 +16,15 @@ package com.liferay.headless.form.internal.resource.v1_0;
 
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.document.library.util.DLURLHelper;
+import com.liferay.dynamic.data.mapping.form.renderer.DDMFormRenderingContext;
+import com.liferay.dynamic.data.mapping.form.renderer.DDMFormTemplateContextFactory;
 import com.liferay.dynamic.data.mapping.model.DDMFormInstance;
 import com.liferay.dynamic.data.mapping.service.DDMFormInstanceService;
 import com.liferay.headless.form.dto.v1_0.Form;
+import com.liferay.headless.form.dto.v1_0.FormContext;
 import com.liferay.headless.form.dto.v1_0.FormDocument;
 import com.liferay.headless.form.internal.dto.v1_0.util.CreatorUtil;
+import com.liferay.headless.form.internal.dto.v1_0.util.FormContextUtil;
 import com.liferay.headless.form.internal.dto.v1_0.util.FormDocumentUtil;
 import com.liferay.headless.form.internal.dto.v1_0.util.StructureUtil;
 import com.liferay.headless.form.resource.v1_0.FormResource;
@@ -34,6 +38,10 @@ import com.liferay.portal.vulcan.pagination.Page;
 import com.liferay.portal.vulcan.pagination.Pagination;
 
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+
+import javax.ws.rs.core.Context;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -67,6 +75,26 @@ public class FormResourceImpl extends BaseFormResourceImpl {
 			pagination,
 			_ddmFormInstanceService.getFormInstancesCount(
 				contextCompany.getCompanyId(), siteId));
+	}
+
+	@Override
+	public FormContext postFormEvaluateContext(
+			Long formId, FormContext formContext)
+		throws Exception {
+
+		DDMFormInstance ddmFormInstance =
+			_ddmFormInstanceService.getFormInstance(formId);
+
+		DDMFormRenderingContext ddmFormRenderingContext =
+			new DDMFormRenderingContext();
+
+		ddmFormRenderingContext.setGroupId(ddmFormInstance.getGroupId());
+		ddmFormRenderingContext.setHttpServletRequest(_httpServletRequest);
+
+		return FormContextUtil.evaluateContext(
+			ddmFormInstance, ddmFormRenderingContext,
+			_ddmFormTemplateContextFactory, formContext.getFormFieldValues(),
+			contextAcceptLanguage.getPreferredLocale());
 	}
 
 	@Override
@@ -131,10 +159,16 @@ public class FormResourceImpl extends BaseFormResourceImpl {
 	private DDMFormInstanceService _ddmFormInstanceService;
 
 	@Reference
+	private DDMFormTemplateContextFactory _ddmFormTemplateContextFactory;
+
+	@Reference
 	private DLAppService _dlAppService;
 
 	@Reference
 	private DLURLHelper _dlurlHelper;
+
+	@Context
+	private HttpServletRequest _httpServletRequest;
 
 	@Reference
 	private Portal _portal;

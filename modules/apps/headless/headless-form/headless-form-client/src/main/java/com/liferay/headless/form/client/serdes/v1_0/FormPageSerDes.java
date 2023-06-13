@@ -14,7 +14,7 @@
 
 package com.liferay.headless.form.client.serdes.v1_0;
 
-import com.liferay.headless.form.client.dto.v1_0.Field;
+import com.liferay.headless.form.client.dto.v1_0.FormField;
 import com.liferay.headless.form.client.dto.v1_0.FormPage;
 import com.liferay.headless.form.client.json.BaseJSONParser;
 
@@ -55,19 +55,19 @@ public class FormPageSerDes {
 
 		sb.append("{");
 
-		if (formPage.getFields() != null) {
+		if (formPage.getFormFields() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
 			}
 
-			sb.append("\"fields\": ");
+			sb.append("\"formFields\": ");
 
 			sb.append("[");
 
-			for (int i = 0; i < formPage.getFields().length; i++) {
-				sb.append(String.valueOf(formPage.getFields()[i]));
+			for (int i = 0; i < formPage.getFormFields().length; i++) {
+				sb.append(String.valueOf(formPage.getFormFields()[i]));
 
-				if ((i + 1) < formPage.getFields().length) {
+				if ((i + 1) < formPage.getFormFields().length) {
 					sb.append(", ");
 				}
 			}
@@ -131,11 +131,11 @@ public class FormPageSerDes {
 
 		Map<String, String> map = new HashMap<>();
 
-		if (formPage.getFields() == null) {
-			map.put("fields", null);
+		if (formPage.getFormFields() == null) {
+			map.put("formFields", null);
 		}
 		else {
-			map.put("fields", String.valueOf(formPage.getFields()));
+			map.put("formFields", String.valueOf(formPage.getFormFields()));
 		}
 
 		if (formPage.getHeadline() == null) {
@@ -214,15 +214,15 @@ public class FormPageSerDes {
 			FormPage formPage, String jsonParserFieldName,
 			Object jsonParserFieldValue) {
 
-			if (Objects.equals(jsonParserFieldName, "fields")) {
+			if (Objects.equals(jsonParserFieldName, "formFields")) {
 				if (jsonParserFieldValue != null) {
-					formPage.setFields(
+					formPage.setFormFields(
 						Stream.of(
 							toStrings((Object[])jsonParserFieldValue)
 						).map(
-							object -> FieldSerDes.toDTO((String)object)
+							object -> FormFieldSerDes.toDTO((String)object)
 						).toArray(
-							size -> new Field[size]
+							size -> new FormField[size]
 						));
 				}
 			}

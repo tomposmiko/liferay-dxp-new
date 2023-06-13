@@ -1,4 +1,3 @@
-import '../libs/odata-parser.js';
 import {
 	CONJUNCTIONS,
 	FUNCTIONAL_OPERATORS,
@@ -8,13 +7,7 @@ import {
 	RELATIONAL_OPERATORS
 } from './constants.es';
 import {generateGroupId} from './utils.es';
-
-const OPERATORS = {
-	...FUNCTIONAL_OPERATORS,
-	...RELATIONAL_OPERATORS
-};
-
-const oDataFilterFn = window.oDataParser.filter;
+import {filter as oDataFilterFn} from '../libs/odata-parser';
 
 const EXPRESSION_TYPES = {
 	AND: 'AndExpression',
@@ -32,6 +25,11 @@ const EXPRESSION_TYPES = {
 	OR: 'OrExpression',
 	PAREN: 'ParenExpression',
 	PROPERTY_PATH: 'PropertyPathExpression'
+};
+
+const OPERATORS = {
+	...FUNCTIONAL_OPERATORS,
+	...RELATIONAL_OPERATORS
 };
 
 /**

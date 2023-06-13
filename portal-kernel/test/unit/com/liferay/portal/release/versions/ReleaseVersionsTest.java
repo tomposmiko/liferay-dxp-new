@@ -14,8 +14,6 @@
 
 package com.liferay.portal.release.versions;
 
-import aQute.bnd.osgi.Constants;
-
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
 import com.liferay.portal.kernel.log.Log;
@@ -42,8 +40,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -135,9 +136,15 @@ public class ReleaseVersionsTest {
 						return FileVisitResult.SKIP_SUBTREE;
 					}
 
-					Path bndBndPath = dirPath.resolve("bnd.bnd");
+					String dirName = String.valueOf(dirPath.getFileName());
 
-					if (Files.notExists(bndBndPath)) {
+					if (Objects.equals(dirName, "node_modules")) {
+						return FileVisitResult.SKIP_SUBTREE;
+					}
+
+					Path versionPath = _getVersionPath(dirPath);
+
+					if (versionPath == null) {
 						return FileVisitResult.CONTINUE;
 					}
 
@@ -147,8 +154,6 @@ public class ReleaseVersionsTest {
 					if (Files.exists(lfrbuildRelengIgnorePath)) {
 						return FileVisitResult.CONTINUE;
 					}
-
-					String dirName = String.valueOf(dirPath.getFileName());
 
 					if (dirName.endsWith("-test") ||
 						dirName.endsWith("-test-api") ||
@@ -162,18 +167,18 @@ public class ReleaseVersionsTest {
 						return FileVisitResult.CONTINUE;
 					}
 
-					Path bndBndRelativePath = _portalPath.relativize(
-						bndBndPath);
+					Path versionRelativePath = _portalPath.relativize(
+						versionPath);
 
-					Path otherBndBndPath = otherPath.resolve(
-						bndBndRelativePath);
+					Path otherVersionPath = otherPath.resolve(
+						versionRelativePath);
 
-					if (Files.notExists(otherBndBndPath)) {
+					if (Files.notExists(otherVersionPath)) {
 						if (_log.isInfoEnabled()) {
 							_log.info(
 								StringBundler.concat(
 									"Ignoring ",
-									String.valueOf(bndBndRelativePath),
+									String.valueOf(versionRelativePath),
 									" as it does not exist in ",
 									String.valueOf(otherPath)));
 						}
@@ -182,7 +187,7 @@ public class ReleaseVersionsTest {
 					}
 
 					String message = _checkReleaseVersion(
-						bndBndPath, otherBndBndPath, otherRelease, dirPath);
+						versionPath, otherVersionPath, otherRelease, dirPath);
 
 					if (message != null) {
 						messages.add(message);
@@ -204,29 +209,52 @@ public class ReleaseVersionsTest {
 	}
 
 	private String _checkReleaseVersion(
-			Path bndBndPath, Path otherBndBndPath, boolean otherRelease,
+			Path versionPath, Path otherVersionPath, boolean otherRelease,
 			Path dirPath)
 		throws IOException {
 
-		Properties bndProperties = _loadProperties(bndBndPath);
-		Properties otherBndProperties = _loadProperties(otherBndBndPath);
+		String fileName = String.valueOf(versionPath.getFileName());
 
-		String bundleSymbolicName = bndProperties.getProperty(
-			"Bundle-SymbolicName");
-		String otherBundleSymbolicName = otherBndProperties.getProperty(
-			"Bundle-SymbolicName");
+		ObjectValuePair<Version, Path> otherVersionPathPair = null;
+		ObjectValuePair<Version, Path> versionPathPair = null;
 
-		Assert.assertEquals(bundleSymbolicName, otherBundleSymbolicName);
+		if (Objects.equals(fileName, "bnd.bnd")) {
+			Properties bndProperties = _loadProperties(versionPath);
+			Properties otherBndProperties = _loadProperties(otherVersionPath);
 
-		ObjectValuePair<Version, Path> versionPathPair = _getVersion(
-			bndBndPath, bndProperties);
+			String bundleSymbolicName = bndProperties.getProperty(
+				"Bundle-SymbolicName");
+			String otherBundleSymbolicName = otherBndProperties.getProperty(
+				"Bundle-SymbolicName");
 
-		ObjectValuePair<Version, Path> releaseVersionPair = versionPathPair;
+			Assert.assertEquals(bundleSymbolicName, otherBundleSymbolicName);
 
-		ObjectValuePair<Version, Path> otherVersionPathPair = _getVersion(
-			otherBndBndPath, otherBndProperties);
+			otherVersionPathPair = _getVersion(
+				otherVersionPath, otherBndProperties);
+			versionPathPair = _getVersion(versionPath, bndProperties);
+		}
+		else {
+			Matcher matcher = _versionPattern.matcher(_read(otherVersionPath));
+
+			if (matcher.find()) {
+				otherVersionPathPair = new ObjectValuePair<>(
+					Version.parseVersion(matcher.group(1)), otherVersionPath);
+			}
+
+			matcher = _versionPattern.matcher(_read(versionPath));
+
+			if (matcher.find()) {
+				versionPathPair = new ObjectValuePair<>(
+					Version.parseVersion(matcher.group(1)), versionPath);
+			}
+
+			if ((otherVersionPathPair == null) || (versionPathPair == null)) {
+				return null;
+			}
+		}
 
 		ObjectValuePair<Version, Path> masterVersionPair = otherVersionPathPair;
+		ObjectValuePair<Version, Path> releaseVersionPair = versionPathPair;
 
 		if (otherRelease) {
 			masterVersionPair = versionPathPair;
@@ -239,11 +267,9 @@ public class ReleaseVersionsTest {
 		if (!releaseVersion.equals(new Version(1, 0, 0)) &&
 			(masterVersion.getMajor() != (releaseVersion.getMajor() + 1))) {
 
-			StringBundler sb = new StringBundler(22);
+			StringBundler sb = new StringBundler(18);
 
-			sb.append("The ");
-			sb.append(Constants.BUNDLE_VERSION);
-			sb.append(" for ");
+			sb.append("The version for ");
 			sb.append(_portalPath.relativize(dirPath));
 			sb.append(" on the 'master' branch (");
 			sb.append(masterVersion);
@@ -265,7 +291,6 @@ public class ReleaseVersionsTest {
 			sb.append("). Please ");
 
 			Path updateVersionPath = null;
-			String updateVersionSeparator = null;
 
 			Path gitRepoPath = _getParentFile(dirPath, ".gitrepo");
 
@@ -284,12 +309,9 @@ public class ReleaseVersionsTest {
 
 				updateVersionPath = updateVersionPath.resolve(
 					_getVersionOverrideFileName(dirPath));
-
-				updateVersionSeparator = StringPool.EQUAL;
 			}
 			else {
-				updateVersionPath = dirPath.resolve("bnd.bnd");
-				updateVersionSeparator = ": ";
+				updateVersionPath = dirPath.resolve(fileName);
 			}
 
 			if (Files.exists(updateVersionPath)) {
@@ -299,11 +321,9 @@ public class ReleaseVersionsTest {
 				sb.append("add");
 			}
 
-			sb.append(" \"");
-			sb.append(Constants.BUNDLE_VERSION);
-			sb.append(updateVersionSeparator);
+			sb.append(" the version to ");
 			sb.append(new Version(releaseVersion.getMajor() + 1, 0, 0));
-			sb.append("\" in ");
+			sb.append(" in ");
 			sb.append(_portalPath.relativize(updateVersionPath));
 			sb.append(" for the 'master' branch.");
 
@@ -374,8 +394,7 @@ public class ReleaseVersionsTest {
 		if (versionOverridePath != null) {
 			Properties versionOverrides = _loadProperties(versionOverridePath);
 
-			String version = versionOverrides.getProperty(
-				Constants.BUNDLE_VERSION);
+			String version = versionOverrides.getProperty("Bundle-Version");
 
 			if (Validator.isNotNull(version)) {
 				return new ObjectValuePair<>(
@@ -383,7 +402,7 @@ public class ReleaseVersionsTest {
 			}
 		}
 
-		String version = bndProperties.getProperty(Constants.BUNDLE_VERSION);
+		String version = bndProperties.getProperty("Bundle-Version");
 
 		return new ObjectValuePair<>(Version.parseVersion(version), bndBndPath);
 	}
@@ -391,6 +410,23 @@ public class ReleaseVersionsTest {
 	private String _getVersionOverrideFileName(Path dirPath) {
 		return ".version-override-" + String.valueOf(dirPath.getFileName()) +
 			".properties";
+	}
+
+	private Path _getVersionPath(Path dirPath) {
+		Path bndBndPath = dirPath.resolve("bnd.bnd");
+
+		if (Files.exists(bndBndPath)) {
+			return bndBndPath;
+		}
+
+		String dirName = String.valueOf(dirPath.getFileName());
+		Path packageJsonPath = dirPath.resolve("package.json");
+
+		if (Files.exists(packageJsonPath) && dirName.contains("-theme")) {
+			return packageJsonPath;
+		}
+
+		return null;
 	}
 
 	private boolean _isInGitRepoReadOnly(Path dirPath) throws IOException {
@@ -435,5 +471,7 @@ public class ReleaseVersionsTest {
 		ReleaseVersionsTest.class);
 
 	private static Path _portalPath;
+	private static final Pattern _versionPattern = Pattern.compile(
+		"\"version\": \"(\\w+\\.\\w+\\.\\w+)\"");
 
 }

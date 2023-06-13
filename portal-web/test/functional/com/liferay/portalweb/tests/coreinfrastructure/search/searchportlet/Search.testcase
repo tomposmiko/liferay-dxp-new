@@ -129,36 +129,32 @@ definition {
 		SearchResultPortlet.viewNoSearchResults(searchTerm = "apple");
 	}
 
+	@description = "This is a use case for LPS-92008."
 	@priority = "3"
 	test AssertGuestCannotSeeEmptySearchWidgets {
-		// Workaround: Remove assertions for Suggestions, Sort, Search Results, and Modified Facet portlets until LPS-92008 is fixed
-
-		ProductMenu.gotoPortlet(
-			category = "Site Builder",
-			panel = "Site Administration",
-			portlet = "Pages");
-
-		SitePages.addPublicPage(pageName = "Search Page");
-
-		Navigator.gotoPage(pageName = "Search Page");
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Search Page");
 
 		var portalURL = PropsUtil.get("portal.url");
 
 		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search-page");
 
-		SearchPortlets.addWidgets(searchPortletList = "Category Facet,Custom Facet,Folder Facet,Modified Facet,Search Bar,Search Insights,Search Options,Search Results,Site Facet,Sort,Suggestions,Tag Facet,Type Facet,User Facet");
+		SearchPortlets.addWidgets(searchPortletList = "Category Facet,Custom Facet,Folder Facet,Modified Facet,Search Insights,Search Options,Site Facet,Sort,Suggestions,Tag Facet,Type Facet,User Facet,Search Results,Search Bar");
 
 		User.logoutPG();
+
+		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search");
+
+		// Workaround: Removed assertions for Suggestions, Sort, Search Results, and Modified Facet portlets until LPS-92008 is fixed. See LRQA-47720.
+
+		for (var portletName : list "Category Facet,Custom Facet,Folder Facet,Modified Facet,Search Insights,Search Options,Search Results,Site Facet,Sort,Suggestions,Tag Facet,Type Facet,User Facet") {
+			Portlet.viewNoSpecificPG(portletName = "${portletName}");
+		}
 
 		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search-page");
 
 		for (var portletName : list "Category Facet,Custom Facet,Folder Facet,Search Insights,Search Options,Site Facet,Tag Facet,Type Facet,User Facet") {
-			Portlet.viewNoSpecificPG(portletName = "${portletName}");
-		}
-
-		Navigator.openSpecificURL(url = "${portalURL}/web/guest/search");
-
-		for (var portletName : list "Category Facet,Custom Facet,Folder Facet,Modified Facet,Search Insights,Search Options,Search Results,Site Facet,Sort,Suggestions,Tag Facet,Type Facet,User Facet") {
 			Portlet.viewNoSpecificPG(portletName = "${portletName}");
 		}
 	}
@@ -230,7 +226,9 @@ definition {
 	@description = "This is a use case for LPS-90078."
 	@priority = "4"
 	test ModifyPaginationPortalProperties {
+		property app.server.types = "jboss,resin,tcserver,tomcat,weblogic,websphere,wildfly";
 		property custom.properties = "search.container.page.default.delta=2";
+		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property portal.acceptance = "true";
 		property environment.acceptance = "true";
 
@@ -923,6 +921,8 @@ definition {
 
 	@priority = "5"
 	test SearchDocumentsAndMediaDocument {
+		property app.server.types = "jboss,resin,tcserver,tomcat,weblogic,websphere,wildfly";
+		property database.types = "db2,hypersonic,mariadb,mysql,oracle,postgresql,sqlserver,sybase";
 		property environment.acceptance = "true";
 		property testray.component.names = "Training";
 
@@ -1439,6 +1439,172 @@ definition {
 		AssertHTMLSourceTextNotPresent(value1 = "${actualScript}");
 
 		AssertHTMLSourceTextPresent(value1 = "${escapedScript}");
+	}
+
+	@description = "This is a use case for LPS-84035."
+	@priority = "5"
+	test ViewCreatedSearchPagePermissions {
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
+
+		JSONUser.addUserToSite(
+			groupName = "Guest",
+			userEmailAddress = "userea@liferay.com");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Search Page");
+
+		var webContentServiceContext = '''{"addGuestPermissions": "true", "assetTagNames": ["tag"]}''';
+
+		JSONWebcontent.addWebContent(
+			content = "WC Content",
+			groupName = "Guest",
+			serviceContext = "${webContentServiceContext}",
+			title = "WC Title");
+
+		Navigator.gotoPage(pageName = "Search Page");
+
+		SearchPortlets.addWidgets(searchPortletList = "Custom Filter,Sort,Suggestions,Search Results,Search Bar");
+
+		PermissionsInline.gotoConfigurationPG(portletName = "Search Results");
+
+		PermissionsInline.viewPermissionsChecked(
+			permissionDefinitionKey = "CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX",
+			roleTitle = "Guest");
+
+		PermissionsInline.viewPermissionsChecked(
+			permissionDefinitionKey = "CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX",
+			roleTitle = "Site Member");
+
+		IFrame.closeFrame();
+
+		SearchPortlets.configureDestination(destinationPage = "Search Page");
+
+		User.logoutPG();
+
+		SearchPortlets.searchEmbedded(searchTerm = "WC Title");
+
+		SearchResultPortlet.viewSearchResults(
+			searchAssetTitle = "WC Title",
+			searchAssetType = "Web Content Article",
+			searchTerm = "WC Title");
+
+		AssertElementNotPresent(locator1 = "Portlet#ERROR");
+
+		for (var portlet : list "Custom Filter,Sort,Suggestions,Search Results,Search Bar") {
+			AssertElementPresent(
+				key_portletName = "${portlet}",
+				locator1 = "Portlet#BODY");
+		}
+
+		User.loginPG(
+			password = "test",
+			userEmailAddress = "userea@liferay.com");
+
+		SearchPortlets.searchEmbedded(searchTerm = "WC Title");
+
+		SearchResultPortlet.viewSearchResults(
+			searchAssetTitle = "WC Title",
+			searchAssetType = "Web Content Article",
+			searchTerm = "WC Title");
+
+		AssertElementNotPresent(locator1 = "Portlet#ERROR");
+
+		for (var portlet : list "Custom Filter,Sort,Suggestions,Search Results,Search Bar") {
+			AssertElementPresent(
+				key_portletName = "${portlet}",
+				locator1 = "Portlet#BODY");
+		}
+	}
+
+	@description = "This is a use case for LPS-84035."
+	@priority = "5"
+	test ViewDefaultSearchPagePermissions {
+		JSONUser.addUser(
+			userEmailAddress = "userea@liferay.com",
+			userFirstName = "userfn",
+			userLastName = "userln",
+			userScreenName = "usersn");
+
+		JSONUser.setFirstPassword(
+			agreeToTermsAndAnswerReminderQuery = "true",
+			requireReset = "false",
+			userEmailAddress = "userea@liferay.com");
+
+		JSONUser.addUserToSite(
+			groupName = "Guest",
+			userEmailAddress = "userea@liferay.com");
+
+		var webContentServiceContext = '''{"addGuestPermissions": "true", "assetTagNames": ["tag"]}''';
+
+		JSONWebcontent.addWebContent(
+			content = "WC Content",
+			groupName = "Guest",
+			serviceContext = "${webContentServiceContext}",
+			title = "WC Title");
+
+		SearchPortlets.searchEmbedded(searchTerm = "WC Title");
+
+		PermissionsInline.gotoConfigurationPG(portletName = "Search Results");
+
+		PermissionsInline.viewPermissionsChecked(
+			permissionDefinitionKey = "CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX",
+			roleTitle = "Guest");
+
+		PermissionsInline.viewPermissionsChecked(
+			permissionDefinitionKey = "CONFIGURATION_PERMISSIONS_VIEW_CHECKBOX",
+			roleTitle = "Site Member");
+
+		IFrame.closeFrame();
+
+		User.logoutPG();
+
+		SearchPortlets.searchEmbedded(searchTerm = "WC Title");
+
+		AssertElementNotPresent(locator1 = "Portlet#ERROR");
+
+		AssertElementPresent(locator1 = "Search#SEARCH_BAR_WIDGET");
+
+		for (var portlet : list "Last Modified,Tag,Type,User") {
+			AssertElementPresent(
+				key_portletName = "${portlet}",
+				locator1 = "Portlet#BODY");
+		}
+
+		SearchResultPortlet.viewSearchResults(
+			searchAssetTitle = "WC Title",
+			searchAssetType = "Web Content Article",
+			searchTerm = "WC Title");
+
+		User.loginPG(
+			password = "test",
+			userEmailAddress = "userea@liferay.com");
+
+		SearchPortlets.searchEmbedded(searchTerm = "WC Title");
+
+		AssertElementNotPresent(locator1 = "Portlet#ERROR");
+
+		AssertElementPresent(locator1 = "Search#SEARCH_BAR_WIDGET");
+
+		for (var portlet : list "Last Modified,Tag,Type,User") {
+			AssertElementPresent(
+				key_portletName = "${portlet}",
+				locator1 = "Portlet#BODY");
+		}
+
+		SearchResultPortlet.viewSearchResults(
+			searchAssetTitle = "WC Title",
+			searchAssetType = "Web Content Article",
+			searchTerm = "WC Title");
 	}
 
 	@description = "This is a use case for LPS-74299."

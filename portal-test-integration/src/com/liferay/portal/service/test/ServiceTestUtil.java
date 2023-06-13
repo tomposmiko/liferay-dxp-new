@@ -66,13 +66,12 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
-
-import org.osgi.framework.Constants;
 
 /**
  * @author Brian Wing Shun Chan
@@ -222,7 +221,7 @@ public class ServiceTestUtil {
 
 		HashMap<String, Object> messageBusProperties = new HashMap<>();
 
-		messageBusProperties.put(Constants.SERVICE_RANKING, Integer.MAX_VALUE);
+		messageBusProperties.put("service.ranking", Integer.MAX_VALUE);
 
 		registry.registerService(
 			MessageBus.class, _messageBusWrapper, messageBusProperties);
@@ -235,7 +234,7 @@ public class ServiceTestUtil {
 			new HashMap<>();
 
 		portalExecutorManagerProperties.put(
-			Constants.SERVICE_RANKING, Integer.MAX_VALUE);
+			"service.ranking", Integer.MAX_VALUE);
 
 		registry.registerService(
 			PortalExecutorManager.class, _portalExecutorManagerWrapper,
@@ -386,7 +385,7 @@ public class ServiceTestUtil {
 				public Object invoke(Object proxy, Method method, Object[] args)
 					throws Throwable {
 
-					if ("shutdown".equals(method.getName()) &&
+					if (Objects.equals(method.getName(), "shutdown") &&
 						(args.length == 1)) {
 
 						args[0] = Boolean.FALSE;
@@ -413,7 +412,9 @@ public class ServiceTestUtil {
 		public Object invoke(Object proxy, Method method, Object[] args)
 			throws Throwable {
 
-			if (!"shutdown".equals(method.getName()) || (args.length != 1)) {
+			if (!Objects.equals(method.getName(), "shutdown") ||
+				(args.length != 1)) {
+
 				return method.invoke(_portalExecutorManager, args);
 			}
 

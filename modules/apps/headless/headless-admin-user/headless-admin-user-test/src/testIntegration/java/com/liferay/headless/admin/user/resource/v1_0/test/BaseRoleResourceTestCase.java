@@ -646,7 +646,7 @@ public abstract class BaseRoleResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected Role randomRole() {
+	protected Role randomRole() throws Exception {
 		return new Role() {
 			{
 				dateCreated = RandomTestUtil.nextDate();
@@ -659,13 +659,13 @@ public abstract class BaseRoleResourceTestCase {
 		};
 	}
 
-	protected Role randomIrrelevantRole() {
+	protected Role randomIrrelevantRole() throws Exception {
 		Role randomIrrelevantRole = randomRole();
 
 		return randomIrrelevantRole;
 	}
 
-	protected Role randomPatchRole() {
+	protected Role randomPatchRole() throws Exception {
 		return randomRole();
 	}
 

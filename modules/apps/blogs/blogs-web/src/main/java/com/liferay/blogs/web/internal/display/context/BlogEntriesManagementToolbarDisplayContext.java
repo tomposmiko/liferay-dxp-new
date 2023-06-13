@@ -56,17 +56,17 @@ public class BlogEntriesManagementToolbarDisplayContext
 	public BlogEntriesManagementToolbarDisplayContext(
 		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse,
-		HttpServletRequest request, SearchContainer searchContainer,
+		HttpServletRequest httpServletRequest, SearchContainer searchContainer,
 		TrashHelper trashHelper, String displayStyle) {
 
 		super(
-			liferayPortletRequest, liferayPortletResponse, request,
+			liferayPortletRequest, liferayPortletResponse, httpServletRequest,
 			searchContainer);
 
 		_trashHelper = trashHelper;
 		_displayStyle = displayStyle;
 
-		_themeDisplay = (ThemeDisplay)request.getAttribute(
+		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -255,7 +255,8 @@ public class BlogEntriesManagementToolbarDisplayContext
 			{
 				add(
 					dropdownItem -> {
-						dropdownItem.setActive("title".equals(getOrderByCol()));
+						dropdownItem.setActive(
+							Objects.equals(getOrderByCol(), "title"));
 						dropdownItem.setHref(
 							_getCurrentSortingURL(), "orderByCol", "title");
 						dropdownItem.setLabel(
@@ -265,7 +266,7 @@ public class BlogEntriesManagementToolbarDisplayContext
 				add(
 					dropdownItem -> {
 						dropdownItem.setActive(
-							"display-date".equals(getOrderByCol()));
+							Objects.equals(getOrderByCol(), "display-date"));
 						dropdownItem.setHref(
 							_getCurrentSortingURL(), "orderByCol",
 							"display-date");

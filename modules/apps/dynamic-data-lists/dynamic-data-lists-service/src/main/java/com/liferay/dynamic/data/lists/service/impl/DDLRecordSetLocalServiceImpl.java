@@ -21,6 +21,8 @@ import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.lists.model.DDLRecordSetConstants;
 import com.liferay.dynamic.data.lists.model.DDLRecordSetSettings;
 import com.liferay.dynamic.data.lists.model.DDLRecordSetVersion;
+import com.liferay.dynamic.data.lists.service.DDLRecordLocalService;
+import com.liferay.dynamic.data.lists.service.DDLRecordSetVersionLocalService;
 import com.liferay.dynamic.data.lists.service.base.DDLRecordSetLocalServiceBaseImpl;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializer;
 import com.liferay.dynamic.data.mapping.io.DDMFormValuesDeserializerDeserializeRequest;
@@ -42,6 +44,7 @@ import com.liferay.dynamic.data.mapping.util.DDMFormFactory;
 import com.liferay.dynamic.data.mapping.util.DDMFormInstanceFactory;
 import com.liferay.dynamic.data.mapping.validator.DDMFormValuesValidator;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
@@ -55,12 +58,14 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
-import com.liferay.portal.spring.extender.service.ServiceReference;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * Provides the local service for accessing, adding, deleting, and updating
@@ -69,6 +74,10 @@ import java.util.Map;
  * @author Brian Wing Shun Chan
  * @author Marcellus Tavares
  */
+@Component(
+	property = "model.class.name=com.liferay.dynamic.data.lists.model.DDLRecordSet",
+	service = AopService.class
+)
 public class DDLRecordSetLocalServiceImpl
 	extends DDLRecordSetLocalServiceBaseImpl {
 
@@ -213,10 +222,10 @@ public class DDLRecordSetLocalServiceImpl
 	/**
 	 * Adds the model resources with the permissions to the record set.
 	 *
-	 * @param  recordSet the record set
-	 * @param  groupPermissions whether to add group permissions
-	 * @param  guestPermissions whether to add guest permissions
-	 * @throws PortalException if a portal exception occurred
+	 * @param      recordSet the record set
+	 * @param      groupPermissions whether to add group permissions
+	 * @param      guestPermissions whether to add guest permissions
+	 * @throws     PortalException if a portal exception occurred
 	 * @deprecated As of Judson (7.1.x), replaced by {@link
 	 *             #addRecordSetResources(DDLRecordSet, ModelPermissions)}
 	 */
@@ -258,11 +267,11 @@ public class DDLRecordSetLocalServiceImpl
 
 		// Records
 
-		ddlRecordLocalService.deleteRecords(recordSet.getRecordSetId());
+		_ddlRecordLocalService.deleteRecords(recordSet.getRecordSetId());
 
 		// Record set versions
 
-		ddlRecordSetVersionLocalService.deleteByRecordSetId(
+		_ddlRecordSetVersionLocalService.deleteByRecordSetId(
 			recordSet.getRecordSetId());
 
 		// Dynamic data mapping structure link
@@ -415,7 +424,8 @@ public class DDLRecordSetLocalServiceImpl
 	}
 
 	/**
-	 * Returns the number of all the record sets belonging the group and associated with the DDMStructure.
+	 * Returns the number of all the record sets belonging the group and
+	 * associated with the DDMStructure.
 	 *
 	 * @param  groupId the primary key of the record set's group
 	 * @return the number of record sets belonging to the group
@@ -802,7 +812,7 @@ public class DDLRecordSetLocalServiceImpl
 		recordSet.setDDMStructureId(ddmStructureId);
 
 		DDLRecordSetVersion latestRecordSetVersion =
-			ddlRecordSetVersionLocalService.getLatestRecordSetVersion(
+			_ddlRecordSetVersionLocalService.getLatestRecordSetVersion(
 				recordSet.getRecordSetId());
 
 		int status = GetterUtil.getInteger(
@@ -855,7 +865,7 @@ public class DDLRecordSetLocalServiceImpl
 
 			// Records
 
-			ddlRecordLocalService.deleteRecords(recordSet.getRecordSetId());
+			_ddlRecordLocalService.deleteRecords(recordSet.getRecordSetId());
 
 			// Dynamic data mapping structure link
 
@@ -929,7 +939,7 @@ public class DDLRecordSetLocalServiceImpl
 		throws PortalException {
 
 		DDLRecordSetVersion recordSetVersion =
-			ddlRecordSetVersionLocalService.getLatestRecordSetVersion(
+			_ddlRecordSetVersionLocalService.getLatestRecordSetVersion(
 				recordSet.getRecordSetId());
 
 		recordSetVersion.setUserId(recordSet.getUserId());
@@ -994,22 +1004,28 @@ public class DDLRecordSetLocalServiceImpl
 		}
 	}
 
-	@ServiceReference(type = DDMFormValuesDeserializerTracker.class)
+	@Reference
 	protected DDMFormValuesDeserializerTracker ddmFormValuesDeserializerTracker;
 
-	@ServiceReference(type = DDMFormValuesSerializerTracker.class)
+	@Reference
 	protected DDMFormValuesSerializerTracker ddmFormValuesSerializerTracker;
 
-	@ServiceReference(type = DDMFormValuesValidator.class)
+	@Reference
 	protected DDMFormValuesValidator ddmFormValuesValidator;
 
-	@ServiceReference(type = DDMStructureLinkLocalService.class)
+	@Reference
 	protected DDMStructureLinkLocalService ddmStructureLinkLocalService;
 
-	@ServiceReference(type = DDMStructureLocalService.class)
+	@Reference
 	protected DDMStructureLocalService ddmStructureLocalService;
 
-	@ServiceReference(type = DDMStructureVersionLocalService.class)
+	@Reference
 	protected DDMStructureVersionLocalService ddmStructureVersionLocalService;
+
+	@Reference
+	private DDLRecordLocalService _ddlRecordLocalService;
+
+	@Reference
+	private DDLRecordSetVersionLocalService _ddlRecordSetVersionLocalService;
 
 }

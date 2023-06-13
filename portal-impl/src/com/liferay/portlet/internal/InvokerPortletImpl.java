@@ -548,13 +548,16 @@ public class InvokerPortletImpl
 			RequestDispatcher requestDispatcher =
 				servletContext.getRequestDispatcher(path);
 
-			HttpServletRequest request = portletRequest.getHttpServletRequest();
-			HttpServletResponse response =
+			HttpServletRequest httpServletRequest =
+				portletRequest.getHttpServletRequest();
+			HttpServletResponse httpServletResponse =
 				portletResponse.getHttpServletResponse();
 
-			request.setAttribute(JavaConstants.JAVAX_PORTLET_PORTLET, _portlet);
-			request.setAttribute(PortletRequest.LIFECYCLE_PHASE, lifecycle);
-			request.setAttribute(
+			httpServletRequest.setAttribute(
+				JavaConstants.JAVAX_PORTLET_PORTLET, _portlet);
+			httpServletRequest.setAttribute(
+				PortletRequest.LIFECYCLE_PHASE, lifecycle);
+			httpServletRequest.setAttribute(
 				PortletServlet.PORTLET_SERVLET_FILTER_CHAIN, filterChain);
 
 			try {
@@ -563,10 +566,12 @@ public class InvokerPortletImpl
 				// allow you to specify the content type or headers
 
 				if (lifecycle.equals(PortletRequest.RESOURCE_PHASE)) {
-					requestDispatcher.forward(request, response);
+					requestDispatcher.forward(
+						httpServletRequest, httpServletResponse);
 				}
 				else {
-					requestDispatcher.include(request, response);
+					requestDispatcher.include(
+						httpServletRequest, httpServletResponse);
 				}
 			}
 			catch (ServletException se) {

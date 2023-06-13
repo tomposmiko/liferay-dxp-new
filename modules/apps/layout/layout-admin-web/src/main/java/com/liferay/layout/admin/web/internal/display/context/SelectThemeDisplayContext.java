@@ -39,10 +39,11 @@ import javax.servlet.http.HttpServletRequest;
 public class SelectThemeDisplayContext {
 
 	public SelectThemeDisplayContext(
-		HttpServletRequest request, LiferayPortletRequest liferayPortletRequest,
+		HttpServletRequest httpServletRequest,
+		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse) {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
 	}
@@ -52,7 +53,8 @@ public class SelectThemeDisplayContext {
 			return _displayStyle;
 		}
 
-		_displayStyle = ParamUtil.getString(_request, "displayStyle", "icon");
+		_displayStyle = ParamUtil.getString(
+			_httpServletRequest, "displayStyle", "icon");
 
 		return _displayStyle;
 	}
@@ -74,7 +76,8 @@ public class SelectThemeDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = ParamUtil.getString(_request, "orderByCol", "name");
+		_orderByCol = ParamUtil.getString(
+			_httpServletRequest, "orderByCol", "name");
 
 		return _orderByCol;
 	}
@@ -84,7 +87,8 @@ public class SelectThemeDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = ParamUtil.getString(_request, "orderByType", "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -123,7 +127,7 @@ public class SelectThemeDisplayContext {
 			return _redirect;
 		}
 
-		_redirect = ParamUtil.getString(_request, "redirect");
+		_redirect = ParamUtil.getString(_httpServletRequest, "redirect");
 
 		return _redirect;
 	}
@@ -143,8 +147,9 @@ public class SelectThemeDisplayContext {
 			return _themesSearchContainer;
 		}
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		SearchContainer themesSearchContainer = new SearchContainer(
 			_liferayPortletRequest, getPortletURL(), null, null);
@@ -153,7 +158,7 @@ public class SelectThemeDisplayContext {
 		themesSearchContainer.setOrderByType(getOrderByType());
 
 		GroupDisplayContextHelper groupDisplayContextHelper =
-			new GroupDisplayContextHelper(_request);
+			new GroupDisplayContextHelper(_httpServletRequest);
 
 		List<Theme> themes = ThemeLocalServiceUtil.getPageThemes(
 			themeDisplay.getCompanyId(),
@@ -181,12 +186,12 @@ public class SelectThemeDisplayContext {
 
 	private String _displayStyle;
 	private String _eventName;
+	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
 	private String _orderByCol;
 	private String _orderByType;
 	private String _redirect;
-	private final HttpServletRequest _request;
 	private String _themeId;
 	private SearchContainer _themesSearchContainer;
 

@@ -14,14 +14,14 @@
 
 package com.liferay.portal.kernel.mobile.device;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.util.ServiceProxyFactory;
 
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Milen Dyankov
@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 @ProviderType
 public class DeviceDetectionUtil {
 
-	public static Device detectDevice(HttpServletRequest request) {
+	public static Device detectDevice(HttpServletRequest httpServletRequest) {
 		DeviceRecognitionProvider deviceRecognitionProvider =
 			_deviceRecognitionProvider;
 
@@ -38,7 +38,7 @@ public class DeviceDetectionUtil {
 			return UnknownDevice.getInstance();
 		}
 
-		return deviceRecognitionProvider.detectDevice(request);
+		return deviceRecognitionProvider.detectDevice(httpServletRequest);
 	}
 
 	public static DeviceRecognitionProvider getDeviceRecognitionProvider() {

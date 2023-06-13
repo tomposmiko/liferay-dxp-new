@@ -14,11 +14,11 @@
 
 package com.liferay.asset.auto.tagger.service.persistence;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.asset.auto.tagger.exception.NoSuchEntryException;
 import com.liferay.asset.auto.tagger.model.AssetAutoTaggerEntry;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The persistence interface for the asset auto tagger entry service.

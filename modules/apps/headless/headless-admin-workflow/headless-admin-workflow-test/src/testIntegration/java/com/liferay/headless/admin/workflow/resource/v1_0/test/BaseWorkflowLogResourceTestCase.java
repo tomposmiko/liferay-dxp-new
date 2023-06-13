@@ -809,7 +809,7 @@ public abstract class BaseWorkflowLogResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected WorkflowLog randomWorkflowLog() {
+	protected WorkflowLog randomWorkflowLog() throws Exception {
 		return new WorkflowLog() {
 			{
 				commentLog = RandomTestUtil.randomString();
@@ -823,13 +823,13 @@ public abstract class BaseWorkflowLogResourceTestCase {
 		};
 	}
 
-	protected WorkflowLog randomIrrelevantWorkflowLog() {
+	protected WorkflowLog randomIrrelevantWorkflowLog() throws Exception {
 		WorkflowLog randomIrrelevantWorkflowLog = randomWorkflowLog();
 
 		return randomIrrelevantWorkflowLog;
 	}
 
-	protected WorkflowLog randomPatchWorkflowLog() {
+	protected WorkflowLog randomPatchWorkflowLog() throws Exception {
 		return randomWorkflowLog();
 	}
 

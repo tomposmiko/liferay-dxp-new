@@ -12,3 +12,8 @@
 # Bundle Version 2.0.2
 #
 bffabc85b2876c8eacdde6d8b71af24ac5b478ea^..ba6ca055e08d02fbc37c5ab05f5815b047285c95=OAUTH2-266
+
+#
+# Bundle Version 2.0.3
+#
+ba6ca055e08d02fbc37c5ab05f5815b047285c95^..9965e5175e7596d7959acabc9a35f858b2d8415f=LPS-95413 OAUTH2-259

@@ -87,37 +87,39 @@ public class MentionsPortlet extends MVCPortlet {
 				return;
 			}
 
-			HttpServletRequest request = _portal.getHttpServletRequest(
-				resourceRequest);
+			HttpServletRequest httpServletRequest =
+				_portal.getHttpServletRequest(resourceRequest);
 
-			JSONArray jsonArray = _getJSONArray(request);
+			JSONArray jsonArray = _getJSONArray(httpServletRequest);
 
-			HttpServletResponse response = _portal.getHttpServletResponse(
-				resourceResponse);
+			HttpServletResponse httpServletResponse =
+				_portal.getHttpServletResponse(resourceResponse);
 
-			response.setContentType(ContentTypes.APPLICATION_JSON);
+			httpServletResponse.setContentType(ContentTypes.APPLICATION_JSON);
 
-			ServletResponseUtil.write(response, jsonArray.toString());
+			ServletResponseUtil.write(
+				httpServletResponse, jsonArray.toString());
 		}
 		catch (Exception e) {
 			_log.error(e, e);
 		}
 	}
 
-	private JSONArray _getJSONArray(HttpServletRequest request)
+	private JSONArray _getJSONArray(HttpServletRequest httpServletRequest)
 		throws PortalException {
 
 		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		SocialInteractionsConfiguration socialInteractionsConfiguration =
 			SocialInteractionsConfigurationUtil.
 				getSocialInteractionsConfiguration(
 					themeDisplay.getCompanyId(), MentionsPortletKeys.MENTIONS);
 
-		String query = ParamUtil.getString(request, "query");
+		String query = ParamUtil.getString(httpServletRequest, "query");
 
 		List<User> users = _mentionsUserFinder.getUsers(
 			themeDisplay.getCompanyId(), themeDisplay.getUserId(), query,

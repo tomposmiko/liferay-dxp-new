@@ -1,7 +1,3 @@
-copyLibs {
-	enabled = true
-}
-
 dependencies {
 	testIntegrationCompile group: "com.liferay", name: "com.liferay.arquillian.extension.junit.bridge", version: "1.0.16"
 	testIntegrationCompile project(":apps:asset:asset-category-property-api")

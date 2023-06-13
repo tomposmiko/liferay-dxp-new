@@ -14,12 +14,13 @@
 
 package com.liferay.portal.upgrade.internal.release;
 
-import aQute.bnd.version.Version;
-
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.service.ReleaseLocalService;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import java.util.Map;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.Version;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -56,10 +58,18 @@ public final class ReleasePublisher {
 			"release.bundle.symbolic.name", release.getBundleSymbolicName());
 		properties.put("release.state", release.getState());
 
-		if (Version.isVersion(release.getSchemaVersion())) {
-			properties.put(
-				"release.schema.version",
-				new Version(release.getSchemaVersion()));
+		try {
+			if (Validator.isNotNull(release.getSchemaVersion())) {
+				Version version = new Version(release.getSchemaVersion());
+
+				properties.put("release.schema.version", version);
+			}
+		}
+		catch (IllegalArgumentException iae) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Invalid schema version for release: " + release, iae);
+			}
 		}
 
 		ServiceRegistration<Release> newServiceRegistration =
@@ -109,6 +119,9 @@ public final class ReleasePublisher {
 	}
 
 	private static final int _STATE_IN_PROGRESS = -1;
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		ReleasePublisher.class);
 
 	private BundleContext _bundleContext;
 	private ReleaseLocalService _releaseLocalService;

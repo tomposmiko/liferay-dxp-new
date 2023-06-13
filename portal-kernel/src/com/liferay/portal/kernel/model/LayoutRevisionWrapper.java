@@ -14,13 +14,13 @@
 
 package com.liferay.portal.kernel.model;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.model.wrapper.BaseModelWrapper;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * <p>
@@ -712,10 +712,11 @@ public class LayoutRevisionWrapper
 	}
 
 	@Override
-	public String getRegularURL(javax.servlet.http.HttpServletRequest request)
+	public String getRegularURL(
+			javax.servlet.http.HttpServletRequest httpServletRequest)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
-		return model.getRegularURL(request);
+		return model.getRegularURL(httpServletRequest);
 	}
 
 	/**

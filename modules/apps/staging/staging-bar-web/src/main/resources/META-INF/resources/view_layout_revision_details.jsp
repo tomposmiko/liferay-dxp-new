@@ -56,11 +56,6 @@ else {
 	<c:if test="<%= !hasWorkflowTask %>">
 		<c:if test="<%= !layoutRevision.isHead() && LayoutPermissionUtil.contains(permissionChecker, layoutRevision.getPlid(), ActionKeys.UPDATE) %>">
 			<li class="control-menu-nav-item">
-
-				<%
-				List<LayoutRevision> pendingLayoutRevisions = LayoutRevisionLocalServiceUtil.getLayoutRevisions(layoutRevision.getLayoutSetBranchId(), layoutRevision.getPlid(), WorkflowConstants.STATUS_PENDING);
-				%>
-
 				<portlet:actionURL name="updateLayoutRevision" var="publishURL">
 					<portlet:param name="redirect" value="<%= PortalUtil.getLayoutFullURL(themeDisplay) %>" />
 					<portlet:param name="layoutRevisionId" value="<%= String.valueOf(layoutRevision.getLayoutRevisionId()) %>" />
@@ -69,27 +64,6 @@ else {
 				</portlet:actionURL>
 
 				<c:choose>
-					<c:when test="<%= workflowEnabled && !pendingLayoutRevisions.isEmpty() %>">
-
-						<%
-						String submitMessage = "you-cannot-submit-your-changes-because-someone-else-has-submitted-changes-for-approval";
-
-						LayoutRevision pendingLayoutRevision = pendingLayoutRevisions.get(0);
-
-						if ((pendingLayoutRevision != null) && (pendingLayoutRevision.getUserId() == user.getUserId())) {
-							submitMessage = "you-cannot-submit-your-changes-because-your-previous-submission-is-still-waiting-for-approval";
-						}
-						%>
-
-						<aui:script>
-							AUI.$('.submit-link').on(
-								'mouseenter',
-								function(event) {
-									Liferay.Portal.ToolTip.show(event.currentTarget, '<liferay-ui:message key="<%= submitMessage %>" />');
-								}
-							);
-						</aui:script>
-					</c:when>
 					<c:when test="<%= !workflowEnabled && !layoutRevision.isIncomplete() %>">
 						<span class="staging-bar-control-toggle">
 							<aui:input id="readyToggle" label="<%= StringPool.BLANK %>" labelOff="ready-for-publication" labelOn="ready-for-publication" name="readyToggle" onChange='<%= liferayPortletResponse.getNamespace() + "submitLayoutRevision('" + publishURL + "')" %>' type="toggle-switch" value="<%= false %>" />

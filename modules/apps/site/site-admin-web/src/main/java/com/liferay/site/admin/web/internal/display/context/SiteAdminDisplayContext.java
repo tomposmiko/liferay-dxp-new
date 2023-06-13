@@ -63,15 +63,17 @@ import javax.servlet.http.HttpServletRequest;
 public class SiteAdminDisplayContext {
 
 	public SiteAdminDisplayContext(
-		HttpServletRequest request, LiferayPortletRequest liferayPortletRequest,
+		HttpServletRequest httpServletRequest,
+		LiferayPortletRequest liferayPortletRequest,
 		LiferayPortletResponse liferayPortletResponse) {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_liferayPortletRequest = liferayPortletRequest;
 		_liferayPortletResponse = liferayPortletResponse;
 
-		_groupSearchProvider = (GroupSearchProvider)request.getAttribute(
-			SiteWebKeys.GROUP_SEARCH_PROVIDER);
+		_groupSearchProvider =
+			(GroupSearchProvider)httpServletRequest.getAttribute(
+				SiteWebKeys.GROUP_SEARCH_PROVIDER);
 	}
 
 	public List<DropdownItem> getActionDropdownItems(Group group)
@@ -89,7 +91,8 @@ public class SiteAdminDisplayContext {
 
 		BreadcrumbEntry breadcrumbEntry = new BreadcrumbEntry();
 
-		breadcrumbEntry.setTitle(LanguageUtil.get(_request, "sites"));
+		breadcrumbEntry.setTitle(
+			LanguageUtil.get(_httpServletRequest, "sites"));
 
 		PortletURL mainURL = _liferayPortletResponse.createRenderURL();
 
@@ -143,7 +146,8 @@ public class SiteAdminDisplayContext {
 			return _displayStyle;
 		}
 
-		_displayStyle = ParamUtil.getString(_request, "displayStyle", "list");
+		_displayStyle = ParamUtil.getString(
+			_httpServletRequest, "displayStyle", "list");
 
 		return _displayStyle;
 	}
@@ -161,7 +165,8 @@ public class SiteAdminDisplayContext {
 	public long getGroupId() {
 		if (_groupId <= 0) {
 			_groupId = ParamUtil.getLong(
-				_request, "groupId", GroupConstants.DEFAULT_PARENT_GROUP_ID);
+				_httpServletRequest, "groupId",
+				GroupConstants.DEFAULT_PARENT_GROUP_ID);
 		}
 
 		return _groupId;
@@ -171,8 +176,9 @@ public class SiteAdminDisplayContext {
 		LinkedHashMap<String, Object> organizationParams =
 			new LinkedHashMap<>();
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		Company company = themeDisplay.getCompany();
 
@@ -231,8 +237,9 @@ public class SiteAdminDisplayContext {
 	public int getUserGroupsCount(Group group) {
 		LinkedHashMap<String, Object> userGroupParams = new LinkedHashMap<>();
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		Company company = themeDisplay.getCompany();
 
@@ -247,8 +254,9 @@ public class SiteAdminDisplayContext {
 	public int getUsersCount(Group group) {
 		LinkedHashMap<String, Object> userParams = new LinkedHashMap<>();
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		Company company = themeDisplay.getCompany();
 
@@ -263,8 +271,9 @@ public class SiteAdminDisplayContext {
 	public boolean hasAddChildSitePermission(Group group)
 		throws PortalException {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)_request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)_httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
@@ -285,8 +294,8 @@ public class SiteAdminDisplayContext {
 	private Group _group;
 	private long _groupId;
 	private final GroupSearchProvider _groupSearchProvider;
+	private final HttpServletRequest _httpServletRequest;
 	private final LiferayPortletRequest _liferayPortletRequest;
 	private final LiferayPortletResponse _liferayPortletResponse;
-	private final HttpServletRequest _request;
 
 }

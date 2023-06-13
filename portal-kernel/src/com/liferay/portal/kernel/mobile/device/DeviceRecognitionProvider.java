@@ -14,9 +14,9 @@
 
 package com.liferay.portal.kernel.mobile.device;
 
-import aQute.bnd.annotation.ProviderType;
-
 import javax.servlet.http.HttpServletRequest;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author Milen Dyankov
@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 @ProviderType
 public interface DeviceRecognitionProvider {
 
-	public Device detectDevice(HttpServletRequest request);
+	public Device detectDevice(HttpServletRequest httpServletRequest);
 
 	public KnownDevices getKnownDevices();
 

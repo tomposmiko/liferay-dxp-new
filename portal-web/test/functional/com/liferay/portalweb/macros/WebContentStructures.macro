@@ -26,16 +26,12 @@ definition {
 	}
 
 	macro addLocalization {
-		PortletEntry.changeLocale(
-			fieldName = "Name",
-			locale = "${locale}");
+		PortletEntry.changeLocale(locale = "${locale}");
 
 		WebContentStructures.addName(structureName = "${localization1Name}");
 
 		if (isSet(locale2)) {
-			PortletEntry.changeLocale(
-				fieldName = "Name",
-				locale = "${locale2}");
+			PortletEntry.changeLocale(locale = "${locale2}");
 
 			WebContentStructures.addName(structureName = "${localization2Name}");
 		}
@@ -93,7 +89,7 @@ definition {
 
 			AssertTextEquals.assertPartialText(
 				locator1 = "Message#ERROR_1",
-				value1 = "The structure cannot be deleted because it is required by one or more templates.");
+				value1 = "The structure cannot be deleted because it is required by one or more structure links.");
 		}
 		else {
 			Alert.viewSuccessMessage();

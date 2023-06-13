@@ -107,7 +107,7 @@ Numeric.STATE = {
 	 * @type {?(string|undefined)}
 	 */
 
-	_value: Config.string().internal().valueFn('_internalValueFn'),
+	_value: Config.oneOfType([Config.number(), Config.string()]).internal().valueFn('_internalValueFn'),
 
 	/**
 	 * @default 'integer'
@@ -169,7 +169,7 @@ Numeric.STATE = {
 	 * @type {?(string)}
 	 */
 
-	predefinedValue: Config.string(),
+	predefinedValue: Config.oneOfType([Config.number(), Config.string()]),
 
 	/**
 	 * @default false
@@ -269,7 +269,7 @@ Numeric.STATE = {
 	 * @type {?(string|undefined)}
 	 */
 
-	value: Config.string()
+	value: Config.oneOfType([Config.number(), Config.string()])
 };
 
 Soy.register(Numeric, templates);

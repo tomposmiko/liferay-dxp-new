@@ -183,7 +183,7 @@ closure arguments.
 ### `gradle.properties`
 
 The following settings are available to you in the `gradle.properties` file of a
-Liferay subrepository (e.g., [com-liferay-apio-architect](https://github.com/liferay/com-liferay-apio-architect)).
+Liferay subrepository (e.g., [com-liferay-poshi-runner](https://github.com/liferay/com-liferay-poshi-runner)).
 
 Property Name | Mandatory | Description
 ------------- | --------- | -----------

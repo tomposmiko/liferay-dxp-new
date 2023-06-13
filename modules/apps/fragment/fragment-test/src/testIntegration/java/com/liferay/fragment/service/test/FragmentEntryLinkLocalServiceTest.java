@@ -90,10 +90,11 @@ public class FragmentEntryLinkLocalServiceTest {
 
 		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
-				TestPropsValues.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUserId(), _group.getGroupId(), 0,
 				fragmentEntry.getFragmentEntryId(), classNameId, classPK,
 				fragmentEntry.getCss(), fragmentEntry.getHtml(),
-				fragmentEntry.getJs(), StringPool.BLANK, 0, serviceContext);
+				fragmentEntry.getJs(), StringPool.BLANK, StringPool.BLANK, 0,
+				null, serviceContext);
 
 		Assert.assertNotNull(
 			_fragmentEntryLinkLocalService.fetchFragmentEntryLink(
@@ -136,18 +137,20 @@ public class FragmentEntryLinkLocalServiceTest {
 				QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
 		_fragmentEntryLinkLocalService.addFragmentEntryLink(
-			TestPropsValues.getUserId(), _group.getGroupId(),
+			TestPropsValues.getUserId(), _group.getGroupId(), 0,
 			fragmentEntry.getFragmentEntryId(),
 			PortalUtil.getClassNameId(Layout.class), classPK,
 			fragmentEntry.getCss(), fragmentEntry.getHtml(),
-			fragmentEntry.getJs(), StringPool.BLANK, 0, serviceContext);
+			fragmentEntry.getJs(), StringPool.BLANK, StringPool.BLANK, 0, null,
+			serviceContext);
 
 		_fragmentEntryLinkLocalService.addFragmentEntryLink(
-			TestPropsValues.getUserId(), _group.getGroupId(),
+			TestPropsValues.getUserId(), _group.getGroupId(), 0,
 			fragmentEntry.getFragmentEntryId(),
 			PortalUtil.getClassNameId(Layout.class), classPK,
 			fragmentEntry.getCss(), fragmentEntry.getHtml(),
-			fragmentEntry.getJs(), StringPool.BLANK, 1, serviceContext);
+			fragmentEntry.getJs(), StringPool.BLANK, StringPool.BLANK, 1, null,
+			serviceContext);
 
 		List<FragmentEntryLink> actualFragmentEntryLinks =
 			_fragmentEntryLinkLocalService.getFragmentEntryLinks(
@@ -181,11 +184,12 @@ public class FragmentEntryLinkLocalServiceTest {
 
 		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
-				TestPropsValues.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUserId(), _group.getGroupId(), 0,
 				fragmentEntry.getFragmentEntryId(),
 				PortalUtil.getClassNameId(Layout.class), classPK,
 				fragmentEntry.getCss(), fragmentEntry.getHtml(),
-				fragmentEntry.getJs(), StringPool.BLANK, 0, serviceContext);
+				fragmentEntry.getJs(), StringPool.BLANK, StringPool.BLANK, 0,
+				null, serviceContext);
 
 		_fragmentEntryLinkLocalService.deleteFragmentEntryLink(
 			fragmentEntryLink.getFragmentEntryLinkId());
@@ -217,19 +221,21 @@ public class FragmentEntryLinkLocalServiceTest {
 
 		FragmentEntryLink fragmentEntryLink1 =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
-				TestPropsValues.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUserId(), _group.getGroupId(), 0,
 				fragmentEntry.getFragmentEntryId(),
 				PortalUtil.getClassNameId(Layout.class), classPK,
 				fragmentEntry.getCss(), fragmentEntry.getHtml(),
-				fragmentEntry.getJs(), StringPool.BLANK, 0, serviceContext);
+				fragmentEntry.getJs(), StringPool.BLANK, StringPool.BLANK, 0,
+				null, serviceContext);
 
 		FragmentEntryLink fragmentEntryLink2 =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
-				TestPropsValues.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUserId(), _group.getGroupId(), 0,
 				fragmentEntry.getFragmentEntryId(),
 				PortalUtil.getClassNameId(Layout.class), classPK,
 				fragmentEntry.getCss(), fragmentEntry.getHtml(),
-				fragmentEntry.getJs(), StringPool.BLANK, 0, serviceContext);
+				fragmentEntry.getJs(), StringPool.BLANK, StringPool.BLANK, 0,
+				null, serviceContext);
 
 		_fragmentEntryLinkLocalService.deleteFragmentEntryLinks(
 			_group.getGroupId());
@@ -263,12 +269,12 @@ public class FragmentEntryLinkLocalServiceTest {
 
 		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
-				TestPropsValues.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUserId(), _group.getGroupId(), 0,
 				fragmentEntry.getFragmentEntryId(),
 				PortalUtil.getClassNameId(Layout.class),
 				RandomTestUtil.randomLong(), fragmentEntry.getCss(),
 				fragmentEntry.getHtml(), fragmentEntry.getJs(),
-				StringPool.BLANK, 0, serviceContext);
+				StringPool.BLANK, StringPool.BLANK, 0, null, serviceContext);
 
 		fragmentEntryLink =
 			_fragmentEntryLinkLocalService.updateFragmentEntryLink(

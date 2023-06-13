@@ -1,9 +1,10 @@
 Bundle-Name: Liferay Info API
 Bundle-SymbolicName: com.liferay.info.api
-Bundle-Version: 1.0.3
+Bundle-Version: 1.2.2
 Export-Package:\
 	com.liferay.info.constants,\
 	com.liferay.info.display.contributor,\
+	com.liferay.info.display.request.attributes.contributor,\
 	com.liferay.info.pagination,\
 	com.liferay.info.provider,\
 	com.liferay.info.renderer,\

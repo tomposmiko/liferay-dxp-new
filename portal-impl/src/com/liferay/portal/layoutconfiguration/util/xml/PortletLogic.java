@@ -52,10 +52,11 @@ public class PortletLogic extends RuntimeLogic {
 	public static final String OPEN_TAG = "<runtime-portlet";
 
 	public PortletLogic(
-		HttpServletRequest request, HttpServletResponse response) {
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse) {
 
-		_request = request;
-		_response = response;
+		_httpServletRequest = httpServletRequest;
+		_httpServletResponse = httpServletResponse;
 	}
 
 	@Override
@@ -85,27 +86,30 @@ public class PortletLogic extends RuntimeLogic {
 		}
 
 		BufferCacheServletResponse bufferCacheServletResponse =
-			new BufferCacheServletResponse(_response);
+			new BufferCacheServletResponse(_httpServletResponse);
 
 		queryString = PortletParameterUtil.addNamespace(portletId, queryString);
 
-		Map<String, String[]> parameterMap = _request.getParameterMap();
+		Map<String, String[]> parameterMap =
+			_httpServletRequest.getParameterMap();
 
-		if (!portletId.equals(_request.getParameter("p_p_id"))) {
+		if (!portletId.equals(_httpServletRequest.getParameter("p_p_id"))) {
 			parameterMap = MapUtil.filterByKeys(
 				parameterMap, key -> !key.startsWith("p_p_"));
 		}
 
-		HttpServletRequest request = DynamicServletRequest.addQueryString(
-			_request, parameterMap, queryString, false);
+		HttpServletRequest httpServletRequest =
+			DynamicServletRequest.addQueryString(
+				_httpServletRequest, parameterMap, queryString, false);
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		Portlet portlet = getPortlet(themeDisplay, portletId);
 
 		PortletContainerUtil.render(
-			request, bufferCacheServletResponse, portlet);
+			httpServletRequest, bufferCacheServletResponse, portlet);
 
 		return bufferCacheServletResponse.getString();
 	}
@@ -129,7 +133,8 @@ public class PortletLogic extends RuntimeLogic {
 				portletId);
 
 		if (count < 1) {
-			PortletPreferencesFactoryUtil.getPortletSetup(_request, portletId);
+			PortletPreferencesFactoryUtil.getPortletSetup(
+				_httpServletRequest, portletId);
 
 			PortletLayoutListener portletLayoutListener =
 				portlet.getPortletLayoutListenerInstance();
@@ -149,7 +154,7 @@ public class PortletLogic extends RuntimeLogic {
 		return portlet;
 	}
 
-	private final HttpServletRequest _request;
-	private final HttpServletResponse _response;
+	private final HttpServletRequest _httpServletRequest;
+	private final HttpServletResponse _httpServletResponse;
 
 }

@@ -14,11 +14,11 @@
 
 package com.liferay.portal.search.spi.model.registrar;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.search.spi.model.index.contributor.ModelIndexerWriterContributor;
 import com.liferay.portal.search.spi.model.result.contributor.ModelSummaryContributor;
 import com.liferay.portal.search.spi.model.result.contributor.ModelVisibilityContributor;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * @author André de Oliveira
@@ -40,6 +40,9 @@ public interface ModelSearchDefinition {
 
 	public void setModelVisibilityContributor(
 		ModelVisibilityContributor modelVisibilityContributor);
+
+	public void setSearchResultPermissionFilterSuppressed(
+		boolean searchResultPermissionFilterSuppressed);
 
 	public void setSelectAllLocales(boolean selectAllLocales);
 

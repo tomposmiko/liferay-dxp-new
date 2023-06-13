@@ -14,9 +14,9 @@
 
 package com.liferay.mail.reader.service;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.service.ServiceWrapper;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides a wrapper for {@link AttachmentLocalService}.

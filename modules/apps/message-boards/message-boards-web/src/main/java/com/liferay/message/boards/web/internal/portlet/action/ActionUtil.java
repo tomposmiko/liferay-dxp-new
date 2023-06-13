@@ -43,14 +43,15 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class ActionUtil {
 
-	public static MBCategory getCategory(HttpServletRequest request)
+	public static MBCategory getCategory(HttpServletRequest httpServletRequest)
 		throws Exception {
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		String mvcRenderCommandName = ParamUtil.getString(
-			request, "mvcRenderCommandName");
+			httpServletRequest, "mvcRenderCommandName");
 
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
@@ -67,7 +68,7 @@ public class ActionUtil {
 		MBBanLocalServiceUtil.checkBan(
 			themeDisplay.getScopeGroupId(), themeDisplay.getUserId());
 
-		long categoryId = ParamUtil.getLong(request, "mbCategoryId");
+		long categoryId = ParamUtil.getLong(httpServletRequest, "mbCategoryId");
 
 		MBCategory category = null;
 
@@ -86,16 +87,16 @@ public class ActionUtil {
 	public static MBCategory getCategory(PortletRequest portletRequest)
 		throws Exception {
 
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			portletRequest);
+		HttpServletRequest httpServletRequest =
+			PortalUtil.getHttpServletRequest(portletRequest);
 
-		return getCategory(request);
+		return getCategory(httpServletRequest);
 	}
 
-	public static MBMessage getMessage(HttpServletRequest request)
+	public static MBMessage getMessage(HttpServletRequest httpServletRequest)
 		throws Exception {
 
-		long messageId = ParamUtil.getLong(request, "messageId");
+		long messageId = ParamUtil.getLong(httpServletRequest, "messageId");
 
 		MBMessage message = null;
 
@@ -113,19 +114,21 @@ public class ActionUtil {
 	public static MBMessage getMessage(PortletRequest portletRequest)
 		throws Exception {
 
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			portletRequest);
+		HttpServletRequest httpServletRequest =
+			PortalUtil.getHttpServletRequest(portletRequest);
 
-		return getMessage(request);
+		return getMessage(httpServletRequest);
 	}
 
-	public static MBMessageDisplay getMessageDisplay(HttpServletRequest request)
+	public static MBMessageDisplay getMessageDisplay(
+			HttpServletRequest httpServletRequest)
 		throws PortalException {
 
-		long messageId = ParamUtil.getLong(request, "messageId");
+		long messageId = ParamUtil.getLong(httpServletRequest, "messageId");
 
-		ThemeDisplay themeDisplay = (ThemeDisplay)request.getAttribute(
-			WebKeys.THEME_DISPLAY);
+		ThemeDisplay themeDisplay =
+			(ThemeDisplay)httpServletRequest.getAttribute(
+				WebKeys.THEME_DISPLAY);
 
 		PermissionChecker permissionChecker =
 			themeDisplay.getPermissionChecker();
@@ -157,16 +160,17 @@ public class ActionUtil {
 			PortletRequest portletRequest)
 		throws PortalException {
 
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			portletRequest);
+		HttpServletRequest httpServletRequest =
+			PortalUtil.getHttpServletRequest(portletRequest);
 
-		return getMessageDisplay(request);
+		return getMessageDisplay(httpServletRequest);
 	}
 
-	public static MBMessage getThreadMessage(HttpServletRequest request)
+	public static MBMessage getThreadMessage(
+			HttpServletRequest httpServletRequest)
 		throws Exception {
 
-		long threadId = ParamUtil.getLong(request, "threadId");
+		long threadId = ParamUtil.getLong(httpServletRequest, "threadId");
 
 		MBMessage message = null;
 
@@ -187,10 +191,10 @@ public class ActionUtil {
 	public static MBMessage getThreadMessage(PortletRequest portletRequest)
 		throws Exception {
 
-		HttpServletRequest request = PortalUtil.getHttpServletRequest(
-			portletRequest);
+		HttpServletRequest httpServletRequest =
+			PortalUtil.getHttpServletRequest(portletRequest);
 
-		return getThreadMessage(request);
+		return getThreadMessage(httpServletRequest);
 	}
 
 }

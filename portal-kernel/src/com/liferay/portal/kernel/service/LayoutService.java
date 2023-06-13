@@ -14,8 +14,6 @@
 
 package com.liferay.portal.kernel.service;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCachable;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -34,6 +32,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * Provides the remote service interface for Layout. Methods of this
@@ -638,8 +638,7 @@ public interface LayoutService extends BaseService {
 	 * @param groupId the primary key of the group
 	 * @param privateLayout whether the layout is private to the group
 	 * @param layoutId the layout ID of the layout
-	 * @param parentLayoutId the layout ID to be assigned to the parent
-	 layout
+	 * @param parentLayoutId the layout ID to be assigned to the parent layout
 	 * @return the matching layout
 	 * @throws PortalException if a portal exception occurred
 	 */

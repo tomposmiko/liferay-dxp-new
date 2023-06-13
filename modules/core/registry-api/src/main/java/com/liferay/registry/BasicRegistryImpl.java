@@ -74,6 +74,14 @@ public class BasicRegistryImpl implements Registry {
 	}
 
 	@Override
+	public <T> ServiceReference<T>[] getAllServiceReferences(
+			String className, String filterString)
+		throws Exception {
+
+		return getServiceReferences(className, filterString);
+	}
+
+	@Override
 	public Filter getFilter(String filterString) throws RuntimeException {
 		return new BasicFilter(filterString);
 	}
@@ -693,7 +701,7 @@ public class BasicRegistryImpl implements Registry {
 		public String[] getPropertyKeys() {
 			Set<String> set = _properties.keySet();
 
-			return set.toArray(new String[set.size()]);
+			return set.toArray(new String[0]);
 		}
 
 		public boolean matches(ServiceReference<?> serviceReference) {

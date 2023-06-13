@@ -1337,7 +1337,7 @@ public abstract class BaseOrganizationResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected Organization randomOrganization() {
+	protected Organization randomOrganization() throws Exception {
 		return new Organization() {
 			{
 				comment = RandomTestUtil.randomString();
@@ -1350,13 +1350,13 @@ public abstract class BaseOrganizationResourceTestCase {
 		};
 	}
 
-	protected Organization randomIrrelevantOrganization() {
+	protected Organization randomIrrelevantOrganization() throws Exception {
 		Organization randomIrrelevantOrganization = randomOrganization();
 
 		return randomIrrelevantOrganization;
 	}
 
-	protected Organization randomPatchOrganization() {
+	protected Organization randomPatchOrganization() throws Exception {
 		return randomOrganization();
 	}
 

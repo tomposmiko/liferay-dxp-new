@@ -14,11 +14,11 @@
 
 package com.liferay.knowledge.base.service.persistence;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.knowledge.base.exception.NoSuchTemplateException;
 import com.liferay.knowledge.base.model.KBTemplate;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The persistence interface for the kb template service.

@@ -94,11 +94,17 @@ public class UpgradeContentImages extends UpgradeProcess {
 							data);
 				}
 
+				dynamicContentElement.clearContent();
+
 				if (fileEntry == null) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(
+							"Deleted dynamic content from file entry " +
+								fileEntryId);
+					}
+
 					continue;
 				}
-
-				dynamicContentElement.clearContent();
 
 				dynamicContentElement.addCDATA(
 					JSONUtil.put(

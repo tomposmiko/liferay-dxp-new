@@ -39,46 +39,54 @@ public class GetEditorStrutsAction implements StrutsAction {
 
 	@Override
 	public String execute(
-			HttpServletRequest request, HttpServletResponse response)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse)
 		throws Exception {
 
-		String namespace = ParamUtil.getString(request, "namespace");
+		String namespace = ParamUtil.getString(httpServletRequest, "namespace");
 
-		HttpServletRequest namespacedRequest = new NamespaceServletRequest(
-			request, StringPool.BLANK, namespace);
+		HttpServletRequest namespacedHttpServletRequest =
+			new NamespaceServletRequest(
+				httpServletRequest, StringPool.BLANK, namespace);
 
-		namespacedRequest.setAttribute("aui:form:portletNamespace", namespace);
+		namespacedHttpServletRequest.setAttribute(
+			"aui:form:portletNamespace", namespace);
 
-		String contents = ParamUtil.getString(namespacedRequest, "contents");
+		String contents = ParamUtil.getString(
+			namespacedHttpServletRequest, "contents");
 
-		namespacedRequest.setAttribute(
+		namespacedHttpServletRequest.setAttribute(
 			"liferay-comment:editor:contents", contents);
 
-		String name = ParamUtil.getString(namespacedRequest, "name");
+		String name = ParamUtil.getString(namespacedHttpServletRequest, "name");
 
-		namespacedRequest.setAttribute("liferay-comment:editor:name", name);
+		namespacedHttpServletRequest.setAttribute(
+			"liferay-comment:editor:name", name);
 
 		String onChangeMethod = ParamUtil.getString(
-			namespacedRequest, "onChangeMethod");
+			namespacedHttpServletRequest, "onChangeMethod");
 
-		namespacedRequest.setAttribute(
+		namespacedHttpServletRequest.setAttribute(
 			"liferay-comment:editor:onChangeMethod", onChangeMethod);
 
 		String placeholder = ParamUtil.getString(
-			namespacedRequest, "placeholder");
+			namespacedHttpServletRequest, "placeholder");
 
-		namespacedRequest.setAttribute(
+		namespacedHttpServletRequest.setAttribute(
 			"liferay-comment:editor:placeholder", placeholder);
 
-		String portletId = ParamUtil.getString(namespacedRequest, "portletId");
+		String portletId = ParamUtil.getString(
+			namespacedHttpServletRequest, "portletId");
 
-		namespacedRequest.setAttribute(WebKeys.PORTLET_ID, portletId);
+		namespacedHttpServletRequest.setAttribute(
+			WebKeys.PORTLET_ID, portletId);
 
 		RequestDispatcher requestDispatcher =
 			_servletContext.getRequestDispatcher(
 				"/discussion/editor_resource.jsp");
 
-		requestDispatcher.include(namespacedRequest, response);
+		requestDispatcher.include(
+			namespacedHttpServletRequest, httpServletResponse);
 
 		return null;
 	}

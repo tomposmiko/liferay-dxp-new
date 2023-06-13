@@ -14,54 +14,109 @@
 
 package com.liferay.frontend.js.top.head.extender.internal;
 
-import com.liferay.osgi.felix.util.AbstractExtender;
+import com.liferay.frontend.js.top.head.extender.TopHeadResources;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
 
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.felix.utils.extender.Extension;
-import org.apache.felix.utils.log.Logger;
+import javax.servlet.ServletContext;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * @author Iván Zaera Avellón
  */
 @Component(immediate = true, service = {})
-public class TopHeadExtender extends AbstractExtender {
+public class TopHeadExtender
+	implements ServiceTrackerCustomizer
+		<ServletContext, ServiceRegistration<TopHeadResources>> {
+
+	@Override
+	public ServiceRegistration<TopHeadResources> addingService(
+		ServiceReference<ServletContext> serviceReference) {
+
+		Bundle bundle = serviceReference.getBundle();
+
+		Dictionary<String, String> headers = bundle.getHeaders(
+			StringPool.BLANK);
+
+		Map.Entry<List<String>, List<String>> entry = _scanTopHeadResources(
+			headers);
+
+		if (entry == null) {
+			return null;
+		}
+
+		ServletContext servletContext = _bundleContext.getService(
+			serviceReference);
+
+		return _bundleContext.registerService(
+			TopHeadResources.class,
+			new TopHeadResourcesImpl(
+				servletContext.getContextPath(), entry.getKey(),
+				entry.getValue()),
+			MapUtil.singletonDictionary(
+				"service.ranking",
+				GetterUtil.getInteger(headers.get("Liferay-Top-Head-Weight"))));
+	}
+
+	@Override
+	public void modifiedService(
+		ServiceReference<ServletContext> serviceReference,
+		ServiceRegistration<TopHeadResources> serviceRegistration) {
+	}
+
+	@Override
+	public void removedService(
+		ServiceReference<ServletContext> serviceReference,
+		ServiceRegistration<TopHeadResources> serviceRegistration) {
+
+		serviceRegistration.unregister();
+
+		_bundleContext.ungetService(serviceReference);
+	}
 
 	@Activate
-	protected void activate(BundleContext bundleContext) throws Exception {
-		_logger = new Logger(bundleContext);
+	protected void activate(BundleContext bundleContext)
+		throws InvalidSyntaxException {
 
-		start(bundleContext);
+		_bundleContext = bundleContext;
+		_serviceTracker = new ServiceTracker<>(
+			bundleContext,
+			bundleContext.createFilter(
+				StringBundler.concat(
+					"(&(objectClass=", ServletContext.class.getName(),
+					")(osgi.web.symbolicname=*))")),
+			this);
+
+		_serviceTracker.open();
 	}
 
 	@Deactivate
-	protected void deactivate(BundleContext bundleContext) throws Exception {
-		stop(bundleContext);
+	protected void deactivate() {
+		_serviceTracker.close();
 	}
 
-	@Override
-	protected void debug(Bundle bundle, String s) {
-		_logger.log(
-			Logger.LOG_DEBUG, StringBundler.concat("[", bundle, "] ", s));
-	}
-
-	@Override
-	protected Extension doCreateExtension(Bundle bundle) throws Exception {
-		Dictionary<String, String> headers = bundle.getHeaders(
-			StringPool.BLANK);
+	private static Map.Entry<List<String>, List<String>> _scanTopHeadResources(
+		Dictionary<String, String> headers) {
 
 		String liferayJsResourcesTopHead = headers.get(
 			"Liferay-JS-Resources-Top-Head");
@@ -95,27 +150,12 @@ public class TopHeadExtender extends AbstractExtender {
 				liferayJsResourcesTopHeadAuthenticated.split(StringPool.COMMA));
 		}
 
-		TopHeadResourcesImpl topHeadResourcesImpl = new TopHeadResourcesImpl(
+		return new AbstractMap.SimpleImmutableEntry<>(
 			jsResourcePaths, authenticatedJsResourcePaths);
-
-		int liferayTopHeadWeight = GetterUtil.getInteger(
-			headers.get("Liferay-Top-Head-Weight"));
-
-		return new TopHeadExtension(
-			bundle, topHeadResourcesImpl, liferayTopHeadWeight);
 	}
 
-	@Override
-	protected void error(String s, Throwable t) {
-		_logger.log(Logger.LOG_ERROR, s, t);
-	}
-
-	@Override
-	protected void warn(Bundle bundle, String s, Throwable t) {
-		_logger.log(
-			Logger.LOG_WARNING, StringBundler.concat("[", bundle, "] ", s), t);
-	}
-
-	private Logger _logger;
+	private BundleContext _bundleContext;
+	private ServiceTracker
+		<ServletContext, ServiceRegistration<TopHeadResources>> _serviceTracker;
 
 }

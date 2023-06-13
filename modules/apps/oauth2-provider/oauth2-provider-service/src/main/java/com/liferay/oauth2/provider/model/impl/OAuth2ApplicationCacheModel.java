@@ -14,8 +14,6 @@
 
 package com.liferay.oauth2.provider.model.impl;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.oauth2.provider.model.OAuth2Application;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.string.StringBundler;
@@ -27,6 +25,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import java.util.Date;
+
+import org.osgi.annotation.versioning.ProviderType;
 
 /**
  * The cache model class for representing OAuth2Application in entity cache.
@@ -67,7 +67,7 @@ public class OAuth2ApplicationCacheModel
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(37);
+		StringBundler sb = new StringBundler(41);
 
 		sb.append("{oAuth2ApplicationId=");
 		sb.append(oAuth2ApplicationId);
@@ -85,6 +85,10 @@ public class OAuth2ApplicationCacheModel
 		sb.append(oAuth2ApplicationScopeAliasesId);
 		sb.append(", allowedGrantTypes=");
 		sb.append(allowedGrantTypes);
+		sb.append(", clientCredentialUserId=");
+		sb.append(clientCredentialUserId);
+		sb.append(", clientCredentialUserName=");
+		sb.append(clientCredentialUserName);
 		sb.append(", clientId=");
 		sb.append(clientId);
 		sb.append(", clientProfile=");
@@ -148,6 +152,16 @@ public class OAuth2ApplicationCacheModel
 		}
 		else {
 			oAuth2ApplicationImpl.setAllowedGrantTypes(allowedGrantTypes);
+		}
+
+		oAuth2ApplicationImpl.setClientCredentialUserId(clientCredentialUserId);
+
+		if (clientCredentialUserName == null) {
+			oAuth2ApplicationImpl.setClientCredentialUserName("");
+		}
+		else {
+			oAuth2ApplicationImpl.setClientCredentialUserName(
+				clientCredentialUserName);
 		}
 
 		if (clientId == null) {
@@ -228,6 +242,9 @@ public class OAuth2ApplicationCacheModel
 
 		oAuth2ApplicationScopeAliasesId = objectInput.readLong();
 		allowedGrantTypes = objectInput.readUTF();
+
+		clientCredentialUserId = objectInput.readLong();
+		clientCredentialUserName = objectInput.readUTF();
 		clientId = objectInput.readUTF();
 
 		clientProfile = objectInput.readInt();
@@ -267,6 +284,15 @@ public class OAuth2ApplicationCacheModel
 		}
 		else {
 			objectOutput.writeUTF(allowedGrantTypes);
+		}
+
+		objectOutput.writeLong(clientCredentialUserId);
+
+		if (clientCredentialUserName == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(clientCredentialUserName);
 		}
 
 		if (clientId == null) {
@@ -338,6 +364,8 @@ public class OAuth2ApplicationCacheModel
 	public long modifiedDate;
 	public long oAuth2ApplicationScopeAliasesId;
 	public String allowedGrantTypes;
+	public long clientCredentialUserId;
+	public String clientCredentialUserName;
 	public String clientId;
 	public int clientProfile;
 	public String clientSecret;

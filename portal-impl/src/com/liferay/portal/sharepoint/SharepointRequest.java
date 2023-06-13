@@ -39,10 +39,11 @@ import javax.servlet.http.HttpServletResponse;
 public class SharepointRequest {
 
 	public SharepointRequest(
-			HttpServletRequest request, HttpServletResponse response, User user)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, User user)
 		throws SharepointException {
 
-		this(request, response, user, StringPool.BLANK);
+		this(httpServletRequest, httpServletResponse, user, StringPool.BLANK);
 	}
 
 	public SharepointRequest(String rootPath) throws SharepointException {
@@ -62,11 +63,11 @@ public class SharepointRequest {
 	}
 
 	public HttpServletRequest getHttpServletRequest() {
-		return _request;
+		return _httpServletRequest;
 	}
 
 	public HttpServletResponse getHttpServletResponse() {
-		return _response;
+		return _httpServletResponse;
 	}
 
 	public String getParameterValue(String name) {
@@ -108,14 +109,14 @@ public class SharepointRequest {
 	}
 
 	protected void addParams() throws SharepointException {
-		String contentType = _request.getContentType();
+		String contentType = _httpServletRequest.getContentType();
 
 		if (!contentType.equals(SharepointUtil.VEERMER_URLENCODED)) {
 			return;
 		}
 
 		try {
-			InputStream is = _request.getInputStream();
+			InputStream is = _httpServletRequest.getInputStream();
 
 			UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 				new UnsyncByteArrayOutputStream();
@@ -156,24 +157,24 @@ public class SharepointRequest {
 	}
 
 	private SharepointRequest(
-			HttpServletRequest request, HttpServletResponse response, User user,
-			String rootPath)
+			HttpServletRequest httpServletRequest,
+			HttpServletResponse httpServletResponse, User user, String rootPath)
 		throws SharepointException {
 
-		_request = request;
-		_response = response;
+		_httpServletRequest = httpServletRequest;
+		_httpServletResponse = httpServletResponse;
 		_user = user;
 		_rootPath = rootPath;
 
-		_params.putAll(request.getParameterMap());
+		_params.putAll(httpServletRequest.getParameterMap());
 
 		addParams();
 	}
 
 	private byte[] _bytes;
+	private final HttpServletRequest _httpServletRequest;
+	private final HttpServletResponse _httpServletResponse;
 	private final Map<String, String[]> _params = new HashMap<>();
-	private final HttpServletRequest _request;
-	private final HttpServletResponse _response;
 	private String _rootPath = StringPool.BLANK;
 	private SharepointStorage _storage;
 	private final User _user;

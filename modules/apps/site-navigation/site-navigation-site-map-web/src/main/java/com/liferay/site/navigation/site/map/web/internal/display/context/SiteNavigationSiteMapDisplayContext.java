@@ -44,12 +44,13 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class SiteNavigationSiteMapDisplayContext {
 
-	public SiteNavigationSiteMapDisplayContext(HttpServletRequest request)
+	public SiteNavigationSiteMapDisplayContext(
+			HttpServletRequest httpServletRequest)
 		throws ConfigurationException {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 
-		_themeDisplay = (ThemeDisplay)request.getAttribute(
+		_themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
 		PortletDisplay portletDisplay = _themeDisplay.getPortletDisplay();
@@ -301,8 +302,8 @@ public class SiteNavigationSiteMapDisplayContext {
 	}
 
 	private Long _displayStyleGroupId;
+	private final HttpServletRequest _httpServletRequest;
 	private Boolean _includeRootInTree;
-	private final HttpServletRequest _request;
 	private Layout _rootLayout;
 	private Long _rootLayoutId;
 	private final SiteNavigationSiteMapPortletInstanceConfiguration

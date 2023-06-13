@@ -141,22 +141,6 @@ public class FragmentEntryProcessorEditableTest {
 	}
 
 	@Test
-	public void testFragmentEntryProcessorEditableCSSMediaQuery()
-		throws Exception {
-
-		FragmentEntryLink fragmentEntryLink =
-			_fragmentEntryLinkLocalService.createFragmentEntryLink(0);
-
-		fragmentEntryLink.setCss(_getFileAsString("media_query.css"));
-
-		Assert.assertEquals(
-			_getFileAsString("processed_media_query.css"),
-			_fragmentEntryProcessorRegistry.processFragmentEntryLinkCSS(
-				fragmentEntryLink, FragmentEntryLinkConstants.EDIT,
-				LocaleUtil.getMostRelevantLocale(), new long[0], 0));
-	}
-
-	@Test
 	public void testFragmentEntryProcessorEditableMappedAssetField()
 		throws Exception {
 
@@ -164,12 +148,12 @@ public class FragmentEntryProcessorEditableTest {
 
 		FragmentEntryLink fragmentEntryLink =
 			_fragmentEntryLinkLocalService.addFragmentEntryLink(
-				TestPropsValues.getUserId(), _group.getGroupId(),
+				TestPropsValues.getUserId(), _group.getGroupId(), 0,
 				fragmentEntry.getFragmentEntryId(),
 				_portal.getClassNameId(Layout.class), TestPropsValues.getPlid(),
 				fragmentEntry.getCss(), fragmentEntry.getHtml(),
-				fragmentEntry.getJs(), StringPool.BLANK, 0,
-				ServiceContextTestUtil.getServiceContext());
+				fragmentEntry.getJs(), StringPool.BLANK, StringPool.BLANK, 0,
+				null, ServiceContextTestUtil.getServiceContext());
 
 		AssetEntry assetEntry = AssetTestUtil.addAssetEntry(
 			_group.getGroupId());

@@ -57,7 +57,7 @@
 					var iframe = A.one('#<portlet:namespace />iframe');
 
 					if (iframe) {
-						iframe.attr('src', src);
+						iframe.attr('src', baseSrc + src);
 					}
 				}
 			},

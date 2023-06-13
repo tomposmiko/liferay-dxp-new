@@ -38,7 +38,7 @@ public class LayoutPageTemplateEntryVerticalCard implements VerticalCard {
 
 		_layoutPageTemplateEntry = layoutPageTemplateEntry;
 
-		_request = PortalUtil.getHttpServletRequest(renderRequest);
+		_httpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
 	}
 
 	@Override
@@ -71,9 +71,11 @@ public class LayoutPageTemplateEntryVerticalCard implements VerticalCard {
 		Date createDate = _layoutPageTemplateEntry.getCreateDate();
 
 		String createDateDescription = LanguageUtil.getTimeDescription(
-			_request, System.currentTimeMillis() - createDate.getTime(), true);
+			_httpServletRequest,
+			System.currentTimeMillis() - createDate.getTime(), true);
 
-		return LanguageUtil.format(_request, "x-ago", createDateDescription);
+		return LanguageUtil.format(
+			_httpServletRequest, "x-ago", createDateDescription);
 	}
 
 	@Override
@@ -86,7 +88,7 @@ public class LayoutPageTemplateEntryVerticalCard implements VerticalCard {
 		return false;
 	}
 
+	private final HttpServletRequest _httpServletRequest;
 	private final LayoutPageTemplateEntry _layoutPageTemplateEntry;
-	private final HttpServletRequest _request;
 
 }

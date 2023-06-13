@@ -14,8 +14,6 @@
 
 package com.liferay.frontend.js.loader.modules.extender.internal.config.generator;
 
-import aQute.bnd.osgi.Constants;
-
 import com.liferay.frontend.js.loader.modules.extender.internal.configuration.Details;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -42,6 +40,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import org.osgi.framework.Bundle;
+import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 import org.osgi.framework.wiring.BundleCapability;
 import org.osgi.framework.wiring.BundleWire;
@@ -101,13 +100,13 @@ public class JSConfigGeneratorPackage {
 	}
 
 	/**
-	 * Returns the name of the package, which is defined by the
-	 * {@link Details#OSGI_WEBRESOURCE} property provided by the OSGi bundle and
+	 * Returns the name of the package, which is defined by the {@link
+	 * Details#OSGI_WEBRESOURCE} property provided by the OSGi bundle and
 	 * usually looks like 'osgi-bundle-name'.
 	 *
 	 * Note that the name of the package may be different from the one that its
 	 * modules use. For example, you may have a package named 'my-osgi-bundle'
-	 * that exports modules with id 'my-js-package@2.0.0/path/to/my-module' (it
+	 * that exports modules with ID 'my-js-package@2.0.0/path/to/my-module' (it
 	 * all depends on what is in the MANIFEST.MF and config.json files).
 	 *
 	 * This is because even though the tools used to build legacy JARs had a

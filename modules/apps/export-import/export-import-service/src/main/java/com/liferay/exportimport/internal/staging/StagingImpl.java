@@ -14,8 +14,6 @@
 
 package com.liferay.exportimport.internal.staging;
 
-import aQute.bnd.annotation.ProviderType;
-
 import com.liferay.change.tracking.CTEngineManager;
 import com.liferay.changeset.model.ChangesetCollection;
 import com.liferay.changeset.model.ChangesetEntry;
@@ -186,6 +184,7 @@ import javax.portlet.PortletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.osgi.annotation.versioning.ProviderType;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -596,9 +595,10 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void deleteRecentLayoutRevisionId(
-		HttpServletRequest request, long layoutSetBranchId, long plid) {
+		HttpServletRequest httpServletRequest, long layoutSetBranchId,
+		long plid) {
 
-		long userId = _portal.getUserId(request);
+		long userId = _portal.getUserId(httpServletRequest);
 
 		deleteRecentLayoutRevisionId(userId, layoutSetBranchId, plid);
 	}
@@ -1812,10 +1812,11 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public long getRecentLayoutRevisionId(
-			HttpServletRequest request, long layoutSetBranchId, long plid)
+			HttpServletRequest httpServletRequest, long layoutSetBranchId,
+			long plid)
 		throws PortalException {
 
-		long userId = _portal.getUserId(request);
+		long userId = _portal.getUserId(httpServletRequest);
 
 		return getRecentLayoutRevisionId(userId, layoutSetBranchId, plid);
 	}
@@ -1831,11 +1832,11 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public long getRecentLayoutSetBranchId(
-		HttpServletRequest request, long layoutSetId) {
+		HttpServletRequest httpServletRequest, long layoutSetId) {
 
 		RecentLayoutSetBranch recentLayoutSetBranch =
 			_recentLayoutSetBranchLocalService.fetchRecentLayoutSetBranch(
-				_portal.getUserId(request), layoutSetId);
+				_portal.getUserId(httpServletRequest), layoutSetId);
 
 		if (recentLayoutSetBranch != null) {
 			return recentLayoutSetBranch.getLayoutSetBranchId();
@@ -3129,12 +3130,12 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void setRecentLayoutBranchId(
-			HttpServletRequest request, long layoutSetBranchId, long plid,
-			long layoutBranchId)
+			HttpServletRequest httpServletRequest, long layoutSetBranchId,
+			long plid, long layoutBranchId)
 		throws PortalException {
 
 		setRecentLayoutBranchId(
-			_portal.getUserId(request), layoutSetBranchId, plid,
+			_portal.getUserId(httpServletRequest), layoutSetBranchId, plid,
 			layoutBranchId);
 	}
 
@@ -3149,12 +3150,12 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void setRecentLayoutRevisionId(
-			HttpServletRequest request, long layoutSetBranchId, long plid,
-			long layoutRevisionId)
+			HttpServletRequest httpServletRequest, long layoutSetBranchId,
+			long plid, long layoutRevisionId)
 		throws PortalException {
 
 		setRecentLayoutRevisionId(
-			_portal.getUserId(request), layoutSetBranchId, plid,
+			_portal.getUserId(httpServletRequest), layoutSetBranchId, plid,
 			layoutRevisionId);
 	}
 
@@ -3169,12 +3170,13 @@ public class StagingImpl implements Staging {
 
 	@Override
 	public void setRecentLayoutSetBranchId(
-			HttpServletRequest request, long layoutSetId,
+			HttpServletRequest httpServletRequest, long layoutSetId,
 			long layoutSetBranchId)
 		throws PortalException {
 
 		setRecentLayoutSetBranchId(
-			_portal.getUserId(request), layoutSetId, layoutSetBranchId);
+			_portal.getUserId(httpServletRequest), layoutSetId,
+			layoutSetBranchId);
 	}
 
 	@Override
@@ -3929,19 +3931,6 @@ public class StagingImpl implements Staging {
 		return false;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected long publishLayouts(
-			PortletRequest portletRequest, long sourceGroupId,
-			long targetGroupId, Map<String, String[]> parameterMap,
-			boolean schedule)
-		throws PortalException {
-
-		return 0;
-	}
-
 	protected long publishPortlet(
 			long userId, long scopeGroupId, long plid, String portletId,
 			Map<String, String[]> parameterMap, boolean copyFromLive)
@@ -4030,79 +4019,6 @@ public class StagingImpl implements Staging {
 			sourceLayout.getPlid(), targetLayoutPlid, portletId, parameterMap);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x), with no direct replacement
-	 */
-	@Deprecated
-	protected long publishToRemote(
-			PortletRequest portletRequest, boolean schedule)
-		throws PortalException {
-
-		return 0;
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void setExportImportConfigurationLocalService(
-		ExportImportConfigurationLocalService
-			exportImportConfigurationLocalService) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void setGroupLocalService(GroupLocalService groupLocalService) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void setLayoutBranchLocalService(
-		LayoutBranchLocalService layoutBranchLocalService) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void setLayoutLocalService(
-		LayoutLocalService layoutLocalService) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void setLayoutRevisionLocalService(
-		LayoutRevisionLocalService layoutRevisionLocalService) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void setLayoutService(LayoutService layoutService) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void setLayoutSetBranchLocalService(
-		LayoutSetBranchLocalService layoutSetBranchLocalService) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void setLockManager(LockManager lockManager) {
-	}
-
 	protected void setRecentLayoutBranchId(
 			long userId, long layoutSetBranchId, long plid, long layoutBranchId)
 		throws PortalException {
@@ -4138,14 +4054,6 @@ public class StagingImpl implements Staging {
 		}
 
 		ProxiedLayoutsThreadLocal.clearProxiedLayouts();
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void setRecentLayoutBranchLocalService(
-		RecentLayoutBranchLocalService recentLayoutBranchLocalService) {
 	}
 
 	protected void setRecentLayoutRevisionId(
@@ -4207,14 +4115,6 @@ public class StagingImpl implements Staging {
 			userId, layoutSetBranchId, plid, layoutBranchId);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void setRecentLayoutRevisionLocalService(
-		RecentLayoutRevisionLocalService recentLayoutRevisionLocalService) {
-	}
-
 	protected void setRecentLayoutSetBranchId(
 			long userId, long layoutSetId, long layoutSetBranchId)
 		throws PortalException {
@@ -4251,37 +4151,6 @@ public class StagingImpl implements Staging {
 		}
 
 		ProxiedLayoutsThreadLocal.clearProxiedLayouts();
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void setRecentLayoutSetBranchLocalService(
-		RecentLayoutSetBranchLocalService recentLayoutSetBranchLocalService) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void setStagingLocalService(
-		StagingLocalService stagingLocalService) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void setUserLocalService(UserLocalService userLocalService) {
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void setWorkflowInstanceLinkLocalService(
-		WorkflowInstanceLinkLocalService workflowInstanceLinkLocalService) {
 	}
 
 	private void _setGroupTypeSetting(long groupId, String key, String value) {

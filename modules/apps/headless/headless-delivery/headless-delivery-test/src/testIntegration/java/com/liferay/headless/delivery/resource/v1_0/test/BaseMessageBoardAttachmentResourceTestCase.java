@@ -189,6 +189,8 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 			404,
 			invokeGetMessageBoardAttachmentResponse(
 				messageBoardAttachment.getId()));
+
+		assertResponseCode(404, invokeGetMessageBoardAttachmentResponse(0L));
 	}
 
 	protected MessageBoardAttachment
@@ -1036,7 +1038,9 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected MessageBoardAttachment randomMessageBoardAttachment() {
+	protected MessageBoardAttachment randomMessageBoardAttachment()
+		throws Exception {
+
 		return new MessageBoardAttachment() {
 			{
 				contentUrl = RandomTestUtil.randomString();
@@ -1049,14 +1053,18 @@ public abstract class BaseMessageBoardAttachmentResourceTestCase {
 		};
 	}
 
-	protected MessageBoardAttachment randomIrrelevantMessageBoardAttachment() {
+	protected MessageBoardAttachment randomIrrelevantMessageBoardAttachment()
+		throws Exception {
+
 		MessageBoardAttachment randomIrrelevantMessageBoardAttachment =
 			randomMessageBoardAttachment();
 
 		return randomIrrelevantMessageBoardAttachment;
 	}
 
-	protected MessageBoardAttachment randomPatchMessageBoardAttachment() {
+	protected MessageBoardAttachment randomPatchMessageBoardAttachment()
+		throws Exception {
+
 		return randomMessageBoardAttachment();
 	}
 

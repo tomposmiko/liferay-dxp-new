@@ -66,14 +66,43 @@ renderResponse.setTitle(editSegmentsEntryDisplayContext.getTitle(locale));
 	<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" id="getSegmentsFieldValueName" var="getSegmentsFieldValueNameURL" />
 
 	<aui:script require='<%= npmResolvedPackageName + "/js/index.es as SegmentEdit" %>'>
+		var availableLocales = {};
+
+		<%
+		for (Locale availableLocale : editSegmentsEntryDisplayContext.getAvailableLocales()) {
+			String availableLanguageId = LocaleUtil.toLanguageId(availableLocale);
+		%>
+
+			availableLocales['<%= availableLanguageId %>'] = '<%= availableLocale.getDisplayName(locale) %>';
+
+		<%
+		}
+		%>
+
 		SegmentEdit.default(
 			'<%= segmentEditRootElementId %>',
 			{
+				availableLocales: availableLocales,
 				contributors: <%= editSegmentsEntryDisplayContext.getContributorsJSONArray() %>,
+				defaultLanguageId: '<%= editSegmentsEntryDisplayContext.getDefaultLanguageId() %>',
 				formId: '<portlet:namespace />editSegmentFm',
 				initialMembersCount: <%= editSegmentsEntryDisplayContext.getSegmentsEntryClassPKsCount() %>,
 				initialSegmentActive: <%= (segmentsEntry == null) ? false : segmentsEntry.isActive() %>,
-				initialSegmentName: '<%= (segmentsEntry != null) ? HtmlUtil.escapeJS(segmentsEntry.getName(locale)) : StringPool.BLANK %>',
+
+				<c:choose>
+					<c:when test="<%= segmentsEntry != null %>">
+
+						<%
+						JSONSerializer jsonSerializer = JSONFactoryUtil.createJSONSerializer();
+						%>
+
+						initialSegmentName: <%= JSONFactoryUtil.createJSONObject(jsonSerializer.serializeDeep(segmentsEntry.getNameMap())) %>,
+					</c:when>
+					<c:otherwise>
+						initialSegmentName: null,
+					</c:otherwise>
+				</c:choose>
+
 				locale: '<%= locale %>',
 				portletNamespace: '<portlet:namespace />',
 				previewMembersURL: '<%= previewMembersURL %>',

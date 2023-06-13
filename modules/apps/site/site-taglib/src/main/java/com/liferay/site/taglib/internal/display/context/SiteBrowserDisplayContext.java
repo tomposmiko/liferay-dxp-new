@@ -33,18 +33,19 @@ import javax.servlet.http.HttpServletRequest;
 public class SiteBrowserDisplayContext {
 
 	public SiteBrowserDisplayContext(
-		HttpServletRequest request, RenderRequest renderRequest) {
+		HttpServletRequest httpServletRequest, RenderRequest renderRequest) {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_renderRequest = renderRequest;
 
 		_emptyResultsMessage = GetterUtil.getString(
-			request.getAttribute(
+			httpServletRequest.getAttribute(
 				"liferay-site:site-browser:emptyResultsMessage"));
-		_groups = (List<Group>)request.getAttribute(
+		_groups = (List<Group>)httpServletRequest.getAttribute(
 			"liferay-site:site-browser:groups");
 		_groupsCount = GetterUtil.getInteger(
-			request.getAttribute("liferay-site:site-browser:groupsCount"));
+			httpServletRequest.getAttribute(
+				"liferay-site:site-browser:groupsCount"));
 	}
 
 	public String getDisplayStyle() {
@@ -53,7 +54,8 @@ public class SiteBrowserDisplayContext {
 		}
 
 		_displayStyle = GetterUtil.getString(
-			_request.getAttribute("liferay-site:site-browser:displayStyle"));
+			_httpServletRequest.getAttribute(
+				"liferay-site:site-browser:displayStyle"));
 
 		return _displayStyle;
 	}
@@ -63,7 +65,8 @@ public class SiteBrowserDisplayContext {
 			return _orderByCol;
 		}
 
-		_orderByCol = ParamUtil.getString(_request, "orderByCol", "name");
+		_orderByCol = ParamUtil.getString(
+			_httpServletRequest, "orderByCol", "name");
 
 		return _orderByCol;
 	}
@@ -73,7 +76,8 @@ public class SiteBrowserDisplayContext {
 			return _orderByType;
 		}
 
-		_orderByType = ParamUtil.getString(_request, "orderByType", "asc");
+		_orderByType = ParamUtil.getString(
+			_httpServletRequest, "orderByType", "asc");
 
 		return _orderByType;
 	}
@@ -83,7 +87,7 @@ public class SiteBrowserDisplayContext {
 			return _portletURL;
 		}
 
-		_portletURL = (PortletURL)_request.getAttribute(
+		_portletURL = (PortletURL)_httpServletRequest.getAttribute(
 			"liferay-site:site-browser:portletURL");
 
 		return _portletURL;
@@ -111,11 +115,11 @@ public class SiteBrowserDisplayContext {
 	private final String _emptyResultsMessage;
 	private final List<Group> _groups;
 	private final int _groupsCount;
+	private final HttpServletRequest _httpServletRequest;
 	private String _orderByCol;
 	private String _orderByType;
 	private PortletURL _portletURL;
 	private final RenderRequest _renderRequest;
-	private final HttpServletRequest _request;
 	private SearchContainer _searchContainer;
 
 }

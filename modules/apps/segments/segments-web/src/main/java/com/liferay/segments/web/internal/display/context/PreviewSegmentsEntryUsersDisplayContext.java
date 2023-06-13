@@ -49,14 +49,14 @@ import javax.servlet.http.HttpServletRequest;
 public class PreviewSegmentsEntryUsersDisplayContext {
 
 	public PreviewSegmentsEntryUsersDisplayContext(
-		HttpServletRequest request, RenderRequest renderRequest,
+		HttpServletRequest httpServletRequest, RenderRequest renderRequest,
 		RenderResponse renderResponse,
 		SegmentsEntryProvider segmentsEntryProvider,
 		SegmentsEntryService segmentsEntryService,
 		ODataRetriever<User> userODataRetriever,
 		UserLocalService userLocalService) {
 
-		_request = request;
+		_httpServletRequest = httpServletRequest;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
 		_segmentsEntryProvider = segmentsEntryProvider;
@@ -64,7 +64,7 @@ public class PreviewSegmentsEntryUsersDisplayContext {
 		_userODataRetriever = userODataRetriever;
 		_userLocalService = userLocalService;
 
-		_themeDisplay = (ThemeDisplay)_request.getAttribute(
+		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -171,7 +171,8 @@ public class PreviewSegmentsEntryUsersDisplayContext {
 			return _segmentsEntry;
 		}
 
-		long segmentsEntryId = ParamUtil.getLong(_request, "segmentsEntryId");
+		long segmentsEntryId = ParamUtil.getLong(
+			_httpServletRequest, "segmentsEntryId");
 
 		if (segmentsEntryId > 0) {
 			try {
@@ -192,9 +193,9 @@ public class PreviewSegmentsEntryUsersDisplayContext {
 	private static final Log _log = LogFactoryUtil.getLog(
 		PreviewSegmentsEntryUsersDisplayContext.class);
 
+	private final HttpServletRequest _httpServletRequest;
 	private final RenderRequest _renderRequest;
 	private final RenderResponse _renderResponse;
-	private final HttpServletRequest _request;
 	private SegmentsEntry _segmentsEntry;
 	private final SegmentsEntryProvider _segmentsEntryProvider;
 	private final SegmentsEntryService _segmentsEntryService;

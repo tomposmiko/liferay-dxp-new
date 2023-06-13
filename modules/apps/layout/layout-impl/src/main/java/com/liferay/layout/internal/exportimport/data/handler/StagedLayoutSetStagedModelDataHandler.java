@@ -60,6 +60,7 @@ import com.liferay.portal.kernel.util.ThemeFactoryUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.service.impl.LayoutLocalServiceHelper;
 import com.liferay.sites.kernel.util.Sites;
 import com.liferay.sites.kernel.util.SitesUtil;
 
@@ -138,7 +139,11 @@ public class StagedLayoutSetStagedModelDataHandler
 				layout.getSourcePrototypeLayoutUuid(),
 				layoutSetPrototype.getGroupId(), true);
 
-			if (sourcePrototypeLayout == null) {
+			if ((sourcePrototypeLayout == null) &&
+				_layoutLocalService.hasLayout(
+					layout.getUuid(), layout.getGroupId(),
+					layout.isPrivateLayout())) {
+
 				_layoutLocalService.deleteLayout(
 					layout, false,
 					ServiceContextThreadLocal.getServiceContext());
@@ -747,6 +752,11 @@ public class StagedLayoutSetStagedModelDataHandler
 				int layoutPriority = GetterUtil.getInteger(
 					layoutElement.attributeValue("layout-priority"));
 
+				layoutPriority = _layoutLocalServiceHelper.getNextPriority(
+					layout.getGroupId(), layout.isPrivateLayout(),
+					layout.getParentLayoutId(),
+					layout.getSourcePrototypeLayoutUuid(), layoutPriority);
+
 				layoutPriorities.put(layout.getPlid(), layoutPriority);
 			}
 		}
@@ -873,6 +883,9 @@ public class StagedLayoutSetStagedModelDataHandler
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
+
+	@Reference
+	private LayoutLocalServiceHelper _layoutLocalServiceHelper;
 
 	@Reference
 	private LayoutSetBranchLocalService _layoutSetBranchLocalService;

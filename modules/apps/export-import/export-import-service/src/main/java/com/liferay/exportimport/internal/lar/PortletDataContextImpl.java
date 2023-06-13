@@ -14,9 +14,6 @@
 
 package com.liferay.exportimport.internal.lar;
 
-import aQute.bnd.annotation.ProviderType;
-
-import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetLink;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetLinkLocalServiceUtil;
@@ -141,6 +138,8 @@ import java.util.Set;
 
 import jodd.bean.BeanUtil;
 
+import org.osgi.annotation.versioning.ProviderType;
+
 /**
  * <p>
  * Holds context information that is used during exporting and importing portlet
@@ -189,14 +188,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		_assetCategoryIdsMap.put(
 			getPrimaryKeyString(className, (Serializable)classPK),
 			assetCategoryIds);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	public void addAssetLinks(Class<?> clazz, long classPK) {
-		addAssetLinks(clazz, (Serializable)classPK);
 	}
 
 	/**
@@ -2133,54 +2124,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return _xStream.toXML(object);
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void addAssetLinks(Class<?> clazz, Serializable classPK) {
-		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
-			clazz.getName(), GetterUtil.getLong(classPK));
-
-		if (assetEntry == null) {
-			return;
-		}
-
-		List<AssetLink> assetLinks = AssetLinkLocalServiceUtil.getLinks(
-			assetEntry.getEntryId());
-
-		for (AssetLink assetLink : assetLinks) {
-			_assetLinkIds.add(assetLink.getLinkId());
-		}
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void addAssetPriority(
-		Element element, Class<?> clazz, long classPK) {
-
-		addAssetPriority(element, clazz, (Serializable)classPK);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected void addAssetPriority(
-		Element element, Class<?> clazz, Serializable classPK) {
-
-		AssetEntry assetEntry = AssetEntryLocalServiceUtil.fetchEntry(
-			clazz.getName(), GetterUtil.getLong(classPK));
-
-		if (assetEntry == null) {
-			return;
-		}
-
-		element.addAttribute(
-			"asset-priority", String.valueOf(assetEntry.getPriority()));
-	}
-
 	protected void addExpando(
 		Element element, String path, ClassedModel classedModel,
 		Class<?> clazz) {
@@ -2576,34 +2519,10 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return groupElement;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected String getPrimaryKeyString(Class<?> clazz, long primaryKey) {
-		return getPrimaryKeyString(clazz, (Serializable)primaryKey);
-	}
-
 	protected String getPrimaryKeyString(
 		Class<?> clazz, Serializable primaryKey) {
 
 		return getPrimaryKeyString(clazz.getName(), primaryKey);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected String getPrimaryKeyString(Class<?> clazz, String primaryKey) {
-		return getPrimaryKeyString(clazz, (Serializable)primaryKey);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected String getPrimaryKeyString(String className, long primaryKey) {
-		return getPrimaryKeyString(className, (Serializable)primaryKey);
 	}
 
 	protected String getPrimaryKeyString(
@@ -2614,14 +2533,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		).concat(
 			String.valueOf(primaryKey)
 		);
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected String getPrimaryKeyString(String className, String primaryKey) {
-		return getPrimaryKeyString(className, (Serializable)primaryKey);
 	}
 
 	protected List<Element> getReferenceDataElements(
@@ -2673,19 +2584,6 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return referenceDataElements;
 	}
 
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected List<Element> getReferenceElements(
-		Element parentElement, String className, long groupId, String uuid,
-		long classPK, String referenceType) {
-
-		return getReferenceElements(
-			parentElement, className, groupId, uuid, (Serializable)classPK,
-			referenceType);
-	}
-
 	protected List<Element> getReferenceElements(
 		Element parentElement, String className, long groupId, String uuid,
 		Serializable classPK, String referenceType) {
@@ -2733,19 +2631,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 		List<Node> nodes = xPath.selectNodes(referencesElement);
 
-		return ListUtil.fromArray(nodes.toArray(new Element[nodes.size()]));
-	}
-
-	/**
-	 * @deprecated As of Judson (7.1.x)
-	 */
-	@Deprecated
-	protected List<Element> getReferenceElements(
-		StagedModel parentStagedModel, String className, long classPK,
-		String referenceType) {
-
-		return getReferenceElements(
-			parentStagedModel, className, (Serializable)classPK, referenceType);
+		return ListUtil.fromArray(nodes.toArray(new Element[0]));
 	}
 
 	protected List<Element> getReferenceElements(

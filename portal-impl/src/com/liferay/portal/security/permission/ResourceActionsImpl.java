@@ -137,13 +137,15 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	@Override
-	public String getAction(HttpServletRequest request, String action) {
+	public String getAction(
+		HttpServletRequest httpServletRequest, String action) {
+
 		String key = getActionNamePrefix() + action;
 
-		String value = LanguageUtil.get(request, key, null);
+		String value = LanguageUtil.get(httpServletRequest, key, null);
 
 		if ((value == null) || value.equals(key)) {
-			value = _getResourceBundlesString(request, key);
+			value = _getResourceBundlesString(httpServletRequest, key);
 		}
 
 		if (value == null) {
@@ -214,13 +216,15 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	@Override
-	public String getModelResource(HttpServletRequest request, String name) {
+	public String getModelResource(
+		HttpServletRequest httpServletRequest, String name) {
+
 		String key = getModelResourceNamePrefix() + name;
 
-		String value = LanguageUtil.get(request, key, null);
+		String value = LanguageUtil.get(httpServletRequest, key, null);
 
 		if ((value == null) || value.equals(key)) {
-			value = _getResourceBundlesString(request, key);
+			value = _getResourceBundlesString(httpServletRequest, key);
 		}
 
 		if (value == null) {
@@ -309,14 +313,12 @@ public class ResourceActionsImpl implements ResourceActions {
 
 	@Override
 	public String[] getOrganizationModelResources() {
-		return _organizationModelResources.toArray(
-			new String[_organizationModelResources.size()]);
+		return _organizationModelResources.toArray(new String[0]);
 	}
 
 	@Override
 	public String[] getPortalModelResources() {
-		return _portalModelResources.toArray(
-			new String[_portalModelResources.size()]);
+		return _portalModelResources.toArray(new String[0]);
 	}
 
 	@Override
@@ -529,8 +531,7 @@ public class ResourceActionsImpl implements ResourceActions {
 
 	@Override
 	public String[] getRootModelResources() {
-		return _rootModelResources.toArray(
-			new String[_rootModelResources.size()]);
+		return _rootModelResources.toArray(new String[0]);
 	}
 
 	@Override
@@ -910,18 +911,18 @@ public class ResourceActionsImpl implements ResourceActions {
 	}
 
 	private String _getResourceBundlesString(
-		HttpServletRequest request, String key) {
+		HttpServletRequest httpServletRequest, String key) {
 
 		Locale locale = null;
 
-		HttpSession session = request.getSession(false);
+		HttpSession session = httpServletRequest.getSession(false);
 
 		if (session != null) {
 			locale = (Locale)session.getAttribute(WebKeys.LOCALE);
 		}
 
 		if (locale == null) {
-			locale = request.getLocale();
+			locale = httpServletRequest.getLocale();
 		}
 
 		return _getResourceBundlesString(locale, key);

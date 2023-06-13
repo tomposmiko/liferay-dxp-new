@@ -80,7 +80,9 @@ public class HeaderResponseImpl
 			throw new IllegalArgumentException();
 		}
 
-		if ("PortletHub".equals(name) && "javax.portlet".equals(scope)) {
+		if (Objects.equals(name, "PortletHub") &&
+			Objects.equals(scope, "javax.portlet")) {
+
 			return;
 		}
 
@@ -194,10 +196,11 @@ public class HeaderResponseImpl
 	}
 
 	public void init(
-		PortletRequestImpl portletRequestImpl, HttpServletResponse response,
+		PortletRequestImpl portletRequestImpl,
+		HttpServletResponse httpServletResponse,
 		List<PortletDependency> portletDependencies) {
 
-		super.init(portletRequestImpl, response);
+		super.init(portletRequestImpl, httpServletResponse);
 
 		if (portletDependencies != null) {
 			for (PortletDependency portletDependency : portletDependencies) {

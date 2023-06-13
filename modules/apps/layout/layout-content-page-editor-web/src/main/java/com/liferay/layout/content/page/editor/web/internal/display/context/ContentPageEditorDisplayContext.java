@@ -40,6 +40,7 @@ import com.liferay.item.selector.criteria.DownloadURLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.URLItemSelectorReturnType;
 import com.liferay.item.selector.criteria.image.criterion.ImageItemSelectorCriterion;
 import com.liferay.item.selector.criteria.url.criterion.URLItemSelectorCriterion;
+import com.liferay.layout.admin.constants.LayoutAdminPortletKeys;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorWebKeys;
 import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
@@ -108,6 +109,7 @@ import java.util.stream.Stream;
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletConfig;
 import javax.portlet.PortletMode;
+import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceURL;
@@ -127,29 +129,30 @@ import org.jsoup.select.Elements;
 public class ContentPageEditorDisplayContext {
 
 	public ContentPageEditorDisplayContext(
-		HttpServletRequest request, RenderResponse renderResponse,
+		HttpServletRequest httpServletRequest, RenderResponse renderResponse,
 		String className, long classPK,
 		FragmentRendererController fragmentRendererController) {
 
-		this.request = request;
+		request = httpServletRequest;
 		_renderResponse = renderResponse;
 		this.classPK = classPK;
 
 		classNameId = PortalUtil.getClassNameId(className);
 		infoDisplayContributorTracker =
-			(InfoDisplayContributorTracker)request.getAttribute(
+			(InfoDisplayContributorTracker)httpServletRequest.getAttribute(
 				InfoDisplayWebKeys.INFO_DISPLAY_CONTRIBUTOR_TRACKER);
-		themeDisplay = (ThemeDisplay)request.getAttribute(
+		themeDisplay = (ThemeDisplay)httpServletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 		_fragmentRendererController = fragmentRendererController;
 		_fragmentCollectionContributorTracker =
-			(FragmentCollectionContributorTracker)request.getAttribute(
-				ContentPageEditorWebKeys.
-					FRAGMENT_COLLECTION_CONTRIBUTOR_TRACKER);
+			(FragmentCollectionContributorTracker)
+				httpServletRequest.getAttribute(
+					ContentPageEditorWebKeys.
+						FRAGMENT_COLLECTION_CONTRIBUTOR_TRACKER);
 		_fragmentRendererTracker =
-			(FragmentRendererTracker)request.getAttribute(
+			(FragmentRendererTracker)httpServletRequest.getAttribute(
 				FragmentActionKeys.FRAGMENT_RENDERER_TRACKER);
-		_itemSelector = (ItemSelector)request.getAttribute(
+		_itemSelector = (ItemSelector)httpServletRequest.getAttribute(
 			ContentPageEditorWebKeys.ITEM_SELECTOR);
 	}
 
@@ -188,6 +191,8 @@ public class ContentPageEditorDisplayContext {
 				"discardDraftURL",
 				getFragmentEntryActionURL(
 					"/content_layout/discard_draft_layout")
+			).put(
+				"lookAndFeelURL", _getLookAndFeelURL()
 			);
 		}
 
@@ -916,6 +921,29 @@ public class ContentPageEditorDisplayContext {
 			SegmentsConstants.SEGMENTS_EXPERIENCE_ID_DEFAULT);
 
 		return _layoutData;
+	}
+
+	private String _getLookAndFeelURL() {
+		PortletURL lookAndFeelURL = PortalUtil.getControlPanelPortletURL(
+			request, LayoutAdminPortletKeys.GROUP_PAGES,
+			PortletRequest.RENDER_PHASE);
+
+		lookAndFeelURL.setParameter(
+			"mvcRenderCommandName", "/layout/edit_layout");
+
+		lookAndFeelURL.setParameter("redirect", themeDisplay.getURLCurrent());
+		lookAndFeelURL.setParameter("backURL", themeDisplay.getURLCurrent());
+
+		Layout layout = themeDisplay.getLayout();
+
+		lookAndFeelURL.setParameter(
+			"groupId", String.valueOf(layout.getGroupId()));
+		lookAndFeelURL.setParameter(
+			"selPlid", String.valueOf(layout.getPlid()));
+		lookAndFeelURL.setParameter(
+			"privateLayout", String.valueOf(layout.isPrivateLayout()));
+
+		return lookAndFeelURL.toString();
 	}
 
 	private Set<SoyContext> _getMappedAssetEntriesSoyContexts()

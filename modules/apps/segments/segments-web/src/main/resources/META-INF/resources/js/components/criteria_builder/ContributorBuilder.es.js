@@ -252,10 +252,14 @@ class ContributorBuilder extends React.Component {
 				);
 
 				return {
-					contributors
+					contributors,
+					membersCountLoading: true
 				};
 			},
-			onQueryChange
+			() => {
+				onQueryChange();
+				this._debouncedFetchMembersCount();
+			}
 		);
 	}
 

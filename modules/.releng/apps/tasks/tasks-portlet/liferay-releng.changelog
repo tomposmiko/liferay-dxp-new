@@ -7,3 +7,18 @@
 # Bundle Version 7.2.0.2
 #
 356a6da16c0a606e6aa8a2be0de1cd4354ae97db^..057dd4bb78084a8cdeaef695421d8d9f16d6417d=LPS-88218
+
+#
+# Bundle Version 7.2.0.3
+#
+057dd4bb78084a8cdeaef695421d8d9f16d6417d^..0a46d215031aee5612f6c426d42425adc28b2830=LPS-84119
+
+#
+# Bundle Version 7.2.0.4
+#
+0a46d215031aee5612f6c426d42425adc28b2830^..358dd22d2fd0444be5e3dfd0c9e2c83e995ed21f=LPS-84119
+
+#
+# Bundle Version 7.2.0.5
+#
+358dd22d2fd0444be5e3dfd0c9e2c83e995ed21f^..c1e4e4a07e27c189c7e2e8aca7d6f33aa35bf7d0=LPS-95413

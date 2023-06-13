@@ -69,14 +69,14 @@ public class GetMethodImpl implements Method {
 				is = flashMagicBytesUtilResult.getInputStream();
 
 				try {
-					HttpServletRequest request =
+					HttpServletRequest httpServletRequest =
 						webDAVRequest.getHttpServletRequest();
-					HttpServletResponse response =
+					HttpServletResponse httpServletResponse =
 						webDAVRequest.getHttpServletResponse();
 
 					ServletResponseUtil.sendFileWithRangeHeader(
-						request, response, fileName, is, resource.getSize(),
-						resource.getContentType());
+						httpServletRequest, httpServletResponse, fileName, is,
+						resource.getSize(), resource.getContentType());
 				}
 				catch (Exception e) {
 					if (_log.isWarnEnabled()) {

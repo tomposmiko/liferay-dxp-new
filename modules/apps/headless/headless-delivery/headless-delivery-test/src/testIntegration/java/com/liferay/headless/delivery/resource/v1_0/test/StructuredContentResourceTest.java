@@ -124,7 +124,9 @@ public class StructuredContentResourceTest
 	}
 
 	@Override
-	protected StructuredContent randomIrrelevantStructuredContent() {
+	protected StructuredContent randomIrrelevantStructuredContent()
+		throws Exception {
+
 		StructuredContent structuredContent = randomStructuredContent();
 
 		structuredContent.setContentStructureId(
@@ -134,7 +136,7 @@ public class StructuredContentResourceTest
 	}
 
 	@Override
-	protected StructuredContent randomStructuredContent() {
+	protected StructuredContent randomStructuredContent() throws Exception {
 		StructuredContent structuredContent = super.randomStructuredContent();
 
 		structuredContent.setContentStructureId(_ddmStructure.getStructureId());

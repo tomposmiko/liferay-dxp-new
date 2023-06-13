@@ -797,7 +797,7 @@ public abstract class BaseSegmentResourceTestCase {
 			"Invalid entity field " + entityFieldName);
 	}
 
-	protected Segment randomSegment() {
+	protected Segment randomSegment() throws Exception {
 		return new Segment() {
 			{
 				active = RandomTestUtil.randomBoolean();
@@ -812,7 +812,7 @@ public abstract class BaseSegmentResourceTestCase {
 		};
 	}
 
-	protected Segment randomIrrelevantSegment() {
+	protected Segment randomIrrelevantSegment() throws Exception {
 		Segment randomIrrelevantSegment = randomSegment();
 
 		randomIrrelevantSegment.setSiteId(irrelevantGroup.getGroupId());
@@ -820,7 +820,7 @@ public abstract class BaseSegmentResourceTestCase {
 		return randomIrrelevantSegment;
 	}
 
-	protected Segment randomPatchSegment() {
+	protected Segment randomPatchSegment() throws Exception {
 		return randomSegment();
 	}
 
